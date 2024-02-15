@@ -147,7 +147,7 @@ module IL
     end
   end
 
-  class ConditionalJump
+  class JumpNotZero < Statement
     extend T::Sig
 
     attr_reader :cond
@@ -160,7 +160,7 @@ module IL
     end
 
     def to_s
-      "jeq #{@cond} #{@target}"
+      "jnz #{@cond} #{@target}"
     end
   end
 

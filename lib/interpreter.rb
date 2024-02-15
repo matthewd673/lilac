@@ -118,6 +118,41 @@ class IL::Assignment
   end
 end
 
+class IL::Label
+  def interpret(context)
+    # empty
+  end
+end
+
+class IL::Jump
+  def interpret(context)
+    # check for invalid target
+    if not context.label_indices.include?(@target)
+      raise("Invalid jump target '#{@target}'")
+    end
+
+    # move instruction pointer there
+    context.ip = context.label_indices[@target]
+  end
+end
+
+class IL::JumpNotZero
+  def interpret(context)
+    # evaluate conditional
+    cond_eval = @cond.evaluate(context)
+
+    # check for invalid target
+    if not context.label_indices.include?(@target)
+      raise("Invalid jump target '#{@target}'")
+    end
+
+    # move instruction pointer there if not zero
+    if cond_eval.value != 0
+      context.ip = context.label_indices[@target]
+    end
+  end
+end
+
 module Interpreter
   include Kernel
   extend T::Sig
@@ -153,11 +188,15 @@ module Interpreter
   class Context
     extend T::Sig
 
-    attr_accessor :symbols
+    attr_accessor :ip
+    attr_reader :symbols
+    attr_reader :label_indices
 
     sig { void }
     def initialize
+      @ip = 0
       @symbols = Hash.new
+      @label_indices = Hash.new
     end
   end
 
@@ -165,11 +204,30 @@ module Interpreter
   def self.interpret(program)
     context = Context.new
 
-    # interpret each statement in the program
+    # collect all stmts in the program
+    stmts = []
     program.each_stmt { |s|
       puts(s.to_s)
-      s.interpret(context)
+      stmts.push(s)
     }
+
+    # register labels
+    stmts.each { |s, i|
+      if s.is_a?(IL::Label)
+        # check for duplicate labels
+        if context.label_indices.include?(s.name)
+          raise("Multiple definitions of label #{s.name}")
+        end
+        context.label_indices[s.name] = i
+      end
+    }
+
+    # interpret
+    while context.ip < stmts.length
+      s = stmts[context.ip]
+      s.interpret(context)
+      context.ip += 1
+    end
 
     # TODO: temp sanity check
     puts("Symbol table state:")
