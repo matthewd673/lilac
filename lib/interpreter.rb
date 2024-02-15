@@ -3,7 +3,7 @@ require "sorbet-runtime"
 require_relative "il"
 
 class IL::Value
-  sig { params(context: Interpreter::Context).returns(T.untyped) }
+  sig { params(context: Interpreter::Context).returns(Interpreter::Value) }
   def evaluate(context)
     if self.class == IL::Value
       raise("#{self.class} is a stub and should not be constructed")
@@ -15,7 +15,7 @@ end
 
 class IL::Constant
   def evaluate(context)
-    return @value
+    return Interpreter::Value.new(@type, @value)
   end
 end
 
@@ -25,12 +25,13 @@ class IL::ID
       raise("Undefined ID #{@name}")
     end
 
-    return context.symbols[@name].value
+    info = context.symbols[@name]
+    return Interpreter::Value.new(info.type, info.value)
   end
 end
 
 class IL::Expression
-  sig { params(context: Interpreter::Context).returns(T.untyped) }
+  sig { params(context: Interpreter::Context).returns(Interpreter::Value) }
   def evaluate(context)
     if self.class == IL::Expression
       raise("#{self.class} is a stub and should not be constructed")
@@ -42,21 +43,28 @@ end
 
 class IL::BinaryOp
   def evaluate(context)
-    lval = @left.evaluate(context)
-    rval = @right.evaluate(context)
+    left = @left.evaluate(context)
+    right = @right.evaluate(context)
 
-    case @op
+    if not left.type.eql?(right.type)
+      raise("Mismatched types '#{left.type}' and '#{right.type}'")
+    end
+
+    result = case @op
     when IL::BinaryOp::ADD_OP
-      return lval + rval
+      left.value + right.value
     when IL::BinaryOp::SUB_OP
-      return lval - rval
+      left.value - right.value
     when IL::BinaryOp::MUL_OP
-      return lval * rval
+      left.value * right.value
     when IL::BinaryOp::DIV_OP
-      return lval / rval
+      left.value / right.value
     else
       raise("Invalid binary operator '#{@op}'")
     end
+
+    # since both operands must have same type we can return either as our type
+    return Interpreter::Value.new(left.type, result)
   end
 end
 
@@ -79,9 +87,15 @@ class IL::Declaration
     end
     # insert id in symbol table with appropriate type
     rhs_eval = @rhs.evaluate(context)
+
+    # catch type mismatch
+    if not rhs_eval.type.eql?(@type)
+      raise("Cannot declare ID of type #{@type} with value of type #{rhs_eval.type}")
+    end
+
     context.symbols[@id.name] = Interpreter::SymbolInfo.new(@id.name,
                                                             @type,
-                                                            rhs_eval)
+                                                            rhs_eval.value)
   end
 end
 
@@ -91,15 +105,35 @@ class IL::Assignment
     if not context.symbols.include?(@id.name)
       raise("Assigning to undefined ID '#{@id.name}'")
     end
+
     # update value in symbol table
     rhs_eval = @rhs.evaluate(context)
-    context.symbols[@id.name].value = rhs_eval
+
+    # catch type mismatch
+    if not rhs_eval.type.eql?(context.symbols[@id.name].type)
+      raise("Cannot assign value of type #{rhs_eval.type} into #{@id.name} (type #{context.symbols[@id.name].type})")
+    end
+
+    context.symbols[@id.name].value = rhs_eval.value
   end
 end
 
 module Interpreter
   include Kernel
   extend T::Sig
+
+  class Value
+    extend T::Sig
+
+    attr_reader :type
+    attr_reader :value
+
+    sig { params(type: String, value: T.untyped).void }
+    def initialize(type, value)
+      @type = type
+      @value = value
+    end
+  end
 
   class SymbolInfo
     extend T::Sig
