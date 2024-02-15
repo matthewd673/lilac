@@ -86,7 +86,15 @@ class IL::Declaration
 end
 
 class IL::Assignment
-  # TODO
+  def interpret(context)
+    # make sure variable has been declared
+    if not context.symbols.include?(@id.name)
+      raise("Assigning to undefined ID '#{@id.name}'")
+    end
+    # update value in symbol table
+    rhs_eval = @rhs.evaluate(context)
+    context.symbols[@id.name].value = rhs_eval
+  end
 end
 
 module Interpreter

@@ -16,7 +16,18 @@ if $PROGRAM_NAME == __FILE__
   program.push_stmt(Declaration.new(Type::I32,
                                     ID.new("b"),
                                     Constant.new(Type::I32,
-                                                 23)))
+                                                 10)))
+
+  program.push_stmt(Declaration.new(Type::I32,
+                                    ID.new("c"),
+                                    BinaryOp.new(BinaryOp::MUL_OP,
+                                                 ID.new("a"),
+                                                 ID.new("b"))))
+
+  program.push_stmt(Assignment.new(ID.new("c"),
+                                   BinaryOp.new(BinaryOp::SUB_OP,
+                                                ID.new("c"),
+                                                ID.new("b"))))
 
   Interpreter.interpret(program)
 end
