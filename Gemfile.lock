@@ -1,0 +1,21 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rake (13.1.0)
+    sorbet (0.5.11255)
+      sorbet-static (= 0.5.11255)
+    sorbet-runtime (0.5.11255)
+    sorbet-static (0.5.11255-universal-darwin)
+    sorbet-static (0.5.11255-x86_64-linux)
+
+PLATFORMS
+  universal-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  rake
+  sorbet
+  sorbet-runtime
+
+BUNDLED WITH
+   2.5.3
