@@ -5,7 +5,7 @@ if $PROGRAM_NAME == __FILE__
   puts("lilac")
 
 
-  program = Program.new()
+  program = Program.new
   program.push_stmt(Declaration.new(Type::I32,
                                     ID.new("my_var"),
                                     BinaryOp.new(BinaryOp::ADD_OP,

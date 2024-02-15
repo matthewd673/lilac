@@ -113,6 +113,53 @@ class Assignment < Statement
   end
 end
 
+class Label < Statement
+  extend T::Sig
+
+  attr_reader :name
+
+  sig { params(name: String).void }
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    "#{@name}:"
+  end
+end
+
+class Jump < Statement
+  extend T::Sig
+
+  attr_reader :target
+
+  sig { params(target: String).void }
+  def initialize(target)
+    @target = target
+  end
+
+  def to_s
+    "jmp #{@target}"
+  end
+end
+
+class ConditionalJump
+  extend T::Sig
+
+  attr_reader :cond
+  attr_reader :target
+
+  sig { params(cond: Value, target: String).void }
+  def initialize(cond, target)
+    @cond = cond
+    @target = target
+  end
+
+  def to_s
+    "jeq #{@cond} #{@target}"
+  end
+end
+
 class Program
   extend T::Sig
 
