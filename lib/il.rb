@@ -173,7 +173,7 @@ class Program
     @stmt_list.push(stmt)
   end
 
-  def each
+  def each_stmt
     for stmt in @stmt_list
       yield(stmt)
     end

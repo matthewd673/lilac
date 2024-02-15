@@ -1,5 +1,6 @@
 # typed: true
 require_relative "il"
+require_relative "interpreter"
 
 if $PROGRAM_NAME == __FILE__
   puts("lilac")
@@ -15,7 +16,5 @@ if $PROGRAM_NAME == __FILE__
                                    Constant.new(Type::I32,
                                                 23)))
 
-  program.each { |s|
-    puts(s)
-  }
+  Interpreter.interpret(program)
 end
