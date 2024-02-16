@@ -254,11 +254,17 @@ module Interpreter
     }
 
     # interpret
+    stmt_ct = 0
     while context.ip < stmts.length
       s = stmts[context.ip]
       s.interpret(context)
       context.ip += 1
+      stmt_ct += 1
     end
+
+    puts("---")
+    puts("Interpretation complete")
+    puts("Statements executed: #{stmt_ct}")
 
     # TODO: temp sanity check
     puts("Symbol table state:")
