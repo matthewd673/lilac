@@ -97,6 +97,7 @@ module IL
     extend T::Sig
 
     NEG_OP = "-"
+    POS_OP = "+"
 
     attr_reader :op
     attr_reader :value
