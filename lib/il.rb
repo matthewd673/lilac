@@ -56,6 +56,13 @@ module IL
     SUB_OP = "-"
     MUL_OP = "*"
     DIV_OP = "/"
+    EQ_OP  = "="
+    LT_OP  = "<"
+    GT_OP  = ">"
+    LEQ_OP = "<="
+    GEQ_OP = ">="
+    OR_OP  = "||"
+    AND_OP = "&&"
 
     attr_reader :op
     attr_reader :left

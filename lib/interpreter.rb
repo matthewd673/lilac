@@ -59,6 +59,20 @@ class IL::BinaryOp
       left.value * right.value
     when IL::BinaryOp::DIV_OP
       left.value / right.value
+    when IL::BinaryOp::EQ_OP
+      if left.value == right.value then 1 else 0 end
+    when IL::BinaryOp::LT_OP
+      if left.value < right.value then 1 else 0 end
+    when IL::BinaryOp::GT_OP
+      if left.value > right.value then 1 else 0 end
+    when IL::BinaryOp::LEQ_OP
+      if left.value <= right.value then 1 else 0 end
+    when IL::BinaryOp::GEQ_OP
+      if left.value >= right.value then 1 else 0 end
+    when IL::BinaryOp::OR_OP
+      if left.value != 0 || right.value != 0 then 1 else 0 end
+    when IL::BinaryOp::AND_OP
+      if left.value != 0 && right.value != 0 then 1 else 0 end
     else
       raise("Invalid binary operator '#{@op}'")
     end
