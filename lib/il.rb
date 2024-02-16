@@ -33,7 +33,7 @@ module IL
 
     attr_reader :name
 
-    sig {params(name: String).void}
+    sig { params(name: String).void }
     def initialize(name)
       @name = name
     end
@@ -41,6 +41,18 @@ module IL
     sig { returns(String) }
     def to_s
       "#{@name}"
+    end
+  end
+
+  class Register < ID
+    extend T::Sig
+
+    attr_reader :number
+
+    sig { params(number: Integer).void }
+    def initialize(number)
+      @number = number
+      @name = "%#{number}"
     end
   end
 
@@ -188,6 +200,15 @@ module IL
       for stmt in @stmt_list
         yield(stmt)
       end
+    end
+
+    sig { returns(String) }
+    def to_s
+      str = ""
+      each_stmt { |s|
+        str += s.to_s + "\n"
+      }
+      return str
     end
   end
 end
