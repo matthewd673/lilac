@@ -93,6 +93,26 @@ module IL
     end
   end
 
+  class UnaryOp < Expression
+    extend T::Sig
+
+    NEG_OP = "-"
+
+    attr_reader :op
+    attr_reader :value
+
+    sig { params(op: String, value: Value).void }
+    def initialize(op, value)
+      @op = op
+      @value = value
+    end
+
+    sig { returns(String) }
+    def to_s
+      "#{@op}#{@value}"
+    end
+  end
+
   class Statement
     extend T::Sig
     # stub

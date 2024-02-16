@@ -82,6 +82,23 @@ class IL::BinaryOp
   end
 end
 
+class IL::UnaryOp
+  def evaluate(context)
+    value = @value.evaluate(context)
+
+    result = case @op
+    when IL::UnaryOp::NEG_OP
+      0 - value.value
+    when IL::UnaryOp::POS_OP
+      value.value # does nothing
+    else
+      raise("Invalid unary operator '#{@op}'")
+    end
+
+    return Interpreter::Value.new(value.type, result)
+  end
+end
+
 class IL::Statement
   sig { params(context: Interpreter::Context).void }
   def interpret(context)
