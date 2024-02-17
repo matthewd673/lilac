@@ -2,6 +2,7 @@
 require_relative "il"
 require_relative "interpreter"
 require_relative "debugger"
+require_relative "analysis/bb"
 
 include IL
 
@@ -33,5 +34,8 @@ if $PROGRAM_NAME == __FILE__
   Interpreter.interpret(program)
 
   Debugger.pretty_print(program)
+
+  blocks = BB.create_blocks(program)
+  puts(blocks)
 
 end
