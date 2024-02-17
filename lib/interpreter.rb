@@ -167,7 +167,7 @@ class IL::Jump
   end
 end
 
-class IL::JumpNotZero
+class IL::JumpZero
   def interpret(context)
     # evaluate conditional
     cond_eval = @cond.evaluate(context)
@@ -175,6 +175,28 @@ class IL::JumpNotZero
     # check for invalid target
     if not context.label_indices.include?(@target)
       raise("Invalid jump target '#{@target}'")
+    elsif not context.label_indices[@target]
+      raise("Nil jump target '#{@target}'")
+    end
+
+    # move instruction pointer there if zero
+    if cond_eval.value == 0
+      context.ip = context.label_indices[@target]
+    end
+  end
+end
+
+class IL::JumpNotZero
+  def interpret(context)
+    # NOTE: virtually identical to JumpZero interpretation
+    # evaluate conditional
+    cond_eval = @cond.evaluate(context)
+
+    # check for invalid target
+    if not context.label_indices.include?(@target)
+      raise("Invalid jump target '#{@target}'")
+    elsif not context.label_indices[@target]
+      raise("Nil jump target '#{@target}'")
     end
 
     # move instruction pointer there if not zero
@@ -243,12 +265,13 @@ module Interpreter
     }
 
     # register labels
-    stmts.each { |s, i|
+    stmts.each_with_index { |s, i|
       if s.is_a?(IL::Label)
         # check for duplicate labels
         if context.label_indices.include?(s.name)
           raise("Multiple definitions of label #{s.name}")
         end
+
         context.label_indices[s.name] = i
       end
     }

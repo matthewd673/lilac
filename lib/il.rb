@@ -68,7 +68,7 @@ module IL
     SUB_OP = "-"
     MUL_OP = "*"
     DIV_OP = "/"
-    EQ_OP  = "="
+    EQ_OP  = "=="
     LT_OP  = "<"
     GT_OP  = ">"
     LEQ_OP = "<="
@@ -184,6 +184,23 @@ module IL
 
     def to_s
       "jmp #{@target}"
+    end
+  end
+
+  class JumpZero < Statement
+    extend T::Sig
+
+    attr_reader :cond
+    attr_reader :target
+
+    sig { params(cond: Value, target: String).void }
+    def initialize(cond, target)
+      @cond = cond
+      @target = target
+    end
+
+    def to_s
+      "jz #{@cond} #{@target}"
     end
   end
 
