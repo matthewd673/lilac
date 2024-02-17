@@ -1,6 +1,7 @@
 # typed: true
 require_relative "il"
 require_relative "interpreter"
+require_relative "debugger"
 
 include IL
 
@@ -30,4 +31,7 @@ if $PROGRAM_NAME == __FILE__
                                                 ID.new("b"))))
 
   Interpreter.interpret(program)
+
+  Debugger.pretty_print(program)
+
 end
