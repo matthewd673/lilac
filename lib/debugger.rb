@@ -23,19 +23,21 @@ module ANSI
   CYAN_BRIGHT = 96
   WHITE_BRIGHT = 97
 
-  sig { params(str: String, color: Integer).returns(String) }
-  def self.colorize(str, color = ANSI::DEFAULT)
-    "\e[#{color}m#{str}"
+  sig { params(obj: Object, color: Integer).returns(String) }
+  def self.colorize(obj, color = ANSI::DEFAULT)
+    "\e[#{color}m#{obj.to_s}"
   end
 end
 
 module IL::Type
+  sig { params(str: String).returns(String) }
   def self.colorize(str)
     ANSI.colorize(str, ANSI::YELLOW)
   end
 end
 
 class IL::Value
+  sig { returns(String) }
   def colorize
     ANSI.colorize(to_s, ANSI::MAGENTA)
   end
@@ -48,6 +50,7 @@ class IL::ID
 end
 
 class IL::Expression
+  sig { returns(String) }
   def colorize
     ANSI.colorize(to_s)
   end
@@ -60,9 +63,9 @@ class IL::BinaryOp
 end
 
 class IL::Statement
-  # just print like normal
+  sig { returns(String) }
   def colorize
-    ANSI.colorize(to_s)
+    ANSI.colorize(to_s) # just print in default color
   end
 end
 
@@ -108,8 +111,21 @@ module Debugger
 
   sig { params(program: Program).void }
   def self.pretty_print(program)
-    program.each_stmt { |s|
-      puts(s.colorize)
+    num_col_len = program.length.to_s.length
+    program.each_stmt_with_index { |s, i|
+      padi = left_pad(i.to_s, num_col_len, " ")
+      puts("#{ANSI.colorize(padi, ANSI::GREEN_BRIGHT)} #{s.colorize}")
     }
+  end
+
+  private
+
+  sig { params(str: String, len: Integer, pad: String).returns(String) }
+  def self.left_pad(str, len, pad)
+    while str.length < len
+      str = pad + str
+    end
+
+    return str
   end
 end

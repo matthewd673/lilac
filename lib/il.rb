@@ -3,6 +3,8 @@ require "sorbet-runtime"
 
 module IL
   module Type
+    extend T::Sig
+
     I32 = "i32"
   end
 
@@ -234,10 +236,17 @@ module IL
       @stmt_list.push(stmt)
     end
 
-    def each_stmt
-      for stmt in @stmt_list
-        yield(stmt)
-      end
+    sig { returns(Integer) }
+    def length
+      @stmt_list.length
+    end
+
+    def each_stmt(&block)
+      @stmt_list.each(&block)
+    end
+
+    def each_stmt_with_index(&block)
+      @stmt_list.each_with_index(&block)
     end
 
     sig { returns(String) }
