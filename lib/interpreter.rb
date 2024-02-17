@@ -260,7 +260,6 @@ module Interpreter
     # collect all stmts in the program
     stmts = []
     program.each_stmt { |s|
-      puts(s.to_s)
       stmts.push(s)
     }
 

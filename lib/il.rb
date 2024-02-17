@@ -189,10 +189,9 @@ module IL
     end
   end
 
-  class JumpZero < Statement
+  class JumpZero < Jump
     extend T::Sig
 
-    attr_reader :cond
     attr_reader :target
 
     sig { params(cond: Value, target: String).void }
@@ -206,10 +205,9 @@ module IL
     end
   end
 
-  class JumpNotZero < Statement
+  class JumpNotZero < Jump
     extend T::Sig
 
-    attr_reader :cond
     attr_reader :target
 
     sig { params(cond: Value, target: String).void }
