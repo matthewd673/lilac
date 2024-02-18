@@ -1,6 +1,7 @@
 # typed: true
 require "sorbet-runtime"
 require_relative "il"
+require_relative "analysis/bb"
 
 module ANSI
   extend T::Sig
@@ -23,100 +24,90 @@ module ANSI
   CYAN_BRIGHT = 96
   WHITE_BRIGHT = 97
 
-  sig { params(obj: Object, color: Integer).returns(String) }
-  def self.colorize(obj, color = ANSI::DEFAULT)
-    "\e[#{color}m#{obj.to_s}"
+  sig { params(obj: Object, color: Integer, bold: T::Boolean).returns(String) }
+  def self.fmt(obj, color: ANSI::DEFAULT, bold: false)
+    "\e[#{color}m#{"\e[1m" unless not bold}#{obj.to_s}\e[0m"
   end
 end
 
 module IL::Type
   sig { params(str: String).returns(String) }
   def self.colorize(str)
-    ANSI.colorize(str, ANSI::YELLOW)
+    ANSI.fmt(str, color: ANSI::YELLOW)
   end
 end
 
 class IL::Value
   sig { returns(String) }
   def colorize
-    ANSI.colorize(to_s, ANSI::MAGENTA)
+    ANSI.fmt(to_s, color: ANSI::MAGENTA)
   end
 end
 
 class IL::ID
   def colorize
-    ANSI.colorize(to_s, ANSI::BLUE)
+    ANSI.fmt(to_s, color: ANSI::BLUE)
   end
 end
 
 class IL::Expression
   sig { returns(String) }
   def colorize
-    ANSI.colorize(to_s)
+    ANSI.fmt(to_s) # don't highlight
   end
 end
 
 class IL::BinaryOp
   def colorize
-    "#{@left.colorize} #{ANSI.colorize(@op, ANSI::GREEN)} #{@right.colorize}"
+    "#{@left.colorize} #{ANSI.fmt(@op, color: ANSI::GREEN)} #{@right.colorize}"
   end
 end
 
 class IL::Statement
   sig { returns(String) }
   def colorize
-    ANSI.colorize(to_s) # just print in default color
+    ANSI.fmt(to_s) # just print in default color
   end
 end
 
 class IL::Declaration
   def colorize
-    "#{IL::Type.colorize(@type)} #{@id.colorize} #{ANSI.colorize("=")} #{@rhs.colorize}"
+    "#{IL::Type.colorize(@type)} #{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
   end
 end
 
 class IL::Assignment
   def colorize
-    "#{@id.colorize} #{ANSI.colorize("=")} #{@rhs.colorize}"
+    "#{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
   end
 end
 
 class IL::Label
   def colorize
-    "#{ANSI.colorize(to_s, ANSI::CYAN)}"
+    "#{ANSI.fmt(to_s, color: ANSI::CYAN)}"
   end
 end
 
 class IL::Jump
   def colorize
-    "#{ANSI.colorize("jmp", ANSI::RED)} #{ANSI.colorize(@target, ANSI::CYAN)}"
+    "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
   end
 end
 
 class IL::JumpZero
   def colorize
-    "#{ANSI.colorize("jz", ANSI::RED)} #{@cond.colorize} #{ANSI.colorize(@target, ANSI::CYAN)}"
+    "#{ANSI.fmt("jz", color: ANSI::RED)} #{@cond.colorize} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
   end
 end
 
 class IL::JumpNotZero
   def colorize
-    "#{ANSI.colorize("jnz", ANSI::RED)} #{@cond.colorize} #{ANSI.colorize(@target, ANSI::CYAN)}"
+    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{@cond.colorize} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
   end
 end
 
 module Debugger
   extend T::Sig
-  include IL
-
-  sig { params(program: Program).void }
-  def self.pretty_print(program)
-    num_col_len = program.length.to_s.length
-    program.each_stmt_with_index { |s, i|
-      padi = left_pad(i.to_s, num_col_len, " ")
-      puts("#{ANSI.colorize(padi, ANSI::GREEN_BRIGHT)} #{s.colorize}")
-    }
-  end
 
   private
 
@@ -127,5 +118,30 @@ module Debugger
     end
 
     return str
+  end
+end
+
+module Debugger::PrettyPrinter
+  extend T::Sig
+
+  sig { params(program: IL::Program).void }
+  def self.print_program(program)
+    num_col_len = program.length.to_s.length
+    program.each_stmt_with_index { |s, i|
+      padi = Debugger.left_pad(i.to_s, num_col_len, " ")
+      # TODO: bright green probably only looks good with solarized dark
+      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{s.colorize}")
+    }
+  end
+
+  sig { params(blocks: T::Array[BB::Block]).void }
+  def self.print_blocks(blocks)
+    blocks.each { |b|
+      puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))
+      b.each_stmt_with_index { |s, i|
+        puts(s.colorize)
+      }
+    }
+    print(ANSI.fmt("")) # reset to default color
   end
 end

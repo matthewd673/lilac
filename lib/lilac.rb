@@ -33,9 +33,6 @@ if $PROGRAM_NAME == __FILE__
 
   Interpreter.interpret(program)
 
-  Debugger.pretty_print(program)
-
   blocks = BB.create_blocks(program)
-  puts(blocks)
-
+  Debugger::PrettyPrinter.print_blocks(blocks)
 end
