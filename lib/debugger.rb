@@ -1,4 +1,5 @@
 # typed: true
+# NOTE: sorbet doesn't support refinements which are used in Interpreter
 require "sorbet-runtime"
 require_relative "il"
 require_relative "analysis/bb"
@@ -30,95 +31,8 @@ module ANSI
   end
 end
 
-module IL::Type
-  sig { params(str: String).returns(String) }
-  def self.colorize(str)
-    ANSI.fmt(str, color: ANSI::YELLOW)
-  end
-end
-
-class IL::Value
-  sig { returns(String) }
-  def colorize
-    ANSI.fmt(to_s, color: ANSI::MAGENTA)
-  end
-end
-
-class IL::ID
-  def colorize
-    ANSI.fmt(to_s, color: ANSI::BLUE)
-  end
-end
-
-class IL::Expression
-  sig { returns(String) }
-  def colorize
-    ANSI.fmt(to_s) # don't highlight
-  end
-end
-
-class IL::BinaryOp
-  def colorize
-    "#{@left.colorize} #{ANSI.fmt(@op, color: ANSI::GREEN)} #{@right.colorize}"
-  end
-end
-
-class IL::Statement
-  sig { returns(String) }
-  def colorize
-    ANSI.fmt(to_s) # just print in default color
-  end
-end
-
-class IL::Declaration
-  def colorize
-    "#{IL::Type.colorize(@type)} #{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
-  end
-end
-
-class IL::Assignment
-  def colorize
-    "#{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
-  end
-end
-
-class IL::Label
-  def colorize
-    "#{ANSI.fmt(to_s, color: ANSI::CYAN)}"
-  end
-end
-
-class IL::Jump
-  def colorize
-    "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
-  end
-end
-
-class IL::JumpZero
-  def colorize
-    "#{ANSI.fmt("jz", color: ANSI::RED)} #{@cond.colorize} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
-  end
-end
-
-class IL::JumpNotZero
-  def colorize
-    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{@cond.colorize} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
-  end
-end
-
 module Debugger
   extend T::Sig
-
-  private
-
-  sig { params(str: String, len: Integer, pad: String).returns(String) }
-  def self.left_pad(str, len, pad)
-    while str.length < len
-      str = pad + str
-    end
-
-    return str
-  end
 end
 
 module Debugger::PrettyPrinter
@@ -128,7 +42,7 @@ module Debugger::PrettyPrinter
   def self.print_program(program)
     num_col_len = program.length.to_s.length
     program.each_stmt_with_index { |s, i|
-      padi = Debugger.left_pad(i.to_s, num_col_len, " ")
+      padi = left_pad(i.to_s, num_col_len, " ")
       # TODO: bright green probably only looks good with solarized dark
       puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{s.colorize}")
     }
@@ -143,5 +57,102 @@ module Debugger::PrettyPrinter
       }
     }
     print(ANSI.fmt("")) # reset to default color
+  end
+
+  protected
+
+  refine IL::Type do
+    sig { params(str: String).returns(String) }
+    def self.colorize(str)
+      ANSI.fmt(str, color: ANSI::YELLOW)
+    end
+  end
+
+  refine IL::Value do
+    sig { returns(String) }
+    def colorize
+      ANSI.fmt(to_s, color: ANSI::MAGENTA)
+    end
+  end
+
+  refine IL::ID do
+    sig { returns(String) }
+    def colorize
+      ANSI.fmt(to_s, color: ANSI::BLUE)
+    end
+  end
+
+  refine IL::Expression do
+    sig { returns(String) }
+    def colorize
+      ANSI.fmt(to_s) # don't highlight
+    end
+  end
+
+  refine IL::BinaryOp do
+    sig { returns(String) }
+    def colorize
+      "#{@left.colorize} #{ANSI.fmt(@op, color: ANSI::GREEN)} #{@right.colorize}"
+    end
+  end
+
+  refine IL::Statement do
+    sig { returns(String) }
+    def colorize
+      ANSI.fmt(to_s) # just print in default color
+    end
+  end
+
+  refine IL::Declaration do
+    sig { returns(String) }
+    def colorize
+      "#{IL::Type.colorize(@type)} #{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
+    end
+  end
+
+  refine IL::Assignment do
+    sig { returns(String) }
+    def colorize
+      "#{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
+    end
+  end
+
+  refine IL::Label do
+    sig { returns(String) }
+    def colorize
+      "#{ANSI.fmt(to_s, color: ANSI::CYAN)}"
+    end
+  end
+
+  refine IL::Jump do
+    sig { returns(String) }
+    def colorize
+      "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
+    end
+  end
+
+  refine IL::JumpZero do
+    sig { returns(String) }
+    def colorize
+      "#{ANSI.fmt("jz", color: ANSI::RED)} #{@cond.colorize} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
+    end
+  end
+
+  refine IL::JumpNotZero do
+    sig { returns(String) }
+    def colorize
+      "#{ANSI.fmt("jnz", color: ANSI::RED)} #{@cond.colorize} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
+    end
+  end
+
+  private
+
+  sig { params(str: String, len: Integer, pad: String).returns(String) }
+  def self.left_pad(str, len, pad)
+    while str.length < len
+      str = pad + str
+    end
+
+    return str
   end
 end
