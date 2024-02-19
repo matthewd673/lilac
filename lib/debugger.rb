@@ -45,6 +45,7 @@ class IL::Value
 end
 
 class IL::ID
+  sig { returns(String) }
   def colorize
     ANSI.fmt(to_s, color: ANSI::BLUE)
   end
@@ -58,6 +59,7 @@ class IL::Expression
 end
 
 class IL::BinaryOp
+  sig { returns(String) }
   def colorize
     "#{@left.colorize} #{ANSI.fmt(@op, color: ANSI::GREEN)} #{@right.colorize}"
   end
@@ -71,30 +73,35 @@ class IL::Statement
 end
 
 class IL::Declaration
+  sig { returns(String) }
   def colorize
     "#{IL::Type.colorize(@type)} #{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
   end
 end
 
 class IL::Assignment
+  sig { returns(String) }
   def colorize
     "#{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
   end
 end
 
 class IL::Label
+  sig { returns(String) }
   def colorize
     "#{ANSI.fmt(to_s, color: ANSI::CYAN)}"
   end
 end
 
 class IL::Jump
+  sig { returns(String) }
   def colorize
     "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
   end
 end
 
 class IL::JumpZero
+  sig { returns(String) }
   def colorize
     "#{ANSI.fmt("jz", color: ANSI::RED)} #{@cond.colorize} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
   end
