@@ -1,6 +1,7 @@
-# typed: true
+# typed: strict
 require "sorbet-runtime"
 require_relative "il"
+require_relative "visitor"
 require_relative "analysis/bb"
 
 module ANSI
@@ -30,125 +31,110 @@ module ANSI
   end
 end
 
-module IL::Type
-  sig { params(str: String).returns(String) }
-  def self.colorize(str)
-    ANSI.fmt(str, color: ANSI::YELLOW)
-  end
-end
-
-class IL::Value
-  sig { returns(String) }
-  def colorize
-    ANSI.fmt(to_s, color: ANSI::MAGENTA)
-  end
-end
-
-class IL::ID
-  sig { returns(String) }
-  def colorize
-    ANSI.fmt(to_s, color: ANSI::BLUE)
-  end
-end
-
-class IL::Expression
-  sig { returns(String) }
-  def colorize
-    ANSI.fmt(to_s) # don't highlight
-  end
-end
-
-class IL::BinaryOp
-  sig { returns(String) }
-  def colorize
-    "#{@left.colorize} #{ANSI.fmt(@op, color: ANSI::GREEN)} #{@right.colorize}"
-  end
-end
-
-class IL::Statement
-  sig { returns(String) }
-  def colorize
-    ANSI.fmt(to_s) # just print in default color
-  end
-end
-
-class IL::Declaration
-  sig { returns(String) }
-  def colorize
-    "#{IL::Type.colorize(@type)} #{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
-  end
-end
-
-class IL::Assignment
-  sig { returns(String) }
-  def colorize
-    "#{@id.colorize} #{ANSI.fmt("=")} #{@rhs.colorize}"
-  end
-end
-
-class IL::Label
-  sig { returns(String) }
-  def colorize
-    "#{ANSI.fmt(to_s, color: ANSI::CYAN)}"
-  end
-end
-
-class IL::Jump
-  sig { returns(String) }
-  def colorize
-    "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
-  end
-end
-
-class IL::JumpZero
-  sig { returns(String) }
-  def colorize
-    "#{ANSI.fmt("jz", color: ANSI::RED)} #{@cond.colorize} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
-  end
-end
-
-class IL::JumpNotZero
-  def colorize
-    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{@cond.colorize} #{ANSI.fmt(@target, color: ANSI::CYAN)}"
-  end
-end
-
 module Debugger
+  # stub
+end
+
+class Debugger::PrettyPrinter
   extend T::Sig
+
+  VISIT_TYPE = T.let(-> (v, o) {
+    ANSI.fmt(o.to_s, color: ANSI::YELLOW)
+  }, Visitor::LAMBDA)
+
+  VISIT_VALUE = T.let(-> (v, o) {
+    ANSI.fmt(o.to_s, color: ANSI::MAGENTA)
+  }, Visitor::LAMBDA)
+
+  VISIT_ID = T.let(-> (v, o) {
+    ANSI.fmt(o.to_s, color: ANSI::BLUE)
+  }, Visitor::LAMBDA)
+
+  VISIT_EXPRESSION = T.let(-> (v, o) {
+    o.to_s # don't format
+  }, Visitor::LAMBDA)
+
+  VISIT_BINARYOP = T.let(-> (v, o) {
+    "#{v.visit(o.left)} #{ANSI.fmt(o.op, color: ANSI::GREEN)} #{v.visit(o.right)}"
+  }, Visitor::LAMBDA)
+
+  VISIT_STATEMENT = T.let(-> (v, o) {
+    o.to_s # don't format
+  }, Visitor::LAMBDA)
+
+  VISIT_DECLARATION = T.let(-> (v, o) {
+    "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}"
+  }, Visitor::LAMBDA)
+
+  VISIT_ASSIGNMENT = T.let(-> (v, o) {
+    "#{v.visit(o.id)} = #{v.visit(o.rhs)}"
+  }, Visitor::LAMBDA)
+
+  VISIT_LABEL = T.let(-> (v, o) {
+    ANSI.fmt(o.to_s, color: ANSI::CYAN)
+  }, Visitor::LAMBDA)
+
+  VISIT_JUMP = T.let(-> (v, o) {
+    "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}"
+  }, Visitor::LAMBDA)
+
+  VISIT_JUMPZERO = T.let(-> (v, o) {
+    "#{ANSI.fmt("jz", color: ANSI::RED)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}"
+  }, Visitor::LAMBDA)
+
+  VISIT_JUMPNOTZERO = T.let(-> (v, o) {
+    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{v.visit(o.cond)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}"
+  }, Visitor::LAMBDA)
+
+
+  VISIT_LAMBDAS = T.let({
+    IL::Type => VISIT_TYPE,
+    IL::Value => VISIT_VALUE,
+    IL::ID => VISIT_ID,
+    IL::Expression => VISIT_EXPRESSION,
+    IL::BinaryOp => VISIT_BINARYOP,
+    IL::Statement => VISIT_STATEMENT,
+    IL::Declaration => VISIT_DECLARATION,
+    IL::Assignment => VISIT_ASSIGNMENT,
+    IL::Label => VISIT_LABEL,
+    IL::Jump => VISIT_JUMP,
+    IL::JumpZero => VISIT_JUMPZERO,
+    IL::JumpNotZero => VISIT_JUMPNOTZERO,
+  }, Visitor::LAMBDA_HASH)
+
+  sig { void }
+  def initialize
+    @visitor = T.let(Visitor.new(VISIT_LAMBDAS), Visitor)
+  end
+
+  sig { params(program: IL::Program).void }
+  def print_program(program)
+    num_col_len = program.length.to_s.length
+    program.each_stmt_with_index { |s, i|
+      padi = left_pad(i.to_s, num_col_len, " ")
+      # TODO: bright green probably only looks good with solarized dark
+      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{@visitor.visit(s)}")
+    }
+  end
+
+  sig { params(blocks: T::Array[BB::Block]).void }
+  def print_blocks(blocks)
+    blocks.each { |b|
+      puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))
+      b.each_stmt_with_index { |s, i|
+        puts(@visitor.visit(s))
+      }
+    }
+  end
 
   private
 
   sig { params(str: String, len: Integer, pad: String).returns(String) }
-  def self.left_pad(str, len, pad)
+  def left_pad(str, len, pad)
     while str.length < len
       str = pad + str
     end
 
     return str
-  end
-end
-
-module Debugger::PrettyPrinter
-  extend T::Sig
-
-  sig { params(program: IL::Program).void }
-  def self.print_program(program)
-    num_col_len = program.length.to_s.length
-    program.each_stmt_with_index { |s, i|
-      padi = Debugger.left_pad(i.to_s, num_col_len, " ")
-      # TODO: bright green probably only looks good with solarized dark
-      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{s.colorize}")
-    }
-  end
-
-  sig { params(blocks: T::Array[BB::Block]).void }
-  def self.print_blocks(blocks)
-    blocks.each { |b|
-      puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))
-      b.each_stmt_with_index { |s, i|
-        puts(s.colorize)
-      }
-    }
-    print(ANSI.fmt("")) # reset to default color
   end
 end

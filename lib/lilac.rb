@@ -31,8 +31,9 @@ if $PROGRAM_NAME == __FILE__
                                                 ID.new("c"),
                                                 ID.new("b"))))
 
-  Interpreter.interpret(program)
+  # Interpreter.interpret(program)
 
   blocks = BB.create_blocks(program)
-  Debugger::PrettyPrinter.print_blocks(blocks)
+  pretty_printer = Debugger::PrettyPrinter.new
+  pretty_printer.print_blocks(blocks)
 end
