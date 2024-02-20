@@ -1,11 +1,22 @@
-# typed: true
+# typed: strict
 require "sorbet-runtime"
 
 module IL
-  module Type
+  class Type < T::Enum
     extend T::Sig
 
-    I32 = "i32"
+    enums do
+      I32 = new
+    end
+
+    sig { returns(String) }
+    def to_s
+      case self
+      when I32 then "i32"
+      else
+        T.absurd(self)
+      end
+    end
   end
 
   class Value
@@ -16,15 +27,18 @@ module IL
   class Constant < Value
     extend T::Sig
 
+    sig { returns(Type) }
     attr_reader :type
+    sig { returns(T.untyped) }
     attr_reader :value
 
-    sig { params(type: String, value: T.untyped).void }
+    sig { params(type: Type, value: T.untyped).void }
     def initialize(type, value)
       @type = type
       @value = value
     end
 
+    sig { returns(String) }
     def to_s
       "#{@value}"
     end
@@ -33,6 +47,7 @@ module IL
   class ID < Value
     extend T::Sig
 
+    sig { returns(String) }
     attr_reader :name
 
     sig { params(name: String).void }
@@ -49,6 +64,7 @@ module IL
   class Register < ID
     extend T::Sig
 
+    sig { returns(Integer) }
     attr_reader :number
 
     sig { params(number: Integer).void }
@@ -78,8 +94,11 @@ module IL
     OR_OP  = "||"
     AND_OP = "&&"
 
+    sig { returns(String) }
     attr_reader :op
+    sig { returns(Value) }
     attr_reader :left
+    sig { returns(Value) }
     attr_reader :right
 
     sig { params(op: String, left: Value, right: Value).void }
@@ -101,7 +120,9 @@ module IL
     NEG_OP = "-"
     POS_OP = "+"
 
+    sig { returns(String) }
     attr_reader :op
+    sig { returns(Value) }
     attr_reader :value
 
     sig { params(op: String, value: Value).void }
@@ -124,11 +145,14 @@ module IL
   class Declaration < Statement
     extend T::Sig
 
+    sig { returns(Type) }
     attr_reader :type
+    sig { returns(ID) }
     attr_reader :id
+    sig { returns(T.any(Expression, Value)) }
     attr_reader :rhs
 
-    sig { params(type: String, id: ID, rhs: T.any(Expression, Value)).void }
+    sig { params(type: Type, id: ID, rhs: T.any(Expression, Value)).void }
     def initialize(type, id, rhs)
       @type = type
       @id = id
@@ -144,7 +168,9 @@ module IL
   class Assignment < Statement
     extend T::Sig
 
+    sig { returns(ID) }
     attr_reader :id
+    sig { returns(T.any(Expression, Value)) }
     attr_reader :rhs
 
     sig { params(id: ID, rhs: T.any(Expression, Value)).void }
@@ -162,6 +188,7 @@ module IL
   class Label < Statement
     extend T::Sig
 
+    sig { returns(String) }
     attr_reader :name
 
     sig { params(name: String).void }
@@ -169,6 +196,7 @@ module IL
       @name = name
     end
 
+    sig { returns(String) }
     def to_s
       "#{@name}:"
     end
@@ -177,6 +205,7 @@ module IL
   class Jump < Statement
     extend T::Sig
 
+    sig { returns(String) }
     attr_reader :target
 
     sig { params(target: String).void }
@@ -184,6 +213,7 @@ module IL
       @target = target
     end
 
+    sig { returns(String) }
     def to_s
       "jmp #{@target}"
     end
@@ -192,7 +222,8 @@ module IL
   class JumpZero < Jump
     extend T::Sig
 
-    attr_reader :target
+    sig { returns(Value) }
+    attr_reader :cond
 
     sig { params(cond: Value, target: String).void }
     def initialize(cond, target)
@@ -200,6 +231,7 @@ module IL
       @target = target
     end
 
+    sig { returns(String) }
     def to_s
       "jz #{@cond} #{@target}"
     end
@@ -208,7 +240,8 @@ module IL
   class JumpNotZero < Jump
     extend T::Sig
 
-    attr_reader :target
+    sig { returns(Value) }
+    attr_reader :cond
 
     sig { params(cond: Value, target: String).void }
     def initialize(cond, target)
@@ -216,6 +249,7 @@ module IL
       @target = target
     end
 
+    sig { returns(String) }
     def to_s
       "jnz #{@cond} #{@target}"
     end
@@ -226,7 +260,7 @@ module IL
 
     sig { void }
     def initialize
-      @stmt_list = []
+      @stmt_list = T.let([], T::Array[Statement])
     end
 
     sig { params(stmt: Statement).void }
@@ -239,10 +273,21 @@ module IL
       @stmt_list.length
     end
 
+    sig { params(
+            block: T.proc.params(arg0: Statement).returns(T.untyped)
+          )
+          .void
+    }
     def each_stmt(&block)
       @stmt_list.each(&block)
     end
 
+    sig { params(
+            block: T.proc.params(arg0: Statement, arg1: Integer)
+              .returns(T.untyped)
+            )
+            .void
+    }
     def each_stmt_with_index(&block)
       @stmt_list.each_with_index(&block)
     end
