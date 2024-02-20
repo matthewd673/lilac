@@ -22,6 +22,10 @@ module BB
       @stmt_list.length
     end
 
+    def empty?
+      @stmt_list.empty?
+    end
+
     def each_stmt(&block)
       @stmt_list.each(&block)
     end
@@ -32,7 +36,7 @@ module BB
 
     sig { returns(String) }
     def to_s
-      str = "---BLOCK (len=#{length})---\n"
+      str = "[BLOCK (len=#{length})]\n"
       each_stmt { |s|
         str += s.to_s + "\n"
       }
@@ -46,14 +50,14 @@ module BB
 
     program.each_stmt { |s|
       # mark beginning of a block
-      if s.is_a?(IL::Label)
+      if s.is_a?(IL::Label) and not blocks[-1].empty?
         blocks.push(Block.new)
       end
 
       blocks[-1].push_stmt(s)
 
       # mark end of a block
-      if s.is_a?(IL::Jump)
+      if s.is_a?(IL::Jump) # block will never be empty due to above push
         blocks.push(Block.new)
       end
     }
