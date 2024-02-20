@@ -1,7 +1,9 @@
 # typed: true
 require_relative "il"
 require_relative "interpreter"
-require_relative "debugger"
+require_relative "debugger/pretty_printer"
+require_relative "analysis/analyzer"
+require_relative "analysis/lvn"
 require_relative "analysis/bb"
 
 include IL
@@ -36,4 +38,8 @@ if $PROGRAM_NAME == __FILE__
   blocks = BB.create_blocks(program)
   pretty_printer = Debugger::PrettyPrinter.new
   pretty_printer.print_blocks(blocks)
+
+  # TODO: temp (though everything here is temp)
+  Analyzer.run_analysis(LVN.new)
+
 end

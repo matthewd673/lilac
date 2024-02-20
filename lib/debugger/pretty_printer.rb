@@ -1,42 +1,40 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "il"
-require_relative "visitor"
-require_relative "analysis/bb"
-
-module ANSI
-  extend T::Sig
-
-  DEFAULT = 39
-  BLACK = 30
-  RED = 31
-  GREEN = 32
-  YELLOW = 33
-  BLUE = 34
-  MAGENTA = 35
-  CYAN = 36
-  WHITE = 37
-  BLACK_BRIGHT = 90
-  RED_BRIGHT = 91
-  GREEN_BRIGHT = 92
-  YELLOW_BRIGHT = 93
-  BLUE_BRIGHT = 94
-  MAGENTA_BRIGHT = 95
-  CYAN_BRIGHT = 96
-  WHITE_BRIGHT = 97
-
-  sig { params(obj: Object, color: Integer, bold: T::Boolean).returns(String) }
-  def self.fmt(obj, color: ANSI::DEFAULT, bold: false)
-    "\e[#{color}m#{"\e[1m" unless not bold}#{obj.to_s}\e[0m"
-  end
-end
-
-module Debugger
-  # stub
-end
+require_relative "debugger"
+require_relative "ansi"
+require_relative "../il"
+require_relative "../visitor"
+require_relative "../analysis/bb"
 
 class Debugger::PrettyPrinter
   extend T::Sig
+
+  sig { void }
+  def initialize
+    @visitor = T.let(Visitor.new(VISIT_LAMBDAS), Visitor)
+  end
+
+  sig { params(program: IL::Program).void }
+  def print_program(program)
+    num_col_len = program.length.to_s.length
+    program.each_stmt_with_index { |s, i|
+      padi = left_pad(i.to_s, num_col_len, " ")
+      # TODO: bright green probably only looks good with solarized dark
+      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{@visitor.visit([s])}")
+    }
+  end
+
+  sig { params(blocks: T::Array[BB::Block]).void }
+  def print_blocks(blocks)
+    blocks.each { |b|
+      puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))
+      b.each_stmt_with_index { |s, i|
+        puts(@visitor.visit([s]))
+      }
+    }
+  end
+
+  protected
 
   VISIT_TYPE = T.let(-> (v, o) {
     ANSI.fmt(o[0].to_s, color: ANSI::YELLOW)
@@ -101,31 +99,6 @@ class Debugger::PrettyPrinter
     IL::JumpZero => VISIT_JUMPZERO,
     IL::JumpNotZero => VISIT_JUMPNOTZERO,
   }, Visitor::LambdaHash)
-
-  sig { void }
-  def initialize
-    @visitor = T.let(Visitor.new(VISIT_LAMBDAS), Visitor)
-  end
-
-  sig { params(program: IL::Program).void }
-  def print_program(program)
-    num_col_len = program.length.to_s.length
-    program.each_stmt_with_index { |s, i|
-      padi = left_pad(i.to_s, num_col_len, " ")
-      # TODO: bright green probably only looks good with solarized dark
-      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{@visitor.visit([s])}")
-    }
-  end
-
-  sig { params(blocks: T::Array[BB::Block]).void }
-  def print_blocks(blocks)
-    blocks.each { |b|
-      puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))
-      b.each_stmt_with_index { |s, i|
-        puts(@visitor.visit([s]))
-      }
-    }
-  end
 
   private
 
