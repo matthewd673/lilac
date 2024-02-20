@@ -1,5 +1,4 @@
 # typed: strict
-# NOTE: sorbet doesn't support refinements which are used in Interpreter
 require "sorbet-runtime"
 require_relative "il"
 require_relative "visitor"

@@ -2,9 +2,9 @@
 require_relative "il"
 require_relative "interpreter"
 require_relative "debugger/pretty_printer"
-require_relative "analysis/analyzer"
-require_relative "analysis/lvn"
-require_relative "analysis/bb"
+require_relative "optimization/runner"
+require_relative "optimization/lvn"
+require_relative "optimization/bb"
 
 include IL
 
@@ -40,6 +40,5 @@ if $PROGRAM_NAME == __FILE__
   pretty_printer.print_blocks(blocks)
 
   # TODO: temp (though everything here is temp)
-  Analyzer.run_analysis(LVN.new)
-
+  Runner.run_pass(LVN.new)
 end

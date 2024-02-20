@@ -2,7 +2,7 @@
 require "sorbet-runtime"
 require_relative "../il"
 
-class Analysis
+class Optimization
   extend T::Sig
 
   sig { returns(String) }
@@ -15,8 +15,8 @@ class Analysis
   sig { void }
   def initialize
     # NOTE: these should always be overwritten by subclasses
-    @id = T.let("analysis", String)
-    @full_name = T.let("Analysis stub", String)
+    @id = T.let("optimization", String)
+    @full_name = T.let("Optimization stub", String)
     @level = T.let(1, Integer)
   end
 end

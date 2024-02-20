@@ -4,7 +4,7 @@ require_relative "debugger"
 require_relative "ansi"
 require_relative "../il"
 require_relative "../visitor"
-require_relative "../analysis/bb"
+require_relative "../optimization/bb"
 
 class Debugger::PrettyPrinter
   extend T::Sig

@@ -1,8 +1,8 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "analysis"
+require_relative "optimization"
 
-class LVN < Analysis
+class LVN < Optimization
   sig { void }
   def initialize
     @id = T.let("lvn", String)
