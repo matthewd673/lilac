@@ -5,21 +5,22 @@ require_relative "il"
 class Visitor
   extend T::Sig
 
-  LAMBDA = T.type_alias {
-    T.proc.params(arg0: Visitor, arg1: T.untyped).returns(T.untyped)
+  Lambda = T.type_alias {
+    T.proc.params(arg0: Visitor, arg1: T::Array[T.untyped]).returns(T.untyped)
   }
 
-  LAMBDA_HASH = T.type_alias {
-    T::Hash[T::Class[T.untyped], LAMBDA]
+  LambdaHash = T.type_alias {
+    T::Hash[T::Class[T.untyped], Lambda]
   }
 
-  sig { params(visit_lambdas: LAMBDA_HASH).void }
+  sig { params(visit_lambdas: LambdaHash).void }
   def initialize(visit_lambdas)
     @visit_lambdas = visit_lambdas
   end
 
-  sig { params(object: T.untyped).returns(T.untyped) }
-  def visit(object)
+  sig { params(obj_arr: T::Array[T.untyped]).returns(T.untyped) }
+  def visit(obj_arr)
+    object = obj_arr[0]
     object.class.ancestors.each { |a|
       if not @visit_lambdas.include?(a) then next end
 
@@ -28,7 +29,7 @@ class Visitor
         raise("Visitor has a NIL lambda registered for #{a}")
       end
 
-      return l.call(self, object)
+      return l.call(self, obj_arr)
     }
 
     raise("Visitor does not support #{object.class} or its ancestors")

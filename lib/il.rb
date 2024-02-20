@@ -2,6 +2,10 @@
 require "sorbet-runtime"
 
 module IL
+  extend T::Sig
+
+  ILObject = T.type_alias { T.any(Value, Expression, Statement) }
+
   class Type < T::Enum
     extend T::Sig
 

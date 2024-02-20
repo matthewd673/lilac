@@ -39,52 +39,52 @@ class Debugger::PrettyPrinter
   extend T::Sig
 
   VISIT_TYPE = T.let(-> (v, o) {
-    ANSI.fmt(o.to_s, color: ANSI::YELLOW)
-  }, Visitor::LAMBDA)
+    ANSI.fmt(o[0].to_s, color: ANSI::YELLOW)
+  }, Visitor::Lambda)
 
   VISIT_VALUE = T.let(-> (v, o) {
-    ANSI.fmt(o.to_s, color: ANSI::MAGENTA)
-  }, Visitor::LAMBDA)
+    ANSI.fmt(o[0].to_s, color: ANSI::MAGENTA)
+  }, Visitor::Lambda)
 
   VISIT_ID = T.let(-> (v, o) {
-    ANSI.fmt(o.to_s, color: ANSI::BLUE)
-  }, Visitor::LAMBDA)
+    ANSI.fmt(o[0].to_s, color: ANSI::BLUE)
+  }, Visitor::Lambda)
 
   VISIT_EXPRESSION = T.let(-> (v, o) {
-    o.to_s # don't format
-  }, Visitor::LAMBDA)
+    o[0].to_s # don't format
+  }, Visitor::Lambda)
 
   VISIT_BINARYOP = T.let(-> (v, o) {
-    "#{v.visit(o.left)} #{ANSI.fmt(o.op, color: ANSI::GREEN)} #{v.visit(o.right)}"
-  }, Visitor::LAMBDA)
+    "#{v.visit([o[0].left])} #{ANSI.fmt(o[0].op, color: ANSI::GREEN)} #{v.visit([o[0].right])}"
+  }, Visitor::Lambda)
 
   VISIT_STATEMENT = T.let(-> (v, o) {
-    o.to_s # don't format
-  }, Visitor::LAMBDA)
+    o[0].to_s # don't format
+  }, Visitor::Lambda)
 
   VISIT_DECLARATION = T.let(-> (v, o) {
-    "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}"
-  }, Visitor::LAMBDA)
+    "#{v.visit([o[0].type])} #{v.visit([o[0].id])} = #{v.visit([o[0].rhs])}"
+  }, Visitor::Lambda)
 
   VISIT_ASSIGNMENT = T.let(-> (v, o) {
-    "#{v.visit(o.id)} = #{v.visit(o.rhs)}"
-  }, Visitor::LAMBDA)
+    "#{v.visit([o[0].id])} = #{v.visit([o[0].rhs])}"
+  }, Visitor::Lambda)
 
   VISIT_LABEL = T.let(-> (v, o) {
-    ANSI.fmt(o.to_s, color: ANSI::CYAN)
-  }, Visitor::LAMBDA)
+    ANSI.fmt(o[0].to_s, color: ANSI::CYAN)
+  }, Visitor::Lambda)
 
   VISIT_JUMP = T.let(-> (v, o) {
-    "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}"
-  }, Visitor::LAMBDA)
+    "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(o[0].target, color: ANSI::CYAN)}"
+  }, Visitor::Lambda)
 
   VISIT_JUMPZERO = T.let(-> (v, o) {
-    "#{ANSI.fmt("jz", color: ANSI::RED)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}"
-  }, Visitor::LAMBDA)
+    "#{ANSI.fmt("jz", color: ANSI::RED)} #{v.visit([o[0].cond])} #{ANSI.fmt(o[0].target, color: ANSI::CYAN)}"
+  }, Visitor::Lambda)
 
   VISIT_JUMPNOTZERO = T.let(-> (v, o) {
-    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{v.visit(o.cond)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}"
-  }, Visitor::LAMBDA)
+    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{v.visit([o[0].cond])} #{ANSI.fmt(o[0].target, color: ANSI::CYAN)}"
+  }, Visitor::Lambda)
 
 
   VISIT_LAMBDAS = T.let({
@@ -100,7 +100,7 @@ class Debugger::PrettyPrinter
     IL::Jump => VISIT_JUMP,
     IL::JumpZero => VISIT_JUMPZERO,
     IL::JumpNotZero => VISIT_JUMPNOTZERO,
-  }, Visitor::LAMBDA_HASH)
+  }, Visitor::LambdaHash)
 
   sig { void }
   def initialize
@@ -113,7 +113,7 @@ class Debugger::PrettyPrinter
     program.each_stmt_with_index { |s, i|
       padi = left_pad(i.to_s, num_col_len, " ")
       # TODO: bright green probably only looks good with solarized dark
-      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{@visitor.visit(s)}")
+      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{@visitor.visit([s])}")
     }
   end
 
@@ -122,7 +122,7 @@ class Debugger::PrettyPrinter
     blocks.each { |b|
       puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))
       b.each_stmt_with_index { |s, i|
-        puts(@visitor.visit(s))
+        puts(@visitor.visit([s]))
       }
     }
   end
