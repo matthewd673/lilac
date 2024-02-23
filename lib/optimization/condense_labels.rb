@@ -2,7 +2,6 @@
 # TODO: supports typed: strict apart from one glitch, see TODO below
 require "sorbet-runtime"
 require_relative "../il"
-require_relative "../debugger/pretty_printer"
 
 class CondenseLabels < Optimization
   extend T::Sig
@@ -20,7 +19,7 @@ class CondenseLabels < Optimization
     label_adj_map = {} # IL::Label -> the IL::Label immediately above it
 
     stmt_list = []
-    program.each_stmt_with_index { |s, i|
+    program.each_stmt { |s|
       # identify adjacent labels
       last = stmt_list[-1]
       # TODO: sorbet is saying this code is unreachable? it gets reached though
@@ -58,8 +57,8 @@ class CondenseLabels < Optimization
       }
     }
 
-    # return a new program with the modified stmt_list
-    new_program = IL::Program.new
-    new_program.concat_stmt_list(stmt_list)
+    # replace statement list on input program
+    program.clear
+    program.concat_stmt_list(stmt_list)
   end
 end

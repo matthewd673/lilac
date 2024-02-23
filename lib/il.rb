@@ -355,14 +355,19 @@ module IL
       @stmt_list = T.let([], T::Array[Statement])
     end
 
+    sig { params(stmt: Statement).void }
+    def push_stmt(stmt)
+      @stmt_list.push(stmt)
+    end
+
     sig { params(stmt_list: T::Array[Statement]).void }
     def concat_stmt_list(stmt_list)
       @stmt_list.concat(stmt_list)
     end
 
-    sig { params(stmt: Statement).void }
-    def push_stmt(stmt)
-      @stmt_list.push(stmt)
+    sig { void }
+    def clear
+      @stmt_list.clear
     end
 
     sig { returns(Integer) }

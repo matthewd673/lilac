@@ -3,9 +3,13 @@ require "sorbet-runtime"
 require_relative "../il"
 require_relative "optimization"
 require_relative "condense_labels"
+require_relative "remove_useless_jumps"
 
 class Runner
   extend T::Sig
+
+  sig { returns(IL::Program) }
+  attr_reader :program
 
   sig { params(program: IL::Program).void }
   def initialize(program)
@@ -33,6 +37,7 @@ class Runner
   protected
 
   OPTIMIZATIONS = T.let([
-    CondenseLabels.new
+    CondenseLabels.new,
+    RemoveUselessJumps.new
   ], T::Array[Optimization])
 end
