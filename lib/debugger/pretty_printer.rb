@@ -1,20 +1,27 @@
 # typed: strict
 require "sorbet-runtime"
 require_relative "debugger"
-require_relative "ansi"
+require_relative "../ansi"
 require_relative "../il"
 require_relative "../visitor"
 require_relative "../optimization/bb"
 
+# A PrettyPrinter contains functions that make it easy to pretty-print various
+# internal lilac data structures, like +IL::Program+, to the terminal.
 class Debugger::PrettyPrinter
   extend T::Sig
 
   sig { void }
+  # Construct a new PrettyPrinter.
   def initialize
     @visitor = T.let(Visitor.new(VISIT_LAMBDAS), Visitor)
   end
 
   sig { params(program: IL::Program).void }
+  # Pretty-print the statements in an +IL::Program+ to the terminal with line
+  # numbers and syntax highlighting.
+  #
+  # @param [IL::Program] program The program to print.
   def print_program(program)
     num_col_len = program.length.to_s.length
     program.each_stmt_with_index { |s, i|
@@ -25,6 +32,10 @@ class Debugger::PrettyPrinter
   end
 
   sig { params(blocks: T::Array[BB::Block]).void }
+  # Pretty-print a collection of basic blocks (+BB::Block+) to the terminal
+  # with headers for each block and syntax highlighting.
+  #
+  # @param [T::Array[BB::Block]] blocks The array of blocks to print.
   def print_blocks(blocks)
     blocks.each { |b|
       puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))

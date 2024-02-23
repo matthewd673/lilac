@@ -241,8 +241,7 @@
 53
 54
 55
-56
-57</pre>
+56</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 14</span>
@@ -273,8 +272,7 @@
 </span>  <span class='id identifier rubyid_stmt_ct'>stmt_ct</span> <span class='op'>=</span> <span class='int'>0</span>
   <span class='kw'>while</span> <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_ip'>ip</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_stmts'>stmts</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
     <span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='id identifier rubyid_stmts'>stmts</span><span class='lbracket'>[</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_ip'>ip</span><span class='rbracket'>]</span>
-    <span class='comment'># s.interpret(context)
-</span>    <span class='id identifier rubyid_visitor'>visitor</span><span class='period'>.</span><span class='id identifier rubyid_visit'>visit</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='id identifier rubyid_s'>s</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_visitor'>visitor</span><span class='period'>.</span><span class='id identifier rubyid_visit'>visit</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='comma'>,</span> <span class='label'>ctx:</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_ip'>ip</span> <span class='op'>+=</span> <span class='int'>1</span>
     <span class='id identifier rubyid_stmt_ct'>stmt_ct</span> <span class='op'>+=</span> <span class='int'>1</span>
   <span class='kw'>end</span>
@@ -301,7 +299,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 23 13:23:50 2024 by
+  Generated on Fri Feb 23 18:22:04 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>

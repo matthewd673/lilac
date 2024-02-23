@@ -219,14 +219,14 @@
       <pre class="lines">
 
 
+10
 11
 12
 13
-14
-15</pre>
+14</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/condense_labels.rb', line 11</span>
+      <pre class="code"><span class="info file"># File 'lib/optimization/condense_labels.rb', line 10</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
   <span class='ivar'>@id</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>condense_labels</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
@@ -260,6 +260,7 @@
       <pre class="lines">
 
 
+17
 18
 19
 20
@@ -305,18 +306,17 @@
 60
 61
 62
-63
-64</pre>
+63</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/condense_labels.rb', line 18</span>
+      <pre class="code"><span class="info file"># File 'lib/optimization/condense_labels.rb', line 17</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_jump_map'>jump_map</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='comment'># target name -&gt; IL::Goto
 </span>  <span class='id identifier rubyid_label_adj_map'>label_adj_map</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='comment'># IL::Label -&gt; the IL::Label immediately above it
 </span>
   <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_stmt_with_index'>each_stmt_with_index</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
+  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_stmt'>each_stmt</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span>
     <span class='comment'># identify adjacent labels
 </span>    <span class='id identifier rubyid_last'>last</span> <span class='op'>=</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
     <span class='comment'># TODO: sorbet is saying this code is unreachable? it gets reached though
@@ -354,9 +354,9 @@
     <span class='rbrace'>}</span>
   <span class='rbrace'>}</span>
 
-  <span class='comment'># return a new program with the modified stmt_list
-</span>  <span class='id identifier rubyid_new_program'>new_program</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Program.html" title="IL::Program (class)">Program</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="IL/Program.html#initialize-instance_method" title="IL::Program#initialize (method)">new</a></span></span>
-  <span class='id identifier rubyid_new_program'>new_program</span><span class='period'>.</span><span class='id identifier rubyid_concat_stmt_list'>concat_stmt_list</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
+  <span class='comment'># replace statement list on input program
+</span>  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_concat_stmt_list'>concat_stmt_list</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -368,7 +368,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 23 13:23:50 2024 by
+  Generated on Fri Feb 23 18:22:05 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>

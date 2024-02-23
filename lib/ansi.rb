@@ -1,6 +1,8 @@
 # typed: strict
 require "sorbet-runtime"
 
+# The ANSI module contains constants and helper functions that can be used
+# to format text in the terminal.
 module ANSI
   extend T::Sig
 
@@ -23,6 +25,12 @@ module ANSI
   WHITE_BRIGHT = 97
 
   sig { params(obj: Object, color: Integer, bold: T::Boolean).returns(String) }
+  # Format a String using ANSI codes.
+  #
+  # @param [Integer] color The foreground color of the String.
+  # @param [T::Boolean] bold Determines if the String is bold or not.
+  #
+  # @return [String] The formatted String which can be printed as normal.
   def self.fmt(obj, color: ANSI::DEFAULT, bold: false)
     "\e[#{color}m#{"\e[1m" unless not bold}#{obj.to_s}\e[0m"
   end

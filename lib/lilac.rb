@@ -40,5 +40,6 @@ if $PROGRAM_NAME == __FILE__
   pretty_printer.print_blocks(blocks)
 
   # TODO: temp (though everything here is temp)
-  Runner.run_pass(LVN.new)
+  runner = Runner.new(program)
+  runner.run_pass(CondenseLabels.new)
 end
