@@ -8,7 +8,7 @@ class Optimization
   sig { returns(String) }
   attr_reader :id
   sig { returns(String) }
-  attr_reader :full_name
+  attr_reader :description
   sig { returns(Integer) }
   attr_reader :level
 
@@ -16,7 +16,17 @@ class Optimization
   def initialize
     # NOTE: these should always be overwritten by subclasses
     @id = T.let("optimization", String)
-    @full_name = T.let("Optimization stub", String)
+    @description = T.let("Optimization stub", String)
     @level = T.let(1, Integer)
+  end
+
+  sig { params(program: IL::Program).void }
+  def run(program)
+    # stub
+  end
+
+  sig { returns(String) }
+  def to_s
+    "#{@id} (#{@level}): #{@description}"
   end
 end
