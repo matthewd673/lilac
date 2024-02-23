@@ -37,8 +37,7 @@ module Interpreter
     stmt_ct = 0
     while context.ip < stmts.length
       s = stmts[context.ip]
-      # s.interpret(context)
-      visitor.visit([s, context])
+      visitor.visit(s, ctx: context)
       context.ip += 1
       stmt_ct += 1
     end
@@ -58,7 +57,7 @@ module Interpreter
 
   protected
 
-  VISIT_VALUE = T.let(-> (v, o) {
+  VISIT_VALUE = T.let(-> (v, o, context) {
    if self.class == IL::Value
      raise("#{self.class} is a stub and should not be constructed")
    else
@@ -66,15 +65,14 @@ module Interpreter
    end
   }, Visitor::Lambda)
 
-  VISIT_CONSTANT = T.let(-> (v, o) {
-    type = o[0].type
-    value = o[0].value
+  VISIT_CONSTANT = T.let(-> (v, o, context) {
+    type = o.type
+    value = o.value
     return InterpreterValue.new(type, value)
   }, Visitor::Lambda)
 
-  VISIT_ID = T.let(-> (v, o) {
-    context = o[1]
-    name = o[0].name
+  VISIT_ID = T.let(-> (v, o, context) {
+    name = o.name
 
     if not context.symbols.include?(name)
       raise("Undefined ID #{name}")
@@ -87,7 +85,7 @@ module Interpreter
     return InterpreterValue.new(info.type, info.value)
   }, Visitor::Lambda)
 
-  VISIT_EXPRESSION = T.let(-> (v, o) {
+  VISIT_EXPRESSION = T.let(-> (v, o, context) {
     if self.class == IL::Expression
       raise("#{self.class} is a stub and should not be constructed")
     else
@@ -95,14 +93,13 @@ module Interpreter
     end
   }, Visitor::Lambda)
 
-  VISIT_BINARYOP = T.let(-> (v, o) {
-    context = o[1]
-    left = o[0].left
-    right = o[0].right
-    op = o[0].op
+  VISIT_BINARYOP = T.let(-> (v, o, context) {
+    left = o.left
+    right = o.right
+    op = o.op
 
-    left = v.visit([left, context])
-    right = v.visit([right, context])
+    left = v.visit(left, ctx: context)
+    right = v.visit(right, ctx: context)
 
     if not left.type.eql?(right.type)
       raise("Mismatched types '#{left.type}' and '#{right.type}'")
@@ -139,12 +136,11 @@ module Interpreter
     return InterpreterValue.new(left.type, result)
   }, Visitor::Lambda)
 
-  VISIT_UNARYOP = T.let(-> (v, o) {
-    context = o[1]
-    value = o[0].value
-    op = o[0].op
+  VISIT_UNARYOP = T.let(-> (v, o, context) {
+    value = o.value
+    op = o.op
 
-    value = v.visit([value, context])
+    value = v.visit(value, ctx: context)
 
     result = case op
     when IL::UnaryOp::NEG_OP
@@ -158,7 +154,7 @@ module Interpreter
     return InterpreterValue.new(value.type, result)
   }, Visitor::Lambda)
 
-  VISIT_STATEMENT = T.let(-> (v, o) {
+  VISIT_STATEMENT = T.let(-> (v, o, context) {
     if self.class == IL::Statement
       raise("#{self.class} is a stub and should not be constructed")
     else
@@ -166,18 +162,17 @@ module Interpreter
     end
   }, Visitor::Lambda)
 
-  VISIT_DECLARATION = T.let(-> (v, o) {
-    context = o[1]
-    type = o[0].type
-    id = o[0].id
-    rhs = o[0].rhs
+  VISIT_DECLARATION = T.let(-> (v, o, context) {
+    type = o.type
+    id = o.id
+    rhs = o.rhs
 
     # check for redeclaration
     if context.symbols.include?(id.name)
       raise("Redeclaration of ID '#{id.name}'")
     end
     # insert id in symbol table with appropriate type
-    rhs_eval = v.visit([rhs, context])
+    rhs_eval = v.visit(rhs, ctx: context)
 
     # catch type mismatch
     if not rhs_eval.type.eql?(type)
@@ -189,10 +184,9 @@ module Interpreter
                                                            rhs_eval.value)
   }, Visitor::Lambda)
 
-  VISIT_ASSIGNMENT = T.let(-> (v, o) {
-    context = o[1]
-    id = o[0].id
-    rhs = o[0].rhs
+  VISIT_ASSIGNMENT = T.let(-> (v, o, context) {
+    id = o.id
+    rhs = o.rhs
 
     # make sure variable has been declared
     if not context.symbols.include?(id.name)
@@ -200,7 +194,7 @@ module Interpreter
     end
 
     # update value in symbol table
-    rhs_eval = v.visit([rhs, context])
+    rhs_eval = v.visit(rhs, ctx: context)
 
     # catch type mismatch
     info = context.symbols[id.name]
@@ -214,13 +208,12 @@ module Interpreter
     info.value = rhs_eval.value
   }, Visitor::Lambda)
 
-  VISIT_LABEL = T.let(-> (v, o) {
+  VISIT_LABEL = T.let(-> (v, o, context) {
     # empty
   }, Visitor::Lambda)
 
-  VISIT_JUMP = T.let(-> (v, o) {
-    context = o[1]
-    target = o[0].target
+  VISIT_JUMP = T.let(-> (v, o, context) {
+    target = o.target
 
     # check for invalid target
     if not context.label_indices.include?(target)
@@ -235,13 +228,12 @@ module Interpreter
     context.ip = index
   }, Visitor::Lambda)
 
-  VISIT_JUMPZERO = T.let(-> (v, o) {
-    context = o[1]
-    cond = o[0].cond
-    target = o[0].target
+  VISIT_JUMPZERO = T.let(-> (v, o, context) {
+    cond = o.cond
+    target = o.target
 
     # evaluate conditional
-    cond_eval = v.visit([cond, context])
+    cond_eval = v.visit(cond, ctx: context)
 
     # check for invalid target
     if not context.label_indices.include?(target)
@@ -258,13 +250,12 @@ module Interpreter
     end
   }, Visitor::Lambda)
 
-  VISIT_JUMPNOTZERO = T.let(-> (v, o) {
-    context = o[1]
+  VISIT_JUMPNOTZERO = T.let(-> (v, o, context) {
     cond = o[0].cond
     target = o[0].target
 
     # evaluate conditional
-    cond_eval = v.visit([cond, context])
+    cond_eval = v.visit(cond, ctx: context)
 
     # check for invalid target
     if not context.label_indices.include?(target)
@@ -349,7 +340,4 @@ module Interpreter
       @label_indices = T.let(Hash.new, T::Hash[String, Integer])
     end
   end
-
-
-
 end
