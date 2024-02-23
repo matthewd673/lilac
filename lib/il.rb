@@ -281,7 +281,7 @@ module IL
     extend T::Sig
 
     sig { returns(String) }
-    attr_reader :target
+    attr_accessor :target
 
     sig { params(target: String).void }
     # Construct a new Jump.
@@ -353,6 +353,11 @@ module IL
     # Construct a new Program.
     def initialize
       @stmt_list = T.let([], T::Array[Statement])
+    end
+
+    sig { params(stmt_list: T::Array[Statement]).void }
+    def concat_stmt_list(stmt_list)
+      @stmt_list.concat(stmt_list)
     end
 
     sig { params(stmt: Statement).void }

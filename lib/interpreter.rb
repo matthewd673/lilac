@@ -7,58 +7,10 @@ module Interpreter
   extend T::Sig
   include Kernel
 
-  class InterpreterValue
-    extend T::Sig
-
-    sig { returns(IL::Type) }
-    attr_reader :type
-    sig { returns(T.untyped) }
-    attr_reader :value
-
-    sig { params(type: IL::Type, value: T.untyped).void }
-    def initialize(type, value)
-      @type = type
-      @value = value
-    end
-  end
-
-  class SymbolInfo
-    extend T::Sig
-
-    sig { returns(String) }
-    attr_reader :name
-    sig { returns(IL::Type) }
-    attr_reader :type
-    sig { returns T.untyped }
-    attr_accessor :value
-
-    sig { params(name: String, type: IL::Type, value: T.untyped).void }
-    def initialize(name, type, value)
-      @name = name
-      @type = type
-      @value = value
-    end
-  end
-
-  class Context
-    extend T::Sig
-
-    sig { returns(Integer) }
-    attr_accessor :ip
-    sig { returns(T::Hash[String, SymbolInfo]) }
-    attr_reader :symbols # symbol name -> SymbolInfo
-    sig { returns(T::Hash[String, Integer]) }
-    attr_reader :label_indices # label name -> index in stmt_list
-
-    sig { void }
-    def initialize
-      @ip = T.let(0, Integer)
-      @symbols = T.let(Hash.new, T::Hash[String, SymbolInfo])
-      @label_indices = T.let(Hash.new, T::Hash[String, Integer])
-    end
-  end
-
   sig { params(program: IL::Program).void }
+  # Interpret a program.
+  #
+  # @param [IL::Program] program The program to interpret.
   def self.interpret(program)
     context = Context.new
     visitor = Visitor.new(VISIT_LAMBDAS)
@@ -344,4 +296,60 @@ module Interpreter
     IL::JumpZero => VISIT_JUMPZERO,
     IL::JumpNotZero => VISIT_JUMPNOTZERO,
   }, Visitor::LambdaHash)
+
+  private
+
+  class InterpreterValue
+    extend T::Sig
+
+    sig { returns(IL::Type) }
+    attr_reader :type
+    sig { returns(T.untyped) }
+    attr_reader :value
+
+    sig { params(type: IL::Type, value: T.untyped).void }
+    def initialize(type, value)
+      @type = type
+      @value = value
+    end
+  end
+
+  class SymbolInfo
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :name
+    sig { returns(IL::Type) }
+    attr_reader :type
+    sig { returns T.untyped }
+    attr_accessor :value
+
+    sig { params(name: String, type: IL::Type, value: T.untyped).void }
+    def initialize(name, type, value)
+      @name = name
+      @type = type
+      @value = value
+    end
+  end
+
+  class Context
+    extend T::Sig
+
+    sig { returns(Integer) }
+    attr_accessor :ip
+    sig { returns(T::Hash[String, SymbolInfo]) }
+    attr_reader :symbols # symbol name -> SymbolInfo
+    sig { returns(T::Hash[String, Integer]) }
+    attr_reader :label_indices # label name -> index in stmt_list
+
+    sig { void }
+    def initialize
+      @ip = T.let(0, Integer)
+      @symbols = T.let(Hash.new, T::Hash[String, SymbolInfo])
+      @label_indices = T.let(Hash.new, T::Hash[String, Integer])
+    end
+  end
+
+
+
 end

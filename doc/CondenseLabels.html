@@ -152,6 +152,28 @@
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>(program)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
     </ul>
   
 
@@ -163,6 +185,11 @@
   
   
   
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Optimization.html" title="Optimization (class)">Optimization</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Optimization.html#to_s-instance_method" title="Optimization#to_s (method)">#to_s</a></span></p>
+
   <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
@@ -192,14 +219,14 @@
       <pre class="lines">
 
 
-9
-10
 11
 12
-13</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/condense_labels.rb', line 9</span>
+      <pre class="code"><span class="info file"># File 'lib/optimization/condense_labels.rb', line 11</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
   <span class='ivar'>@id</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>condense_labels</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
@@ -214,10 +241,134 @@
 </div>
 
 
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="run-instance_method">
+  
+    #<strong>run</strong>(program)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/optimization/condense_labels.rb', line 18</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_jump_map'>jump_map</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='comment'># target name -&gt; IL::Goto
+</span>  <span class='id identifier rubyid_label_adj_map'>label_adj_map</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='comment'># IL::Label -&gt; the IL::Label immediately above it
+</span>
+  <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_stmt_with_index'>each_stmt_with_index</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
+    <span class='comment'># identify adjacent labels
+</span>    <span class='id identifier rubyid_last'>last</span> <span class='op'>=</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+    <span class='comment'># TODO: sorbet is saying this code is unreachable? it gets reached though
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Label.html" title="IL::Label (class)">Label</a></span></span><span class='rparen'>)</span> <span class='kw'>and</span> <span class='id identifier rubyid_last'>last</span> <span class='kw'>and</span> <span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Label.html" title="IL::Label (class)">Label</a></span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_label_adj_map'>label_adj_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_s'>s</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_last'>last</span>
+    <span class='comment'># push all stmts to internal list except adjacent labels
+</span>    <span class='kw'>else</span>
+      <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># mark jumps
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Jump.html" title="IL::Jump (class)">Jump</a></span></span><span class='rparen'>)</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_jump_map'>jump_map</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_target'>target</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_jump_map'>jump_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_target'>target</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='rparen'>)</span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_jump_map'>jump_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_target'>target</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_s'>s</span><span class='rbracket'>]</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_label_adj_map'>label_adj_map</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_reverse_each'>reverse_each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_c'>c</span><span class='op'>|</span>
+    <span class='comment'># redirect all jumps pointing at the adj label to its predecessor
+</span>    <span class='id identifier rubyid_jump_map'>jump_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_c'>c</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_j'>j</span><span class='op'>|</span>
+      <span class='id identifier rubyid_j'>j</span><span class='period'>.</span><span class='id identifier rubyid_target'>target</span> <span class='op'>=</span> <span class='id identifier rubyid_label_adj_map'>label_adj_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_c'>c</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+
+      <span class='comment'># copy jumps in map to reflect their new target
+</span>      <span class='comment'># we don&#39;t have to remove them from their old location since that label
+</span>      <span class='comment'># will never be read again (and we&#39;re iterating through that collection
+</span>      <span class='comment'># right now so removing it would be awkward)
+</span>      <span class='kw'>if</span> <span class='id identifier rubyid_jump_map'>jump_map</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_j'>j</span><span class='period'>.</span><span class='id identifier rubyid_target'>target</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_jump_map'>jump_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_j'>j</span><span class='period'>.</span><span class='id identifier rubyid_target'>target</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_j'>j</span><span class='rparen'>)</span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_jump_map'>jump_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_j'>j</span><span class='period'>.</span><span class='id identifier rubyid_target'>target</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_j'>j</span><span class='rbracket'>]</span>
+      <span class='kw'>end</span>
+    <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+
+  <span class='comment'># return a new program with the modified stmt_list
+</span>  <span class='id identifier rubyid_new_program'>new_program</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Program.html" title="IL::Program (class)">Program</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="IL/Program.html#initialize-instance_method" title="IL::Program#initialize (method)">new</a></span></span>
+  <span class='id identifier rubyid_new_program'>new_program</span><span class='period'>.</span><span class='id identifier rubyid_concat_stmt_list'>concat_stmt_list</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
 </div>
 
       <div id="footer">
-  Generated on Tue Feb 20 17:47:28 2024 by
+  Generated on Fri Feb 23 13:23:50 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>
