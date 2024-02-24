@@ -72,27 +72,27 @@ class Debugger::PrettyPrinter
   }, Visitor::Lambda)
 
   VISIT_DECLARATION = T.let(-> (v, o, c) {
-    "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}"
+    "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
   }, Visitor::Lambda)
 
   VISIT_ASSIGNMENT = T.let(-> (v, o, c) {
-    "#{v.visit(o.id)} = #{v.visit(o.rhs)}"
+    "#{v.visit(o.id)} = #{v.visit(o.rhs)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
   }, Visitor::Lambda)
 
   VISIT_LABEL = T.let(-> (v, o, c) {
-    ANSI.fmt(o.to_s, color: ANSI::CYAN)
+    "#{ANSI.fmt("#{o.name}:", color: ANSI::CYAN)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
   }, Visitor::Lambda)
 
   VISIT_JUMP = T.let(-> (v, o, c) {
-    "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}"
+    "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
   }, Visitor::Lambda)
 
   VISIT_JUMPZERO = T.let(-> (v, o, c) {
-    "#{ANSI.fmt("jz", color: ANSI::RED)} #{v.visit(o.cond)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}"
+    "#{ANSI.fmt("jz", color: ANSI::RED)} #{v.visit(o.cond)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
   }, Visitor::Lambda)
 
   VISIT_JUMPNOTZERO = T.let(-> (v, o, c) {
-    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{v.visit(o.cond)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}"
+    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{v.visit(o.cond)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
   }, Visitor::Lambda)
 
 

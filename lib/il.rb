@@ -196,7 +196,9 @@ module IL
   # A Statement is a single instruction or "line of code" in the IL.
   class Statement
     extend T::Sig
-    # stub
+
+    sig { returns(T.nilable(String)) }
+    attr_accessor :annotation
   end
 
   # A Declaration is a Statement that declares a new ID with a type and value.
