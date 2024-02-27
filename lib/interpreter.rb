@@ -105,31 +105,32 @@ module Interpreter
       raise("Mismatched types '#{left.type}' and '#{right.type}'")
     end
 
+    # cannot use BinaryOp.calculate since these are InterpreterValues
     result = case op
-    when IL::BinaryOp::ADD_OP
+    when IL::BinaryOp::Operator::ADD
       left.value + right.value
-    when IL::BinaryOp::SUB_OP
+    when IL::BinaryOp::Operator::SUB
       left.value - right.value
-    when IL::BinaryOp::MUL_OP
+    when IL::BinaryOp::Operator::MUL
       left.value * right.value
-    when IL::BinaryOp::DIV_OP
+    when IL::BinaryOp::Operator::DIV
       left.value / right.value
-    when IL::BinaryOp::EQ_OP
+    when IL::BinaryOp::Operator::EQ
       if left.value == right.value then 1 else 0 end
-    when IL::BinaryOp::LT_OP
+    when IL::BinaryOp::Operator::LT
       if left.value < right.value then 1 else 0 end
-    when IL::BinaryOp::GT_OP
+    when IL::BinaryOp::Operator::GT
       if left.value > right.value then 1 else 0 end
-    when IL::BinaryOp::LEQ_OP
+    when IL::BinaryOp::Operator::LEQ
       if left.value <= right.value then 1 else 0 end
-    when IL::BinaryOp::GEQ_OP
+    when IL::BinaryOp::Operator::GEQ
       if left.value >= right.value then 1 else 0 end
-    when IL::BinaryOp::OR_OP
+    when IL::BinaryOp::Operator::OR
       if left.value != 0 || right.value != 0 then 1 else 0 end
-    when IL::BinaryOp::AND_OP
+    when IL::BinaryOp::Operator::AND
       if left.value != 0 && right.value != 0 then 1 else 0 end
-    else
-      raise("Invalid binary operator '#{op}'")
+    else # cannot use T.absurd since o.op is untyped
+      raise("Unimplemented binary operator '#{op}'")
     end
 
     # since both operands must have same type we can return either as our type
@@ -142,13 +143,12 @@ module Interpreter
 
     value = v.visit(value, ctx: context)
 
+    # cannot use UnaryOp.calculate since these are InterpreterValues
     result = case op
-    when IL::UnaryOp::NEG_OP
+    when IL::UnaryOp::Operator::NEG
       0 - value.value
-    when IL::UnaryOp::POS_OP
-      value.value # does nothing
     else
-      raise("Invalid unary operator '#{op}'")
+      raise("Unsupported unary operator '#{op}'")
     end
 
     return InterpreterValue.new(value.type, result)

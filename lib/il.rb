@@ -105,7 +105,11 @@ module IL
   # arithmetic operations. Expressions cannot be nested.
   class Expression
     extend T::Sig
-    # stub
+
+    sig { returns(T.untyped) }
+    def calculate
+      0
+    end
   end
 
   # A BinaryOp is an Expression which computes a value from two operands.
@@ -113,41 +117,40 @@ module IL
   class BinaryOp < Expression
     extend T::Sig
 
-    # Addition
-    ADD_OP = "+"
-    # Subtraction
-    SUB_OP = "-"
-    # Multiplication
-    MUL_OP = "*"
-    # Division
-    DIV_OP = "/"
-    # Boolean equality
-    EQ_OP  = "=="
-    # Boolean less than
-    LT_OP  = "<"
-    # Boolean greater than
-    GT_OP  = ">"
-    # Boolean less than equal to
-    LEQ_OP = "<="
-    # Boolean greater than equal to
-    GEQ_OP = ">="
-    # Boolean or
-    OR_OP  = "||"
-    # Boolean and
-    AND_OP = "&&"
+    class Operator < T::Enum
+      extend T::Sig
 
-    sig { returns(String) }
+      enums do
+        ADD = new("+")
+        SUB = new("-")
+        MUL = new("*")
+        DIV = new("/")
+        EQ  = new("==")
+        LT  = new("<")
+        GT  = new(">")
+        LEQ = new("<=")
+        GEQ = new(">=")
+        OR  = new("||")
+        AND = new("&&")
+      end
+
+      sig { returns(String) }
+      def to_s
+        self.serialize
+      end
+    end
+
+    sig { returns(Operator) }
     attr_reader :op
     sig { returns(Value) }
     attr_reader :left
     sig { returns(Value) }
     attr_reader :right
 
-    sig { params(op: String, left: Value, right: Value).void }
+    sig { params(op: Operator, left: Value, right: Value).void }
     # Construct a new BinaryOp.
     #
-    # @param [String] op The binary operator. Must be one of the valid
-    # constant operator values.
+    # @param [String] op The binary operator.
     # @param [Value] left The left operand.
     # @param [Value] right The right operand.
     def initialize(op, left, right)
@@ -160,27 +163,71 @@ module IL
     def to_s
       "#{@left} #{@op} #{@right}"
     end
+
+    sig { returns(T.untyped) }
+    def calculate
+      # calculations can only be performed on constants
+      if not @left.is_a?(Constant) or not @right.is_a?(Constant)
+        return nil
+      end
+
+      left = @left
+      right = @right
+
+      case @op
+      when Operator::ADD
+        left.value + right.value
+      when Operator::SUB
+        left.value - right.value
+      when Operator::MUL
+        left.value * right.value
+      when Operator::DIV
+        left.value / right.value
+      when Operator::EQ
+        if left.value == right.value then 1 else 0 end
+      when Operator::LT
+        if left.value < right.value then 1 else 0 end
+      when Operator::GT
+        if left.value > right.value then 1 else 0 end
+      when Operator::LEQ
+        if left.value <= right.value then 1 else 0 end
+      when Operator::GEQ
+        if left.value >= right.value then 1 else 0 end
+      when Operator::OR
+        if left.value != 0 || right.value != 0 then 1 else 0 end
+      when Operator::AND
+        if left.value != 0 && right.value != 0 then 1 else 0 end
+      else T.absurd(self)
+      end
+    end
   end
 
   # A UnaryOp is an Expression which computes a value from one operand.
   class UnaryOp < Expression
     extend T::Sig
 
-    # Unary negation
-    NEG_OP = "-"
-    # Does nothing
-    POS_OP = "+"
+    class Operator < T::Enum
+      extend T::Sig
 
-    sig { returns(String) }
+      enums do
+        NEG = new("-")
+      end
+
+      sig { returns(String) }
+      def to_s
+        self.serialize
+      end
+    end
+
+    sig { returns(Operator) }
     attr_reader :op
     sig { returns(Value) }
     attr_reader :value
 
-    sig { params(op: String, value: Value).void }
+    sig { params(op: Operator, value: Value).void }
     # Construct a new UnaryOp.
     #
-    # @param [String] op The unary operator. Must be one of the valid
-    # constant operator values.
+    # @param [Operator] op The unary operator.
     # @param [Value] value The value being operated on.
     def initialize(op, value)
       @op = op
@@ -190,6 +237,22 @@ module IL
     sig { returns(String) }
     def to_s
       "#{@op}#{@value}"
+    end
+
+    sig { returns(T.untyped) }
+    def calculate
+      # calculations can only be performed on constants
+      if not @value.is_a?(Constant)
+        return nil
+      end
+
+      value = @value
+
+      case @op
+      when Operator::NEG
+        0 - value.value
+      else T.absurd(self)
+      end
     end
   end
 
