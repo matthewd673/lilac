@@ -8,14 +8,9 @@ module BB
   class Block
     extend T::Sig
 
-    sig { void }
-    def initialize
-      @stmt_list = []
-    end
-
-    sig { params(stmt: IL::Statement).void }
-    def push_stmt(stmt)
-      @stmt_list.push(stmt)
+    sig { params(stmt_list: T::Array[IL::Statement]).void }
+    def initialize(stmt_list)
+      @stmt_list = stmt_list
     end
 
     def length
@@ -46,21 +41,28 @@ module BB
 
   sig { params(program: IL::Program).returns(T::Array[Block]) }
   def self.create_blocks(program)
-    blocks = [Block.new]
+    blocks = []
+    stmt_list = []
 
     program.each_stmt { |s|
       # mark beginning of a block
-      if s.is_a?(IL::Label) and not blocks[-1].empty?
-        blocks.push(Block.new)
+      if s.is_a?(IL::Label) and not stmt_list.empty?
+        blocks.push(Block.new(stmt_list))
+        stmt_list = []
       end
 
-      blocks[-1].push_stmt(s)
+      stmt_list.push(s)
 
       # mark end of a block
       if s.is_a?(IL::Jump) # block will never be empty due to above push
-        blocks.push(Block.new)
+        blocks.push(Block.new(stmt_list))
+        stmt_list = []
       end
     }
+
+    if not stmt_list.empty?
+      blocks.push(Block.new(stmt_list))
+    end
 
     return blocks
   end

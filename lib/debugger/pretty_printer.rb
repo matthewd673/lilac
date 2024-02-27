@@ -4,7 +4,7 @@ require_relative "debugger"
 require_relative "../ansi"
 require_relative "../il"
 require_relative "../visitor"
-require_relative "../optimization/bb"
+require_relative "../analysis/bb"
 
 # A PrettyPrinter contains functions that make it easy to pretty-print various
 # internal lilac data structures, like +IL::Program+, to the terminal.
@@ -88,11 +88,11 @@ class Debugger::PrettyPrinter
   }, Visitor::Lambda)
 
   VISIT_JUMPZERO = T.let(-> (v, o, c) {
-    "#{ANSI.fmt("jz", color: ANSI::RED)} #{v.visit(o.cond)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
+    "#{ANSI.fmt("jz", color: ANSI::RED)} #{v.visit(o.cond)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
   }, Visitor::Lambda)
 
   VISIT_JUMPNOTZERO = T.let(-> (v, o, c) {
-    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{v.visit(o.cond)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
+    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{v.visit(o.cond)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
   }, Visitor::Lambda)
 
 

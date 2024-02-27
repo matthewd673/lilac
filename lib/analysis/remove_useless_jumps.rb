@@ -3,7 +3,7 @@
 require "sorbet-runtime"
 require_relative "../il"
 
-class RemoveUselessJumps < Optimization
+class RemoveUselessJumps < Analysis
   extend T::Sig
 
   sig { void }

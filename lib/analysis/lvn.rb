@@ -1,8 +1,8 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "optimization"
+# require_relative "analysis"
 
-class LVN < Optimization
+class LVN < Analysis
   extend T::Sig
 
   sig { void }

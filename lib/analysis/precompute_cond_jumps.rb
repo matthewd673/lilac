@@ -2,14 +2,14 @@
 require "sorbet-runtime"
 require_relative "../il"
 
-class PrecomputeCondJumps < Optimization
+class PrecomputeCondJumps < Analysis
   extend T::Sig
 
   sig { void }
   def initialize
     @id = T.let("precompute_cond_jumps", String)
     @description = T.let("Replace constant conditional jumps with unconditional jumps", String)
-    @level = T.let(0, Integer)
+    @level = T.let(1, Integer)
   end
 
   sig { params(program: IL::Program).void }

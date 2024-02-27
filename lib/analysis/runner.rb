@@ -1,7 +1,7 @@
 # typed: strict
 require "sorbet-runtime"
 require_relative "../il"
-require_relative "optimization"
+require_relative "analysis"
 require_relative "condense_labels"
 require_relative "remove_useless_jumps"
 require_relative "precompute_cond_jumps"
@@ -18,30 +18,30 @@ class Runner
     @program = program
   end
 
-  sig { params(opt: Optimization).void }
-  def run_pass(opt)
-    Kernel::puts("Running #{opt.id}")
-    opt.run(@program)
+  sig { params(analysis: Analysis).void }
+  def run_pass(analysis)
+    Kernel::puts("Running #{analysis.id}")
+    analysis.run(@program)
   end
 
-  sig { params(opt_list: T::Array[Optimization]).void }
-  def run_passes(opt_list)
-    for o in opt_list
-      run_pass(o)
+  sig { params(analysis_list: T::Array[Analysis]).void }
+  def run_passes(analysis_list)
+    for a in analysis_list
+      run_pass(a)
     end
   end
 
-  sig { params(level: Integer).returns(T::Array[Optimization]) }
+  sig { params(level: Integer).returns(T::Array[Analysis]) }
   def level_passes(level)
-    OPTIMIZATIONS.select { |o| o.level == level }
+    ANALYSES.select { |a| a.level == level }
   end
 
   protected
 
-  OPTIMIZATIONS = T.let([
+  ANALYSES = T.let([
     CondenseLabels.new,
     RemoveUselessJumps.new,
     LVN.new,
     PrecomputeCondJumps.new,
-  ], T::Array[Optimization])
+  ], T::Array[Analysis])
 end

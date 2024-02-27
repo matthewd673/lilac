@@ -2,7 +2,7 @@
 require "sorbet-runtime"
 require_relative "../il"
 
-class Optimization
+class Analysis
   extend T::Sig
 
   sig { returns(String) }

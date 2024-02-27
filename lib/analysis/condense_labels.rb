@@ -3,7 +3,7 @@
 require "sorbet-runtime"
 require_relative "../il"
 
-class CondenseLabels < Optimization
+class CondenseLabels < Analysis
   extend T::Sig
 
   sig { void }
