@@ -210,7 +210,7 @@ module IL
     sig { returns(ID) }
     attr_reader :id
     sig { returns(T.any(Expression, Value)) }
-    attr_reader :rhs
+    attr_accessor :rhs
 
     sig { params(type: Type, id: ID, rhs: T.any(Expression, Value)).void }
     # Construct a new Declaration.
@@ -238,7 +238,7 @@ module IL
     sig { returns(ID) }
     attr_reader :id
     sig { returns(T.any(Expression, Value)) }
-    attr_reader :rhs
+    attr_accessor :rhs
 
     sig { params(id: ID, rhs: T.any(Expression, Value)).void }
     # Construct a new Assignment.

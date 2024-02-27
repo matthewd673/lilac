@@ -5,6 +5,7 @@ require_relative "optimization"
 require_relative "condense_labels"
 require_relative "remove_useless_jumps"
 require_relative "precompute_cond_jumps"
+require_relative "lvn"
 
 class Runner
   extend T::Sig
@@ -40,6 +41,7 @@ class Runner
   OPTIMIZATIONS = T.let([
     CondenseLabels.new,
     RemoveUselessJumps.new,
+    LVN.new,
     PrecomputeCondJumps.new,
   ], T::Array[Optimization])
 end
