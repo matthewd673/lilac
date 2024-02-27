@@ -16,7 +16,6 @@ class LVN < Optimization
   def run(program)
     block_list = BB.create_blocks(program)
     block_list.each { |b|
-
       value_number_map = ValueNumberMap.new
       id_number_map = IDNumberMap.new
 
@@ -26,8 +25,11 @@ class LVN < Optimization
           next
         end
 
+        # try to precompute rhs (constant-folding)
+        rhs = constant_folding(s.rhs, value_number_map, id_number_map)
+
         # calculate hash for rhs
-        rhs_val = ValueHash.new(s.rhs, value_number_map, id_number_map)
+        rhs_val = ValueHash.new(rhs, value_number_map, id_number_map)
         # get or insert the value (existing shows if it existed before or not)
         number = value_number_map.get_number_by_value(rhs_val.hash)
         existing = true
@@ -39,10 +41,19 @@ class LVN < Optimization
         # associate number with the id being assigned to
         id_number_map.assign_id(s.id.name, number)
 
+        # constants on the rhs are always better off staying as constants
+        if rhs_val.value.is_a?(IL::Constant)
+          s.rhs = rhs_val.value
+          s.annotation = "#{number} (is constant)" unless not existing
+          next
+        end
+
+        # brand new values will never have their rhs replaced
         if not existing
           next
         end
 
+        # if the value exists in another id, set rhs to that id
         existing_id = id_number_map.get_id_by_number(number)
         if existing_id
           s.rhs = IL::ID.new(existing_id)
@@ -61,6 +72,53 @@ class LVN < Optimization
   end
 
   private
+
+  sig { params(rhs: T.any(IL::Expression, IL::Value),
+               value_number_map: ValueNumberMap,
+               id_number_map: IDNumberMap)
+        .returns(T.any(IL::Expression, IL::Value)) }
+  def constant_folding(rhs, value_number_map, id_number_map)
+    if rhs.is_a?(IL::ID)
+      # check if the id has a value number
+      id_number = id_number_map.get_number_by_id(rhs.name)
+
+      # if it has a value number, get it and check if its a constant
+      if not id_number then return rhs end
+      id_value = value_number_map.get_value_by_number(id_number)
+
+      if not id_value then return rhs end # will never happen
+
+      # if its a constant, set rhs to that constant
+      if id_value.value.is_a?(IL::Constant)
+        return id_value.value
+      end
+    elsif rhs.is_a?(IL::BinaryOp)
+      # recurse on left and right (in case they are ids mapped to constants)
+      left = constant_folding(rhs.left, value_number_map, id_number_map)
+      right = constant_folding(rhs.right, value_number_map, id_number_map)
+
+      # only calculate if both sides are constants
+      if left.is_a?(IL::Constant) and right.is_a?(IL::Constant)
+        rhs.left = left
+        rhs.right = right
+        # TODO: below calculation ignores type mismatch
+        constant_result = IL::Constant.new(left.type, rhs.calculate)
+        return constant_result
+      end
+    elsif rhs.is_a?(IL::UnaryOp)
+      # recurse on value (in case they are ids mapped to constants)
+      value = constant_folding(rhs.value, value_number_map, id_number_map)
+
+      # only calculate if both sides are constants
+      if value.is_a?(IL::Constant)
+        rhs.value = value
+        constant_result = IL::Constant.new(value.type, rhs.calculate)
+        return constant_result
+      end
+    end
+
+    return rhs
+  end
 
   class ValueNumberMap
     extend T::Sig

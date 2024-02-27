@@ -143,14 +143,14 @@ module IL
     sig { returns(Operator) }
     attr_reader :op
     sig { returns(Value) }
-    attr_reader :left
+    attr_accessor :left
     sig { returns(Value) }
-    attr_reader :right
+    attr_accessor :right
 
     sig { params(op: Operator, left: Value, right: Value).void }
     # Construct a new BinaryOp.
     #
-    # @param [String] op The binary operator.
+    # @param [Operator] op The binary operator.
     # @param [Value] left The left operand.
     # @param [Value] right The right operand.
     def initialize(op, left, right)
@@ -222,7 +222,7 @@ module IL
     sig { returns(Operator) }
     attr_reader :op
     sig { returns(Value) }
-    attr_reader :value
+    attr_accessor :value
 
     sig { params(op: Operator, value: Value).void }
     # Construct a new UnaryOp.
