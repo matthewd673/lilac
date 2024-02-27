@@ -2,10 +2,7 @@
 require "sorbet-runtime"
 require_relative "../il"
 require_relative "analysis"
-require_relative "condense_labels"
-require_relative "remove_useless_jumps"
-require_relative "precompute_cond_jumps"
-require_relative "lvn"
+require_relative "analyses"
 
 class Runner
   extend T::Sig
@@ -35,13 +32,4 @@ class Runner
   def level_passes(level)
     ANALYSES.select { |a| a.level == level }
   end
-
-  protected
-
-  ANALYSES = T.let([
-    CondenseLabels.new,
-    RemoveUselessJumps.new,
-    LVN.new,
-    PrecomputeCondJumps.new,
-  ], T::Array[Analysis])
 end
