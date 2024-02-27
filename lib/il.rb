@@ -368,7 +368,7 @@ module IL
     extend T::Sig
 
     sig { returns(Value) }
-    attr_reader :cond
+    attr_accessor :cond
 
     sig { params(cond: Value, target: String).void }
     # Construct a new JumpZero.
@@ -392,7 +392,7 @@ module IL
     extend T::Sig
 
     sig { returns(Value) }
-    attr_reader :cond
+    attr_accessor :cond
 
     sig { params(cond: Value, target: String).void }
     # Construct a new JumpNotZero.

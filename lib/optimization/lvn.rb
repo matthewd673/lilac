@@ -20,6 +20,17 @@ class LVN < Optimization
       id_number_map = IDNumberMap.new
 
       b.each_stmt { |s|
+        # perform constant folding on conditional jump conditions
+        # this is a bonus on top of LVN's core task
+        if s.is_a?(IL::JumpZero) or s.is_a?(IL::JumpNotZero)
+          cond = constant_folding(s.cond, value_number_map, id_number_map)
+          # swap out cond only if the new result is a constant
+          if cond.is_a?(IL::Constant)
+            s.cond = cond
+          end
+          next # job's done with the jmps
+        end
+
         # only declarations and assignments are relevant
         if not (s.is_a?(IL::Declaration) or s.is_a?(IL::Assignment))
           next
