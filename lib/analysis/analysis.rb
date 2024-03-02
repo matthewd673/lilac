@@ -15,8 +15,8 @@ class Analysis
   sig { void }
   def initialize
     # NOTE: these should always be overwritten by subclasses
-    @id = T.let("optimization", String)
-    @description = T.let("Optimization stub", String)
+    @id = T.let("analysis", String)
+    @description = T.let("Analysis stub", String)
     @level = T.let(1, Integer)
   end
 

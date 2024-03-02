@@ -4,7 +4,7 @@ require_relative "../il"
 require_relative "analysis"
 require_relative "analyses"
 
-class Runner
+class AnalysisRunner
   extend T::Sig
 
   sig { returns(IL::Program) }
