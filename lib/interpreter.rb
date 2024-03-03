@@ -3,6 +3,11 @@ require "sorbet-runtime"
 require_relative "il"
 require_relative "visitor"
 
+# The Interpreter module provides a simple interpreter for the lilac IL.
+# Lilac IL is not designed to be an interpreted language (and does
+# not support any dynamic features that may be expected of an interpreted
+# language). Rather, the interpreter is provided as an easy way to execute
+# lilac IL without translating it to a machine-specific form.
 module Interpreter
   extend T::Sig
   include Kernel
@@ -290,6 +295,9 @@ module Interpreter
 
   private
 
+  # An InterpreterValue is a value that can be returned while evaluating
+  # an expression. It abstracts away details about the source of the value
+  # (like if its a Constant or came from the symbol table).
   class InterpreterValue
     extend T::Sig
 
@@ -305,6 +313,8 @@ module Interpreter
     end
   end
 
+  # The SymbolInfo class contains information about variables in the
+  # interpreter's memory including their name, type, and current value.
   class SymbolInfo
     extend T::Sig
 
@@ -323,6 +333,9 @@ module Interpreter
     end
   end
 
+  # A Context contains all of the information that the interpreter may
+  # need during a step of interpretation including a symbol table,
+  # instruction pointer, and etc.
   class Context
     extend T::Sig
 

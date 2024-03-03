@@ -93,7 +93,18 @@
   
 </div>
 
-<h2>Defined Under Namespace</h2>
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>The Interpreter module provides a simple interpreter for the lilac IL. Lilac IL is not designed to be an interpreted language (and does not support any dynamic features that may be expected of an interpreted language). Rather, the interpreter is provided as an easy way to execute lilac IL without translating it to a machine-specific form.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
 <p class="children">
   
     
@@ -199,11 +210,6 @@
       <pre class="lines">
 
 
-14
-15
-16
-17
-18
 19
 20
 21
@@ -241,10 +247,15 @@
 53
 54
 55
-56</pre>
+56
+57
+58
+59
+60
+61</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 14</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_interpret'>interpret</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Interpreter/Context.html" title="Interpreter::Context (class)">Context</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Interpreter/Context.html#initialize-instance_method" title="Interpreter::Context#initialize (method)">new</a></span></span>
@@ -299,7 +310,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 23 18:22:04 2024 by
+  Generated on Sun Mar  3 16:55:25 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>

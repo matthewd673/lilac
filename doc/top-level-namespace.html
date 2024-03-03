@@ -71,11 +71,6 @@
   
   
   
-  <dl>
-      <dt>Includes:</dt>
-      <dd><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></dd>
-  </dl>
-  
   
 
   
@@ -87,40 +82,78 @@
 <p class="children">
   
     
-      <strong class="modules">Modules:</strong> <span class='object_link'><a href="ANSI.html" title="ANSI (module)">ANSI</a></span>, <span class='object_link'><a href="BB.html" title="BB (module)">BB</a></span>, <span class='object_link'><a href="Debugger.html" title="Debugger (module)">Debugger</a></span>, <span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span>, <span class='object_link'><a href="Interpreter.html" title="Interpreter (module)">Interpreter</a></span>
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="ANSI.html" title="ANSI (module)">ANSI</a></span>, <span class='object_link'><a href="BB.html" title="BB (module)">BB</a></span>, <span class='object_link'><a href="CLI.html" title="CLI (module)">CLI</a></span>, <span class='object_link'><a href="Debugger.html" title="Debugger (module)">Debugger</a></span>, <span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span>, <span class='object_link'><a href="Interpreter.html" title="Interpreter (module)">Interpreter</a></span>
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="CondenseLabels.html" title="CondenseLabels (class)">CondenseLabels</a></span>, <span class='object_link'><a href="LVN.html" title="LVN (class)">LVN</a></span>, <span class='object_link'><a href="Optimization.html" title="Optimization (class)">Optimization</a></span>, <span class='object_link'><a href="PrecomputeCondJumps.html" title="PrecomputeCondJumps (class)">PrecomputeCondJumps</a></span>, <span class='object_link'><a href="RemoveUselessJumps.html" title="RemoveUselessJumps (class)">RemoveUselessJumps</a></span>, <span class='object_link'><a href="Runner.html" title="Runner (class)">Runner</a></span>, <span class='object_link'><a href="Visitor.html" title="Visitor (class)">Visitor</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Analysis.html" title="Analysis (class)">Analysis</a></span>, <span class='object_link'><a href="AnalysisRunner.html" title="AnalysisRunner (class)">AnalysisRunner</a></span>, <span class='object_link'><a href="CFG.html" title="CFG (class)">CFG</a></span>, <span class='object_link'><a href="CondenseLabels.html" title="CondenseLabels (class)">CondenseLabels</a></span>, <span class='object_link'><a href="LVN.html" title="LVN (class)">LVN</a></span>, <span class='object_link'><a href="PrecomputeCondJumps.html" title="PrecomputeCondJumps (class)">PrecomputeCondJumps</a></span>, <span class='object_link'><a href="RemoveUnusedLabels.html" title="RemoveUnusedLabels (class)">RemoveUnusedLabels</a></span>, <span class='object_link'><a href="RemoveUselessJumps.html" title="RemoveUselessJumps (class)">RemoveUselessJumps</a></span>, <span class='object_link'><a href="TypeCheck.html" title="TypeCheck (class)">TypeCheck</a></span>, <span class='object_link'><a href="Validation.html" title="Validation (class)">Validation</a></span>, <span class='object_link'><a href="ValidationRunner.html" title="ValidationRunner (class)">ValidationRunner</a></span>, <span class='object_link'><a href="Visitor.html" title="Visitor (class)">Visitor</a></span>
     
   
 </p>
 
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="ANALYSES-constant" class="">ANALYSES =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>A definitive list of all analyses available in lilac.</p>
 
 
-  <h2>Constant Summary</h2>
+  </div>
+</div>
+<div class="tags">
   
-  <h3 class="inherited">Constants included
-     from <span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="IL.html#ILObject-constant" title="IL::ILObject (constant)">IL::ILObject</a></span></p>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbracket'>[</span>
+  <span class='const'><span class='object_link'><a href="CondenseLabels.html" title="CondenseLabels (class)">CondenseLabels</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="CondenseLabels.html#initialize-instance_method" title="CondenseLabels#initialize (method)">new</a></span></span><span class='comma'>,</span>
+  <span class='const'><span class='object_link'><a href="RemoveUselessJumps.html" title="RemoveUselessJumps (class)">RemoveUselessJumps</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="RemoveUselessJumps.html#initialize-instance_method" title="RemoveUselessJumps#initialize (method)">new</a></span></span><span class='comma'>,</span>
+  <span class='const'><span class='object_link'><a href="LVN.html" title="LVN (class)">LVN</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LVN.html#initialize-instance_method" title="LVN#initialize (method)">new</a></span></span><span class='comma'>,</span>
+  <span class='const'><span class='object_link'><a href="PrecomputeCondJumps.html" title="PrecomputeCondJumps (class)">PrecomputeCondJumps</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="PrecomputeCondJumps.html#initialize-instance_method" title="PrecomputeCondJumps#initialize (method)">new</a></span></span><span class='comma'>,</span>
+  <span class='const'><span class='object_link'><a href="RemoveUnusedLabels.html" title="RemoveUnusedLabels (class)">RemoveUnusedLabels</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="RemoveUnusedLabels.html#initialize-instance_method" title="RemoveUnusedLabels#initialize (method)">new</a></span></span><span class='comma'>,</span>
+<span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Array</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="Analysis.html" title="Analysis (class)">Analysis</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span></pre></dd>
+      
+        <dt id="VALIDATIONS-constant" class="">VALIDATIONS =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>A definitive list of all validations available in lilac.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbracket'>[</span>
+  <span class='const'><span class='object_link'><a href="TypeCheck.html" title="TypeCheck (class)">TypeCheck</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="TypeCheck.html#initialize-instance_method" title="TypeCheck#initialize (method)">new</a></span></span>
+<span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Array</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="Validation.html" title="Validation (class)">Validation</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span></pre></dd>
+      
+    </dl>
+  
 
 
 
 
 
 
-  
-  
-  
-  
-  
-  
-  
+
+
 
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 23 18:22:04 2024 by
+  Generated on Sun Mar  3 16:55:25 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>

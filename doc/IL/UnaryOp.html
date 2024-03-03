@@ -117,49 +117,16 @@
 <div class="tags">
   
 
-</div>
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
   
-    <h2>
-      Constant Summary
-      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
-    </h2>
-
-    <dl class="constants">
-      
-        <dt id="NEG_OP-constant" class="">NEG_OP =
-          <div class="docstring">
-  <div class="discussion">
     
-<p>Unary negation</p>
-
-
-  </div>
-</div>
-<div class="tags">
   
-
-</div>
-        </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-</span><span class='tstring_end'>&quot;</span></span></pre></dd>
-      
-        <dt id="POS_OP-constant" class="">POS_OP =
-          <div class="docstring">
-  <div class="discussion">
     
-<p>Does nothing</p>
-
-
-  </div>
-</div>
-<div class="tags">
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="UnaryOp/Operator.html" title="IL::UnaryOp::Operator (class)">Operator</a></span>
+    
   
-
-</div>
-        </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>+</span><span class='tstring_end'>&quot;</span></span></pre></dd>
-      
-    </dl>
-  
+</p>
 
 
 
@@ -208,8 +175,6 @@
   
   
     
-      <span class="note title readonly">readonly</span>
-    
     
   
   
@@ -237,6 +202,28 @@
     </h2>
 
     <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#calculate-instance_method" title="#calculate (instance method)">#<strong>calculate</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
       
         <li class="public ">
   <span class="summary_signature">
@@ -314,8 +301,6 @@
     
 <p>Construct a new UnaryOp.</p>
 
-<p>constant operator values.</p>
-
 
   </div>
 </div>
@@ -328,13 +313,13 @@
         <span class='name'>op</span>
       
       
-        <span class='type'>(<tt>String</tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="UnaryOp/Operator.html" title="IL::UnaryOp::Operator (class)">Operator</a></span></tt>)</span>
       
       
       
         &mdash;
         <div class='inline'>
-<p>The unary operator. Must be one of the valid</p>
+<p>The unary operator.</p>
 </div>
       
     </li>
@@ -364,13 +349,13 @@
       <pre class="lines">
 
 
-185
-186
-187
-188</pre>
+232
+233
+234
+235</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 185</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 232</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_op'>op</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='ivar'>@op</span> <span class='op'>=</span> <span class='id identifier rubyid_op'>op</span>
@@ -414,12 +399,12 @@
       <pre class="lines">
 
 
-175
-176
-177</pre>
+223
+224
+225</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 175</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 223</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_op'>op</span>
   <span class='ivar'>@op</span>
@@ -430,11 +415,11 @@
 </div>
     
       
-      <span id=""></span>
+      <span id="value=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="value-instance_method">
   
-    #<strong>value</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+    #<strong>value</strong>  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -457,12 +442,12 @@
       <pre class="lines">
 
 
-177
-178
-179</pre>
+225
+226
+227</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 177</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 225</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_value'>value</span>
   <span class='ivar'>@value</span>
@@ -480,7 +465,59 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="to_s-instance_method">
+  <h3 class="signature first" id="calculate-instance_method">
+  
+    #<strong>calculate</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 243</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_calculate'>calculate</span>
+  <span class='comment'># calculations can only be performed on constants
+</span>  <span class='kw'>if</span> <span class='kw'>not</span> <span class='ivar'>@value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Constant.html" title="IL::Constant (class)">Constant</a></span></span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='ivar'>@value</span>
+
+  <span class='kw'>case</span> <span class='ivar'>@op</span>
+  <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="UnaryOp/Operator.html" title="IL::UnaryOp::Operator (class)">Operator</a></span></span><span class='op'>::</span><span class='const'>NEG</span>
+    <span class='int'>0</span> <span class='op'>-</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+  <span class='kw'>else</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_absurd'>absurd</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_s-instance_method">
   
     #<strong>to_s</strong>  &#x21d2; <tt>Object</tt> 
   
@@ -494,12 +531,12 @@
       <pre class="lines">
 
 
-191
-192
-193</pre>
+238
+239
+240</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 191</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 238</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@op</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='ivar'>@value</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -514,7 +551,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 23 18:22:05 2024 by
+  Generated on Sun Mar  3 16:55:25 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>

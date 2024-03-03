@@ -83,12 +83,23 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/optimization/bb.rb</dd>
+    <dd>lib/analysis/bb.rb</dd>
   </dl>
   
 </div>
 
-<h2>Defined Under Namespace</h2>
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>The BB module contains a data structure for basic blocks and functions to create basic blocks from IL Statements.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
 <p class="children">
   
     
@@ -116,7 +127,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#create_blocks-class_method" title="create_blocks (class method)">.<strong>create_blocks</strong>(program)  &#x21d2; Object </a>
+      <a href="#create_blocks-class_method" title="create_blocks (class method)">.<strong>create_blocks</strong>(program)  &#x21d2; T::Array[Block] </a>
     
 
     
@@ -130,7 +141,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Create a list of basic blocks for the given Program.</p>
+</div></span>
   
 </li>
 
@@ -148,57 +161,120 @@
       <div class="method_details first">
   <h3 class="signature first" id="create_blocks-class_method">
   
-    .<strong>create_blocks</strong>(program)  &#x21d2; <tt>Object</tt> 
+    .<strong>create_blocks</strong>(program)  &#x21d2; <tt>T::Array[<span class='object_link'><a href="BB/Block.html" title="BB::Block (class)">Block</a></span>]</tt> 
   
 
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Create a list of basic blocks for the given Program.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>program</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="IL/Program.html" title="IL::Program (class)">IL::Program</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The Program to create blocks from.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>T::Array[<span class='object_link'><a href="BB/Block.html" title="BB::Block (class)">Block</a></span>]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>A list of basic blocks.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66</pre>
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/bb.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 84</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_create_blocks'>create_blocks</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_blocks'>blocks</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="BB/Block.html" title="BB::Block (class)">Block</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB/Block.html#initialize-instance_method" title="BB::Block#initialize (method)">new</a></span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_blocks'>blocks</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
 
   <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_stmt'>each_stmt</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span>
     <span class='comment'># mark beginning of a block
-</span>    <span class='kw'>if</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Label.html" title="IL::Label (class)">Label</a></span></span><span class='rparen'>)</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='id identifier rubyid_blocks'>blocks</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
-      <span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB/Block.html" title="BB::Block (class)">Block</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB/Block.html#initialize-instance_method" title="BB::Block#initialize (method)">new</a></span></span><span class='rparen'>)</span>
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Label.html" title="IL::Label (class)">Label</a></span></span><span class='rparen'>)</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB/Block.html" title="BB::Block (class)">Block</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB/Block.html#initialize-instance_method" title="BB::Block#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
     <span class='kw'>end</span>
 
-    <span class='id identifier rubyid_blocks'>blocks</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_push_stmt'>push_stmt</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='rparen'>)</span>
 
     <span class='comment'># mark end of a block
 </span>    <span class='kw'>if</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Jump.html" title="IL::Jump (class)">Jump</a></span></span><span class='rparen'>)</span> <span class='comment'># block will never be empty due to above push
-</span>      <span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB/Block.html" title="BB::Block (class)">Block</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB/Block.html#initialize-instance_method" title="BB::Block#initialize (method)">new</a></span></span><span class='rparen'>)</span>
+</span>      <span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB/Block.html" title="BB::Block (class)">Block</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB/Block.html#initialize-instance_method" title="BB::Block#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
     <span class='kw'>end</span>
   <span class='rbrace'>}</span>
+
+  <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB/Block.html" title="BB::Block (class)">Block</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB/Block.html#initialize-instance_method" title="BB::Block#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 
   <span class='kw'>return</span> <span class='id identifier rubyid_blocks'>blocks</span>
 <span class='kw'>end</span></pre>
@@ -212,7 +288,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 23 18:22:04 2024 by
+  Generated on Sun Mar  3 16:55:25 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>

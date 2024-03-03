@@ -6,6 +6,7 @@ require_relative "lvn"
 require_relative "precompute_cond_jumps"
 require_relative "remove_unused_labels"
 
+# A definitive list of all analyses available in lilac.
 ANALYSES = T.let([
   CondenseLabels.new,
   RemoveUselessJumps.new,

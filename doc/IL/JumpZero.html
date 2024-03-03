@@ -138,8 +138,6 @@
   
   
     
-      <span class="note title readonly">readonly</span>
-    
     
   
   
@@ -163,6 +161,11 @@
   
   <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="Jump.html" title="IL::Jump (class)">Jump</a></span></h3>
   <p class="inherited"><span class='object_link'><a href="Jump.html#target-instance_method" title="IL::Jump#target (method)">#target</a></span></p>
+
+  
+  
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="Statement.html" title="IL::Statement (class)">Statement</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Statement.html#annotation-instance_method" title="IL::Statement#annotation (method)">#annotation</a></span></p>
 
 
   
@@ -304,13 +307,13 @@
       <pre class="lines">
 
 
-313
-314
-315
-316</pre>
+378
+379
+380
+381</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 313</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 378</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_cond'>cond</span><span class='comma'>,</span> <span class='id identifier rubyid_target'>target</span><span class='rparen'>)</span>
   <span class='ivar'>@cond</span> <span class='op'>=</span> <span class='id identifier rubyid_cond'>cond</span>
@@ -327,11 +330,11 @@
     <h2>Instance Attribute Details</h2>
     
       
-      <span id=""></span>
+      <span id="cond=-instance_method"></span>
       <div class="method_details first">
   <h3 class="signature first" id="cond-instance_method">
   
-    #<strong>cond</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+    #<strong>cond</strong>  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -354,12 +357,12 @@
       <pre class="lines">
 
 
-306
-307
-308</pre>
+371
+372
+373</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 306</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 371</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cond'>cond</span>
   <span class='ivar'>@cond</span>
@@ -391,12 +394,12 @@
       <pre class="lines">
 
 
-319
-320
-321</pre>
+384
+385
+386</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 319</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 384</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>jz </span><span class='embexpr_beg'>#{</span><span class='ivar'>@cond</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='ivar'>@target</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -411,7 +414,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 23 18:22:05 2024 by
+  Generated on Sun Mar  3 16:55:25 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>

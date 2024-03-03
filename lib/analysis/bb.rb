@@ -2,13 +2,17 @@
 require "sorbet-runtime"
 require_relative "../il"
 
+# The BB module contains a data structure for basic blocks and functions
+# to create basic blocks from IL Statements.
 module BB
   extend T::Sig
 
+  # A Block is a data structure for a single basic block.
   class Block
     extend T::Sig
 
     sig { returns(Integer) }
+    # The unique number of the block.
     attr_reader :number
 
     sig { params(number: Integer, stmt_list: T::Array[IL::Statement]).void }
@@ -18,11 +22,16 @@ module BB
     end
 
     sig { returns(Integer) }
+    # Get the number of Statements in the Block.
+    # @return [Integer] The length of the Block's Statement list.
     def length
       @stmt_list.length
     end
 
     sig { returns(T::Boolean) }
+    # Determines if the block is empty.
+    # @return [T::Boolean] True if there are no Statements in the Block's
+    #   Statement list.
     def empty?
       @stmt_list.empty?
     end
@@ -39,18 +48,26 @@ module BB
     end
 
     sig { returns(T.nilable(IL::Statement)) }
+    # Get the first Statement in the block.
+    # @return [T.nilable(IL::Statement)] The first Statement in the Block.
+    #   If the Block is empty this will be nil.
     def first_stmt
       if @stmt_list.empty? then return nil end
       return @stmt_list[0]
     end
 
     sig { returns(T.nilable(IL::Statement)) }
+    # Get the last Statement in the block.
+    # @return [T.nilable(IL::Statement)] The last Statement in the Block.
+    #   If the Block is empty this will be nil.
     def last_stmt
       if @stmt_list.empty? then return nil end
       return @stmt_list[-1]
     end
 
     sig { returns(String) }
+    # Convert the Block, and its Statements, to a String.
+    # @return [String] A String representation of the Block.
     def to_s
       str = "[BLOCK (len=#{length})]\n"
       each_stmt { |s|
@@ -61,6 +78,9 @@ module BB
   end
 
   sig { params(program: IL::Program).returns(T::Array[Block]) }
+  # Create a list of basic blocks for the given Program.
+  # @param [IL::Program] program The Program to create blocks from.
+  # @return [T::Array[Block]] A list of basic blocks.
   def self.create_blocks(program)
     blocks = []
     stmt_list = []

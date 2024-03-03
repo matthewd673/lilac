@@ -69,12 +69,12 @@
   <dl>
     <dt>Inherits:</dt>
     <dd>
-      <span class="inheritName"><span class='object_link'><a href="Optimization.html" title="Optimization (class)">Optimization</a></span></span>
+      <span class="inheritName"><span class='object_link'><a href="Analysis.html" title="Analysis (class)">Analysis</a></span></span>
       
         <ul class="fullTree">
           <li>Object</li>
           
-            <li class="next"><span class='object_link'><a href="Optimization.html" title="Optimization (class)">Optimization</a></span></li>
+            <li class="next"><span class='object_link'><a href="Analysis.html" title="Analysis (class)">Analysis</a></span></li>
           
             <li class="next">PrecomputeCondJumps</li>
           
@@ -101,7 +101,7 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/optimization/precompute_cond_jumps.rb</dd>
+    <dd>lib/analysis/precompute_cond_jumps.rb</dd>
   </dl>
   
 </div>
@@ -114,8 +114,8 @@
 
   <h2>Instance Attribute Summary</h2>
   
-  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="Optimization.html" title="Optimization (class)">Optimization</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="Optimization.html#description-instance_method" title="Optimization#description (method)">#description</a></span>, <span class='object_link'><a href="Optimization.html#id-instance_method" title="Optimization#id (method)">#id</a></span>, <span class='object_link'><a href="Optimization.html#level-instance_method" title="Optimization#level (method)">#level</a></span></p>
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="Analysis.html" title="Analysis (class)">Analysis</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Analysis.html#description-instance_method" title="Analysis#description (method)">#description</a></span>, <span class='object_link'><a href="Analysis.html#id-instance_method" title="Analysis#id (method)">#id</a></span>, <span class='object_link'><a href="Analysis.html#level-instance_method" title="Analysis#level (method)">#level</a></span></p>
 
 
   
@@ -187,8 +187,8 @@
   
   
   
-  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Optimization.html" title="Optimization (class)">Optimization</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="Optimization.html#to_s-instance_method" title="Optimization#to_s (method)">#to_s</a></span></p>
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Analysis.html" title="Analysis (class)">Analysis</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Analysis.html#to_s-instance_method" title="Analysis#to_s (method)">#to_s</a></span></p>
 
   <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
@@ -226,12 +226,12 @@
 13</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/precompute_cond_jumps.rb', line 9</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/precompute_cond_jumps.rb', line 9</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
   <span class='ivar'>@id</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>precompute_cond_jumps</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
   <span class='ivar'>@description</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Replace constant conditional jumps with unconditional jumps</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
-  <span class='ivar'>@level</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='rparen'>)</span>
+  <span class='ivar'>@level</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='int'>1</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -287,7 +287,7 @@
 40</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/precompute_cond_jumps.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/precompute_cond_jumps.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -324,7 +324,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 23 18:22:05 2024 by
+  Generated on Sun Mar  3 16:55:25 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>
