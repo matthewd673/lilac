@@ -27,7 +27,7 @@ module CLI
   sig { void }
   # Print all available validations.
   def self.print_validations
-    for v in VALIDATIONS
+    for v in Validation::VALIDATIONS
       puts(v.id)
     end
   end

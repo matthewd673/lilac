@@ -1,9 +1,12 @@
 # typed: strict
 require "sorbet-runtime"
 require_relative "validation"
+require_relative "validation_pass"
 require_relative "../il"
 
-class TypeCheck < Validation
+include Validation
+
+class Validation::TypeCheck < ValidationPass
   extend T::Sig
 
   sig { void }
