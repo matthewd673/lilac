@@ -1,8 +1,10 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "../il"
+require_relative "analysis"
 
-class PrecomputeCondJumps < Analysis
+include Analysis
+
+class Analysis::PrecomputeCondJumps < AnalysisPass
   extend T::Sig
 
   sig { void }

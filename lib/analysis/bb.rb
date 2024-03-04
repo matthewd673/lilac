@@ -1,10 +1,11 @@
 # typed: strict
 require "sorbet-runtime"
+require_relative "analysis"
 require_relative "../il"
 
 # The BB module contains a data structure for basic blocks and functions
 # to create basic blocks from IL Statements.
-module BB
+module Analysis::BB
   extend T::Sig
 
   # A Block is a data structure for a single basic block.

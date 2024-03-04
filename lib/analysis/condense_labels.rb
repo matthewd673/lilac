@@ -1,9 +1,12 @@
 # typed: false
 # TODO: supports typed: strict apart from one glitch, see TODO below
 require "sorbet-runtime"
-require_relative "../il"
+require_relative "analysis"
+require_relative "analysis_pass"
 
-class CondenseLabels < Analysis
+include Analysis
+
+class Analysis::CondenseLabels < AnalysisPass
   extend T::Sig
 
   sig { void }

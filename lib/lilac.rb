@@ -19,7 +19,7 @@ module CLI
   sig { void }
   # Print all available analyses.
   def self.print_analyses
-    for a in ANALYSES
+    for a in Analysis::ANALYSES
       puts(a.id)
     end
   end

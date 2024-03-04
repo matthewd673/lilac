@@ -7,7 +7,7 @@ require_relative "../analysis/cfg"
 module Debugger::CFGVisualizer
   extend T::Sig
 
-  sig { params(cfg: CFG).returns(String) }
+  sig { params(cfg: Analysis::CFG).returns(String) }
   # Generate a String representation of the CFG in the Graphviz DOT language.
   # @return [String] A String containing DOT code.
   def self.generate_graphviz(cfg)

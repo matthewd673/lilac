@@ -1,9 +1,13 @@
 # typed: strict
 require "sorbet-runtime"
-# require_relative "analysis"
+require_relative "analysis"
 
-class LVN < Analysis
+include Analysis
+
+class Analysis::LVN < AnalysisPass
   extend T::Sig
+
+  include Analysis
 
   sig { void }
   def initialize

@@ -1,9 +1,12 @@
 # typed: strict
 require "sorbet-runtime"
+require_relative "analysis"
 require_relative "bb"
 
-class CFG
+class Analysis::CFG
   extend T::Sig
+
+  include Analysis
 
   sig { returns(BB::Block) }
   attr_reader :entry
@@ -33,6 +36,8 @@ class CFG
 
   class Edge
     extend T::Sig
+
+    include Analysis
 
     sig { returns(BB::Block) }
     attr_reader :from

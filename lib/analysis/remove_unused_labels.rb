@@ -1,8 +1,10 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "../il"
+require_relative "analysis"
 
-class RemoveUnusedLabels < Analysis
+include Analysis
+
+class Analysis::RemoveUnusedLabels < AnalysisPass
   extend T::Sig
 
   sig { void }

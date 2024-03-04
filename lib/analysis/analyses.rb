@@ -1,16 +1,20 @@
 # typed: strict
+require "sorbet-runtime"
 require_relative "analysis"
+require_relative "analysis_pass"
+
 require_relative "condense_labels"
 require_relative "remove_useless_jumps"
 require_relative "lvn"
 require_relative "precompute_cond_jumps"
 require_relative "remove_unused_labels"
 
+
 # A definitive list of all analyses available in lilac.
-ANALYSES = T.let([
+Analysis::ANALYSES = T.let([
   CondenseLabels.new,
   RemoveUselessJumps.new,
   LVN.new,
   PrecomputeCondJumps.new,
   RemoveUnusedLabels.new,
-], T::Array[Analysis])
+], T::Array[Analysis::AnalysisPass])

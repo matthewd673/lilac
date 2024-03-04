@@ -1,9 +1,11 @@
 # typed: false
 # TODO: same erroneous sorbet 7006 error as condense_labels.rb
 require "sorbet-runtime"
-require_relative "../il"
+require_relative "analysis"
 
-class RemoveUselessJumps < Analysis
+include Analysis
+
+class Analysis::RemoveUselessJumps < AnalysisPass
   extend T::Sig
 
   sig { void }

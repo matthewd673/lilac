@@ -31,11 +31,11 @@ class Debugger::PrettyPrinter
     }
   end
 
-  sig { params(blocks: T::Array[BB::Block]).void }
-  # Pretty-print a collection of basic blocks (+BB::Block+) to the terminal
-  # with headers for each block and syntax highlighting.
+  sig { params(blocks: T::Array[Analysis::BB::Block]).void }
+  # Pretty-print a collection of basic blocks (+Analysis::BB::Block+)
+  # to the terminal with headers for each block and syntax highlighting.
   #
-  # @param [T::Array[BB::Block]] blocks The array of blocks to print.
+  # @param [T::Array[Analysis::BB::Block]] blocks The array of blocks to print.
   def print_blocks(blocks)
     blocks.each { |b|
       puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))
