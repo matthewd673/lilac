@@ -1,34 +1,20 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "../il"
+require_relative "../runner"
 require_relative "analysis"
 require_relative "analyses"
 
-class AnalysisRunner
+# An AnalysisRunner is a Runner for Analysis passes.
+class AnalysisRunner < Runner
   extend T::Sig
+  extend T::Generic
 
-  sig { returns(IL::Program) }
-  attr_reader :program
-
-  sig { params(program: IL::Program).void }
-  def initialize(program)
-    @program = program
-  end
-
-  sig { params(analysis: Analysis).void }
-  def run_pass(analysis)
-    Kernel::puts("Running #{analysis.id}")
-    analysis.run(@program)
-  end
-
-  sig { params(analysis_list: T::Array[Analysis]).void }
-  def run_passes(analysis_list)
-    for a in analysis_list
-      run_pass(a)
-    end
-  end
+  P = type_member {{ upper: Analysis }}
 
   sig { params(level: Integer).returns(T::Array[Analysis]) }
+  # Get all of the Analyses at a given optimization level.
+  # @param [Integer] level The level to select at.
+  # @return [T::Array[Analysis]] A list of Analyses.
   def level_passes(level)
     ANALYSES.select { |a| a.level == level }
   end

@@ -1,14 +1,11 @@
 # typed: strict
 require "sorbet-runtime"
+require_relative "../pass"
 require_relative "../il"
 
-class Analysis
+class Analysis < Pass
   extend T::Sig
 
-  sig { returns(String) }
-  attr_reader :id
-  sig { returns(String) }
-  attr_reader :description
   sig { returns(Integer) }
   attr_reader :level
 
@@ -16,13 +13,8 @@ class Analysis
   def initialize
     # NOTE: these should always be overwritten by subclasses
     @id = T.let("analysis", String)
-    @description = T.let("Analysis stub", String)
+    @description = T.let("Generic analysis pass", String)
     @level = T.let(1, Integer)
-  end
-
-  sig { params(program: IL::Program).void }
-  def run(program)
-    # stub
   end
 
   sig { returns(String) }

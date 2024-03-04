@@ -1,21 +1,25 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "../pass"
-require_relative "../il"
+require_relative "il"
 
-class Validation < Pass
+class Pass
   extend T::Sig
+
+  sig { returns(String) }
+  attr_reader :id
+  sig { returns(String) }
+  attr_reader :description
 
   sig { void }
   def initialize
     # NOTE: these should always be overwritten by subclasses
-    @id = T.let("validation", String)
-    @description = T.let("Generic validation stub", String)
+    @id = T.let("pass", String)
+    @description = T.let("Generic pass", String)
   end
 
   sig { params(program: IL::Program).void }
   def run(program)
-    # stub
+    raise("Unimplemented")
   end
 
   sig { returns(String) }
