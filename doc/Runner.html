@@ -87,7 +87,7 @@
   
   <dl>
       <dt>Extended by:</dt>
-      <dd>T::Sig</dd>
+      <dd>T::Generic, T::Sig</dd>
   </dl>
   
   
@@ -99,11 +99,42 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/optimization/runner.rb</dd>
+    <dd>lib/runner.rb</dd>
   </dl>
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>A Runner runs passes on a Program.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><div id="subclasses">
+  <h2>Direct Known Subclasses</h2>
+  <p class="children"><span class='object_link'><a href="Analysis/AnalysisRunner.html" title="Analysis::AnalysisRunner (class)">Analysis::AnalysisRunner</a></span>, <span class='object_link'><a href="Validation/ValidationRunner.html" title="Validation::ValidationRunner (class)">Validation::ValidationRunner</a></span></p>
+</div>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="P-constant" class="">P =
+          
+        </dt>
+        <dd><pre class="code"><span class='id identifier rubyid_type_member'>type_member</span> <span class='lbrace'>{</span><span class='lbrace'>{</span> <span class='label'>upper:</span> <span class='const'><span class='object_link'><a href="Pass.html" title="Pass (class)">Pass</a></span></span> <span class='rbrace'>}</span><span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
 
 
 
@@ -114,7 +145,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#program-instance_method" title="#program (instance method)">#<strong>program</strong>  &#x21d2; Object </a>
+      <a href="#program-instance_method" title="#program (instance method)">#<strong>program</strong>  &#x21d2; IL::Program </a>
     
 
     
@@ -134,7 +165,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute program.</p>
+<p>The Program that the Runner is operating on.</p>
 </div></span>
   
 </li>
@@ -173,7 +204,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>A new instance of Runner.</p>
+<p>Construct a new Runner.</p>
 </div></span>
   
 </li>
@@ -182,7 +213,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#level_passes-instance_method" title="#level_passes (instance method)">#<strong>level_passes</strong>(level)  &#x21d2; Object </a>
+      <a href="#run_pass-instance_method" title="#run_pass (instance method)">#<strong>run_pass</strong>(pass)  &#x21d2; Object </a>
     
 
     
@@ -196,7 +227,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Run a Pass on the Program.</p>
+</div></span>
   
 </li>
 
@@ -204,7 +237,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#run_pass-instance_method" title="#run_pass (instance method)">#<strong>run_pass</strong>(opt)  &#x21d2; Object </a>
+      <a href="#run_passes-instance_method" title="#run_passes (instance method)">#<strong>run_passes</strong>(pass_list)  &#x21d2; Object </a>
     
 
     
@@ -218,29 +251,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#run_passes-instance_method" title="#run_passes (instance method)">#<strong>run_passes</strong>(opt_list)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Run a list of passes on the Program.</p>
+</div></span>
   
 </li>
 
@@ -249,6 +262,7 @@
   
 
 
+  
   <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
@@ -264,7 +278,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns a new instance of Runner.</p>
+<p>Construct a new Runner.</p>
 
 
   </div>
@@ -278,12 +292,12 @@
       <pre class="lines">
 
 
-16
-17
-18</pre>
+18
+19
+20</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/runner.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 18</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
   <span class='ivar'>@program</span> <span class='op'>=</span> <span class='id identifier rubyid_program'>program</span>
@@ -303,7 +317,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="program-instance_method">
   
-    #<strong>program</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+    #<strong>program</strong>  &#x21d2; <tt><span class='object_link'><a href="IL/Program.html" title="IL::Program (class)">IL::Program</a></span></tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -312,13 +326,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute program.</p>
+<p>The Program that the Runner is operating on.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="IL/Program.html" title="IL::Program (class)">IL::Program</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The Program.</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -326,12 +358,12 @@
       <pre class="lines">
 
 
-13
 14
-15</pre>
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/runner.rb', line 13</span>
+      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 14</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_program'>program</span>
   <span class='ivar'>@program</span>
@@ -349,61 +381,60 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="level_passes-instance_method">
+  <h3 class="signature first" id="run_pass-instance_method">
   
-    #<strong>level_passes</strong>(level)  &#x21d2; <tt>Object</tt> 
-  
-
+    #<strong>run_pass</strong>(pass)  &#x21d2; <tt>Object</tt> 
   
 
   
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
 
-
-34
-35
-36</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/runner.rb', line 34</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_level_passes'>level_passes</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
-  <span class='const'>OPTIMIZATIONS</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_o'>o</span><span class='op'>|</span> <span class='id identifier rubyid_o'>o</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span> <span class='op'>==</span> <span class='id identifier rubyid_level'>level</span> <span class='rbrace'>}</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
+  
+</h3><div class="docstring">
+  <div class="discussion">
     
-      <div class="method_details ">
-  <h3 class="signature " id="run_pass-instance_method">
-  
-    #<strong>run_pass</strong>(opt)  &#x21d2; <tt>Object</tt> 
-  
+<p>Run a Pass on the Program.</p>
 
-  
 
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
-</h3><table class="source_code">
+    <li>
+      
+        <span class='name'>pass</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Pass.html" title="Pass (class)">Pass</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The Pass to run.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-21
-22
-23
-24</pre>
+25
+26
+27</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/runner.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 25</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_run_pass'>run_pass</span><span class='lparen'>(</span><span class='id identifier rubyid_opt'>opt</span><span class='rparen'>)</span>
-  <span class='const'>Kernel</span><span class='op'>::</span><span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Running </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_opt'>opt</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_opt'>opt</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='ivar'>@program</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_run_pass'>run_pass</span><span class='lparen'>(</span><span class='id identifier rubyid_pass'>pass</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_pass'>pass</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='ivar'>@program</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -413,30 +444,61 @@
       <div class="method_details ">
   <h3 class="signature " id="run_passes-instance_method">
   
-    #<strong>run_passes</strong>(opt_list)  &#x21d2; <tt>Object</tt> 
+    #<strong>run_passes</strong>(pass_list)  &#x21d2; <tt>Object</tt> 
   
 
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Run a list of passes on the Program.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>pass_list</span>
+      
+      
+        <span class='type'>(<tt>T::Array[<span class='object_link'><a href="Pass.html" title="Pass (class)">Pass</a></span>]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The list of Passes to run.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-27
-28
-29
-30
-31</pre>
+32
+33
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/runner.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 32</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_run_passes'>run_passes</span><span class='lparen'>(</span><span class='id identifier rubyid_opt_list'>opt_list</span><span class='rparen'>)</span>
-  <span class='kw'>for</span> <span class='id identifier rubyid_o'>o</span> <span class='kw'>in</span> <span class='id identifier rubyid_opt_list'>opt_list</span>
-    <span class='id identifier rubyid_run_pass'>run_pass</span><span class='lparen'>(</span><span class='id identifier rubyid_o'>o</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_run_passes'>run_passes</span><span class='lparen'>(</span><span class='id identifier rubyid_pass_list'>pass_list</span><span class='rparen'>)</span>
+  <span class='kw'>for</span> <span class='id identifier rubyid_p'>p</span> <span class='kw'>in</span> <span class='id identifier rubyid_pass_list'>pass_list</span>
+    <span class='id identifier rubyid_run_pass'>run_pass</span><span class='lparen'>(</span><span class='id identifier rubyid_p'>p</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -449,7 +511,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Feb 23 18:22:05 2024 by
+  Generated on Mon Mar  4 00:53:28 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>
