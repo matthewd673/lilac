@@ -410,6 +410,78 @@ module IL
     end
   end
 
+  # A FuncDef is a function definition with a name, params, and body.
+  class FuncDef < Statement
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :name
+
+    sig { params(name: String,
+                 params: T::Array[Type],
+                 stmt_list: T::Array[Statement])
+          .void }
+    def initialize(name, params, stmt_list)
+      @name = name
+      @params = params
+      @stmt_list = stmt_list
+    end
+
+    sig { returns(String) }
+    def to_s
+      param_str = ""
+      @params.each { |p|
+        param_str += "#{p}, "
+      }
+      param_str.chomp!(", ")
+
+      stmt_str = ""
+      @stmt_list.each { |s|
+        stmt_str += "#{s}\n"
+      }
+
+      return "func #{@name}(#{param_str}):\n#{stmt_str}\nend"
+    end
+  end
+
+  # A Call is an Expression that represents a function call.
+  class Call < Expression
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :func_name
+
+    sig { params(func_name: String, args: T::Array[Value]).void }
+    def initialize(func_name, args)
+      @func_name = func_name
+      @args = args
+    end
+
+    sig { returns(String) }
+    def to_s
+      arg_str = ""
+      @args.each { |a|
+        arg_str += "#{a}, "
+      }
+      arg_str.chomp!(", ")
+
+      return "call #{@func_name}(#{arg_str})"
+    end
+  end
+
+  # A CallStatement is a function call that occurs as a standalone Statement.
+  class CallStatement < Statement
+    extend T::Sig
+
+    sig { returns(Call) }
+    attr_reader :call
+
+    sig { params(call: Call).void }
+    def initialize(call)
+      @call = call
+    end
+  end
+
   # A Program is a list of Statements.
   class Program
     extend T::Sig
