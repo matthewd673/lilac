@@ -126,6 +126,7 @@ module IL
         MUL = new("*")
         DIV = new("/")
         EQ  = new("==")
+        NEQ = new("!=")
         LT  = new("<")
         GT  = new(">")
         LEQ = new("<=")
@@ -185,6 +186,8 @@ module IL
         left.value / right.value
       when Operator::EQ
         if left.value == right.value then 1 else 0 end
+      when Operator::NEQ
+        if left.value != right.value then 1 else 0 end
       when Operator::LT
         if left.value < right.value then 1 else 0 end
       when Operator::GT

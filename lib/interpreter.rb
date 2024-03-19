@@ -122,6 +122,8 @@ module Interpreter
       left.value / right.value
     when IL::BinaryOp::Operator::EQ
       if left.value == right.value then 1 else 0 end
+    when IL::BinaryOp::Operator::NEQ
+      if left.value != right.value then 1 else 0 end
     when IL::BinaryOp::Operator::LT
       if left.value < right.value then 1 else 0 end
     when IL::BinaryOp::Operator::GT
