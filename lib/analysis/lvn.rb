@@ -1,6 +1,7 @@
 # typed: strict
 require "sorbet-runtime"
 require_relative "analysis"
+require_relative "bb"
 
 include Analysis
 

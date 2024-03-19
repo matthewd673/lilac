@@ -1,4 +1,10 @@
 # typed: strict
+
+# load requirements for external programs
+# NOTE: this is not comprehensive
+require_relative "analysis/analysis_runner"
+require_relative "debugger/pretty_printer"
+
 require_relative "ansi"
 require_relative "analysis/analyses"
 require_relative "validation/validations"
