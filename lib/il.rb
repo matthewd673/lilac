@@ -14,14 +14,29 @@ module IL
     extend T::Sig
 
     enums do
+      # An unsigned 8-bit integer
+      U8 = new
+      # A signed 16-bit integer
+      I16 = new
       # A signed 32-bit integer
       I32 = new
+      # A signed 64-bit integer
+      I64 = new
+      # A 32-bit floating point number
+      F32 = new
+      # A 64-bit floating point number
+      F64 = new
     end
 
     sig { returns(String) }
     def to_s
       case self
+      when U8 then "u8"
+      when I16 then "i16"
       when I32 then "i32"
+      when I64 then "i64"
+      when F32 then "f32"
+      when F64 then "f64"
       else
         T.absurd(self)
       end
