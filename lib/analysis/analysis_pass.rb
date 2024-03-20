@@ -15,7 +15,7 @@ class Analysis::AnalysisPass < Pass
     # NOTE: these should always be overwritten by subclasses
     @id = T.let("analysis", String)
     @description = T.let("Generic analysis pass", String)
-    @level = T.let(1, Integer)
+    @level = T.let(-1, Integer)
   end
 
   sig { returns(String) }

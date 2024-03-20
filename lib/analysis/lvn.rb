@@ -13,7 +13,7 @@ class Analysis::LVN < AnalysisPass
   sig { void }
   def initialize
     @id = T.let("lvn", String)
-    @full_name = T.let("local value numbering", String)
+    @description = T.let("Local value numbering", String)
     @level = T.let(1, Integer)
   end
 

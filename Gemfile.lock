@@ -1,9 +1,3 @@
-PATH
-  remote: .
-  specs:
-    lilac (0.0.0)
-      sorbet-runtime
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -56,10 +50,10 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  lilac!
   rake
   rdoc
   sorbet
+  sorbet-runtime
   tapioca
 
 BUNDLED WITH

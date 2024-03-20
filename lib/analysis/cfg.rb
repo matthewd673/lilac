@@ -8,9 +8,21 @@ class Analysis::CFG
 
   include Analysis
 
+  # The number used by the ENTRY block in any CFG.
+  ENTRY = -1
+  # The number used by the EXIT block in any CFG.
+  EXIT = -2
+
   sig { returns(BB::Block) }
+  # The ENTRY block in this CFG.
+  #
+  # @return [BB::Block] The ENTRY block object in this CFG.
   attr_reader :entry
+
   sig { returns(BB::Block) }
+  # The EXIT block in this CFG.
+  #
+  # @return [BB::Block] The EXIT block object in this CFG.
   attr_reader :exit
 
   sig { params(block_list: T::Array[BB::Block]).void }
@@ -18,8 +30,8 @@ class Analysis::CFG
     @blocks = T.let([], T::Array[BB::Block])
     @edges = T.let([], T::Array[Edge])
 
-    @entry = T.let(BB::Block.new(-1, []), BB::Block)
-    @exit = T.let(BB::Block.new(-2, []), BB::Block)
+    @entry = T.let(BB::Block.new(ENTRY, []), BB::Block)
+    @exit = T.let(BB::Block.new(EXIT, []), BB::Block)
 
     calculate_graph(block_list)
   end
