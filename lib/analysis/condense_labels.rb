@@ -1,5 +1,4 @@
-# typed: false
-# TODO: supports typed: strict apart from one glitch, see TODO below
+# typed: strict
 require "sorbet-runtime"
 require_relative "analysis"
 require_relative "analysis_pass"
@@ -24,8 +23,7 @@ class Analysis::CondenseLabels < AnalysisPass
     stmt_list = []
     program.each_stmt { |s|
       # identify adjacent labels
-      last = stmt_list[-1]
-      # TODO: sorbet is saying this code is unreachable? it gets reached though
+      last = T.unsafe(stmt_list[-1]) # NOTE: workaround for sorbet 7006
       if s.is_a?(IL::Label) and last and last.is_a?(IL::Label)
         label_adj_map[s] = last
       # push all stmts to internal list except adjacent labels

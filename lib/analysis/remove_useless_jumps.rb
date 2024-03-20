@@ -1,5 +1,4 @@
-# typed: false
-# TODO: same erroneous sorbet 7006 error as condense_labels.rb
+# typed: strict
 require "sorbet-runtime"
 require_relative "analysis"
 
@@ -20,7 +19,7 @@ class Analysis::RemoveUselessJumps < AnalysisPass
     stmt_list = []
     program.each_stmt { |s|
       # identify labels directly below a jump that points to them
-      last = stmt_list[-1]
+      last = T.unsafe(stmt_list[-1]) # NOTE: workaround for sorbet 7006
       if s.is_a?(IL::Label) and last and last.is_a?(IL::Jump) and
          last.target.eql?(s.name) and not last.class.method_defined?(:cond)
         stmt_list.pop

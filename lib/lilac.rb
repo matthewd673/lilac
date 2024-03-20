@@ -4,6 +4,7 @@
 # NOTE: this is not comprehensive
 require_relative "analysis/analysis_runner"
 require_relative "debugger/pretty_printer"
+require_relative "interpreter"
 
 require_relative "ansi"
 require_relative "analysis/analyses"
