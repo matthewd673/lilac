@@ -3,6 +3,8 @@
 # load requirements for external programs
 # NOTE: this is not comprehensive
 require_relative "analysis/analysis_runner"
+require_relative "optimization/optimization_runner"
+require_relative "validation/validation_runner"
 require_relative "debugger/pretty_printer"
 require_relative "interpreter"
 
