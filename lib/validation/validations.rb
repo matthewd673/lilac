@@ -1,8 +1,10 @@
 # typed: strict
 require_relative "validation"
+require_relative "ssa"
 require_relative "typecheck"
 
-# A definitive list of all validations available in lilac.
+# A definitive list of all validations available in Lilac.
 Validation::VALIDATIONS = T.let([
-  TypeCheck.new
+  SSA.new,
+  TypeCheck.new,
 ], T::Array[ValidationPass])
