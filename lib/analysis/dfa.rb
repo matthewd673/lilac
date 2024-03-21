@@ -21,9 +21,9 @@ class Analysis::DFA < AnalysisPass
 
   sig { params(direction: Direction,
                boundary: T::Set[Domain],
-               init: T::Set[Domain],
-               cfg: CFG).void }
-  def initialize(direction, boundary, init, cfg)
+               init: T::Set[Domain]).void }
+  def initialize(direction, boundary, init)
+    # NOTE: should always be overwritten by subclasses
     @id = T.let("dfa", String)
     @description = T.let("Generic data flow analysis", String)
     @level = T.let(-1, Integer)
@@ -31,7 +31,6 @@ class Analysis::DFA < AnalysisPass
     @direction = direction
     @boundary = boundary
     @init = init
-    @cfg = cfg
 
     @out = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
     @in = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
@@ -39,7 +38,24 @@ class Analysis::DFA < AnalysisPass
     @kill = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
   end
 
+  sig { params(program: IL::Program).void }
+  def run(program)
+    blocks = BB::create_blocks(program)
+    cfg = CFG.new(blocks)
+
+    run_dfa(cfg)
+  end
+
   protected
+
+  sig { params(cfg: CFG).void }
+  def run_dfa(cfg)
+    case @direction
+    when Direction::Forwards then run_forwards(cfg)
+    when Direction::Backwards then run_backwards(cfg)
+    else T.absurd(@direction)
+    end
+  end
 
   sig { params(block: BB::Block).void }
   def transfer(block)
@@ -48,11 +64,11 @@ class Analysis::DFA < AnalysisPass
 
   private
 
-  sig { void }
-  def run_forwards
+  sig { params(cfg: CFG).void }
+  def run_forwards(cfg)
     # initialize all nodes
     @out[CFG::ENTRY] = @boundary
-    @cfg.each_block { |b|
+    cfg.each_block { |b|
       if b.number == CFG::ENTRY then next end
       @out[b.number] = @init
     }
@@ -61,19 +77,12 @@ class Analysis::DFA < AnalysisPass
     changed = T.let(true, T::Boolean)
     while changed
       changed = false
-      @cfg.each_block { |b|
+      cfg.each_block { |b|
         if b.number == CFG::ENTRY then next end
 
-        old_out = @out[b.number]
-        # NOTE: purely to appease sorbet
-        if not old_out then raise("OUT set for #{b.number} was nil") end
-
+        old_out = T.unsafe(@out[b.number])
         transfer(b)
-
-        new_out = @out[b.number]
-        # NOTE: purely to appease sorbet
-        if not new_out then raise("New OUT set for #{b.number} is nil") end
-
+        new_out = T.unsafe(@out[b.number])
         if old_out.length != new_out.length
           changed = true
         end
@@ -81,11 +90,11 @@ class Analysis::DFA < AnalysisPass
     end
   end
 
-  sig { void }
-  def run_backwards
+  sig { params(cfg: CFG).void }
+  def run_backwards(cfg)
     # initialize all nodes
     @in[CFG::EXIT] = @boundary
-    @cfg.each_block { |b|
+    cfg.each_block { |b|
       if b.number == CFG::EXIT then next end
       @in[b.number] = @init
     }
@@ -94,19 +103,12 @@ class Analysis::DFA < AnalysisPass
     changed = T.let(true, T::Boolean)
     while changed
       changed = false
-      @cfg.each_block { |b|
+      cfg.each_block { |b|
         if b.number == CFG::EXIT then next end
 
-        old_in = @in[b.number]
-        # NOTE: purely to appease sorbet
-        if not old_in then raise("IN set for #{b.number} was nil") end
-
+        old_in = T.unsafe(@in[b.number])
         transfer(b)
-
-        new_in = @in[b.number]
-        # NOTE: purely to appease sorbet
-        if not new_in then raise("New IN set for #{b.number} is nil") end
-
+        new_in = T.unsafe(@in[b.number])
         if old_in.length != new_in.length
           changed = true
         end
