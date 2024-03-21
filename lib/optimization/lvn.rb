@@ -1,14 +1,13 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "analysis"
-require_relative "bb"
+require_relative "optimization"
+require_relative "optimization_pass"
+require_relative "../analysis/bb"
 
-include Analysis
+include Optimization
 
-class Analysis::LVN < AnalysisPass
+class Optimization::LVN < OptimizationPass
   extend T::Sig
-
-  include Analysis
 
   sig { void }
   def initialize
@@ -19,7 +18,7 @@ class Analysis::LVN < AnalysisPass
 
   sig { params(program: IL::Program).void }
   def run(program)
-    block_list = BB.create_blocks(program)
+    block_list = Analysis::BB.create_blocks(program)
     block_list.each { |b|
       value_number_map = ValueNumberMap.new
       id_number_map = IDNumberMap.new

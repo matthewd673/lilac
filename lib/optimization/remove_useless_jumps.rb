@@ -1,10 +1,11 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "analysis"
+require_relative "optimization"
+require_relative "optimization_pass"
 
-include Analysis
+include Optimization
 
-class Analysis::RemoveUselessJumps < AnalysisPass
+class Optimization::RemoveUselessJumps < OptimizationPass
   extend T::Sig
 
   sig { void }
