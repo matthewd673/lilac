@@ -6,6 +6,8 @@ require_relative "../il"
 
 include Validation
 
+# The type-check validation ensures that there are no definitions or
+# expressions with mismatched types in the program.
 class Validation::TypeCheck < ValidationPass
   extend T::Sig
 
@@ -21,20 +23,18 @@ class Validation::TypeCheck < ValidationPass
 
     program.each_stmt { |s|
       # only declarations and assignments are relevant
-      if not (s.is_a?(IL::Declaration) or s.is_a?(IL::Assignment))
+      if not s.is_a?(IL::Definition)
         next
       end
 
-      # register id in symbol table if declaration
-      if s.is_a?(IL::Declaration)
-        symbols[s.id.name] = s.type
-      end
+      # register id in symbol table every time (since this is SSA)
+      symbols[s.id.key] = s.type
 
       # find the type of the rhs
       if s.rhs.is_a?(IL::Constant)
         rhs_type = T.cast(s.rhs, IL::Constant).type
       elsif s.rhs.is_a?(IL::ID)
-        rhs_type = symbols[T.cast(s.rhs, IL::ID).name]
+        rhs_type = symbols[T.cast(s.rhs, IL::ID).key]
       elsif s.rhs.is_a?(IL::Expression)
         rhs_type = get_expr_type(T.cast(s.rhs, IL::Expression), symbols)
       end
@@ -44,7 +44,7 @@ class Validation::TypeCheck < ValidationPass
         raise("Type mismatch in expression: '#{s.rhs}'")
       end
 
-      if symbols[s.id.name] != rhs_type
+      if symbols[s.id.key] != rhs_type
         raise("Type mismatch in statement: '#{s}'")
       end
     }
@@ -63,7 +63,7 @@ class Validation::TypeCheck < ValidationPass
         ltype = lconst.type
       elsif expr.left.is_a?(IL::ID)
         lid = T.cast(expr.left, IL::ID)
-        ltype = symbols[lid.name]
+        ltype = symbols[lid.key]
       else
         raise("Unsupported left value class: #{expr.left.class}")
       end
@@ -74,7 +74,7 @@ class Validation::TypeCheck < ValidationPass
         rtype = rconst.type
       elsif expr.right.is_a?(IL::ID)
         rid = T.cast(expr.right, IL::ID)
-        rtype = symbols[rid.name]
+        rtype = symbols[rid.key]
       else
         raise("Unsupported right value class: #{expr.right.class}")
       end
@@ -89,7 +89,7 @@ class Validation::TypeCheck < ValidationPass
         vtype = vconst.type
       elsif expr.value.is_a?(IL::ID)
         vid = T.cast(expr.value, IL::ID)
-        vtype = symbols[vid.name]
+        vtype = symbols[vid.key]
       else
         raise("Unsupported value class: #{expr.value.class}")
       end
