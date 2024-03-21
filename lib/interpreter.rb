@@ -2,6 +2,7 @@
 require "sorbet-runtime"
 require_relative "il"
 require_relative "visitor"
+require_relative "validation/validation_runner"
 
 # The Interpreter module provides a simple interpreter for the lilac IL.
 # Lilac IL is not designed to be an interpreted language (and does
@@ -12,13 +13,19 @@ module Interpreter
   extend T::Sig
   include Kernel
 
-  sig { params(program: IL::Program).void }
+  sig { params(program: IL::Program, validate: T::Boolean).void }
   # Interpret a program.
   #
   # @param [IL::Program] program The program to interpret.
-  def self.interpret(program)
+  def self.interpret(program, validate: true)
     context = Context.new
     visitor = Visitor.new(VISIT_LAMBDAS)
+
+    # run all validations before interpreting
+    if validate
+      validation_runner = Validation::ValidationRunner.new(program)
+      validation_runner.run_passes(Validation::VALIDATIONS)
+    end
 
     # collect all stmts in the program
     stmts = []

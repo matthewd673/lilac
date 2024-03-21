@@ -14,7 +14,7 @@ class Validation::TypeCheck < ValidationPass
   sig { void }
   def initialize
     @id = "typecheck"
-    @description = "Detect type mismatch errors"
+    @description = "Detect type mismatchs in definitions and expressions"
   end
 
   sig { params(program: IL::Program).void }
