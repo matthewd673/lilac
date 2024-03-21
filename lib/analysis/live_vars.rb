@@ -5,6 +5,8 @@ require_relative "analysis"
 require_relative "cfg"
 require_relative "dfa"
 
+include Analysis
+
 class Analysis::LiveVars < DFA
   extend T::Sig
   extend T::Generic

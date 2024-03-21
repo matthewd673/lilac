@@ -2,9 +2,10 @@
 require "sorbet-runtime"
 require "set"
 require_relative "analysis"
+require_relative "analysis_pass"
 require_relative "cfg"
 
-class Analysis::DFA < AnalysisPass
+class Analysis::DFA < Analysis::AnalysisPass
   extend T::Sig
   extend T::Generic
 
@@ -59,7 +60,7 @@ class Analysis::DFA < AnalysisPass
 
   sig { params(block: BB::Block).void }
   def transfer(block)
-    # NOTE: stub
+    raise("Transfer function is unimplemented for #{@id}")
   end
 
   private

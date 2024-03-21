@@ -8,6 +8,7 @@ require_relative "interpreter"
 
 require_relative "ansi"
 require_relative "analysis/analyses"
+require_relative "optimization/optimizations"
 require_relative "validation/validations"
 
 # The CLI module contains the CLI tools provided by lilac.
@@ -20,23 +21,32 @@ module CLI
   def self.main
     puts(ANSI.fmt256("lilac", ANSI::LILAC_256, bold: true))
     puts("  analyses: list all analyses")
+    puts("  optimizations: list all optimizations")
     puts("  validations: list all validations")
   end
 
   sig { void }
   # Print all available analyses.
   def self.print_analyses
-    for a in Analysis::ANALYSES
+    Analysis::ANALYSES.each { |a|
       puts(a.id)
-    end
+    }
+  end
+
+  sig { void }
+  # Print all available optimizations.
+  def self.print_optimizations
+    Optimization::OPTIMIZATIONS.each { |o|
+      puts(o.id)
+    }
   end
 
   sig { void }
   # Print all available validations.
   def self.print_validations
-    for v in Validation::VALIDATIONS
+    Validation::VALIDATIONS.each { |v|
       puts(v.id)
-    end
+    }
   end
 end
 
@@ -46,6 +56,8 @@ if $PROGRAM_NAME == __FILE__
     CLI.main
   elsif ARGV[0] == "analyses"
     CLI.print_analyses
+  elsif ARGV[0] == "optimizations"
+    CLI.print_optimizations
   elsif ARGV[0] == "validations"
     CLI.print_validations
   else # unknown args case

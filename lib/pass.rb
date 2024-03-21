@@ -19,7 +19,7 @@ class Pass
 
   sig { params(program: IL::Program).void }
   def run(program)
-    raise("Unimplemented")
+    raise("Run is unimplemented for #{@id}")
   end
 
   sig { returns(String) }
