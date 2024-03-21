@@ -71,12 +71,8 @@ class Debugger::PrettyPrinter
     o.to_s # don't format
   }, Visitor::Lambda)
 
-  VISIT_DECLARATION = T.let(-> (v, o, c) {
+  VISIT_DEFINITION = T.let(-> (v, o, c) {
     "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
-  }, Visitor::Lambda)
-
-  VISIT_ASSIGNMENT = T.let(-> (v, o, c) {
-    "#{v.visit(o.id)} = #{v.visit(o.rhs)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
   }, Visitor::Lambda)
 
   VISIT_LABEL = T.let(-> (v, o, c) {
@@ -103,8 +99,7 @@ class Debugger::PrettyPrinter
     IL::Expression => VISIT_EXPRESSION,
     IL::BinaryOp => VISIT_BINARYOP,
     IL::Statement => VISIT_STATEMENT,
-    IL::Declaration => VISIT_DECLARATION,
-    IL::Assignment => VISIT_ASSIGNMENT,
+    IL::Definition => VISIT_DEFINITION,
     IL::Label => VISIT_LABEL,
     IL::Jump => VISIT_JUMP,
     IL::JumpZero => VISIT_JUMPZERO,

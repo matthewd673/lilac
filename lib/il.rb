@@ -81,19 +81,31 @@ module IL
     extend T::Sig
 
     sig { returns(String) }
+    # The name of the ID.
     attr_reader :name
+    sig { returns(Integer) }
+    # The number of the ID. Multiple definitions of the same ID name must
+    # have unique numbers.
+    attr_reader :number
+    sig { returns(String) }
+    # The key of the ID. Includes both name and number.
+    attr_reader :key
 
-    sig { params(name: String).void }
+    sig { params(name: String, number: Integer).void }
     # Construct a new ID.
     #
     # @param [String] name The name of the ID.
-    def initialize(name)
+    # @param [Integer] number The number of the ID.
+    def initialize(name, number)
       @name = name
+      @number = number
+
+      @key = T.let("#{name}##{number}", String)
     end
 
     sig { returns(String) }
     def to_s
-      "#{@name}"
+      "#{@name}##{@number}"
     end
   end
 
@@ -103,9 +115,6 @@ module IL
   class Register < ID
     extend T::Sig
 
-    sig { returns(Integer) }
-    attr_reader :number
-
     sig { params(number: Integer).void }
     # Construct a new Register.
     #
@@ -113,6 +122,7 @@ module IL
     def initialize(number)
       @number = number
       @name = "%#{number}"
+      @key = @name
     end
   end
 
@@ -282,8 +292,8 @@ module IL
     attr_accessor :annotation
   end
 
-  # A Declaration is a Statement that declares a new ID with a type and value.
-  class Declaration < Statement
+  # A Definition is a Statement that defines an ID with a type and value.
+  class Definition < Statement
     extend T::Sig
 
     sig { returns(Type) }
@@ -294,10 +304,10 @@ module IL
     attr_accessor :rhs
 
     sig { params(type: Type, id: ID, rhs: T.any(Expression, Value)).void }
-    # Construct a new Declaration.
+    # Construct a new Definition.
     #
-    # @param [Type] type The type of the new ID.
-    # @param [ID] id The new ID.
+    # @param [Type] type The type of the ID.
+    # @param [ID] id The ID.
     # @param [T.any(Expression, Value)] rhs The right hand side of
     # the assignment.
     def initialize(type, id, rhs)
@@ -309,32 +319,6 @@ module IL
     sig { returns(String) }
     def to_s
       "#{@type} #{@id} = #{@rhs}"
-    end
-  end
-
-  # An Assignment is a Statement that assigns a new value to an existing ID.
-  class Assignment < Statement
-    extend T::Sig
-
-    sig { returns(ID) }
-    attr_reader :id
-    sig { returns(T.any(Expression, Value)) }
-    attr_accessor :rhs
-
-    sig { params(id: ID, rhs: T.any(Expression, Value)).void }
-    # Construct a new Assignment.
-    #
-    # @param [ID] id The ID to assign to.
-    # @param [T.any(Expression, Value)] rhs The right hand side of
-    # the assignment.
-    def initialize(id, rhs)
-      @id = id
-      @rhs = rhs
-    end
-
-    sig { returns(String) }
-    def to_s
-      "#{@id} = #{@rhs}"
     end
   end
 

@@ -169,50 +169,25 @@ module Interpreter
     end
   }, Visitor::Lambda)
 
-  VISIT_DECLARATION = T.let(-> (v, o, context) {
+  VISIT_DEFINITION = T.let(-> (v, o, context) {
     type = o.type
     id = o.id
     rhs = o.rhs
 
-    # check for redeclaration
-    if context.symbols.include?(id.name)
-      raise("Redeclaration of ID '#{id.name}'")
-    end
+    # NOTE: doesn't check for multiple definitions,
+    # this must be done with a validation pass
+
     # insert id in symbol table with appropriate type
     rhs_eval = v.visit(rhs, ctx: context)
 
     # catch type mismatch
     if not rhs_eval.type.eql?(type)
-      raise("Cannot declare ID of type #{type} with value of type #{rhs_eval.type}")
+      raise("Cannot define ID of type #{type} with value of type #{rhs_eval.type}")
     end
 
     context.symbols[id.name] = Interpreter::SymbolInfo.new(id.name,
                                                            type,
                                                            rhs_eval.value)
-  }, Visitor::Lambda)
-
-  VISIT_ASSIGNMENT = T.let(-> (v, o, context) {
-    id = o.id
-    rhs = o.rhs
-
-    # make sure variable has been declared
-    if not context.symbols.include?(id.name)
-      raise("Assigning to undefined ID '#{id.name}'")
-    end
-
-    # update value in symbol table
-    rhs_eval = v.visit(rhs, ctx: context)
-
-    # catch type mismatch
-    info = context.symbols[id.name]
-    if not info # required by sorbet for below usage
-      raise("ID #{o.name} is defined but has NIL SymbolInfo")
-    end
-    if not rhs_eval.type.eql?(info.type)
-      raise("Cannot assign value of type #{rhs_eval.type} into #{id.name} (type #{info.type})")
-    end
-
-    info.value = rhs_eval.value
   }, Visitor::Lambda)
 
   VISIT_LABEL = T.let(-> (v, o, context) {
@@ -287,8 +262,7 @@ module Interpreter
     IL::BinaryOp => VISIT_BINARYOP,
     IL::UnaryOp => VISIT_UNARYOP,
     IL::Statement => VISIT_STATEMENT,
-    IL::Declaration => VISIT_DECLARATION,
-    IL::Assignment => VISIT_ASSIGNMENT,
+    IL::Definition => VISIT_DEFINITION,
     IL::Label => VISIT_LABEL,
     IL::Jump => VISIT_JUMP,
     IL::JumpZero => VISIT_JUMPZERO,

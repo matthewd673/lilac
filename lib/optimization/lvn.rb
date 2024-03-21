@@ -35,8 +35,8 @@ class Optimization::LVN < OptimizationPass
           next # job's done with the jmps
         end
 
-        # only declarations and assignments are relevant
-        if not (s.is_a?(IL::Declaration) or s.is_a?(IL::Assignment))
+        # only definitions are relevant
+        if not s.is_a?(IL::Definition)
           next
         end
 
@@ -54,7 +54,7 @@ class Optimization::LVN < OptimizationPass
         end
 
         # associate number with the id being assigned to
-        id_number_map.assign_id(s.id.name, number)
+        id_number_map.assign_id(s.id, number)
 
         # constants on the rhs are always better off staying as constants
         if rhs_val.value.is_a?(IL::Constant)
@@ -71,7 +71,7 @@ class Optimization::LVN < OptimizationPass
         # if the value exists in another id, set rhs to that id
         existing_id = id_number_map.get_id_by_number(number)
         if existing_id
-          s.rhs = IL::ID.new(existing_id)
+          s.rhs = existing_id
           s.annotation = number.to_s # TODO: temp
           next
         end
@@ -95,7 +95,7 @@ class Optimization::LVN < OptimizationPass
   def constant_folding(rhs, value_number_map, id_number_map)
     if rhs.is_a?(IL::ID)
       # check if the id has a value number
-      id_number = id_number_map.get_number_by_id(rhs.name)
+      id_number = id_number_map.get_number_by_id(rhs)
 
       # if it has a value number, get it and check if its a constant
       if not id_number then return rhs end
@@ -174,13 +174,13 @@ class Optimization::LVN < OptimizationPass
 
     sig { void }
     def initialize
-      @id_to_number = T.let({}, T::Hash[String, Integer])
-      @number_to_ids = T.let({}, T::Hash[Integer, T::Array[String]])
+      @id_to_number = T.let({}, T::Hash[String, Integer]) # id.key -> number
+      @number_to_ids = T.let({}, T::Hash[Integer, T::Array[IL::ID]])
     end
 
-    sig { params(id: String, number: Integer).void }
+    sig { params(id: IL::ID, number: Integer).void }
     def assign_id(id, number)
-      old_number = @id_to_number[id]
+      old_number = @id_to_number[id.key]
       if old_number
         old_id_list = @number_to_ids[old_number]
         if old_id_list # will always be true, check for sorbet's sake
@@ -188,7 +188,7 @@ class Optimization::LVN < OptimizationPass
         end
       end
 
-      @id_to_number[id] = number
+      @id_to_number[id.key] = number
 
       id_list = @number_to_ids[number]
       if id_list
@@ -198,12 +198,12 @@ class Optimization::LVN < OptimizationPass
       end
     end
 
-    sig { params(id: String).returns(T.nilable(Integer)) }
+    sig { params(id: IL::ID).returns(T.nilable(Integer)) }
     def get_number_by_id(id)
-      @id_to_number[id]
+      @id_to_number[id.key]
     end
 
-    sig { params(number: Integer).returns(T.nilable(String)) }
+    sig { params(number: Integer).returns(T.nilable(IL::ID)) }
     def get_id_by_number(number)
       id_list = @number_to_ids[number]
 
@@ -253,7 +253,7 @@ class Optimization::LVN < OptimizationPass
       elsif value.is_a?(IL::ID)
         # lookup value number for id
         # (if id is defined in another block it may not exist)
-        number = @id_number_map.get_number_by_id(value.name)
+        number = @id_number_map.get_number_by_id(value)
         if not number
           number = -1 # TODO: is this the proper way to handle this case?
         end
