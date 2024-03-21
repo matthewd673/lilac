@@ -1,5 +1,6 @@
 # typed: strict
 require "sorbet-runtime"
+require "set"
 require_relative "analysis"
 require_relative "bb"
 
@@ -7,6 +8,23 @@ class Analysis::CFG
   extend T::Sig
 
   include Analysis
+
+  class Edge
+    extend T::Sig
+
+    include Analysis
+
+    sig { returns(BB::Block) }
+    attr_reader :from
+    sig { returns(BB::Block) }
+    attr_reader :to
+
+    sig { params(from: BB::Block, to: BB::Block).void }
+    def initialize(from, to)
+      @from = from
+      @to = to
+    end
+  end
 
   # The number used by the ENTRY block in any CFG.
   ENTRY = -1
@@ -30,6 +48,9 @@ class Analysis::CFG
     @blocks = T.let([], T::Array[BB::Block])
     @edges = T.let([], T::Array[Edge])
 
+    @predecessors = T.let(Hash.new, T::Hash[Integer, T::Set[BB::Block]])
+    @successors = T.let(Hash.new, T::Hash[Integer, T::Set[BB::Block]])
+
     @entry = T.let(BB::Block.new(ENTRY, []), BB::Block)
     @exit = T.let(BB::Block.new(EXIT, []), BB::Block)
 
@@ -46,24 +67,49 @@ class Analysis::CFG
     @edges.each(&block)
   end
 
-  class Edge
-    extend T::Sig
-
-    include Analysis
-
-    sig { returns(BB::Block) }
-    attr_reader :from
-    sig { returns(BB::Block) }
-    attr_reader :to
-
-    sig { params(from: BB::Block, to: BB::Block).void }
-    def initialize(from, to)
-      @from = from
-      @to = to
+  sig { params(b_block: BB::Block,
+               block: T.proc.params(arg0: BB::Block).void).void }
+  def each_predecessor(b_block, &block)
+    if not @predecessors[b_block.number]
+      return []
     end
+    T.unsafe(@predecessors[b_block.number]).each(&block)
+  end
+
+  sig { params(b_block: BB::Block,
+               block: T.proc.params(arg0: BB::Block).void).void }
+  def each_successor(b_block, &block)
+    if not @successors[b_block.number]
+      return []
+    end
+    T.unsafe(@successors[b_block.number]).each(&block)
   end
 
   protected
+
+  sig { params(from: BB::Block, to: BB::Block).void }
+  # Create a new Edge and add it to the edge list. The blocks will also be
+  # added to the appropriate successors and predecessors lists. This should
+  # be used instead of manually creating and pushing Edges.
+  #
+  # @param [BB::Block] from The Block that the edge originates from.
+  # @param [BB::Block] to The Block that the edge terminates at.
+  def create_edge(from, to)
+    edge = Edge.new(from, to)
+    @edges.push(edge)
+
+    # add "to" to "from"s successors
+    if not @successors[from.number]
+      @successors[from.number] = Set[]
+    end
+    T.unsafe(@successors[from.number]).push(to)
+
+    # add "from" to "to"s predecessors
+    if not @predecessors[to.number]
+      @predecessors[to.number] = Set[]
+    end
+    T.unsafe(@predecessors[to.number]).push(from)
+  end
 
   sig { params(block_list: T::Array[BB::Block]).void }
   def calculate_graph(block_list)
