@@ -27,14 +27,15 @@ module Interpreter
       validation_runner.run_passes(Validation::VALIDATIONS)
     end
 
-    # collect all stmts in the program
-    stmts = []
-    program.each_stmt { |s|
-      stmts.push(s)
+    # collect all items in the program
+    # TODO: support functions
+    items = []
+    program.item_list.each { |i|
+      items.push(i)
     }
 
     # register labels
-    stmts.each_with_index { |s, i|
+    items.each_with_index { |s, i|
       if s.is_a?(IL::Label)
         # check for duplicate labels
         if context.label_indices.include?(s.name)
@@ -47,8 +48,8 @@ module Interpreter
 
     # interpret
     stmt_ct = 0
-    while context.ip < stmts.length
-      s = stmts[context.ip]
+    while context.ip < items.length
+      s = items[context.ip]
       visitor.visit(s, ctx: context)
       context.ip += 1
       stmt_ct += 1

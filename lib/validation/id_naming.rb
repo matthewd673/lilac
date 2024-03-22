@@ -21,9 +21,13 @@ class Validation::IDNaming < ValidationPass
 
   sig { params(program: IL::Program).void }
   def run(program)
-    program.each_stmt { |s|
-      ids = get_ids(s)
+    program.item_list.each { |i|
+      ids = get_ids(i)
       ids.each { |id|
+        # don't check registers since they don't have user-provided names
+        # (and necessarily contain a reserved character in their "name")
+        if id.is_a?(IL::Register) then next end
+
         # check for reserved characters (% and #)
         if id.name.include?("%") or id.name.include?("#")
           raise("Reserved character used in ID name '#{id.name}'")
@@ -34,7 +38,10 @@ class Validation::IDNaming < ValidationPass
 
   private
 
-  sig { params(node: T.any(IL::Statement, IL::Expression, IL::Value))
+  sig { params(node: T.any(IL::FuncDef,
+                           IL::Statement,
+                           IL::Expression,
+                           IL::Value))
           .returns(T::Array[IL::ID]) }
   def get_ids(node)
     case node
@@ -48,9 +55,6 @@ class Validation::IDNaming < ValidationPass
       return get_ids(node.left).concat(get_ids(node.right))
     when IL::UnaryOp
       return get_ids(node.value)
-    # NOTE: registers don't count since their names aren't user-provided
-    when IL::Register
-      return []
     when IL::ID
       return [node]
     # TODO: support functions

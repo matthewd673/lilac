@@ -86,17 +86,18 @@ module Analysis::BB
     blocks = []
     stmt_list = []
 
-    program.each_stmt { |s|
+    # TODO: adapt to work with functions
+    program.item_list.each { |i|
       # mark beginning of a block
-      if s.is_a?(IL::Label) and not stmt_list.empty?
+      if i.is_a?(IL::Label) and not stmt_list.empty?
         blocks.push(Block.new(blocks.length, stmt_list))
         stmt_list = []
       end
 
-      stmt_list.push(s)
+      stmt_list.push(i)
 
       # mark end of a block
-      if s.is_a?(IL::Jump) # block will never be empty due to above push
+      if i.is_a?(IL::Jump) # block will never be empty due to above push
         blocks.push(Block.new(blocks.length, stmt_list))
         stmt_list = []
       end

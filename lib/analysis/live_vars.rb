@@ -11,7 +11,8 @@ class Analysis::LiveVars < DFA
   extend T::Sig
   extend T::Generic
 
-  Domain = type_member {{ upper: String }}
+  # Domain = variable names
+  Domain = type_member {{ lower: String }}
 
   sig { void }
   def initialize
@@ -65,7 +66,7 @@ class Analysis::LiveVars < DFA
 
     b.each_stmt { |s|
       # TODO: someday will need to account for function calls
-      if not (s.is_a?(IL::Declaration) or s.is_a?(IL::Assignment))
+      if not s.is_a?(IL::Definition)
         next
       end
 
@@ -87,9 +88,7 @@ class Analysis::LiveVars < DFA
   sig { params(node: T.any(IL::Statement, IL::Expression, IL::Value))
     .returns(T::Set[String])}
   def find_vars(node)
-    if node.is_a?(IL::Declaration)
-      return find_vars(node.rhs)
-    elsif node.is_a?(IL::Assignment)
+    if node.is_a?(IL::Definition)
       return find_vars(node.rhs)
     elsif node.is_a?(IL::BinaryOp)
       return find_vars(node.left) | find_vars(node.right)

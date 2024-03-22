@@ -21,29 +21,29 @@ class Optimization::RemoveUnusedLabels < OptimizationPass
 
     # find all labels that are jumped to
     jumped_labels = []
-    program.each_stmt { |s|
-      if not s.is_a?(IL::Jump) then next end
+    program.item_list.each { |i|
+      if not i.is_a?(IL::Jump) then next end
 
-      if jumped_labels.include?(s.target) then next end
-      jumped_labels.push(s.target)
+      if jumped_labels.include?(i.target) then next end
+      jumped_labels.push(i.target)
     }
 
     # remove all labels that aren't jumped to
-    program.each_stmt { |s|
+    program.item_list.each { |i|
       # only labels are relevant
-      if not s.is_a?(IL::Label)
-        stmt_list.push(s)
+      if not i.is_a?(IL::Label)
+        stmt_list.push(i)
         next
       end
 
       # only include label if it is jumped to
-      if jumped_labels.include?(s.name)
-        stmt_list.push(s)
+      if jumped_labels.include?(i.name)
+        stmt_list.push(i)
       end
     }
 
     # replace statement list on input program
-    program.clear
-    program.concat_stmt_list(stmt_list)
+    program.item_list.clear
+    program.item_list.concat(stmt_list)
   end
 end

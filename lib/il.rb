@@ -412,8 +412,29 @@ module IL
     end
   end
 
+  # A FuncParam is a parameter accepted by a function.
+  class FuncParam
+    extend T::Sig
+
+    sig { returns(Type) }
+    attr_reader :type
+    sig { returns(ID) }
+    attr_reader :id
+
+    sig { params(type: Type, id: ID).void }
+    def initialize(type, id)
+      @type = type
+      @id = id
+    end
+
+    sig { returns(String) }
+    def to_s
+      "#{@type} #{@id}"
+    end
+  end
+
   # A FuncDef is a function definition with a name, params, and body.
-  class FuncDef < Statement
+  class FuncDef
     extend T::Sig
 
     sig { returns(String) }
@@ -421,11 +442,13 @@ module IL
 
     sig { params(name: String,
                  params: T::Array[Type],
+                 ret_type: Type,
                  stmt_list: T::Array[Statement])
           .void }
-    def initialize(name, params, stmt_list)
+    def initialize(name, params, ret_type, stmt_list)
       @name = name
       @params = params
+      @ret_type = ret_type
       @stmt_list = stmt_list
     end
 
@@ -442,7 +465,7 @@ module IL
         stmt_str += "#{s}\n"
       }
 
-      return "func #{@name}(#{param_str}):\n#{stmt_str}\nend"
+      return "func #{@name}(#{param_str}) -> #{@ret_type}:\n#{stmt_str}\nend"
     end
   end
 
@@ -484,60 +507,33 @@ module IL
     end
   end
 
+  # A TopLevelItem is any IL object that can occur at the top-level of a
+  # Program.
+  TopLevelItem = T.type_alias { T.any(Statement, FuncDef) }
+
   # A Program is a list of Statements.
   class Program
     extend T::Sig
 
+    sig { returns(T::Array[TopLevelItem]) }
+    attr_reader :item_list
+
     sig { void }
     # Construct a new Program.
     def initialize
-      @stmt_list = T.let([], T::Array[Statement])
-    end
-
-    sig { params(stmt: Statement).void }
-    def push_stmt(stmt)
-      @stmt_list.push(stmt)
-    end
-
-    sig { params(stmt_list: T::Array[Statement]).void }
-    def concat_stmt_list(stmt_list)
-      @stmt_list.concat(stmt_list)
-    end
-
-    sig { void }
-    def clear
-      @stmt_list.clear
+      @item_list = T.let([], T::Array[TopLevelItem])
     end
 
     sig { returns(Integer) }
     def length
-      @stmt_list.length
-    end
-
-    sig { params(
-            block: T.proc.params(arg0: Statement).returns(T.untyped)
-          )
-          .void
-    }
-    def each_stmt(&block)
-      @stmt_list.each(&block)
-    end
-
-    sig { params(
-            block: T.proc.params(arg0: Statement, arg1: Integer)
-              .returns(T.untyped)
-            )
-            .void
-    }
-    def each_stmt_with_index(&block)
-      @stmt_list.each_with_index(&block)
+      @item_list.length
     end
 
     sig { returns(String) }
     def to_s
       str = ""
-      each_stmt { |s|
-        str += s.to_s + "\n"
+      @item_list.each { |i|
+        str += i.to_s + "\n"
       }
       return str
     end

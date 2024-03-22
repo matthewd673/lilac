@@ -24,10 +24,10 @@ class Debugger::PrettyPrinter
   # @param [IL::Program] program The program to print.
   def print_program(program)
     num_col_len = program.length.to_s.length
-    program.each_stmt_with_index { |s, i|
+    program.item_list.each_with_index { |item, i|
       padi = left_pad(i.to_s, num_col_len, " ")
       # TODO: bright green probably only looks good with solarized dark
-      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{@visitor.visit(s)}")
+      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{@visitor.visit(item)}")
     }
   end
 
@@ -56,7 +56,11 @@ class Debugger::PrettyPrinter
   }, Visitor::Lambda)
 
   VISIT_ID = T.let(-> (v, o, c) {
-    ANSI.fmt(o.to_s, color: ANSI::BLUE)
+    "#{ANSI.fmt(o.name, color: ANSI::BLUE)}##{o.number}"
+  }, Visitor::Lambda)
+
+  VISIT_REGISTER = T.let(-> (v, o, c) {
+    "#{ANSI.fmt(o.name, color: ANSI::BLUE)}"
   }, Visitor::Lambda)
 
   VISIT_EXPRESSION = T.let(-> (v, o, c) {
@@ -96,6 +100,7 @@ class Debugger::PrettyPrinter
     IL::Type => VISIT_TYPE,
     IL::Value => VISIT_VALUE,
     IL::ID => VISIT_ID,
+    IL::Register => VISIT_REGISTER,
     IL::Expression => VISIT_EXPRESSION,
     IL::BinaryOp => VISIT_BINARYOP,
     IL::Statement => VISIT_STATEMENT,

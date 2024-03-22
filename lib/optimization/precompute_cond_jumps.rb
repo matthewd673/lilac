@@ -18,27 +18,27 @@ class Optimization::PrecomputeCondJumps < OptimizationPass
   sig { params(program: IL::Program).void }
   def run(program)
     stmt_list = []
-    program.each_stmt { |s|
+    program.item_list.each { |i|
       # precompute jz
-      if s.is_a?(IL::JumpZero) and s.cond.is_a?(IL::Constant)
-        cond = T.cast(s.cond, IL::Constant)
+      if i.is_a?(IL::JumpZero) and i.cond.is_a?(IL::Constant)
+        cond = T.cast(i.cond, IL::Constant)
         if cond.value == 0
-          stmt_list.push(IL::Jump.new(s.target))
+          stmt_list.push(IL::Jump.new(i.target))
         end
       # precompute jnz
-      elsif s.is_a?(IL::JumpNotZero) and s.cond.is_a?(IL::Constant)
-        cond = T.cast(s.cond, IL::Constant)
+      elsif i.is_a?(IL::JumpNotZero) and i.cond.is_a?(IL::Constant)
+        cond = T.cast(i.cond, IL::Constant)
         if cond.value != 0
-          stmt_list.push(IL::Jump.new(s.target))
+          stmt_list.push(IL::Jump.new(i.target))
         end
       # if statement is not a jump that we're modifying, just push it to list
       else
-        stmt_list.push(s)
+        stmt_list.push(i)
       end
     }
 
     # replace statement list on input program
-    program.clear
-    program.concat_stmt_list(stmt_list)
+    program.item_list.clear
+    program.item_list.concat(stmt_list)
   end
 end

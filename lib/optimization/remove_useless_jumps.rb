@@ -18,19 +18,19 @@ class Optimization::RemoveUselessJumps < OptimizationPass
   sig { params(program: IL::Program).void }
   def run(program)
     stmt_list = []
-    program.each_stmt { |s|
+    program.item_list.each { |i|
       # identify labels directly below a jump that points to them
       last = T.unsafe(stmt_list[-1]) # NOTE: workaround for sorbet 7006
-      if s.is_a?(IL::Label) and last and last.is_a?(IL::Jump) and
-         last.target.eql?(s.name) and not last.class.method_defined?(:cond)
+      if i.is_a?(IL::Label) and last and last.is_a?(IL::Jump) and
+         last.target.eql?(i.name) and not last.class.method_defined?(:cond)
         stmt_list.pop
       end
 
-      stmt_list.push(s)
+      stmt_list.push(i)
     }
 
     # replace statement list on input program
-    program.clear
-    program.concat_stmt_list(stmt_list)
+    program.item_list.clear
+    program.item_list.concat(stmt_list)
   end
 end

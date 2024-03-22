@@ -21,31 +21,32 @@ class Validation::TypeCheck < ValidationPass
   def run(program)
     symbols = {} # id -> type
 
-    program.each_stmt { |s|
+    # TODO: support functions
+    program.item_list.each { |i|
       # only declarations and assignments are relevant
-      if not s.is_a?(IL::Definition)
+      if not i.is_a?(IL::Definition)
         next
       end
 
       # register id in symbol table every time (since this is SSA)
-      symbols[s.id.key] = s.type
+      symbols[i.id.key] = i.type
 
       # find the type of the rhs
-      if s.rhs.is_a?(IL::Constant)
-        rhs_type = T.cast(s.rhs, IL::Constant).type
-      elsif s.rhs.is_a?(IL::ID)
-        rhs_type = symbols[T.cast(s.rhs, IL::ID).key]
-      elsif s.rhs.is_a?(IL::Expression)
-        rhs_type = get_expr_type(T.cast(s.rhs, IL::Expression), symbols)
+      if i.rhs.is_a?(IL::Constant)
+        rhs_type = T.cast(i.rhs, IL::Constant).type
+      elsif i.rhs.is_a?(IL::ID)
+        rhs_type = symbols[T.cast(i.rhs, IL::ID).key]
+      elsif i.rhs.is_a?(IL::Expression)
+        rhs_type = get_expr_type(T.cast(i.rhs, IL::Expression), symbols)
       end
 
       # check for a mismatch
       if not rhs_type
-        raise("Type mismatch in expression: '#{s.rhs}'")
+        raise("Type mismatch in expression: '#{i.rhs}'")
       end
 
-      if symbols[s.id.key] != rhs_type
-        raise("Type mismatch in statement: '#{s}'")
+      if symbols[i.id.key] != rhs_type
+        raise("Type mismatch in statement: '#{i}'")
       end
     }
   end
