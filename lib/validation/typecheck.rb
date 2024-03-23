@@ -3,6 +3,7 @@ require "sorbet-runtime"
 require_relative "validation"
 require_relative "validation_pass"
 require_relative "../il"
+require_relative "../symbol_table"
 
 include Validation
 
@@ -19,42 +20,80 @@ class Validation::TypeCheck < ValidationPass
 
   sig { params(program: IL::Program).void }
   def run(program)
-    symbols = {} # id -> type
+    symbols = SymbolTable.new
+    funcs = {} # name -> return type
 
-    # TODO: support functions
+    # store function return types
     program.item_list.each { |i|
-      # only declarations and assignments are relevant
+      # only funcdefs are relevant
+      if not i.is_a?(IL::FuncDef)
+        next
+      end
+
+      funcs[i.name] = i.ret_type
+    }
+
+    # scan on all items
+    scan_items(program.item_list, symbols, funcs)
+  end
+
+  private
+
+  sig { params(items: T::Array[IL::TopLevelItem],
+               symbols: SymbolTable,
+               funcs: T::Hash[String, String]).void }
+  def scan_items(items, symbols, funcs)
+    symbols.push_scope
+
+    items.each { |i|
+      # recurse on funcdefs
+      if i.is_a?(IL::FuncDef)
+        scan_items(i.stmt_list, symbols, funcs)
+        next
+      end
+
+      # otherwise, only definitions are relevant
       if not i.is_a?(IL::Definition)
         next
       end
 
-      # register id in symbol table every time (since this is SSA)
-      symbols[i.id.key] = i.type
+      # register id in symbol table for every def (since this is SSA)
+      symbols.insert(ILSymbol.new(i.id.key, i.type))
 
       # find the type of the rhs
       if i.rhs.is_a?(IL::Constant)
         rhs_type = T.cast(i.rhs, IL::Constant).type
       elsif i.rhs.is_a?(IL::ID)
-        rhs_type = symbols[T.cast(i.rhs, IL::ID).key]
+        rhs_symbol = symbols.lookup(T.cast(i.rhs, IL::ID).key)
+        if not rhs_symbol
+          raise("Symbol not found: #{T.cast(i.rhs, IL::ID).key}")
+        end
+        rhs_type = rhs_symbol.type
+      elsif i.rhs.is_a?(IL::Call)
+        rhs_type = funcs[T.cast(i.rhs, IL::Call).func_name]
       elsif i.rhs.is_a?(IL::Expression)
         rhs_type = get_expr_type(T.cast(i.rhs, IL::Expression), symbols)
       end
 
       # check for a mismatch
       if not rhs_type
-        raise("Type mismatch in expression: '#{i.rhs}'")
+        raise("Expression has nil type: '#{i.rhs}'")
       end
 
-      if symbols[i.id.key] != rhs_type
+      id_symbol = symbols.lookup(i.id.key)
+      if not id_symbol
+        raise("Symbol not found: #{i.id.key}")
+      end
+      if id_symbol.type != rhs_type
         raise("Type mismatch in statement: '#{i}'")
       end
     }
+
+    symbols.pop_scope
   end
 
-  private
-
   sig { params(expr: IL::Expression,
-               symbols: T::Hash[String, IL::Type])
+               symbols: SymbolTable)
         .returns(T.nilable(IL::Type)) }
   def get_expr_type(expr, symbols)
     if expr.is_a?(IL::BinaryOp)
@@ -64,7 +103,11 @@ class Validation::TypeCheck < ValidationPass
         ltype = lconst.type
       elsif expr.left.is_a?(IL::ID)
         lid = T.cast(expr.left, IL::ID)
-        ltype = symbols[lid.key]
+        lsymbol = symbols.lookup(lid.key)
+        if not lsymbol
+          raise("Symbol not found: #{lid.key}")
+        end
+        ltype = lsymbol.type
       else
         raise("Unsupported left value class: #{expr.left.class}")
       end
@@ -75,7 +118,11 @@ class Validation::TypeCheck < ValidationPass
         rtype = rconst.type
       elsif expr.right.is_a?(IL::ID)
         rid = T.cast(expr.right, IL::ID)
-        rtype = symbols[rid.key]
+        rsymbol = symbols.lookup(rid.key)
+        if not rsymbol
+          raise("Symbol not found: #{rid.key}")
+        end
+        rtype = rsymbol.type
       else
         raise("Unsupported right value class: #{expr.right.class}")
       end
@@ -90,7 +137,11 @@ class Validation::TypeCheck < ValidationPass
         vtype = vconst.type
       elsif expr.value.is_a?(IL::ID)
         vid = T.cast(expr.value, IL::ID)
-        vtype = symbols[vid.key]
+        vsymbol = symbols.lookup(vid.key)
+        if not vsymbol
+          raise("Symbol not found: #{vid.key}")
+        end
+        vtype = vsymbol.type
       else
         raise("Unsupported value class: #{expr.value.class}")
       end
