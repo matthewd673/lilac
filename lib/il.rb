@@ -412,7 +412,20 @@ module IL
     end
   end
 
-  # A FuncParam is a parameter accepted by a function.
+  # A Return statement is used to return a value from within a FuncDef.
+  class Return < Statement
+    extend T::Sig
+
+    sig { returns(Value) }
+    attr_reader :value
+
+    sig { params(value: Value).void }
+    def initialize(value)
+      @value = value
+    end
+  end
+
+  # A FuncParam defines a parameter accepted by a FuncDef.
   class FuncParam
     extend T::Sig
 
@@ -481,6 +494,8 @@ module IL
 
     sig { returns(String) }
     attr_reader :func_name
+    sig { returns(T::Array[Value]) }
+    attr_reader :args
 
     sig { params(func_name: String, args: T::Array[Value]).void }
     def initialize(func_name, args)
@@ -497,19 +512,6 @@ module IL
       arg_str.chomp!(", ")
 
       return "call #{@func_name}(#{arg_str})"
-    end
-  end
-
-  # A CallStatement is a function call that occurs as a standalone Statement.
-  class CallStatement < Statement
-    extend T::Sig
-
-    sig { returns(Call) }
-    attr_reader :call
-
-    sig { params(call: Call).void }
-    def initialize(call)
-      @call = call
     end
   end
 
