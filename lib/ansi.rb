@@ -26,15 +26,21 @@ module ANSI
 
   LILAC_256 = 147
 
-  sig { params(obj: Object, color: Integer, bold: T::Boolean).returns(String) }
+  sig { params(obj: Object,
+               color: T.nilable(Integer),
+               bold: T::Boolean)
+          .returns(String) }
   # Format a String using ANSI codes.
   #
-  # @param [Integer] color The foreground color of the String. Should be
-  #   one of the constants provided in the module.
+  # @param [T.nilable(Integer)] color The foreground color of the String.
+  #   Should be one of the constants provided in the module.
   # @param [T::Boolean] bold Determines if the String is bold or not.
   #
   # @return [String] The formatted String which can be printed as normal.
-  def self.fmt(obj, color: ANSI::DEFAULT, bold: false)
+  def self.fmt(obj, color: nil, bold: false)
+    if not color
+      color = ANSI::DEFAULT
+    end
     "\e[#{color}m#{"\e[1m" unless not bold}#{obj.to_s}\e[0m"
   end
 

@@ -11,6 +11,20 @@ require_relative "../analysis/bb"
 class Debugger::PrettyPrinter
   extend T::Sig
 
+  PALETTE = T.let({
+    # IL node colors
+    IL::Type => ANSI::YELLOW,
+    IL::Constant => ANSI::MAGENTA,
+    IL::ID => ANSI::BLUE,
+    IL::Register => ANSI::BLUE,
+    IL::BinaryOp => ANSI::GREEN,
+    IL::Label => ANSI::CYAN,
+    IL::Jump => ANSI::RED,
+    # Additional colors
+    :gutter => ANSI::GREEN_BRIGHT, # TODO: only looks good with solarized dark
+    :annotation => ANSI::GREEN_BRIGHT,
+  }, T::Hash[T.untyped, Integer])
+
   sig { void }
   # Construct a new PrettyPrinter.
   def initialize
@@ -23,11 +37,11 @@ class Debugger::PrettyPrinter
   #
   # @param [IL::Program] program The program to print.
   def print_program(program)
-    num_col_len = program.length.to_s.length
-    program.item_list.each_with_index { |item, i|
-      padi = left_pad(i.to_s, num_col_len, " ")
-      # TODO: bright green probably only looks good with solarized dark
-      puts("#{ANSI.fmt(padi, color: ANSI::GREEN_BRIGHT)} #{@visitor.visit(item)}")
+    gutter_len = program.length.to_s.length
+    ctx = PrettyPrinterContext.new(gutter_len, 0, 0)
+    program.item_list.each { |item|
+      puts(@visitor.visit(item, ctx: ctx))
+      ctx.line_num += 1
     }
   end
 
@@ -47,54 +61,150 @@ class Debugger::PrettyPrinter
 
   protected
 
+  PrettyPrinterContext = Struct.new(:gutter_len, :line_num, :indent)
+
   VISIT_TYPE = T.let(-> (v, o, c) {
-    ANSI.fmt(o.to_s, color: ANSI::YELLOW)
+    ANSI.fmt(o.to_s, color: PALETTE[IL::Type])
   }, Visitor::Lambda)
 
   VISIT_VALUE = T.let(-> (v, o, c) {
-    ANSI.fmt(o.to_s, color: ANSI::MAGENTA)
+    o.to_s # NOTE: stub, don't format
+  }, Visitor::Lambda)
+
+  VISIT_CONSTANT = T.let(-> (v, o, c) {
+    ANSI.fmt(o.to_s, color: PALETTE[IL::Constant])
   }, Visitor::Lambda)
 
   VISIT_ID = T.let(-> (v, o, c) {
-    "#{ANSI.fmt(o.name, color: ANSI::BLUE)}##{o.number}"
+    "#{ANSI.fmt(o.name, color: PALETTE[IL::ID])}##{o.number}"
   }, Visitor::Lambda)
 
   VISIT_REGISTER = T.let(-> (v, o, c) {
-    "#{ANSI.fmt(o.name, color: ANSI::BLUE)}"
+    "#{ANSI.fmt(o.name, color: PALETTE[IL::Register])}"
   }, Visitor::Lambda)
 
   VISIT_EXPRESSION = T.let(-> (v, o, c) {
-    o.to_s # don't format
+    o.to_s # NOTE: stub, don't format
   }, Visitor::Lambda)
 
   VISIT_BINARYOP = T.let(-> (v, o, c) {
-    "#{v.visit(o.left)} #{ANSI.fmt(o.op, color: ANSI::GREEN)} #{v.visit(o.right)}"
+    s = "#{v.visit(o.left)} "
+    s += "#{ANSI.fmt(o.op, color: PALETTE[IL::BinaryOp])} "
+    s += v.visit(o.right)
+    return s
   }, Visitor::Lambda)
 
   VISIT_STATEMENT = T.let(-> (v, o, c) {
-    o.to_s # don't format
+    o.to_s # NOTE: stub, don't format
   }, Visitor::Lambda)
 
   VISIT_DEFINITION = T.let(-> (v, o, c) {
-    "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
+    # line number and indent
+    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    pad = indent(c.indent)
+    s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
+
+    s += "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}"
+
+    # annotation
+    if o.annotation
+      s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
+    end
+
+    return s
   }, Visitor::Lambda)
 
   VISIT_LABEL = T.let(-> (v, o, c) {
-    "#{ANSI.fmt("#{o.name}:", color: ANSI::CYAN)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
+    # line number and indent
+    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    pad = indent(c.indent)
+    s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
+
+    s += ANSI.fmt("#{o.name}:", color: PALETTE[IL::Label])
+
+    # annotation
+    if o.annotation
+      s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
+    end
+
+    return s
   }, Visitor::Lambda)
 
   VISIT_JUMP = T.let(-> (v, o, c) {
-    "#{ANSI.fmt("jmp", color: ANSI::RED)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
+    # line number and indent
+    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    pad = indent(c.indent)
+    s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
+
+    s += "#{ANSI.fmt("jmp", color: PALETTE[IL::Jump])} "
+    s += ANSI.fmt(o.target, color: PALETTE[IL::Label])
+
+    # annotation
+    if o.annotation
+      s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
+    end
+
+    return s
   }, Visitor::Lambda)
 
   VISIT_JUMPZERO = T.let(-> (v, o, c) {
-    "#{ANSI.fmt("jz", color: ANSI::RED)} #{v.visit(o.cond)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
+    # line number and indent
+    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    pad = indent(c.indent)
+    s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
+
+    s += "#{ANSI.fmt("jz", color: PALETTE[IL::Jump])} "
+    s += "#{v.visit(o.cond)} #{ANSI.fmt(o.target, color: PALETTE[IL::Label])}"
+
+    # annotation
+    if o.annotation
+      s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
+    end
+
+    return s
   }, Visitor::Lambda)
 
   VISIT_JUMPNOTZERO = T.let(-> (v, o, c) {
-    "#{ANSI.fmt("jnz", color: ANSI::RED)} #{v.visit(o.cond)} #{ANSI.fmt(o.target, color: ANSI::CYAN)}#{ANSI.fmt(" \" #{o.annotation}", color: ANSI::GREEN_BRIGHT) unless not o.annotation}"
+    # line number and indent
+    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    pad = indent(c.indent)
+    s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
+
+    s += "#{ANSI.fmt("jnz", color: PALETTE[IL::Jump])} "
+    s += "#{v.visit(o.cond)} #{ANSI.fmt(o.target, color: PALETTE[IL::Label])}"
+
+    # annotation
+    if o.annotation
+      s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
+    end
+
+    return s
   }, Visitor::Lambda)
 
+  VISIT_FUNCDEF = T.let(-> (v, o, c) {
+    # line number
+    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    c.line_num += 1
+    s = ANSI.fmt(num, color: PALETTE[:gutter])
+
+    s += "#{ANSI.fmt(o.name, bold: true)} ("
+    s += ") -> #{v.visit(o.ret_type)}:\n"
+    c.indent = 1
+    o.stmt_list.each { |stmt|
+      s += "#{v.visit(stmt, ctx: c)}\n"
+      c.line_num += 1
+    }
+    # TODO: params
+
+    # fix line number and indent
+    c.line_num -= 1
+    c.indent = 0
+    return s
+  }, Visitor::Lambda)
+
+  VISIT_FUNCPARAM = T.let(-> (v, o, c) {
+    "#{v.visit(o.type)} #{v.visit(o.id)}"
+  }, Visitor::Lambda)
 
   VISIT_LAMBDAS = T.let({
     IL::Type => VISIT_TYPE,
@@ -109,14 +219,27 @@ class Debugger::PrettyPrinter
     IL::Jump => VISIT_JUMP,
     IL::JumpZero => VISIT_JUMPZERO,
     IL::JumpNotZero => VISIT_JUMPNOTZERO,
+    IL::FuncDef => VISIT_FUNCDEF,
+    IL::FuncParam => VISIT_FUNCPARAM,
   }, Visitor::LambdaHash)
 
   private
 
   sig { params(str: String, len: Integer, pad: String).returns(String) }
-  def left_pad(str, len, pad)
+  def self.left_pad(str, len, pad: " ")
     while str.length < len
       str = pad + str
+    end
+
+    return str
+  end
+
+  sig { params(indent: Integer).returns(String) }
+  def self.indent(indent)
+    str = ""
+
+    for i in 1..indent
+      str += "  "
     end
 
     return str
