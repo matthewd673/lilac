@@ -43,6 +43,12 @@ class Optimization::LVN < OptimizationPass
         # try to precompute rhs (constant-folding)
         rhs = constant_folding(s.rhs, value_number_map, id_number_map)
 
+        # don't perform any type of lvn on function calls -- just skip
+        # NOTE: if a function has no side-effects, lvn could work...
+        if rhs.is_a?(IL::Call)
+          next
+        end
+
         # calculate hash for rhs
         rhs_val = ValueHash.new(rhs, value_number_map, id_number_map)
         # get or insert the value (existing shows if it existed before or not)
