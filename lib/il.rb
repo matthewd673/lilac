@@ -439,9 +439,15 @@ module IL
 
     sig { returns(String) }
     attr_reader :name
+    sig { returns(T::Array[FuncParam]) }
+    attr_reader :params
+    sig { returns(Type) }
+    attr_reader :ret_type
+    sig { returns(T::Array[Statement]) }
+    attr_reader :stmt_list
 
     sig { params(name: String,
-                 params: T::Array[Type],
+                 params: T::Array[FuncParam],
                  ret_type: Type,
                  stmt_list: T::Array[Statement])
           .void }
