@@ -76,7 +76,7 @@
   
   <dl>
     <dt>Included in:</dt>
-    <dd><span class='object_link'><a href="Analysis/AnalysisRunner.html" title="Analysis::AnalysisRunner (class)">AnalysisRunner</a></span>, <span class='object_link'><a href="Analysis/CFG.html" title="Analysis::CFG (class)">CFG</a></span>, <span class='object_link'><a href="Analysis/CFG/Edge.html" title="Analysis::CFG::Edge (class)">CFG::Edge</a></span>, <span class='object_link'><a href="Analysis/LVN.html" title="Analysis::LVN (class)">LVN</a></span></dd>
+    <dd><span class='object_link'><a href="Analysis/AnalysisRunner.html" title="Analysis::AnalysisRunner (class)">AnalysisRunner</a></span>, <span class='object_link'><a href="Analysis/CFG.html" title="Analysis::CFG (class)">CFG</a></span>, <span class='object_link'><a href="Analysis/CFG/Edge.html" title="Analysis::CFG::Edge (class)">CFG::Edge</a></span>, <span class='object_link'><a href="Analysis/DFA.html" title="Analysis::DFA (class)">DFA</a></span></dd>
   </dl>
   
 
@@ -91,7 +91,7 @@
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
     
-<p>The Analysis module is a namespace for lilac software analysis tools.</p>
+<p>The Analysis module is a namespace for Lilac analyses.</p>
 
 
   </div>
@@ -107,7 +107,7 @@
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Analysis/AnalysisPass.html" title="Analysis::AnalysisPass (class)">AnalysisPass</a></span>, <span class='object_link'><a href="Analysis/AnalysisRunner.html" title="Analysis::AnalysisRunner (class)">AnalysisRunner</a></span>, <span class='object_link'><a href="Analysis/CFG.html" title="Analysis::CFG (class)">CFG</a></span>, <span class='object_link'><a href="Analysis/CondenseLabels.html" title="Analysis::CondenseLabels (class)">CondenseLabels</a></span>, <span class='object_link'><a href="Analysis/LVN.html" title="Analysis::LVN (class)">LVN</a></span>, <span class='object_link'><a href="Analysis/PrecomputeCondJumps.html" title="Analysis::PrecomputeCondJumps (class)">PrecomputeCondJumps</a></span>, <span class='object_link'><a href="Analysis/RemoveUnusedLabels.html" title="Analysis::RemoveUnusedLabels (class)">RemoveUnusedLabels</a></span>, <span class='object_link'><a href="Analysis/RemoveUselessJumps.html" title="Analysis::RemoveUselessJumps (class)">RemoveUselessJumps</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Analysis/AnalysisPass.html" title="Analysis::AnalysisPass (class)">AnalysisPass</a></span>, <span class='object_link'><a href="Analysis/AnalysisRunner.html" title="Analysis::AnalysisRunner (class)">AnalysisRunner</a></span>, <span class='object_link'><a href="Analysis/CFG.html" title="Analysis::CFG (class)">CFG</a></span>, <span class='object_link'><a href="Analysis/DFA.html" title="Analysis::DFA (class)">DFA</a></span>, <span class='object_link'><a href="Analysis/LiveVars.html" title="Analysis::LiveVars (class)">LiveVars</a></span>, <span class='object_link'><a href="Analysis/ReachingDefs.html" title="Analysis::ReachingDefs (class)">ReachingDefs</a></span>
     
   
 </p>
@@ -124,7 +124,7 @@
           <div class="docstring">
   <div class="discussion">
     
-<p>A definitive list of all analyses available in lilac.</p>
+<p>A definitive list of all analyses available in Lilac.</p>
 
 
   </div>
@@ -135,11 +135,8 @@
 </div>
         </dt>
         <dd><pre class="code"><span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbracket'>[</span>
-  <span class='const'><span class='object_link'><a href="Analysis/CondenseLabels.html" title="Analysis::CondenseLabels (class)">CondenseLabels</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/CondenseLabels.html#initialize-instance_method" title="Analysis::CondenseLabels#initialize (method)">new</a></span></span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Analysis/RemoveUselessJumps.html" title="Analysis::RemoveUselessJumps (class)">RemoveUselessJumps</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/RemoveUselessJumps.html#initialize-instance_method" title="Analysis::RemoveUselessJumps#initialize (method)">new</a></span></span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Analysis/LVN.html" title="Analysis::LVN (class)">LVN</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/LVN.html#initialize-instance_method" title="Analysis::LVN#initialize (method)">new</a></span></span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Analysis/PrecomputeCondJumps.html" title="Analysis::PrecomputeCondJumps (class)">PrecomputeCondJumps</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/PrecomputeCondJumps.html#initialize-instance_method" title="Analysis::PrecomputeCondJumps#initialize (method)">new</a></span></span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Analysis/RemoveUnusedLabels.html" title="Analysis::RemoveUnusedLabels (class)">RemoveUnusedLabels</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/RemoveUnusedLabels.html#initialize-instance_method" title="Analysis::RemoveUnusedLabels#initialize (method)">new</a></span></span><span class='comma'>,</span>
+  <span class='const'><span class='object_link'><a href="Analysis/LiveVars.html" title="Analysis::LiveVars (class)">LiveVars</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/LiveVars.html#initialize-instance_method" title="Analysis::LiveVars#initialize (method)">new</a></span></span><span class='comma'>,</span>
+  <span class='const'><span class='object_link'><a href="Analysis/ReachingDefs.html" title="Analysis::ReachingDefs (class)">ReachingDefs</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/ReachingDefs.html#initialize-instance_method" title="Analysis::ReachingDefs#initialize (method)">new</a></span></span><span class='comma'>,</span>
 <span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Array</span><span class='lbracket'>[</span><span class='const'>Analysis</span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Analysis/AnalysisPass.html" title="Analysis::AnalysisPass (class)">AnalysisPass</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span></pre></dd>
       
     </dl>
@@ -156,7 +153,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Mar  4 00:53:28 2024 by
+  Generated on Sat Mar 23 15:21:26 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>

@@ -11,6 +11,7 @@ require_relative "../analysis/bb"
 class Debugger::PrettyPrinter
   extend T::Sig
 
+  # A Map representing the color palette used by PrettyPrinter.
   PALETTE = T.let({
     # IL node colors
     IL::Type => ANSI::YELLOW,
@@ -61,6 +62,7 @@ class Debugger::PrettyPrinter
 
   protected
 
+  # A visit context used internally by the PrettyPrinter Visitor.
   PrettyPrinterContext = Struct.new(:gutter_len, :line_num, :indent)
 
   VISIT_TYPE = T.let(-> (v, o, c) {

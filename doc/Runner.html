@@ -107,7 +107,7 @@
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
     
-<p>A Runner runs passes on a Program.</p>
+<p>A Runner runs Passes on a Program.</p>
 
 
   </div>
@@ -117,7 +117,7 @@
 
 </div><div id="subclasses">
   <h2>Direct Known Subclasses</h2>
-  <p class="children"><span class='object_link'><a href="Analysis/AnalysisRunner.html" title="Analysis::AnalysisRunner (class)">Analysis::AnalysisRunner</a></span>, <span class='object_link'><a href="Validation/ValidationRunner.html" title="Validation::ValidationRunner (class)">Validation::ValidationRunner</a></span></p>
+  <p class="children"><span class='object_link'><a href="Analysis/AnalysisRunner.html" title="Analysis::AnalysisRunner (class)">Analysis::AnalysisRunner</a></span>, <span class='object_link'><a href="Optimization/OptimizationRunner.html" title="Optimization::OptimizationRunner (class)">Optimization::OptimizationRunner</a></span>, <span class='object_link'><a href="Validation/ValidationRunner.html" title="Validation::ValidationRunner (class)">Validation::ValidationRunner</a></span></p>
 </div>
 
   
@@ -292,12 +292,12 @@
       <pre class="lines">
 
 
-18
 19
-20</pre>
+20
+21</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 18</span>
+      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
   <span class='ivar'>@program</span> <span class='op'>=</span> <span class='id identifier rubyid_program'>program</span>
@@ -358,12 +358,12 @@
       <pre class="lines">
 
 
-14
 15
-16</pre>
+16
+17</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 14</span>
+      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_program'>program</span>
   <span class='ivar'>@program</span>
@@ -426,12 +426,12 @@
       <pre class="lines">
 
 
-25
 26
-27</pre>
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run_pass'>run_pass</span><span class='lparen'>(</span><span class='id identifier rubyid_pass'>pass</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_pass'>pass</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='ivar'>@program</span><span class='rparen'>)</span>
@@ -487,14 +487,14 @@
       <pre class="lines">
 
 
-32
 33
 34
 35
-36</pre>
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/runner.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run_passes'>run_passes</span><span class='lparen'>(</span><span class='id identifier rubyid_pass_list'>pass_list</span><span class='rparen'>)</span>
   <span class='kw'>for</span> <span class='id identifier rubyid_p'>p</span> <span class='kw'>in</span> <span class='id identifier rubyid_pass_list'>pass_list</span>
@@ -511,7 +511,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Mar  4 00:53:28 2024 by
+  Generated on Sat Mar 23 15:21:26 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>

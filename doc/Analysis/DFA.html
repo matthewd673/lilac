@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Analysis::DFA
+  
+    &mdash; Documentation by YARD 0.9.34
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "Analysis::DFA";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (D)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Analysis.html" title="Analysis (module)">Analysis</a></span></span>
+     &raquo; 
+    <span class="title">DFA</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Analysis::DFA
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="AnalysisPass.html" title="Analysis::AnalysisPass (class)">AnalysisPass</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="../Pass.html" title="Pass (class)">Pass</a></span></li>
+          
+            <li class="next"><span class='object_link'><a href="AnalysisPass.html" title="Analysis::AnalysisPass (class)">AnalysisPass</a></span></li>
+          
+            <li class="next">Analysis::DFA</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  <dl>
+      <dt>Extended by:</dt>
+      <dd>T::Generic, T::Sig</dd>
+  </dl>
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="../Analysis.html" title="Analysis (module)">Analysis</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/analysis/dfa.rb</dd>
+  </dl>
+  
+</div>
+
+<div id="subclasses">
+  <h2>Direct Known Subclasses</h2>
+  <p class="children"><span class='object_link'><a href="LiveVars.html" title="Analysis::LiveVars (class)">LiveVars</a></span>, <span class='object_link'><a href="ReachingDefs.html" title="Analysis::ReachingDefs (class)">ReachingDefs</a></span></p>
+</div>
+<h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="DFA/Direction.html" title="Analysis::DFA::Direction (class)">Direction</a></span>
+    
+  
+</p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="Domain-constant" class="">Domain =
+          
+        </dt>
+        <dd><pre class="code"><span class='id identifier rubyid_type_member'>type_member</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+  
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="../Analysis.html" title="Analysis (module)">Analysis</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Analysis.html#ANALYSES-constant" title="Analysis::ANALYSES (constant)">ANALYSES</a></span></p>
+
+
+
+
+  <h2>Instance Attribute Summary</h2>
+  
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="AnalysisPass.html" title="Analysis::AnalysisPass (class)">AnalysisPass</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="AnalysisPass.html#level-instance_method" title="Analysis::AnalysisPass#level (method)">#level</a></span></p>
+
+  
+  
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="../Pass.html" title="Pass (class)">Pass</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Pass.html#description-instance_method" title="Pass#description (method)">#description</a></span>, <span class='object_link'><a href="../Pass.html#id-instance_method" title="Pass#id (method)">#id</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(direction, boundary, init)  &#x21d2; DFA </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of DFA.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>(program)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="AnalysisPass.html" title="Analysis::AnalysisPass (class)">AnalysisPass</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="AnalysisPass.html#to_s-instance_method" title="Analysis::AnalysisPass#to_s (method)">#to_s</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../Pass.html" title="Pass (class)">Pass</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Pass.html#to_s-instance_method" title="Pass#to_s (method)">#to_s</a></span></p>
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(direction, boundary, init)  &#x21d2; <tt><span class='object_link'><a href="" title="Analysis::DFA (class)">DFA</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new instance of DFA.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/dfa.rb', line 26</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_direction'>direction</span><span class='comma'>,</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='comma'>,</span> <span class='id identifier rubyid_init'>init</span><span class='rparen'>)</span>
+  <span class='comment'># NOTE: should always be overwritten by subclasses
+</span>  <span class='ivar'>@id</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>dfa</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
+  <span class='ivar'>@description</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Generic data flow analysis</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
+  <span class='ivar'>@level</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='op'>-</span><span class='int'>1</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='rparen'>)</span>
+
+  <span class='ivar'>@direction</span> <span class='op'>=</span> <span class='id identifier rubyid_direction'>direction</span>
+  <span class='ivar'>@boundary</span> <span class='op'>=</span> <span class='id identifier rubyid_boundary'>boundary</span>
+  <span class='ivar'>@init</span> <span class='op'>=</span> <span class='id identifier rubyid_init'>init</span>
+
+  <span class='ivar'>@out</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>Integer</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@in</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>Integer</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@gen</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>Integer</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@kill</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>Integer</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="run-instance_method">
+  
+    #<strong>run</strong>(program)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+43
+44
+45
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/dfa.rb', line 43</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_blocks'>blocks</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (module)">BB</a></span></span><span class='op'>::</span><span class='id identifier rubyid_create_blocks'><span class='object_link'><a href="BB.html#create_blocks-class_method" title="Analysis::BB.create_blocks (method)">create_blocks</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_cfg'>cfg</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="CFG.html" title="Analysis::CFG (class)">CFG</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="CFG.html#initialize-instance_method" title="Analysis::CFG#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_blocks'>blocks</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_run_dfa'>run_dfa</span><span class='lparen'>(</span><span class='id identifier rubyid_cfg'>cfg</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sat Mar 23 15:21:26 2024 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.34 (ruby-3.3.0).
+</div>
+
+    </div>
+  </body>
+</html>

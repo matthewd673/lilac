@@ -1,7 +1,8 @@
 # typed: strict
 require "sorbet-runtime"
+require "pass"
 
-# A Runner runs passes on a Program.
+# A Runner runs Passes on a Program.
 class Runner
   extend T::Sig
   extend T::Generic

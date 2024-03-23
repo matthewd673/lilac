@@ -5,7 +5,7 @@ require "sorbet-runtime"
 module IL
   extend T::Sig
 
-  # ILObject is a Sorbet type alias for any object in the IL that can be
+  # ILObject is a type-alias for any object in the IL that can be
   # "visited". For example, +IL::Value+ is in but +IL::Type+ is out.
   ILObject = T.type_alias { T.any(Value, Expression, Statement) }
 
@@ -132,6 +132,9 @@ module IL
     extend T::Sig
 
     sig { returns(T.untyped) }
+    # Calculate the value of an Expression.
+    #
+    # @return [T.untyped] The value of the Expression, likely numeric.
     def calculate
       0
     end
@@ -142,6 +145,8 @@ module IL
   class BinaryOp < Expression
     extend T::Sig
 
+    # A +BinaryOp::Operator+ represents all of the possible operators that
+    # can be used in a BinaryOp Expression.
     class Operator < T::Enum
       extend T::Sig
 
@@ -234,6 +239,8 @@ module IL
   class UnaryOp < Expression
     extend T::Sig
 
+    # A +UnaryOp::Operator+ represents all of the possible operators that
+    # can be used in a UnaryOp Expression.
     class Operator < T::Enum
       extend T::Sig
 

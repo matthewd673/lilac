@@ -7,11 +7,17 @@ require_relative "il"
 class Visitor
   extend T::Sig
 
+  # A +Visitor::Lambda+ is a type-alias for a lambda called by a Visitor.
+  # It has three parameters: the calling Visitor, the object being visited,
+  # and the optional visiting context. It can have any return type.
   Lambda = T.type_alias {
     T.proc.params(arg0: Visitor, arg1: T.untyped, arg2: T.untyped)
       .returns(T.untyped)
   }
 
+  # A +Visitor::LambdaHash+ is a type-alias for a hash of classes ->
+  # +Visitor::Lambda+ objects. It is used by a Visitor to determine which
+  # lambda to call for a given object.
   LambdaHash = T.type_alias {
     T::Hash[T::Class[T.untyped], Lambda]
   }

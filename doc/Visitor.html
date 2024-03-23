@@ -125,7 +125,18 @@
     <dl class="constants">
       
         <dt id="Lambda-constant" class="">Lambda =
-          
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>A <code>Visitor::Lambda</code> is a type-alias for a lambda called by a Visitor. It has three parameters: the calling Visitor, the object being visited, and the optional visiting context. It can have any return type.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
         </dt>
         <dd><pre class="code"><span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_type_alias'>type_alias</span> <span class='lbrace'>{</span>
   <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_proc'>proc</span><span class='period'>.</span><span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='label'>arg0:</span> <span class='const'>Visitor</span><span class='comma'>,</span> <span class='label'>arg1:</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_untyped'>untyped</span><span class='comma'>,</span> <span class='label'>arg2:</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_untyped'>untyped</span><span class='rparen'>)</span>
@@ -133,7 +144,18 @@
 <span class='rbrace'>}</span></pre></dd>
       
         <dt id="LambdaHash-constant" class="">LambdaHash =
-          
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>A <code>Visitor::LambdaHash</code> is a type-alias for a hash of classes -&gt; <code>Visitor::Lambda</code> objects. It is used by a Visitor to determine which lambda to call for a given object.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
         </dt>
         <dd><pre class="code"><span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_type_alias'>type_alias</span> <span class='lbrace'>{</span>
   <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>T</span><span class='op'>::</span><span class='const'>Class</span><span class='lbracket'>[</span><span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_untyped'>untyped</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#Lambda-constant" title="Visitor::Lambda (constant)">Lambda</a></span></span><span class='rbracket'>]</span>
@@ -259,12 +281,12 @@
       <pre class="lines">
 
 
-24
-25
-26</pre>
+30
+31
+32</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/visitor.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/visitor.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_visit_lambdas'>visit_lambdas</span><span class='rparen'>)</span>
   <span class='ivar'>@visit_lambdas</span> <span class='op'>=</span> <span class='id identifier rubyid_visit_lambdas'>visit_lambdas</span>
@@ -345,12 +367,6 @@
       <pre class="lines">
 
 
-36
-37
-38
-39
-40
-41
 42
 43
 44
@@ -358,10 +374,16 @@
 46
 47
 48
-49</pre>
+49
+50
+51
+52
+53
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/visitor.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'lib/visitor.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_visit'>visit</span><span class='lparen'>(</span><span class='id identifier rubyid_obj'>obj</span><span class='comma'>,</span> <span class='label'>ctx:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_obj'>obj</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_ancestors'>ancestors</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span>
@@ -387,7 +409,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Mar  4 00:53:28 2024 by
+  Generated on Sat Mar 23 15:21:26 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.3.0).
 </div>
