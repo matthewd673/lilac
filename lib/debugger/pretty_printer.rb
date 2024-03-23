@@ -94,6 +94,15 @@ class Debugger::PrettyPrinter
     return s
   }, Visitor::Lambda)
 
+  VISIT_CALL = T.let(-> (v, o, c) {
+    s = "#{ANSI.fmt(o.func_name, bold: true)} ("
+    o.args.each { |a|
+      s += "#{v.visit(a)}, "
+    }
+    s.chomp!(", ")
+    s += ")"
+  }, Visitor::Lambda)
+
   VISIT_STATEMENT = T.let(-> (v, o, c) {
     o.to_s # NOTE: stub, don't format
   }, Visitor::Lambda)
@@ -181,6 +190,22 @@ class Debugger::PrettyPrinter
     return s
   }, Visitor::Lambda)
 
+  VISIT_RETURN = T.let(-> (v, o, c) {
+    # line number and indent
+    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    pad = indent(c.indent)
+    s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
+
+    s += "#{ANSI.fmt("ret", bold: true)} #{v.visit(o.value)}"
+
+    # annotation
+    if o.annotation
+      s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
+    end
+
+    return s
+  }, Visitor::Lambda)
+
   VISIT_FUNCDEF = T.let(-> (v, o, c) {
     # line number
     num = left_pad(c.line_num.to_s, c.gutter_len) + " "
@@ -188,13 +213,21 @@ class Debugger::PrettyPrinter
     s = ANSI.fmt(num, color: PALETTE[:gutter])
 
     s += "#{ANSI.fmt(o.name, bold: true)} ("
+
+    # print params
+    o.params.each { |p|
+      s += "#{v.visit(p.type)} #{v.visit(p.id)}, "
+    }
+    s.chomp!(", ")
+
     s += ") -> #{v.visit(o.ret_type)}:\n"
+
+    # print body
     c.indent = 1
     o.stmt_list.each { |stmt|
       s += "#{v.visit(stmt, ctx: c)}\n"
       c.line_num += 1
     }
-    # TODO: params
 
     # fix line number and indent
     c.line_num -= 1
@@ -213,12 +246,14 @@ class Debugger::PrettyPrinter
     IL::Register => VISIT_REGISTER,
     IL::Expression => VISIT_EXPRESSION,
     IL::BinaryOp => VISIT_BINARYOP,
+    IL::Call => VISIT_CALL,
     IL::Statement => VISIT_STATEMENT,
     IL::Definition => VISIT_DEFINITION,
     IL::Label => VISIT_LABEL,
     IL::Jump => VISIT_JUMP,
     IL::JumpZero => VISIT_JUMPZERO,
     IL::JumpNotZero => VISIT_JUMPNOTZERO,
+    IL::Return => VISIT_RETURN,
     IL::FuncDef => VISIT_FUNCDEF,
     IL::FuncParam => VISIT_FUNCPARAM,
   }, Visitor::LambdaHash)
