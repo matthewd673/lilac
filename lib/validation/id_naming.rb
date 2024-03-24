@@ -58,6 +58,11 @@ class Validation::IDNaming < ValidationPass
         next
       end
 
+      # skip registers
+      if i.id.is_a?(IL::Register)
+        next
+      end
+
       if not valid?(i.id.name)
         raise("Reserved character in ID name '#{i.id.name}'")
       end

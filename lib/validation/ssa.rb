@@ -19,21 +19,44 @@ class Validation::SSA < ValidationPass
 
   sig { params(program: IL::Program).void }
   def run(program)
-    key_set = Set[]
+    symbols = SymbolTable.new
+    symbols.push_scope # top level scope
 
-    # TODO: support funcdefs
-    program.item_list.each { |i|
+    scan_items(program.item_list, symbols)
+  end
+
+  private
+
+  sig { params(items: T::Array[IL::TopLevelItem], symbols: SymbolTable).void }
+  def scan_items(items, symbols)
+    items.each { |i|
+      # recurse on function defs
+      if i.is_a?(IL::FuncDef)
+        # create a new scope (NOTE: assumes ssa doesn't hold between funcs)
+        symbols.push_scope
+
+        # scan and register params
+        i.params.each { |p|
+          if symbols.lookup(p.id.key)
+            raise("Multiple definitions of ID '#{p.id.key}'")
+          end
+          symbols.insert(ILSymbol.new(p.id.key, p.type))
+        }
+
+        # recursive scan
+        scan_items(i.stmt_list, symbols)
+        symbols.pop_scope
+      end
+
       # only definitions are relevant
       if not i.is_a?(IL::Definition)
         next
       end
 
-      # NOTE: unsafe to workaroudn Sorbet expecting T.noreturn (???)
-      if T.unsafe(key_set).include?(i.id.key)
+      if symbols.lookup(i.id.key)
         raise("Multiple definitions of ID '#{i.id.key}'")
       end
-
-      T.unsafe(key_set).add(i.id.key)
+      symbols.insert(ILSymbol.new(i.id.key, i.type))
     }
   end
 end
