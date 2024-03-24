@@ -21,22 +21,53 @@ class Validation::IDNaming < ValidationPass
 
   sig { params(program: IL::Program).void }
   def run(program)
-    program.item_list.each { |i|
-      ids = get_ids(i)
-      ids.each { |id|
-        # don't check registers since they don't have user-provided names
-        # (and necessarily contain a reserved character in their "name")
-        if id.is_a?(IL::Register) then next end
-
-        # check for reserved characters (% and #)
-        if id.name.include?("%") or id.name.include?("#")
-          raise("Reserved character used in ID name '#{id.name}'")
-        end
-      }
-    }
+    scan_items(program.item_list)
   end
 
   private
+
+  sig { params(items: T::Array[IL::TopLevelItem]).void }
+  def scan_items(items)
+    items.each { |i|
+      # scan and recurse on funcdefs
+      if i.is_a?(IL::FuncDef)
+        # scan params
+        i.params.each { |p|
+          # skip registers, which are named automatically
+          if p.id.is_a?(IL::Register) then next end
+
+          if not valid?(p.id.name)
+            raise("Reserved character in ID name '#{p.id.name}'")
+          end
+        }
+
+        # check function name
+        # (this won't check Calls but you must def a func to call it so...)
+        if not valid?(i.name)
+          raise("Reserved character in FuncDef name '#{i.name}'")
+        end
+
+        # recurse
+        scan_items(i.stmt_list)
+        next
+      end
+
+      # otherwise, only defs are relevant
+      # (every id must be defined, another validation will check that)
+      if not i.is_a?(IL::Definition)
+        next
+      end
+
+      if not valid?(i.id.name)
+        raise("Reserved character in ID name '#{i.id.name}'")
+      end
+    }
+  end
+
+  sig { params(name: String).returns(T::Boolean) }
+  def valid?(name)
+    not (name.include?("%") or name.include?("#"))
+  end
 
   sig { params(node: T.any(IL::FuncDef,
                            IL::Statement,
@@ -57,7 +88,6 @@ class Validation::IDNaming < ValidationPass
       return get_ids(node.value)
     when IL::ID
       return [node]
-    # TODO: support functions
     end
 
     return []

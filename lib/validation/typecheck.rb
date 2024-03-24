@@ -34,7 +34,9 @@ class Validation::TypeCheck < ValidationPass
     }
 
     # scan on all items
+    symbols.push_scope
     scan_items(program.item_list, symbols, funcs)
+    symbols.pop_scope
   end
 
   private
@@ -43,12 +45,19 @@ class Validation::TypeCheck < ValidationPass
                symbols: SymbolTable,
                funcs: T::Hash[String, String]).void }
   def scan_items(items, symbols, funcs)
-    symbols.push_scope
-
     items.each { |i|
       # recurse on funcdefs
       if i.is_a?(IL::FuncDef)
+        # create new scope with funcdef's params
+        symbols.push_scope
+
+        # register params in func scope
+        i.params.each { |p|
+          symbols.insert(ILSymbol.new(p.id.key, p.type))
+        }
+
         scan_items(i.stmt_list, symbols, funcs)
+        symbols.pop_scope
         next
       end
 
@@ -88,8 +97,6 @@ class Validation::TypeCheck < ValidationPass
         raise("Type mismatch in statement: '#{i}'")
       end
     }
-
-    symbols.pop_scope
   end
 
   sig { params(expr: IL::Expression,
