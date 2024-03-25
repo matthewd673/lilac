@@ -430,6 +430,11 @@ module IL
     def initialize(value)
       @value = value
     end
+
+    sig { returns(String) }
+    def to_s
+      "ret #{@value}"
+    end
   end
 
   # A FuncParam defines a parameter accepted by a FuncDef.
