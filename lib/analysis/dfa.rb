@@ -57,7 +57,7 @@ class Analysis::DFA < Analysis::AnalysisPass
     end
   end
 
-  sig { params(block: BB::Block).void }
+  sig { params(block: BB).void }
   def transfer(block)
     raise("Transfer function is unimplemented for #{@id}")
   end

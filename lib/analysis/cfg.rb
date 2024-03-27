@@ -14,12 +14,12 @@ class Analysis::CFG
 
     include Analysis
 
-    sig { returns(BB::Block) }
+    sig { returns(BB) }
     attr_reader :from
-    sig { returns(BB::Block) }
+    sig { returns(BB) }
     attr_reader :to
 
-    sig { params(from: BB::Block, to: BB::Block).void }
+    sig { params(from: BB, to: BB).void }
     def initialize(from, to)
       @from = from
       @to = to
@@ -31,33 +31,33 @@ class Analysis::CFG
   # The number used by the EXIT block in any CFG.
   EXIT = -2
 
-  sig { returns(BB::Block) }
+  sig { returns(BB) }
   # The ENTRY block in this CFG.
   #
   # @return [BB::Block] The ENTRY block object in this CFG.
   attr_reader :entry
 
-  sig { returns(BB::Block) }
+  sig { returns(BB) }
   # The EXIT block in this CFG.
   #
   # @return [BB::Block] The EXIT block object in this CFG.
   attr_reader :exit
 
-  sig { params(block_list: T::Array[BB::Block]).void }
+  sig { params(block_list: T::Array[BB]).void }
   def initialize(block_list)
-    @blocks = T.let([], T::Array[BB::Block])
+    @blocks = T.let([], T::Array[BB])
     @edges = T.let([], T::Array[Edge])
 
-    @predecessors = T.let(Hash.new, T::Hash[Integer, T::Set[BB::Block]])
-    @successors = T.let(Hash.new, T::Hash[Integer, T::Set[BB::Block]])
+    @predecessors = T.let(Hash.new, T::Hash[Integer, T::Set[BB]])
+    @successors = T.let(Hash.new, T::Hash[Integer, T::Set[BB]])
 
-    @entry = T.let(BB::Block.new(ENTRY, []), BB::Block)
-    @exit = T.let(BB::Block.new(EXIT, []), BB::Block)
+    @entry = T.let(BB.new(ENTRY, []), BB)
+    @exit = T.let(BB.new(EXIT, []), BB)
 
     calculate_graph(block_list)
   end
 
-  sig { params(block: T.proc.params(arg0: BB::Block).void).void }
+  sig { params(block: T.proc.params(arg0: BB).void).void }
   def each_block(&block)
     @blocks.each(&block)
   end
@@ -67,8 +67,7 @@ class Analysis::CFG
     @edges.each(&block)
   end
 
-  sig { params(b_block: BB::Block,
-               block: T.proc.params(arg0: BB::Block).void).void }
+  sig { params(b_block: BB, block: T.proc.params(arg0: BB).void).void }
   def each_predecessor(b_block, &block)
     if not @predecessors[b_block.id]
       return []
@@ -76,8 +75,7 @@ class Analysis::CFG
     T.unsafe(@predecessors[b_block.id]).each(&block)
   end
 
-  sig { params(b_block: BB::Block,
-               block: T.proc.params(arg0: BB::Block).void).void }
+  sig { params(b_block: BB, block: T.proc.params(arg0: BB).void).void }
   def each_successor(b_block, &block)
     if not @successors[b_block.id]
       return []
@@ -87,7 +85,7 @@ class Analysis::CFG
 
   protected
 
-  sig { params(from: BB::Block, to: BB::Block).void }
+  sig { params(from: BB, to: BB).void }
   # Create a new Edge and add it to the edge list. The blocks will also be
   # added to the appropriate successors and predecessors lists. This should
   # be used instead of manually creating and pushing Edges.
@@ -111,7 +109,7 @@ class Analysis::CFG
     T.unsafe(@predecessors[to.id]).push(from)
   end
 
-  sig { params(block_list: T::Array[BB::Block]).void }
+  sig { params(block_list: T::Array[BB]).void }
   def calculate_graph(block_list)
     # just in case this gets run more than once
     @blocks.clear

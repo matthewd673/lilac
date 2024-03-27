@@ -37,14 +37,14 @@ class Analysis::LiveVars < Analysis::DFA
 
   protected
 
-  sig { params(block: BB::Block, cfg: CFG).void }
+  sig { params(block: BB, cfg: CFG).void }
   def transfer(block, cfg)
     n = block.id
     @out[n] = meet(block, cfg)
     @in[n] = T.unsafe(@gen[n]) | (T.unsafe(@out[n]) - T.unsafe(@kill[n]))
   end
 
-  sig { params(block: BB::Block, cfg: CFG).returns(T::Set[Domain]) }
+  sig { params(block: BB, cfg: CFG).returns(T::Set[Domain]) }
   def meet(block, cfg)
     union = Set[]
     cfg.each_successor(block) { |s|
@@ -55,7 +55,7 @@ class Analysis::LiveVars < Analysis::DFA
 
   private
 
-  sig { params(b: BB::Block).void }
+  sig { params(b: BB).void }
   def init_sets(b)
     # initialize gen and kill sets
     @gen[b.id] = Set[]

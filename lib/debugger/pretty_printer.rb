@@ -46,7 +46,7 @@ class Debugger::PrettyPrinter
     }
   end
 
-  sig { params(blocks: T::Array[Analysis::BB::Block]).void }
+  sig { params(blocks: T::Array[Analysis::BB]).void }
   # Pretty-print a collection of basic blocks (+Analysis::BB::Block+)
   # to the terminal with headers for each block and syntax highlighting.
   #
