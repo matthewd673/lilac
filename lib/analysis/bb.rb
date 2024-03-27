@@ -13,12 +13,12 @@ module Analysis::BB
     extend T::Sig
 
     sig { returns(Integer) }
-    # The unique number of the block.
-    attr_reader :number
+    # The unique ID of the block.
+    attr_reader :id
 
-    sig { params(number: Integer, stmt_list: T::Array[IL::Statement]).void }
-    def initialize(number, stmt_list)
-      @number = number
+    sig { params(id: Integer, stmt_list: T::Array[IL::Statement]).void }
+    def initialize(id, stmt_list)
+      @id = id
       @stmt_list = stmt_list
     end
 

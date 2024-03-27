@@ -44,14 +44,14 @@ class Analysis::ReachingDefs < DFA
 
   sig { params(block: BB::Block, cfg: CFG).void }
   def transfer(block, cfg)
-    n = block.number
+    n = block.id
     @in[n] = meet(block, cfg)
     @out[n] = T.unsafe(@gen[n]) | (T.unsafe(@in[n]) - T.unsafe(@kill[n]))
   end
 
   sig { params(block: BB::Block, cfg: CFG).returns(T::Set[Domain]) }
   def meet(block, cfg)
-    # TODO
+    Set[] # TODO
   end
 
   private
@@ -59,8 +59,8 @@ class Analysis::ReachingDefs < DFA
   sig { params(b: BB::Block).void }
   def init_sets(b)
     # initialize gen and kill sets
-    @gen[b.number] = Set[]
-    @kill[b.number] = Set[]
+    @gen[b.id] = Set[]
+    @kill[b.id] = Set[]
 
     # find all definitions in block
     b.each_stmt { |s|
@@ -70,24 +70,24 @@ class Analysis::ReachingDefs < DFA
       end
 
       key = s.id.key
-      T.unsafe(@gen[b.number]).add(key)
+      T.unsafe(@gen[b.id]).add(key)
     }
 
     # any def not in this block is killed here
-    @kill[b.number] = @all_defs - T.unsafe(@gen[b.number])
+    @kill[b.id] = @all_defs - T.unsafe(@gen[b.id])
   end
 
   sig { params(program: IL::Program).returns(T::Set[Domain]) }
   def compute_all_defs(program)
     all = Set[]
 
-    program.each_stmt { |s|
+    program.item_list.each { |i|
       # only definitions are relevant
-      if not s.is_a?(IL::Definition)
+      if not i.is_a?(IL::Definition)
         next
       end
 
-      key = s.id.key
+      key = i.id.key
       T.unsafe(all).add(key)
     }
 

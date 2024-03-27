@@ -70,19 +70,19 @@ class Analysis::CFG
   sig { params(b_block: BB::Block,
                block: T.proc.params(arg0: BB::Block).void).void }
   def each_predecessor(b_block, &block)
-    if not @predecessors[b_block.number]
+    if not @predecessors[b_block.id]
       return []
     end
-    T.unsafe(@predecessors[b_block.number]).each(&block)
+    T.unsafe(@predecessors[b_block.id]).each(&block)
   end
 
   sig { params(b_block: BB::Block,
                block: T.proc.params(arg0: BB::Block).void).void }
   def each_successor(b_block, &block)
-    if not @successors[b_block.number]
+    if not @successors[b_block.id]
       return []
     end
-    T.unsafe(@successors[b_block.number]).each(&block)
+    T.unsafe(@successors[b_block.id]).each(&block)
   end
 
   protected
@@ -99,16 +99,16 @@ class Analysis::CFG
     @edges.push(edge)
 
     # add "to" to "from"s successors
-    if not @successors[from.number]
-      @successors[from.number] = Set[]
+    if not @successors[from.id]
+      @successors[from.id] = Set[]
     end
-    T.unsafe(@successors[from.number]).push(to)
+    T.unsafe(@successors[from.id]).push(to)
 
     # add "from" to "to"s predecessors
-    if not @predecessors[to.number]
-      @predecessors[to.number] = Set[]
+    if not @predecessors[to.id]
+      @predecessors[to.id] = Set[]
     end
-    T.unsafe(@predecessors[to.number]).push(from)
+    T.unsafe(@predecessors[to.id]).push(from)
   end
 
   sig { params(block_list: T::Array[BB::Block]).void }
@@ -152,7 +152,7 @@ class Analysis::CFG
       end
 
       # create edge to next block
-      following = block_list[b.number + 1]
+      following = block_list[b.id + 1]
       if following
         @edges.push(Edge.new(b, following))
       else # reached the end, point to exit

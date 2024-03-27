@@ -27,7 +27,6 @@ class Analysis::DFA < Analysis::AnalysisPass
     # NOTE: should always be overwritten by subclasses
     @id = T.let("dfa", String)
     @description = T.let("Generic data flow analysis", String)
-    @level = T.let(-1, Integer)
 
     @direction = direction
     @boundary = boundary
@@ -70,8 +69,8 @@ class Analysis::DFA < Analysis::AnalysisPass
     # initialize all nodes
     @out[CFG::ENTRY] = @boundary
     cfg.each_block { |b|
-      if b.number == CFG::ENTRY then next end
-      @out[b.number] = @init
+      if b.id == CFG::ENTRY then next end
+      @out[b.id] = @init
     }
 
     # iterate
@@ -79,11 +78,11 @@ class Analysis::DFA < Analysis::AnalysisPass
     while changed
       changed = false
       cfg.each_block { |b|
-        if b.number == CFG::ENTRY then next end
+        if b.id == CFG::ENTRY then next end
 
-        old_out = T.unsafe(@out[b.number])
+        old_out = T.unsafe(@out[b.id])
         transfer(b)
-        new_out = T.unsafe(@out[b.number])
+        new_out = T.unsafe(@out[b.id])
         if old_out.length != new_out.length
           changed = true
         end
@@ -96,8 +95,8 @@ class Analysis::DFA < Analysis::AnalysisPass
     # initialize all nodes
     @in[CFG::EXIT] = @boundary
     cfg.each_block { |b|
-      if b.number == CFG::EXIT then next end
-      @in[b.number] = @init
+      if b.id == CFG::EXIT then next end
+      @in[b.id] = @init
     }
 
     # iterate
@@ -105,11 +104,11 @@ class Analysis::DFA < Analysis::AnalysisPass
     while changed
       changed = false
       cfg.each_block { |b|
-        if b.number == CFG::EXIT then next end
+        if b.id == CFG::EXIT then next end
 
-        old_in = T.unsafe(@in[b.number])
+        old_in = T.unsafe(@in[b.id])
         transfer(b)
-        new_in = T.unsafe(@in[b.number])
+        new_in = T.unsafe(@in[b.id])
         if old_in.length != new_in.length
           changed = true
         end

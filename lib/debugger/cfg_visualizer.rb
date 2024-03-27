@@ -16,7 +16,7 @@ module Debugger::CFGVisualizer
 
     # define blocks
     cfg.each_block { |b|
-      name = b.number
+      name = b.id
       shape = "box"
       if b == cfg.entry
         name = "ENTRY"
@@ -31,11 +31,11 @@ module Debugger::CFGVisualizer
 
     # define edges
     cfg.each_edge { |e|
-      from_name = e.from.number
+      from_name = e.from.id
       if e.from == cfg.entry then from_name = "ENTRY"
       elsif e.from == cfg.exit then from_name = "EXIT" end
 
-      to_name = e.to.number
+      to_name = e.to.id
       if e.to == cfg.entry then to_name = "ENTRY"
       elsif e.to == cfg.exit then to_name = "EXIT" end
 

@@ -5,9 +5,7 @@ require_relative "analysis"
 require_relative "cfg"
 require_relative "dfa"
 
-include Analysis
-
-class Analysis::LiveVars < DFA
+class Analysis::LiveVars < Analysis::DFA
   extend T::Sig
   extend T::Generic
 
@@ -22,7 +20,6 @@ class Analysis::LiveVars < DFA
 
     @id = T.let("live_vars", String)
     @description = T.let("Live variables analysis", String)
-    @level = T.let(2, Integer)
   end
 
 
@@ -42,7 +39,7 @@ class Analysis::LiveVars < DFA
 
   sig { params(block: BB::Block, cfg: CFG).void }
   def transfer(block, cfg)
-    n = block.number
+    n = block.id
     @out[n] = meet(block, cfg)
     @in[n] = T.unsafe(@gen[n]) | (T.unsafe(@out[n]) - T.unsafe(@kill[n]))
   end
@@ -51,7 +48,7 @@ class Analysis::LiveVars < DFA
   def meet(block, cfg)
     union = Set[]
     cfg.each_successor(block) { |s|
-      union = union | T.unsafe(@in[s.number])
+      union = union | T.unsafe(@in[s.id])
     }
     return union
   end
@@ -61,8 +58,8 @@ class Analysis::LiveVars < DFA
   sig { params(b: BB::Block).void }
   def init_sets(b)
     # initialize gen and kill sets
-    @gen[b.number] = Set[]
-    @kill[b.number] = Set[]
+    @gen[b.id] = Set[]
+    @kill[b.id] = Set[]
 
     b.each_stmt { |s|
       # TODO: someday will need to account for function calls
@@ -74,14 +71,14 @@ class Analysis::LiveVars < DFA
       # add these to the GEN set
       ue = find_vars(s)
       ue.each { |var|
-        b_kill = T.unsafe(@kill[b.number])
+        b_kill = T.unsafe(@kill[b.id])
         if not b_kill.include?(var)
-          T.unsafe(@gen[b.number]).add(var)
+          T.unsafe(@gen[b.id]).add(var)
         end
       }
 
       # add lhs to KILL set
-      T.unsafe(@kill[b.number]).add(s.id)
+      T.unsafe(@kill[b.id]).add(s.id)
     }
   end
 
