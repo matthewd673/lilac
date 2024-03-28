@@ -25,7 +25,7 @@ class Analysis::LiveVars < Analysis::DFA
 
   sig { params(program: IL::Program).void }
   def run(program)
-    blocks = BB::create_blocks(program)
+    blocks = BB::from_program(program)
     cfg = CFG.new(blocks)
 
     blocks.each { |b|

@@ -24,44 +24,28 @@ class Validation::TypeCheck < ValidationPass
     funcs = {} # name -> return type
 
     # store function return types
-    program.item_list.each { |i|
-      # only funcdefs are relevant
-      if not i.is_a?(IL::FuncDef)
-        next
-      end
-
-      funcs[i.name] = i.ret_type
+    program.each_func { |f|
+      funcs[f.name] = f.ret_type
     }
 
     # scan on all items
     symbols.push_scope
-    scan_items(program.item_list, symbols, funcs)
+    scan_items(program.stmt_list, symbols, funcs)
+    # ...and scan on all functions
+    program.each_func { |f|
+      scan_items(f.stmt_list, symbols, funcs)
+    }
     symbols.pop_scope
   end
 
   private
 
-  sig { params(items: T::Array[IL::TopLevelItem],
+  sig { params(items: T::Array[IL::Statement],
                symbols: SymbolTable,
                funcs: T::Hash[String, String]).void }
   def scan_items(items, symbols, funcs)
     items.each { |i|
-      # recurse on funcdefs
-      if i.is_a?(IL::FuncDef)
-        # create new scope with funcdef's params
-        symbols.push_scope
-
-        # register params in func scope
-        i.params.each { |p|
-          symbols.insert(ILSymbol.new(p.id.key, p.type))
-        }
-
-        scan_items(i.stmt_list, symbols, funcs)
-        symbols.pop_scope
-        next
-      end
-
-      # otherwise, only definitions are relevant
+      # only definitions are relevant
       if not i.is_a?(IL::Definition)
         next
       end

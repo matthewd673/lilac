@@ -291,6 +291,18 @@ module IL
     end
   end
 
+  # A Phi function is an Expression that combines multiple possible SSA
+  # values at a join node.
+  class Phi < Expression
+    sig { returns(T::Array[Value]) }
+    attr_reader :values
+
+    sig { params(values: T::Array[Value]).void }
+    def initialize(values)
+      @values = values
+    end
+  end
+
   # A Statement is a single instruction or "line of code" in the IL.
   class Statement
     extend T::Sig
@@ -527,32 +539,46 @@ module IL
     end
   end
 
-  # A TopLevelItem is any IL object that can occur at the top-level of a
-  # Program.
-  TopLevelItem = T.type_alias { T.any(Statement, FuncDef) }
-
   # A Program is a list of Statements.
   class Program
     extend T::Sig
 
-    sig { returns(T::Array[TopLevelItem]) }
-    attr_reader :item_list
+    sig { returns(T::Array[Statement]) }
+    attr_reader :stmt_list
 
     sig { void }
     # Construct a new Program.
     def initialize
-      @item_list = T.let([], T::Array[TopLevelItem])
+      @stmt_list = T.let([], T::Array[Statement])
+      @func_map = T.let({}, T::Hash[String, FuncDef])
     end
 
     sig { returns(Integer) }
     def length
-      @item_list.length
+      @stmt_list.length
+    end
+
+    sig { params(funcdef: FuncDef).void }
+    def register_func(funcdef)
+      @func_map[funcdef.name] = funcdef
+    end
+
+    sig { params(block: T.proc.params(arg0: FuncDef).void).void }
+    def each_func(&block)
+      @func_map.keys.each { |k|
+        yield T.unsafe(@func_map[k])
+      }
+    end
+
+    sig { params(name: String).returns(T.nilable(FuncDef)) }
+    def get_func(name)
+      @func_map[name]
     end
 
     sig { returns(String) }
     def to_s
       str = ""
-      @item_list.each { |i|
+      @stmt_list.each { |i|
         str += i.to_s + "\n"
       }
       return str

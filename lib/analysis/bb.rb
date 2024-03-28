@@ -73,25 +73,25 @@ class Analysis::BB
   end
 
   sig { params(program: IL::Program).returns(T::Array[Analysis::BB]) }
-  # Create a list of basic blocks for the given Program.
+  # Create a list of basic blocks for the given Program and its functions.
   # @param [IL::Program] program The Program to create blocks from.
   # @return [T::Array[Analysis::BB]] A list of basic blocks.
-  def self.create_blocks(program)
+  def self.from_program(program)
     blocks = []
     stmt_list = []
 
     # TODO: adapt to work with functions
-    program.item_list.each { |i|
+    program.stmt_list.each { |s|
       # mark beginning of a block
-      if i.is_a?(IL::Label) and not stmt_list.empty?
+      if s.is_a?(IL::Label) and not stmt_list.empty?
         blocks.push(Analysis::BB.new(blocks.length, stmt_list))
         stmt_list = []
       end
 
-      stmt_list.push(i)
+      stmt_list.push(s)
 
       # mark end of a block
-      if i.is_a?(IL::Jump) # block will never be empty due to above push
+      if s.is_a?(IL::Jump) # block will never be empty due to above push
         blocks.push(Analysis::BB.new(blocks.length, stmt_list))
         stmt_list = []
       end
@@ -102,5 +102,17 @@ class Analysis::BB
     end
 
     return blocks
+  end
+
+  private
+
+  sig { params(stmt_list: T::Array[IL::Statement]).void }
+  def self.create_blocks(stmt_list)
+    blocks = []
+    block_stmts = []
+
+    stmt_list.each { |i|
+      # TODO
+    }
   end
 end
