@@ -26,14 +26,11 @@ class Analysis::ReachingDefs < DFA
     @all_defs = T.let(Set[], T::Set[Domain])
   end
 
-  sig { params(program: IL::Program).void }
-  def run(program)
-    blocks = BB::create_blocks(program)
-    cfg = CFG.new(blocks)
+  sig { params(cfg: CFG).void }
+  def run(cfg)
+    @all_defs = compute_all_defs(cfg)
 
-    @all_defs = compute_all_defs(program)
-
-    blocks.each { |b|
+    cfg.each_block { |b|
       init_sets(b)
     }
 
@@ -77,18 +74,20 @@ class Analysis::ReachingDefs < DFA
     @kill[b.id] = @all_defs - T.unsafe(@gen[b.id])
   end
 
-  sig { params(program: IL::Program).returns(T::Set[Domain]) }
-  def compute_all_defs(program)
+  sig { params(cfg: CFG).returns(T::Set[Domain]) }
+  def compute_all_defs(cfg)
     all = Set[]
 
-    program.item_list.each { |i|
-      # only definitions are relevant
-      if not i.is_a?(IL::Definition)
-        next
-      end
+    cfg.each_block { |b|
+      b.each_stmt { |s|
+        # only definitions are relevant
+        if not s.is_a?(IL::Definition)
+          next
+        end
 
-      key = i.id.key
-      T.unsafe(all).add(key)
+        key = s.id.key
+        T.unsafe(all).add(key)
+      }
     }
 
     return all

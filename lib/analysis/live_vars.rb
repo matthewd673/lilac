@@ -23,12 +23,9 @@ class Analysis::LiveVars < Analysis::DFA
   end
 
 
-  sig { params(program: IL::Program).void }
-  def run(program)
-    blocks = BB::from_program(program)
-    cfg = CFG.new(blocks)
-
-    blocks.each { |b|
+  sig { params(cfg: CFG).void }
+  def run(cfg)
+    cfg.each_block { |b|
       init_sets(b)
     }
 

@@ -15,30 +15,28 @@ class Optimization::PrecomputeCondJumps < OptimizationPass
     @level = T.let(1, Integer)
   end
 
-  sig { params(program: IL::Program).void }
-  def run(program)
-    stmt_list = []
-    program.item_list.each { |i|
+  sig { params(stmt_list: T::Array[IL::Statement]).void }
+  def run(stmt_list)
+    replacement = []
+
+    stmt_list.each_with_index { |s, i|
       # precompute jz
-      if i.is_a?(IL::JumpZero) and i.cond.is_a?(IL::Constant)
-        cond = T.cast(i.cond, IL::Constant)
+      if s.is_a?(IL::JumpZero) and s.cond.is_a?(IL::Constant)
+        cond = T.cast(s.cond, IL::Constant)
         if cond.value == 0
-          stmt_list.push(IL::Jump.new(i.target))
+          replacement.push({:index => i, :stmt => IL::Jump.new(s.target)})
         end
       # precompute jnz
-      elsif i.is_a?(IL::JumpNotZero) and i.cond.is_a?(IL::Constant)
-        cond = T.cast(i.cond, IL::Constant)
+      elsif s.is_a?(IL::JumpNotZero) and s.cond.is_a?(IL::Constant)
+        cond = T.cast(s.cond, IL::Constant)
         if cond.value != 0
-          stmt_list.push(IL::Jump.new(i.target))
+          replacement.push(:index => i, :stmt => IL::Jump.new(s.target))
         end
-      # if statement is not a jump that we're modifying, just push it to list
-      else
-        stmt_list.push(i)
       end
     }
 
-    # replace statement list on input program
-    program.item_list.clear
-    program.item_list.concat(stmt_list)
+    replacement.each { |r|
+      stmt_list[r[:index]] = r[:stmt]
+    }
   end
 end

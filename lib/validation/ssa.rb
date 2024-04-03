@@ -21,41 +21,42 @@ class Validation::SSA < ValidationPass
     symbols = SymbolTable.new
     symbols.push_scope # top level scope
 
-    scan_items(program.item_list, symbols)
+    # scan top level of program
+    scan_stmt_list(program.stmt_list, symbols)
+
+    # scan all funcs
+    program.each_func { |f|
+      # create a new scope (NOTE: assumes ssa doesn't hold between funcs)
+      symbols.push_scope
+
+      # scan and register params
+      f.params.each { |p|
+        if symbols.lookup(p.id.key)
+          raise("Multiple definitions of ID '#{p.id.key}'")
+        end
+        symbols.insert(ILSymbol.new(p.id.key, p.type))
+      }
+
+      # recursive scan
+      scan_stmt_list(f.stmt_list, symbols)
+      symbols.pop_scope
+    }
   end
 
   private
 
-  sig { params(items: T::Array[IL::TopLevelItem], symbols: SymbolTable).void }
-  def scan_items(items, symbols)
-    items.each { |i|
-      # recurse on function defs
-      if i.is_a?(IL::FuncDef)
-        # create a new scope (NOTE: assumes ssa doesn't hold between funcs)
-        symbols.push_scope
-
-        # scan and register params
-        i.params.each { |p|
-          if symbols.lookup(p.id.key)
-            raise("Multiple definitions of ID '#{p.id.key}'")
-          end
-          symbols.insert(ILSymbol.new(p.id.key, p.type))
-        }
-
-        # recursive scan
-        scan_items(i.stmt_list, symbols)
-        symbols.pop_scope
-      end
-
+  sig { params(stmt_list: T::Array[IL::Statement], symbols: SymbolTable).void }
+  def scan_stmt_list(stmt_list, symbols)
+    stmt_list.each { |s|
       # only definitions are relevant
-      if not i.is_a?(IL::Definition)
+      if not s.is_a?(IL::Definition)
         next
       end
 
-      if symbols.lookup(i.id.key)
-        raise("Multiple definitions of ID '#{i.id.key}'")
+      if symbols.lookup(s.id.key)
+        raise("Multiple definitions of ID '#{s.id.key}'")
       end
-      symbols.insert(ILSymbol.new(i.id.key, i.type))
+      symbols.insert(ILSymbol.new(s.id.key, s.type))
     }
   end
 end

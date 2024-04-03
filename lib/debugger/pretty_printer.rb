@@ -40,8 +40,12 @@ class Debugger::PrettyPrinter
   def print_program(program)
     gutter_len = program.length.to_s.length
     ctx = PrettyPrinterContext.new(gutter_len, 0, 0)
-    program.item_list.each { |item|
-      puts(@visitor.visit(item, ctx: ctx))
+    program.each_func { |f|
+      puts(@visitor.visit(f, ctx: ctx))
+      ctx.line_number += 1 # TODO: is this right?
+    }
+    program.stmt_list.each { |s|
+      puts(@visitor.visit(s, ctx: ctx))
       ctx.line_num += 1
     }
   end

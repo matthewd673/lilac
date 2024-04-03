@@ -16,79 +16,76 @@ class Optimization::LVN < OptimizationPass
     @level = T.let(1, Integer)
   end
 
-  sig { params(program: IL::Program).void }
-  def run(program)
-    block_list = Analysis::BB.create_blocks(program)
-    block_list.each { |b|
-      value_number_map = ValueNumberMap.new
-      id_number_map = IDNumberMap.new
+  sig { params(block: Analysis::BB).void }
+  def run(block)
+    value_number_map = ValueNumberMap.new
+    id_number_map = IDNumberMap.new
 
-      b.each_stmt { |s|
-        # perform constant folding on conditional jump conditions
-        # this is a bonus on top of LVN's core task
-        if s.is_a?(IL::JumpZero) or s.is_a?(IL::JumpNotZero)
-          cond = constant_folding(s.cond, value_number_map, id_number_map)
-          # swap out cond only if the new result is a constant
-          if cond.is_a?(IL::Constant)
-            s.cond = cond
-          end
-          next # job's done with the jmps
+    block.each_stmt { |s|
+      # perform constant folding on conditional jump conditions
+      # this is a bonus on top of LVN's core task
+      if s.is_a?(IL::JumpZero) or s.is_a?(IL::JumpNotZero)
+        cond = constant_folding(s.cond, value_number_map, id_number_map)
+        # swap out cond only if the new result is a constant
+        if cond.is_a?(IL::Constant)
+          s.cond = cond
         end
+        next # job's done with the jmps
+      end
 
-        # only definitions are relevant
-        if not s.is_a?(IL::Definition)
-          next
-        end
+      # only definitions are relevant
+      if not s.is_a?(IL::Definition)
+        next
+      end
 
-        # try to precompute rhs (constant-folding)
-        rhs = constant_folding(s.rhs, value_number_map, id_number_map)
+      # try to precompute rhs (constant-folding)
+      rhs = constant_folding(s.rhs, value_number_map, id_number_map)
 
-        # don't perform any type of lvn on function calls -- just skip
-        # NOTE: if a function has no side-effects, lvn could work...
-        if rhs.is_a?(IL::Call)
-          next
-        end
+      # don't perform any type of lvn on function calls -- just skip
+      # NOTE: if a function has no side-effects, lvn could work...
+      if rhs.is_a?(IL::Call)
+        next
+      end
 
-        # calculate hash for rhs
-        rhs_val = ValueHash.new(rhs, value_number_map, id_number_map)
-        # get or insert the value (existing shows if it existed before or not)
-        number = value_number_map.get_number_by_value(rhs_val.hash)
-        existing = true
-        if not number
-          number = value_number_map.insert_value(rhs_val)
-          existing = false
-        end
+      # calculate hash for rhs
+      rhs_val = ValueHash.new(rhs, value_number_map, id_number_map)
+      # get or insert the value (existing shows if it existed before or not)
+      number = value_number_map.get_number_by_value(rhs_val.hash)
+      existing = true
+      if not number
+        number = value_number_map.insert_value(rhs_val)
+        existing = false
+      end
 
-        # associate number with the id being assigned to
-        id_number_map.assign_id(s.id, number)
+      # associate number with the id being assigned to
+      id_number_map.assign_id(s.id, number)
 
-        # constants on the rhs are always better off staying as constants
-        if rhs_val.value.is_a?(IL::Constant)
-          s.rhs = rhs_val.value
-          s.annotation = "#{number} (is constant)" unless not existing
-          next
-        end
+      # constants on the rhs are always better off staying as constants
+      if rhs_val.value.is_a?(IL::Constant)
+        s.rhs = rhs_val.value
+        s.annotation = "#{number} (is constant)" unless not existing
+        next
+      end
 
-        # brand new values will never have their rhs replaced
-        if not existing
-          next
-        end
+      # brand new values will never have their rhs replaced
+      if not existing
+        next
+      end
 
-        # if the value exists in another id, set rhs to that id
-        existing_id = id_number_map.get_id_by_number(number)
-        if existing_id
-          s.rhs = existing_id
-          s.annotation = number.to_s # TODO: temp
-          next
-        end
+      # if the value exists in another id, set rhs to that id
+      existing_id = id_number_map.get_id_by_number(number)
+      if existing_id
+        s.rhs = existing_id
+        s.annotation = number.to_s # TODO: temp
+        next
+      end
 
-        existing_hash = value_number_map.get_value_by_number(number)
-        if existing_hash
-          s.rhs = existing_hash.value
-          s.annotation = number.to_s # TODO: temp
-          next
-        end
-      }
+      existing_hash = value_number_map.get_value_by_number(number)
+      if existing_hash
+        s.rhs = existing_hash.value
+        s.annotation = number.to_s # TODO: temp
+        next
+      end
     }
   end
 

@@ -15,35 +15,36 @@ class Optimization::RemoveUnusedLabels < OptimizationPass
     @level = T.let(0, Integer)
   end
 
-  sig { params(program: IL::Program).void }
-  def run(program)
+  sig { params(stmt_list: T::Array[IL::Statement]).void }
+  def run(stmt_list)
     stmt_list = []
 
     # find all labels that are jumped to
     jumped_labels = []
-    program.item_list.each { |i|
-      if not i.is_a?(IL::Jump) then next end
+    stmt_list.each { |s|
+      if not s.is_a?(IL::Jump) then next end
 
-      if jumped_labels.include?(i.target) then next end
-      jumped_labels.push(i.target)
+      if jumped_labels.include?(s.target) then next end
+      jumped_labels.push(s.target)
     }
 
-    # remove all labels that aren't jumped to
-    program.item_list.each { |i|
+    # delete all labels that aren't jumped to
+    deletion = []
+    stmt_list.each { |s|
       # only labels are relevant
-      if not i.is_a?(IL::Label)
-        stmt_list.push(i)
+      if not s.is_a?(IL::Label)
+        stmt_list.push(s)
         next
       end
 
-      # only include label if it is jumped to
-      if jumped_labels.include?(i.name)
-        stmt_list.push(i)
+      # only delete label if it is not jumped to
+      if not jumped_labels.include?(s.name)
+        deletion.push(s)
       end
     }
 
-    # replace statement list on input program
-    program.item_list.clear
-    program.item_list.concat(stmt_list)
+    deletion.each { |d|
+      stmt_list.delete(d)
+    }
   end
 end

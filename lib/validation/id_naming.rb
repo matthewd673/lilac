@@ -71,7 +71,7 @@ class Validation::IDNaming < ValidationPass
 
   sig { params(name: String).returns(T::Boolean) }
   def valid?(name)
-    not (name.include?("%") or name.include?("#"))
+    not (name.length == 0 or name.include?("%") or name.include?("#"))
   end
 
   sig { params(node: T.any(IL::FuncDef,
