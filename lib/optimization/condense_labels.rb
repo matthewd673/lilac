@@ -15,29 +15,27 @@ class Optimization::CondenseLabels < OptimizationPass
     @level = T.let(0, Integer)
   end
 
-  sig { params(program: IL::Program).void }
-  def run(program)
-    # TODO: add function support
+  sig { params(stmt_list: T::Array[IL::Statement]).void }
+  def run(stmt_list)
     jump_map = {} # target name -> IL::Goto
     label_adj_map = {} # IL::Label -> the IL::Label immediately above it
 
-    stmt_list = []
-    program.item_list.each { |i|
+    deletion = []
+
+    stmt_list.each_with_index { |s, i|
       # identify adjacent labels
-      last = T.unsafe(stmt_list[-1]) # NOTE: workaround for sorbet 7006
-      if i.is_a?(IL::Label) and last and last.is_a?(IL::Label)
-        label_adj_map[i] = last
-      # push all stmts to internal list except adjacent labels
-      else
-        stmt_list.push(i)
+      last = T.unsafe(stmt_list[i - 1]) # NOTE: workaround for sorbet 7006
+      if s.is_a?(IL::Label) and last and last.is_a?(IL::Label)
+        label_adj_map[s] = last
+        deletion.push(s) # remove adjacent labels
       end
 
       # mark jumps
-      if i.is_a?(IL::Jump)
-        if jump_map.include?(i.target)
-          jump_map[i.target].push(i)
+      if s.is_a?(IL::Jump)
+        if jump_map.include?(s.target)
+          jump_map[s.target].push(s)
         else
-          jump_map[i.target] = [i]
+          jump_map[s.target] = [s]
         end
       end
     }
@@ -59,8 +57,9 @@ class Optimization::CondenseLabels < OptimizationPass
       }
     }
 
-    # replace statement list on input program
-    program.item_list.clear
-    program.item_list.concat(stmt_list)
+    # delete all marked stmts
+    deletion.each { |s|
+      stmt_list.delete(s)
+    }
   end
 end

@@ -28,19 +28,20 @@ module Interpreter
     end
 
     # collect all funcs in the program
-    funcs = {} # [String] name -> [IL::FuncDef] func def object
-    program.item_list.each { |i|
-      if not i.is_a?(IL::FuncDef) then next end
-
-      funcs[i.name] = i
+    context.funcs = {}
+    program.each_func { |f|
+      context.funcs[f.name] = f
     }
-    context.funcs = funcs
 
     # collect all labels in program -- including within functions
-    context.label_indices = register_labels(program.item_list)
+    context.label_indices = {}
+    register_labels(context.label_indices, program.stmt_list)
+    program.each_func { |f|
+      register_labels(context.label_indices, f.stmt_list)
+    }
 
     # begin interpretation
-    interpret_items(program.item_list, visitor, context)
+    interpret_stmt_list(program.stmt_list, visitor, context)
 
     puts("---")
     puts("Interpretation complete")
@@ -52,54 +53,44 @@ module Interpreter
 
   protected
 
-  sig { params(item_list: T::Array[IL::TopLevelItem])
-          .returns(T::Hash[String, Integer]) }
-  def self.register_labels(item_list)
+  sig { params(label_hash: T::Hash[String, Integer],
+               stmt_list: T::Array[IL::Statement]).void }
+  def self.register_labels(label_hash, stmt_list)
     index = 0
-    label_map = Hash.new
-
-    item_list.each { |i|
-      # recurse on funcdefs
-      if i.is_a?(IL::FuncDef)
-        inner = register_labels(i.stmt_list)
-        # add the labels that it found into the main list
-        inner.keys.each { |k|
-          label_map[k] = inner[k]
-        }
-
-        index += 1
-        next
-      end
-
+    stmt_list.each { |s|
       # register labels in item list
-      if not i.is_a?(IL::Label) then next end
-      label_map[i.name] = index
+      if s.is_a?(IL::Label)
+        label_hash[s.name] = index
+      end
       index += 1
     }
-
-    return label_map
   end
 
-  sig { params(item_list: T::Array[IL::TopLevelItem],
+  sig { params(stmt_list: T::Array[IL::Statement],
                visitor: Visitor,
                context: Context).returns(T.nilable(InterpreterValue)) }
-  def self.interpret_items(item_list, visitor, context)
-    while context.ip < item_list.length
-      i = item_list[context.ip]
+  def self.interpret_stmt_list(stmt_list, visitor, context)
+    while context.ip < stmt_list.length
+      s = stmt_list[context.ip]
 
       # skip items that do nothing
-      if i.is_a?(IL::FuncDef) or i.is_a?(IL::Label)
+      if s.is_a?(IL::Label)
         context.ip += 1
         next
       end
 
+      puts "  #{s}"
+      puts "---"
+      puts context.symbols
+      puts "---"
+
       # special handling for Return
-      if i.is_a?(IL::Return)
-        return visitor.visit(i.value, ctx: context)
+      if s.is_a?(IL::Return)
+        return visitor.visit(s.value, ctx: context)
       end
 
       # visit a statement normally
-      visitor.visit(i, ctx: context)
+      visitor.visit(s, ctx: context)
       context.ip += 1
     end
 
@@ -233,7 +224,7 @@ module Interpreter
     }
 
     # interpret body of function
-    ret_value = interpret_items(stmt_list, v, context)
+    ret_value = interpret_stmt_list(stmt_list, v, context)
 
     # re-enter current func scope
     context.symbols.pop_scope
@@ -289,8 +280,8 @@ module Interpreter
   }, Visitor::Lambda)
 
   VISIT_JUMPNOTZERO = T.let(-> (v, o, context) {
-    cond = o[0].cond
-    target = o[0].target
+    cond = o.cond
+    target = o.target
 
     # evaluate conditional
     cond_eval = v.visit(cond, ctx: context)

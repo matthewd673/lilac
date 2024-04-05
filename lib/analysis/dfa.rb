@@ -38,11 +38,8 @@ class Analysis::DFA < Analysis::AnalysisPass
     @kill = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
   end
 
-  sig { params(program: IL::Program).void }
-  def run(program)
-    blocks = BB::create_blocks(program)
-    cfg = CFG.new(blocks)
-
+  sig { params(cfg: CFG).void }
+  def run(cfg)
     run_dfa(cfg)
   end
 

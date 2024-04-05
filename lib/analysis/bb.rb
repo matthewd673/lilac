@@ -72,31 +72,42 @@ class Analysis::BB
     return str
   end
 
-  sig { params(program: IL::Program).returns(T::Array[Analysis::BB]) }
-  # Create a list of basic blocks for the given Program.
-  # @param [IL::Program] program The Program to create blocks from.
-  # @return [T::Array[Analysis::BB]] A list of basic blocks.
-  def self.create_blocks(program)
-    blocks = []
-    stmt_list = []
+  sig { params(stmt_list: T::Array[IL::Statement])
+          .returns(T::Array[Analysis::BB]) }
+  # Create a list of basic blocks for the given statement list.
+  # @param [T::Array[IL::Statement]] stmt_list The statement list to
+  #   create blocks from.
+  # @return [T::Array[Analysis::BB]] A list of basic blocks in
+  #   the statement list.
+  def self.from_stmt_list(stmt_list)
+    return create_blocks(stmt_list)
+  end
 
-    # TODO: adapt to work with functions
-    program.item_list.each { |i|
+  private
+
+  sig { params(stmt_list: T::Array[IL::Statement])
+          .returns(T::Array[Analysis::BB]) }
+  def self.create_blocks(stmt_list)
+    blocks = []
+    block_stmts = []
+
+    stmt_list.each { |s|
       # mark beginning of a block
-      if i.is_a?(IL::Label) and not stmt_list.empty?
+      if s.is_a?(IL::Label) and not stmt_list.empty?
         blocks.push(Analysis::BB.new(blocks.length, stmt_list))
         stmt_list = []
       end
 
-      stmt_list.push(i)
+      stmt_list.push(s)
 
       # mark end of a block
-      if i.is_a?(IL::Jump) # block will never be empty due to above push
+      if s.is_a?(IL::Jump) # block will never be empty due to above push
         blocks.push(Analysis::BB.new(blocks.length, stmt_list))
         stmt_list = []
       end
     }
 
+    # scoop up stragglers
     if not stmt_list.empty?
       blocks.push(Analysis::BB.new(blocks.length, stmt_list))
     end
