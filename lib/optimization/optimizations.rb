@@ -16,4 +16,5 @@ Optimization::OPTIMIZATIONS = T.let([
   PrecomputeCondJumps.new,
   RemoveUnusedLabels.new,
   RemoveUselessJumps.new,
+  SimplifyRedundantBinops.new,
 ], T::Array[Optimization::OptimizationPass])

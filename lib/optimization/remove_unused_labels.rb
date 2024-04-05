@@ -2,6 +2,7 @@
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
+require_relative "../il"
 
 include Optimization
 
@@ -17,8 +18,6 @@ class Optimization::RemoveUnusedLabels < OptimizationPass
 
   sig { params(stmt_list: T::Array[IL::Statement]).void }
   def run(stmt_list)
-    stmt_list = []
-
     # find all labels that are jumped to
     jumped_labels = []
     stmt_list.each { |s|
