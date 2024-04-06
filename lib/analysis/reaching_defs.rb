@@ -1,6 +1,5 @@
 # typed: strict
 require "sorbet-runtime"
-require "set"
 require_relative "analysis"
 require_relative "cfg"
 require_relative "dfa"
@@ -14,22 +13,18 @@ class Analysis::ReachingDefs < DFA
   # Domain = definitions
   Domain = type_member {{ lower: String }}
 
-  sig { void }
-  def initialize
+  sig { params(cfg: CFG).void }
+  def initialize(cfg)
+    @all_defs = T.let(compute_all_defs(cfg), T::Set[Domain])
+
     super(Direction::Forwards,
-          Set[],
-          Set[])
-
-    @id = T.let("reaching_defs", String)
-    @description = T.let("Reaching definitions analysis", String)
-
-    @all_defs = T.let(Set[], T::Set[Domain])
+          Set[], # boundary = empty set
+          Set[], # init = empty set
+          cfg)
   end
 
   sig { params(cfg: CFG).void }
   def run(cfg)
-    @all_defs = compute_all_defs(cfg)
-
     cfg.each_block { |b|
       init_sets(b)
     }
@@ -39,16 +34,23 @@ class Analysis::ReachingDefs < DFA
 
   protected
 
-  sig { params(block: BB, cfg: CFG).void }
-  def transfer(block, cfg)
-    n = block.id
-    @in[n] = meet(block, cfg)
-    @out[n] = T.unsafe(@gen[n]) | (T.unsafe(@in[n]) - T.unsafe(@kill[n]))
+  sig { params(block: BB).returns(T::Set[Domain]) }
+  def meet(block)
+    # union of OUT[P] for all predecessors P of B
+    u = T.let(Set[], T::Set[Domain])
+
+    @cfg.each_predecessor(block) { |p|
+      u = u | get_set(@out, p)
+    }
+
+    return u
   end
 
-  sig { params(block: BB, cfg: CFG).returns(T::Set[Domain]) }
-  def meet(block, cfg)
-    Set[] # TODO
+  sig { params(block: BB).returns(T::Set[Domain]) }
+  def transfer(block)
+    # union of GEN[B] and (IN[B] - KILL[B])
+    return get_set(@gen, block) |
+      (get_set(@in, block) - get_set(@kill, block))
   end
 
   private

@@ -14,7 +14,7 @@ class Analysis::LiveVars < Analysis::DFA
 
   sig { params(cfg: CFG).void }
   def initialize(cfg)
-    super(Direction::Forwards,
+    super(Direction::Backwards,
           Set[],
           Set[],
           cfg)
