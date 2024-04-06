@@ -22,17 +22,8 @@ module CLI
   # Handles behavior when the lilac CLI is called with no arguments.
   def self.main
     puts(ANSI.fmt256("lilac", ANSI::LILAC_256, bold: true))
-    puts("  analyses: list all analyses")
     puts("  optimizations: list all optimizations")
     puts("  validations: list all validations")
-  end
-
-  sig { void }
-  # Print all available analyses.
-  def self.print_analyses
-    Analysis::ANALYSES.each { |a|
-      puts(a.id)
-    }
   end
 
   sig { void }
@@ -56,8 +47,6 @@ end
 if $PROGRAM_NAME == __FILE__
   if ARGV.length == 0 # no args case
     CLI.main
-  elsif ARGV[0] == "analyses"
-    CLI.print_analyses
   elsif ARGV[0] == "optimizations"
     CLI.print_optimizations
   elsif ARGV[0] == "validations"
