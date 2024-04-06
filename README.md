@@ -1,5 +1,7 @@
 # lilac
 
+![workflow](https://github.com/matthewd673/lilac/actions/workflows/ruby.yml/badge.svg)
+
 ## Build and run
 
 Lilac uses [rbenv](https://github.com/rbenv/rbenv) to manage its Ruby version.
