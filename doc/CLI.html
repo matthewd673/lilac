@@ -6,7 +6,7 @@
 <title>
   Module: CLI
   
-    &mdash; Documentation by YARD 0.9.34
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -146,30 +146,6 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#print_analyses-class_method" title="print_analyses (class method)">.<strong>print_analyses</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-<p>Print all available analyses.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
       <a href="#print_optimizations-class_method" title="print_optimizations (class method)">.<strong>print_optimizations</strong>  &#x21d2; Object </a>
     
 
@@ -256,62 +232,15 @@
 24
 25
 26
-27
-28</pre>
+27</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_main'>main</span>
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="ANSI.html" title="ANSI (module)">ANSI</a></span></span><span class='period'>.</span><span class='id identifier rubyid_fmt256'><span class='object_link'><a href="ANSI.html#fmt256-class_method" title="ANSI.fmt256 (method)">fmt256</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>lilac</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="ANSI.html" title="ANSI (module)">ANSI</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="ANSI.html#LILAC_256-constant" title="ANSI::LILAC_256 (constant)">LILAC_256</a></span></span><span class='comma'>,</span> <span class='label'>bold:</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  analyses: list all analyses</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  optimizations: list all optimizations</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  validations: list all validations</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="print_analyses-class_method">
-  
-    .<strong>print_analyses</strong>  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-<p>Print all available analyses.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-32
-33
-34
-35
-36</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 32</span>
-
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_print_analyses'>print_analyses</span>
-  <span class='const'><span class='object_link'><a href="Analysis.html" title="Analysis (module)">Analysis</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Analysis.html#ANALYSES-constant" title="Analysis::ANALYSES (constant)">ANALYSES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span>
-    <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
-  <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -344,14 +273,14 @@
       <pre class="lines">
 
 
-40
-41
-42
-43
-44</pre>
+31
+32
+33
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 40</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_print_optimizations'>print_optimizations</span>
   <span class='const'><span class='object_link'><a href="Optimization.html" title="Optimization (module)">Optimization</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Optimization.html#OPTIMIZATIONS-constant" title="Optimization::OPTIMIZATIONS (constant)">OPTIMIZATIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_o'>o</span><span class='op'>|</span>
@@ -389,14 +318,14 @@
       <pre class="lines">
 
 
-48
-49
-50
-51
-52</pre>
+39
+40
+41
+42
+43</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_print_validations'>print_validations</span>
   <span class='const'><span class='object_link'><a href="Validation.html" title="Validation (module)">Validation</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Validation.html#VALIDATIONS-constant" title="Validation::VALIDATIONS (constant)">VALIDATIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
@@ -413,9 +342,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Mar 23 15:21:26 2024 by
+  Generated on Sat Apr  6 19:23:38 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.34 (ruby-3.3.0).
+  0.9.36 (ruby-3.3.0).
 </div>
 
     </div>

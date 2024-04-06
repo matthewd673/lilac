@@ -6,7 +6,7 @@
 <title>
   Class: IL::Program
   
-    &mdash; Documentation by YARD 0.9.34
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -125,7 +125,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#item_list-instance_method" title="#item_list (instance method)">#<strong>item_list</strong>  &#x21d2; Object </a>
+      <a href="#stmt_list-instance_method" title="#stmt_list (instance method)">#<strong>stmt_list</strong>  &#x21d2; Object </a>
     
 
     
@@ -145,7 +145,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute item_list.</p>
+<p>Returns the value of attribute stmt_list.</p>
 </div></span>
   
 </li>
@@ -163,6 +163,50 @@
     </h2>
 
     <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_func-instance_method" title="#each_func (instance method)">#<strong>each_func</strong>(&amp;block)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_func-instance_method" title="#get_func (instance method)">#<strong>get_func</strong>(name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
       
         <li class="public ">
   <span class="summary_signature">
@@ -194,6 +238,28 @@
   <span class="summary_signature">
     
       <a href="#length-instance_method" title="#length (instance method)">#<strong>length</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_func-instance_method" title="#register_func (instance method)">#<strong>register_func</strong>(funcdef)  &#x21d2; Object </a>
     
 
     
@@ -267,15 +333,17 @@
       <pre class="lines">
 
 
-538
-539
-540</pre>
+551
+552
+553
+554</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 538</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 551</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
-  <span class='ivar'>@item_list</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Array</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="../IL.html#TopLevelItem-constant" title="IL::TopLevelItem (constant)">TopLevelItem</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@stmt_list</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Array</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="Statement.html" title="IL::Statement (class)">Statement</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@func_map</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="FuncDef.html" title="IL::FuncDef (class)">FuncDef</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -290,9 +358,9 @@
       
       <span id=""></span>
       <div class="method_details first">
-  <h3 class="signature first" id="item_list-instance_method">
+  <h3 class="signature first" id="stmt_list-instance_method">
   
-    #<strong>item_list</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+    #<strong>stmt_list</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -301,7 +369,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute item_list.</p>
+<p>Returns the value of attribute stmt_list.</p>
 
 
   </div>
@@ -315,15 +383,15 @@
       <pre class="lines">
 
 
-534
-535
-536</pre>
+547
+548
+549</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 534</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 547</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_item_list'>item_list</span>
-  <span class='ivar'>@item_list</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span>
+  <span class='ivar'>@stmt_list</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -338,7 +406,71 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="length-instance_method">
+  <h3 class="signature first" id="each_func-instance_method">
+  
+    #<strong>each_func</strong>(&amp;block)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+567
+568
+569
+570
+571</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 567</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_func'>each_func</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='ivar'>@func_map</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='op'>|</span>
+    <span class='kw'>yield</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_unsafe'>unsafe</span><span class='lparen'>(</span><span class='ivar'>@func_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_func-instance_method">
+  
+    #<strong>get_func</strong>(name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+574
+575
+576</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 574</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_func'>get_func</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='ivar'>@func_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="length-instance_method">
   
     #<strong>length</strong>  &#x21d2; <tt>Object</tt> 
   
@@ -352,15 +484,45 @@
       <pre class="lines">
 
 
-543
-544
-545</pre>
+557
+558
+559</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 543</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 557</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_length'>length</span>
-  <span class='ivar'>@item_list</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+  <span class='ivar'>@stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_func-instance_method">
+  
+    #<strong>register_func</strong>(funcdef)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+562
+563
+564</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 562</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_func'>register_func</span><span class='lparen'>(</span><span class='id identifier rubyid_funcdef'>funcdef</span><span class='rparen'>)</span>
+  <span class='ivar'>@func_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_funcdef'>funcdef</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_funcdef'>funcdef</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -382,20 +544,20 @@
       <pre class="lines">
 
 
-548
-549
-550
-551
-552
-553
-554</pre>
+579
+580
+581
+582
+583
+584
+585</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 548</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 579</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_str'>str</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
-  <span class='ivar'>@item_list</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
+  <span class='ivar'>@stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
     <span class='id identifier rubyid_str'>str</span> <span class='op'>+=</span> <span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span>
   <span class='rbrace'>}</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_str'>str</span>
@@ -410,9 +572,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Mar 23 15:21:26 2024 by
+  Generated on Sat Apr  6 19:23:38 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.34 (ruby-3.3.0).
+  0.9.36 (ruby-3.3.0).
 </div>
 
     </div>

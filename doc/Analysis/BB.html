@@ -4,9 +4,9 @@
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
-  Module: Analysis::BB
+  Class: Analysis::BB
   
-    &mdash; Documentation by YARD 0.9.34
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -59,12 +59,28 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><h1>Module: Analysis::BB
+      <div id="content"><h1>Class: Analysis::BB
   
   
   
 </h1>
 <div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Analysis::BB</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
   
 
   
@@ -91,7 +107,7 @@
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
     
-<p>The BB module contains a data structure for basic blocks and functions to create basic blocks from IL Statements.</p>
+<p>A BB is a data structure representing a basic block.</p>
 
 
   </div>
@@ -99,19 +115,43 @@
 <div class="tags">
   
 
-</div><h2>Defined Under Namespace</h2>
-<p class="children">
-  
-    
-  
-    
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="BB/Block.html" title="Analysis::BB::Block (class)">Block</a></span>
-    
-  
-</p>
+</div>
 
 
 
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#id-instance_method" title="#id (instance method)">#<strong>id</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>The unique ID of the block.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
 
 
 
@@ -127,7 +167,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#create_blocks-class_method" title="create_blocks (class method)">.<strong>create_blocks</strong>(program)  &#x21d2; T::Array[Block] </a>
+      <a href="#from_stmt_list-class_method" title="from_stmt_list (class method)">.<strong>from_stmt_list</strong>(stmt_list)  &#x21d2; T::Array[Analysis::BB] </a>
     
 
     
@@ -142,7 +182,206 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Create a list of basic blocks for the given Program.</p>
+<p>Create a list of basic blocks for the given statement list.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_stmt-instance_method" title="#each_stmt (instance method)">#<strong>each_stmt</strong>(&amp;block)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_stmt_with_index-instance_method" title="#each_stmt_with_index (instance method)">#<strong>each_stmt_with_index</strong>(&amp;block)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#empty%3F-instance_method" title="#empty? (instance method)">#<strong>empty?</strong>  &#x21d2; T::Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Determines if the block is empty.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#first_stmt-instance_method" title="#first_stmt (instance method)">#<strong>first_stmt</strong>  &#x21d2; T.nilable(IL::Statement) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the first Statement in the block.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(id, stmt_list)  &#x21d2; BB </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of BB.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#last_stmt-instance_method" title="#last_stmt (instance method)">#<strong>last_stmt</strong>  &#x21d2; T.nilable(IL::Statement) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the last Statement in the block.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#length-instance_method" title="#length (instance method)">#<strong>length</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the number of Statements in the block.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_s-instance_method" title="#to_s (instance method)">#<strong>to_s</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Convert the block, and its Statements, to a String.</p>
 </div></span>
   
 </li>
@@ -152,16 +391,13 @@
   
 
 
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
   
-
-  <div id="class_method_details" class="method_details_list">
-    <h2>Class Method Details</h2>
-
-    
-      <div class="method_details first">
-  <h3 class="signature first" id="create_blocks-class_method">
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
   
-    .<strong>create_blocks</strong>(program)  &#x21d2; <tt>T::Array[<span class='object_link'><a href="BB/Block.html" title="Analysis::BB::Block (class)">Block</a></span>]</tt> 
+    #<strong>initialize</strong>(id, stmt_list)  &#x21d2; <tt><span class='object_link'><a href="" title="Analysis::BB (class)">BB</a></span></tt> 
   
 
   
@@ -170,7 +406,105 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Create a list of basic blocks for the given Program.</p>
+<p>Returns a new instance of BB.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+15
+16
+17
+18</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 15</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
+  <span class='ivar'>@id</span> <span class='op'>=</span> <span class='id identifier rubyid_id'>id</span>
+  <span class='ivar'>@stmt_list</span> <span class='op'>=</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="id-instance_method">
+  
+    #<strong>id</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>The unique ID of the block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+12
+13
+14</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 12</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_id'>id</span>
+  <span class='ivar'>@id</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="from_stmt_list-class_method">
+  
+    .<strong>from_stmt_list</strong>(stmt_list)  &#x21d2; <tt>T::Array[<span class='object_link'><a href="" title="Analysis::BB (class)">Analysis::BB</a></span>]</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Create a list of basic blocks for the given statement list.</p>
 
 
   </div>
@@ -181,16 +515,16 @@
   
     <li>
       
-        <span class='name'>program</span>
+        <span class='name'>stmt_list</span>
       
       
-        <span class='type'>(<tt><span class='object_link'><a href="../IL/Program.html" title="IL::Program (class)">IL::Program</a></span></tt>)</span>
+        <span class='type'>(<tt>T::Array[<span class='object_link'><a href="../IL/Statement.html" title="IL::Statement (class)">IL::Statement</a></span>]</tt>)</span>
       
       
       
         &mdash;
         <div class='inline'>
-<p>The Program to create blocks from.</p>
+<p>The statement list to create blocks from.</p>
 </div>
       
     </li>
@@ -203,13 +537,13 @@
     <li>
       
       
-        <span class='type'>(<tt>T::Array[<span class='object_link'><a href="BB/Block.html" title="Analysis::BB::Block (class)">Block</a></span>]</tt>)</span>
+        <span class='type'>(<tt>T::Array[<span class='object_link'><a href="" title="Analysis::BB (class)">Analysis::BB</a></span>]</tt>)</span>
       
       
       
         &mdash;
         <div class='inline'>
-<p>A list of basic blocks.</p>
+<p>A list of basic blocks in the statement list.</p>
 </div>
       
     </li>
@@ -222,63 +556,388 @@
       <pre class="lines">
 
 
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111</pre>
+82
+83
+84</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 82</span>
 
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_create_blocks'>create_blocks</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_blocks'>blocks</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_from_stmt_list'>from_stmt_list</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_create_blocks'>create_blocks</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
 
-  <span class='comment'># TODO: adapt to work with functions
-</span>  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_item_list'>item_list</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
-    <span class='comment'># mark beginning of a block
-</span>    <span class='kw'>if</span> <span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Label.html" title="IL::Label (class)">Label</a></span></span><span class='rparen'>)</span> <span class='kw'>and</span> <span class='kw'>not</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
-      <span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB/Block.html" title="Analysis::BB::Block (class)">Block</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB/Block.html#initialize-instance_method" title="Analysis::BB::Block#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-    <span class='kw'>end</span>
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
 
-    <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='rparen'>)</span>
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="each_stmt-instance_method">
+  
+    #<strong>each_stmt</strong>(&amp;block)  &#x21d2; <tt>Object</tt> 
+  
 
-    <span class='comment'># mark end of a block
-</span>    <span class='kw'>if</span> <span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Jump.html" title="IL::Jump (class)">Jump</a></span></span><span class='rparen'>)</span> <span class='comment'># block will never be empty due to above push
-</span>      <span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB/Block.html" title="Analysis::BB::Block (class)">Block</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB/Block.html#initialize-instance_method" title="Analysis::BB::Block#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-    <span class='kw'>end</span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+36
+37
+38</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 36</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_stmt'>each_stmt</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='ivar'>@stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="each_stmt_with_index-instance_method">
+  
+    #<strong>each_stmt_with_index</strong>(&amp;block)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+42
+43
+44</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 42</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_stmt_with_index'>each_stmt_with_index</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='ivar'>@stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="empty?-instance_method">
+  
+    #<strong>empty?</strong>  &#x21d2; <tt>T::Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Determines if the block is empty.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>T::Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>True if there are no Statements in the block’s Statement list.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='ivar'>@stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="first_stmt-instance_method">
+  
+    #<strong>first_stmt</strong>  &#x21d2; <tt>T.nilable(<span class='object_link'><a href="../IL/Statement.html" title="IL::Statement (class)">IL::Statement</a></span>)</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the first Statement in the block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>T.nilable(<span class='object_link'><a href="../IL/Statement.html" title="IL::Statement (class)">IL::Statement</a></span>)</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The first Statement in the block. If the block is empty this will be nil.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+50
+51
+52
+53</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 50</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_first_stmt'>first_stmt</span>
+  <span class='kw'>if</span> <span class='ivar'>@stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='kw'>then</span> <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='ivar'>@stmt_list</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="last_stmt-instance_method">
+  
+    #<strong>last_stmt</strong>  &#x21d2; <tt>T.nilable(<span class='object_link'><a href="../IL/Statement.html" title="IL::Statement (class)">IL::Statement</a></span>)</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the last Statement in the block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>T.nilable(<span class='object_link'><a href="../IL/Statement.html" title="IL::Statement (class)">IL::Statement</a></span>)</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The last Statement in the block. If the block is empty this will be nil.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+59
+60
+61
+62</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 59</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_last_stmt'>last_stmt</span>
+  <span class='kw'>if</span> <span class='ivar'>@stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='kw'>then</span> <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='ivar'>@stmt_list</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="length-instance_method">
+  
+    #<strong>length</strong>  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the number of Statements in the block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The length of the block’s Statement list.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+23
+24
+25</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 23</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_length'>length</span>
+  <span class='ivar'>@stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_s-instance_method">
+  
+    #<strong>to_s</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Convert the block, and its Statements, to a String.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>A String representation of the block.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67
+68
+69
+70
+71
+72
+73</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/analysis/bb.rb', line 67</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_str'>str</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[BLOCK (len=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'>)]\n</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_each_stmt'>each_stmt</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span>
+    <span class='id identifier rubyid_str'>str</span> <span class='op'>+=</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span>
   <span class='rbrace'>}</span>
-
-  <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
-    <span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB/Block.html" title="Analysis::BB::Block (class)">Block</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB/Block.html#initialize-instance_method" title="Analysis::BB::Block#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>return</span> <span class='id identifier rubyid_blocks'>blocks</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_str'>str</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -290,9 +949,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Mar 23 15:21:26 2024 by
+  Generated on Sat Apr  6 19:23:39 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.34 (ruby-3.3.0).
+  0.9.36 (ruby-3.3.0).
 </div>
 
     </div>

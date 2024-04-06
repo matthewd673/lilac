@@ -6,7 +6,7 @@
 <title>
   Module: Interpreter
   
-    &mdash; Documentation by YARD 0.9.34
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -96,7 +96,7 @@
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
     
-<p>The Interpreter module provides a simple interpreter for the lilac IL. Lilac IL is not designed to be an interpreted language (and does not support any dynamic features that may be expected of an interpreted language). Rather, the interpreter is provided as an easy way to execute lilac IL without translating it to a machine-specific form.</p>
+<p>The Interpreter module provides a simple interpreter for the Lilac IL. Lilac IL is not designed to be an interpreted language (and does not support any dynamic features that may be expected of an interpreted language). The interpreter is only provided as an easy way to execute Lilac IL without translating it to a machine-dependent form.</p>
 
 
   </div>
@@ -110,7 +110,7 @@
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Interpreter/Context.html" title="Interpreter::Context (class)">Context</a></span>, <span class='object_link'><a href="Interpreter/InterpreterValue.html" title="Interpreter::InterpreterValue (class)">InterpreterValue</a></span>, <span class='object_link'><a href="Interpreter/SymbolInfo.html" title="Interpreter::SymbolInfo (class)">SymbolInfo</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Interpreter/Context.html" title="Interpreter::Context (class)">Context</a></span>, <span class='object_link'><a href="Interpreter/InterpreterValue.html" title="Interpreter::InterpreterValue (class)">InterpreterValue</a></span>, <span class='object_link'><a href="Interpreter/Scope.html" title="Interpreter::Scope (class)">Scope</a></span>, <span class='object_link'><a href="Interpreter/SymbolInfo.html" title="Interpreter::SymbolInfo (class)">SymbolInfo</a></span>, <span class='object_link'><a href="Interpreter/SymbolTable.html" title="Interpreter::SymbolTable (class)">SymbolTable</a></span>
     
   
 </p>
@@ -242,24 +242,7 @@
 49
 50
 51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69</pre>
+52</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 20</span>
@@ -274,45 +257,28 @@
     <span class='id identifier rubyid_validation_runner'>validation_runner</span><span class='period'>.</span><span class='id identifier rubyid_run_passes'>run_passes</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Validation.html" title="Validation (module)">Validation</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Validation.html#VALIDATIONS-constant" title="Validation::VALIDATIONS (constant)">VALIDATIONS</a></span></span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
-  <span class='comment'># collect all items in the program
-</span>  <span class='comment'># TODO: support functions
-</span>  <span class='id identifier rubyid_items'>items</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_item_list'>item_list</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
-    <span class='id identifier rubyid_items'>items</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='rparen'>)</span>
+  <span class='comment'># collect all funcs in the program
+</span>  <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_funcs'>funcs</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_func'>each_func</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+    <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_funcs'>funcs</span><span class='lbracket'>[</span><span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_f'>f</span>
   <span class='rbrace'>}</span>
 
-  <span class='comment'># register labels
-</span>  <span class='id identifier rubyid_items'>items</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
-    <span class='kw'>if</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Label.html" title="IL::Label (class)">Label</a></span></span><span class='rparen'>)</span>
-      <span class='comment'># check for duplicate labels
-</span>      <span class='kw'>if</span> <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_indices'>label_indices</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
-        <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Multiple definitions of label </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-      <span class='kw'>end</span>
-
-      <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_indices'>label_indices</span><span class='lbracket'>[</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_i'>i</span>
-    <span class='kw'>end</span>
+  <span class='comment'># collect all labels in program -- including within functions
+</span>  <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_indices'>label_indices</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_register_labels'>register_labels</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_indices'>label_indices</span><span class='comma'>,</span> <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_func'>each_func</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+    <span class='id identifier rubyid_register_labels'>register_labels</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_indices'>label_indices</span><span class='comma'>,</span> <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 
-  <span class='comment'># interpret
-</span>  <span class='id identifier rubyid_stmt_ct'>stmt_ct</span> <span class='op'>=</span> <span class='int'>0</span>
-  <span class='kw'>while</span> <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_ip'>ip</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_items'>items</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
-    <span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='id identifier rubyid_items'>items</span><span class='lbracket'>[</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_ip'>ip</span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_visitor'>visitor</span><span class='period'>.</span><span class='id identifier rubyid_visit'>visit</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='comma'>,</span> <span class='label'>ctx:</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_ip'>ip</span> <span class='op'>+=</span> <span class='int'>1</span>
-    <span class='id identifier rubyid_stmt_ct'>stmt_ct</span> <span class='op'>+=</span> <span class='int'>1</span>
-  <span class='kw'>end</span>
+  <span class='comment'># begin interpretation
+</span>  <span class='id identifier rubyid_interpret_stmt_list'>interpret_stmt_list</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='comma'>,</span> <span class='id identifier rubyid_visitor'>visitor</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>---</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Interpretation complete</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Statements executed: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_stmt_ct'>stmt_ct</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 
-  <span class='comment'># TODO: temp sanity check
+  <span class='comment'># NOTE: temp sanity check
 </span>  <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Symbol table state:</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_symbols'>symbols</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='op'>|</span>
-    <span class='id identifier rubyid_info'>info</span> <span class='op'>=</span> <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_symbols'>symbols</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='rbracket'>]</span>
-    <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_info'>info</span> <span class='kw'>then</span> <span class='kw'>next</span> <span class='kw'>end</span> <span class='comment'># skip nil info (should never happen)
-</span>    <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_k'>k</span><span class='embexpr_end'>}</span><span class='tstring_content'> = </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_info'>info</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='tstring_content'> (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_info'>info</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_symbols'>symbols</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -324,9 +290,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Mar 23 15:21:26 2024 by
+  Generated on Sat Apr  6 19:23:38 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.34 (ruby-3.3.0).
+  0.9.36 (ruby-3.3.0).
 </div>
 
     </div>

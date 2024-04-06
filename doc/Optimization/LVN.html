@@ -6,7 +6,7 @@
 <title>
   Class: Optimization::LVN
   
-    &mdash; Documentation by YARD 0.9.34
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -172,7 +172,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>(program)  &#x21d2; Object </a>
+      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>(block)  &#x21d2; Object </a>
     
 
     
@@ -277,7 +277,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="run-instance_method">
   
-    #<strong>run</strong>(program)  &#x21d2; <tt>Object</tt> 
+    #<strong>run</strong>(block)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -356,77 +356,83 @@
 84
 85
 86
-87</pre>
+87
+88
+89
+90</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/optimization/lvn.rb', line 20</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_block_list'>block_list</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Analysis.html" title="Analysis (module)">Analysis</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Analysis/BB.html" title="Analysis::BB (module)">BB</a></span></span><span class='period'>.</span><span class='id identifier rubyid_create_blocks'><span class='object_link'><a href="../Analysis/BB.html#create_blocks-class_method" title="Analysis::BB.create_blocks (method)">create_blocks</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_block_list'>block_list</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_b'>b</span><span class='op'>|</span>
-    <span class='id identifier rubyid_value_number_map'>value_number_map</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="LVN/ValueNumberMap.html" title="Optimization::LVN::ValueNumberMap (class)">ValueNumberMap</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LVN/ValueNumberMap.html#initialize-instance_method" title="Optimization::LVN::ValueNumberMap#initialize (method)">new</a></span></span>
-    <span class='id identifier rubyid_id_number_map'>id_number_map</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="LVN/IDNumberMap.html" title="Optimization::LVN::IDNumberMap (class)">IDNumberMap</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LVN/IDNumberMap.html#initialize-instance_method" title="Optimization::LVN::IDNumberMap#initialize (method)">new</a></span></span>
+<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value_number_map'>value_number_map</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="LVN/ValueNumberMap.html" title="Optimization::LVN::ValueNumberMap (class)">ValueNumberMap</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LVN/ValueNumberMap.html#initialize-instance_method" title="Optimization::LVN::ValueNumberMap#initialize (method)">new</a></span></span>
+  <span class='id identifier rubyid_id_number_map'>id_number_map</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="LVN/IDNumberMap.html" title="Optimization::LVN::IDNumberMap (class)">IDNumberMap</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LVN/IDNumberMap.html#initialize-instance_method" title="Optimization::LVN::IDNumberMap#initialize (method)">new</a></span></span>
 
-    <span class='id identifier rubyid_b'>b</span><span class='period'>.</span><span class='id identifier rubyid_each_stmt'>each_stmt</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span>
-      <span class='comment'># perform constant folding on conditional jump conditions
-</span>      <span class='comment'># this is a bonus on top of LVN&#39;s core task
-</span>      <span class='kw'>if</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/JumpZero.html" title="IL::JumpZero (class)">JumpZero</a></span></span><span class='rparen'>)</span> <span class='kw'>or</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/JumpNotZero.html" title="IL::JumpNotZero (class)">JumpNotZero</a></span></span><span class='rparen'>)</span>
-        <span class='id identifier rubyid_cond'>cond</span> <span class='op'>=</span> <span class='id identifier rubyid_constant_folding'>constant_folding</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_cond'>cond</span><span class='comma'>,</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='comma'>,</span> <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='rparen'>)</span>
-        <span class='comment'># swap out cond only if the new result is a constant
-</span>        <span class='kw'>if</span> <span class='id identifier rubyid_cond'>cond</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Constant.html" title="IL::Constant (class)">Constant</a></span></span><span class='rparen'>)</span>
-          <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_cond'>cond</span> <span class='op'>=</span> <span class='id identifier rubyid_cond'>cond</span>
-        <span class='kw'>end</span>
-        <span class='kw'>next</span> <span class='comment'># job&#39;s done with the jmps
-</span>      <span class='kw'>end</span>
-
-      <span class='comment'># only definitions are relevant
-</span>      <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Definition.html" title="IL::Definition (class)">Definition</a></span></span><span class='rparen'>)</span>
-        <span class='kw'>next</span>
+  <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_each_stmt'>each_stmt</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span>
+    <span class='comment'># perform constant folding on conditional jump conditions
+</span>    <span class='comment'># this is a bonus on top of LVN&#39;s core task
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/JumpZero.html" title="IL::JumpZero (class)">JumpZero</a></span></span><span class='rparen'>)</span> <span class='kw'>or</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/JumpNotZero.html" title="IL::JumpNotZero (class)">JumpNotZero</a></span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_cond'>cond</span> <span class='op'>=</span> <span class='id identifier rubyid_constant_folding'>constant_folding</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_cond'>cond</span><span class='comma'>,</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='comma'>,</span> <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='rparen'>)</span>
+      <span class='comment'># swap out cond only if the new result is a constant
+</span>      <span class='kw'>if</span> <span class='id identifier rubyid_cond'>cond</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Constant.html" title="IL::Constant (class)">Constant</a></span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_cond'>cond</span> <span class='op'>=</span> <span class='id identifier rubyid_cond'>cond</span>
       <span class='kw'>end</span>
+      <span class='kw'>next</span> <span class='comment'># job&#39;s done with the jmps
+</span>    <span class='kw'>end</span>
 
-      <span class='comment'># try to precompute rhs (constant-folding)
-</span>      <span class='id identifier rubyid_rhs'>rhs</span> <span class='op'>=</span> <span class='id identifier rubyid_constant_folding'>constant_folding</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span><span class='comma'>,</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='comma'>,</span> <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='rparen'>)</span>
+    <span class='comment'># only definitions are relevant
+</span>    <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Definition.html" title="IL::Definition (class)">Definition</a></span></span><span class='rparen'>)</span>
+      <span class='kw'>next</span>
+    <span class='kw'>end</span>
 
-      <span class='comment'># calculate hash for rhs
-</span>      <span class='id identifier rubyid_rhs_val'>rhs_val</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="LVN/ValueHash.html" title="Optimization::LVN::ValueHash (class)">ValueHash</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LVN/ValueHash.html#initialize-instance_method" title="Optimization::LVN::ValueHash#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_rhs'>rhs</span><span class='comma'>,</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='comma'>,</span> <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='rparen'>)</span>
-      <span class='comment'># get or insert the value (existing shows if it existed before or not)
-</span>      <span class='id identifier rubyid_number'>number</span> <span class='op'>=</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='period'>.</span><span class='id identifier rubyid_get_number_by_value'>get_number_by_value</span><span class='lparen'>(</span><span class='id identifier rubyid_rhs_val'>rhs_val</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_existing'>existing</span> <span class='op'>=</span> <span class='kw'>true</span>
-      <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_number'>number</span>
-        <span class='id identifier rubyid_number'>number</span> <span class='op'>=</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='period'>.</span><span class='id identifier rubyid_insert_value'>insert_value</span><span class='lparen'>(</span><span class='id identifier rubyid_rhs_val'>rhs_val</span><span class='rparen'>)</span>
-        <span class='id identifier rubyid_existing'>existing</span> <span class='op'>=</span> <span class='kw'>false</span>
-      <span class='kw'>end</span>
+    <span class='comment'># try to precompute rhs (constant-folding)
+</span>    <span class='id identifier rubyid_rhs'>rhs</span> <span class='op'>=</span> <span class='id identifier rubyid_constant_folding'>constant_folding</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span><span class='comma'>,</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='comma'>,</span> <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='rparen'>)</span>
 
-      <span class='comment'># associate number with the id being assigned to
-</span>      <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='period'>.</span><span class='id identifier rubyid_assign_id'>assign_id</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
+    <span class='comment'># don&#39;t perform any type of lvn on function calls -- just skip
+</span>    <span class='comment'># NOTE: if a function has no side-effects, lvn could work...
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_rhs'>rhs</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Call.html" title="IL::Call (class)">Call</a></span></span><span class='rparen'>)</span>
+      <span class='kw'>next</span>
+    <span class='kw'>end</span>
 
-      <span class='comment'># constants on the rhs are always better off staying as constants
-</span>      <span class='kw'>if</span> <span class='id identifier rubyid_rhs_val'>rhs_val</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Constant.html" title="IL::Constant (class)">Constant</a></span></span><span class='rparen'>)</span>
-        <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span> <span class='op'>=</span> <span class='id identifier rubyid_rhs_val'>rhs_val</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
-        <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_annotation'>annotation</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_number'>number</span><span class='embexpr_end'>}</span><span class='tstring_content'> (is constant)</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='kw'>not</span> <span class='id identifier rubyid_existing'>existing</span>
-        <span class='kw'>next</span>
-      <span class='kw'>end</span>
+    <span class='comment'># calculate hash for rhs
+</span>    <span class='id identifier rubyid_rhs_val'>rhs_val</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="LVN/ValueHash.html" title="Optimization::LVN::ValueHash (class)">ValueHash</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LVN/ValueHash.html#initialize-instance_method" title="Optimization::LVN::ValueHash#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_rhs'>rhs</span><span class='comma'>,</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='comma'>,</span> <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='rparen'>)</span>
+    <span class='comment'># get or insert the value (existing shows if it existed before or not)
+</span>    <span class='id identifier rubyid_number'>number</span> <span class='op'>=</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='period'>.</span><span class='id identifier rubyid_get_number_by_value'>get_number_by_value</span><span class='lparen'>(</span><span class='id identifier rubyid_rhs_val'>rhs_val</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_existing'>existing</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_number'>number</span>
+      <span class='id identifier rubyid_number'>number</span> <span class='op'>=</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='period'>.</span><span class='id identifier rubyid_insert_value'>insert_value</span><span class='lparen'>(</span><span class='id identifier rubyid_rhs_val'>rhs_val</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_existing'>existing</span> <span class='op'>=</span> <span class='kw'>false</span>
+    <span class='kw'>end</span>
 
-      <span class='comment'># brand new values will never have their rhs replaced
-</span>      <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_existing'>existing</span>
-        <span class='kw'>next</span>
-      <span class='kw'>end</span>
+    <span class='comment'># associate number with the id being assigned to
+</span>    <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='period'>.</span><span class='id identifier rubyid_assign_id'>assign_id</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
 
-      <span class='comment'># if the value exists in another id, set rhs to that id
-</span>      <span class='id identifier rubyid_existing_id'>existing_id</span> <span class='op'>=</span> <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='period'>.</span><span class='id identifier rubyid_get_id_by_number'>get_id_by_number</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
-      <span class='kw'>if</span> <span class='id identifier rubyid_existing_id'>existing_id</span>
-        <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span> <span class='op'>=</span> <span class='id identifier rubyid_existing_id'>existing_id</span>
-        <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_annotation'>annotation</span> <span class='op'>=</span> <span class='id identifier rubyid_number'>number</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='comment'># TODO: temp
-</span>        <span class='kw'>next</span>
-      <span class='kw'>end</span>
+    <span class='comment'># constants on the rhs are always better off staying as constants
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_rhs_val'>rhs_val</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Constant.html" title="IL::Constant (class)">Constant</a></span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span> <span class='op'>=</span> <span class='id identifier rubyid_rhs_val'>rhs_val</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+      <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_annotation'>annotation</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_number'>number</span><span class='embexpr_end'>}</span><span class='tstring_content'> (is constant)</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='kw'>not</span> <span class='id identifier rubyid_existing'>existing</span>
+      <span class='kw'>next</span>
+    <span class='kw'>end</span>
 
-      <span class='id identifier rubyid_existing_hash'>existing_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='period'>.</span><span class='id identifier rubyid_get_value_by_number'>get_value_by_number</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
-      <span class='kw'>if</span> <span class='id identifier rubyid_existing_hash'>existing_hash</span>
-        <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span> <span class='op'>=</span> <span class='id identifier rubyid_existing_hash'>existing_hash</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
-        <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_annotation'>annotation</span> <span class='op'>=</span> <span class='id identifier rubyid_number'>number</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='comment'># TODO: temp
-</span>        <span class='kw'>next</span>
-      <span class='kw'>end</span>
-    <span class='rbrace'>}</span>
+    <span class='comment'># brand new values will never have their rhs replaced
+</span>    <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_existing'>existing</span>
+      <span class='kw'>next</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># if the value exists in another id, set rhs to that id
+</span>    <span class='id identifier rubyid_existing_id'>existing_id</span> <span class='op'>=</span> <span class='id identifier rubyid_id_number_map'>id_number_map</span><span class='period'>.</span><span class='id identifier rubyid_get_id_by_number'>get_id_by_number</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_existing_id'>existing_id</span>
+      <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span> <span class='op'>=</span> <span class='id identifier rubyid_existing_id'>existing_id</span>
+      <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_annotation'>annotation</span> <span class='op'>=</span> <span class='id identifier rubyid_number'>number</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='comment'># TODO: temp
+</span>      <span class='kw'>next</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_existing_hash'>existing_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_value_number_map'>value_number_map</span><span class='period'>.</span><span class='id identifier rubyid_get_value_by_number'>get_value_by_number</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_existing_hash'>existing_hash</span>
+      <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span> <span class='op'>=</span> <span class='id identifier rubyid_existing_hash'>existing_hash</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+      <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_annotation'>annotation</span> <span class='op'>=</span> <span class='id identifier rubyid_number'>number</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='comment'># TODO: temp
+</span>      <span class='kw'>next</span>
+    <span class='kw'>end</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -439,9 +445,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Mar 23 15:21:26 2024 by
+  Generated on Sat Apr  6 19:23:39 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.34 (ruby-3.3.0).
+  0.9.36 (ruby-3.3.0).
 </div>
 
     </div>

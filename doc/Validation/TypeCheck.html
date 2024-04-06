@@ -6,7 +6,7 @@
 <title>
   Class: Validation::TypeCheck
   
-    &mdash; Documentation by YARD 0.9.34
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -244,13 +244,13 @@
       <pre class="lines">
 
 
-15
 16
 17
-18</pre>
+18
+19</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/validation/typecheck.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/validation/typecheck.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
   <span class='ivar'>@id</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>typecheck</span><span class='tstring_end'>&quot;</span></span>
@@ -283,7 +283,6 @@
       <pre class="lines">
 
 
-21
 22
 23
 24
@@ -301,55 +300,28 @@
 36
 37
 38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52</pre>
+39</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/validation/typecheck.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/validation/typecheck.rb', line 22</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_symbols'>symbols</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='comment'># id -&gt; type
+  <span class='id identifier rubyid_symbols'>symbols</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../SymbolTable.html" title="SymbolTable (class)">SymbolTable</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../SymbolTable.html#initialize-instance_method" title="SymbolTable#initialize (method)">new</a></span></span>
+  <span class='id identifier rubyid_funcs'>funcs</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='comment'># name -&gt; return type
 </span>
-  <span class='comment'># TODO: support functions
-</span>  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_item_list'>item_list</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
-    <span class='comment'># only declarations and assignments are relevant
-</span>    <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Definition.html" title="IL::Definition (class)">Definition</a></span></span><span class='rparen'>)</span>
-      <span class='kw'>next</span>
-    <span class='kw'>end</span>
-
-    <span class='comment'># register id in symbol table every time (since this is SSA)
-</span>    <span class='id identifier rubyid_symbols'>symbols</span><span class='lbracket'>[</span><span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span>
-
-    <span class='comment'># find the type of the rhs
-</span>    <span class='kw'>if</span> <span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Constant.html" title="IL::Constant (class)">Constant</a></span></span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_rhs_type'>rhs_type</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_cast'>cast</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Constant.html" title="IL::Constant (class)">Constant</a></span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/ID.html" title="IL::ID (class)">ID</a></span></span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_rhs_type'>rhs_type</span> <span class='op'>=</span> <span class='id identifier rubyid_symbols'>symbols</span><span class='lbracket'>[</span><span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_cast'>cast</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/ID.html" title="IL::ID (class)">ID</a></span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Expression.html" title="IL::Expression (class)">Expression</a></span></span><span class='rparen'>)</span>
-      <span class='id identifier rubyid_rhs_type'>rhs_type</span> <span class='op'>=</span> <span class='id identifier rubyid_get_expr_type'>get_expr_type</span><span class='lparen'>(</span><span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_cast'>cast</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Expression.html" title="IL::Expression (class)">Expression</a></span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_symbols'>symbols</span><span class='rparen'>)</span>
-    <span class='kw'>end</span>
-
-    <span class='comment'># check for a mismatch
-</span>    <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_rhs_type'>rhs_type</span>
-      <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Type mismatch in expression: &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_rhs'>rhs</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='kw'>end</span>
-
-    <span class='kw'>if</span> <span class='id identifier rubyid_symbols'>symbols</span><span class='lbracket'>[</span><span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='id identifier rubyid_rhs_type'>rhs_type</span>
-      <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Type mismatch in statement: &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_i'>i</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='kw'>end</span>
+  <span class='comment'># store function return types
+</span>  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_func'>each_func</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+    <span class='id identifier rubyid_funcs'>funcs</span><span class='lbracket'>[</span><span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_ret_type'>ret_type</span>
   <span class='rbrace'>}</span>
+
+  <span class='comment'># scan on all items
+</span>  <span class='id identifier rubyid_symbols'>symbols</span><span class='period'>.</span><span class='id identifier rubyid_push_scope'>push_scope</span>
+  <span class='id identifier rubyid_scan_items'>scan_items</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='comma'>,</span> <span class='id identifier rubyid_symbols'>symbols</span><span class='comma'>,</span> <span class='id identifier rubyid_funcs'>funcs</span><span class='rparen'>)</span>
+  <span class='comment'># ...and scan on all functions
+</span>  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_func'>each_func</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+    <span class='id identifier rubyid_scan_items'>scan_items</span><span class='lparen'>(</span><span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='comma'>,</span> <span class='id identifier rubyid_symbols'>symbols</span><span class='comma'>,</span> <span class='id identifier rubyid_funcs'>funcs</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_symbols'>symbols</span><span class='period'>.</span><span class='id identifier rubyid_pop_scope'>pop_scope</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -361,9 +333,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Mar 23 15:21:26 2024 by
+  Generated on Sat Apr  6 19:23:39 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.34 (ruby-3.3.0).
+  0.9.36 (ruby-3.3.0).
 </div>
 
     </div>

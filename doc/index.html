@@ -6,7 +6,7 @@
 <title>
   File: README
   
-    &mdash; Documentation by YARD 0.9.34
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -60,11 +60,13 @@
       <div id="content"><div id='filecontents'>
 <h1 id="label-lilac">lilac</h1>
 
+<p><img src="https://github.com/matthewd673/lilac/actions/workflows/ruby.yml/badge.svg"></p>
+
 <h2 id="label-Build+and+run">Build and run</h2>
 
 <p>Lilac uses <a href="https://github.com/rbenv/rbenv">rbenv</a> to manage its Ruby version.</p>
 
-<p>To build and run Lilac’s (very small) CLI:</p>
+<p>To set up Lilac:</p>
 
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_install'>install</span>
 <span class='id identifier rubyid_rake'>rake</span>
@@ -73,16 +75,21 @@
 <p>To build and use Lilac in another gem:</p>
 
 <pre class="code ruby"><code class="ruby">cd ~/.../lilac
-gem build
+rake
 cd ~/.../other_gem
 gem install --local ~/.../lilac/lilac-X.X.X.gem
+</code></pre>
+
+<p>Lilac also has a very simple CLI that can be run with the following:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_ruby'>ruby</span> <span class='id identifier rubyid_lib'>lib</span><span class='op'>/</span><span class='id identifier rubyid_lilac'>lilac</span><span class='period'>.</span><span class='id identifier rubyid_rb'>rb</span>
 </code></pre>
 </div></div>
 
       <div id="footer">
-  Generated on Sat Mar 23 15:21:26 2024 by
+  Generated on Sat Apr  6 19:23:38 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.34 (ruby-3.3.0).
+  0.9.36 (ruby-3.3.0).
 </div>
 
     </div>

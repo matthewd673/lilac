@@ -6,7 +6,7 @@
 <title>
   Class: Optimization::LVN::ValueNumberMap
   
-    &mdash; Documentation by YARD 0.9.34
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -244,13 +244,13 @@
       <pre class="lines">
 
 
-142
-143
-144
-145</pre>
+145
+146
+147
+148</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/lvn.rb', line 142</span>
+      <pre class="code"><span class="info file"># File 'lib/optimization/lvn.rb', line 145</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
   <span class='ivar'>@index_to_value</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Array</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="ValueHash.html" title="Optimization::LVN::ValueHash (class)">ValueHash</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -283,12 +283,12 @@
       <pre class="lines">
 
 
-167
-168
-169</pre>
+170
+171
+172</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/lvn.rb', line 167</span>
+      <pre class="code"><span class="info file"># File 'lib/optimization/lvn.rb', line 170</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_number_by_value'>get_number_by_value</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='ivar'>@value_to_index</span><span class='lbracket'>[</span><span class='id identifier rubyid_value'>value</span><span class='rbracket'>]</span>
@@ -313,12 +313,12 @@
       <pre class="lines">
 
 
-162
-163
-164</pre>
+165
+166
+167</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/lvn.rb', line 162</span>
+      <pre class="code"><span class="info file"># File 'lib/optimization/lvn.rb', line 165</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_value_by_number'>get_value_by_number</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
   <span class='ivar'>@index_to_value</span><span class='lbracket'>[</span><span class='id identifier rubyid_number'>number</span><span class='rbracket'>]</span>
@@ -343,9 +343,6 @@
       <pre class="lines">
 
 
-148
-149
-150
 151
 152
 153
@@ -354,10 +351,13 @@
 156
 157
 158
-159</pre>
+159
+160
+161
+162</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/lvn.rb', line 148</span>
+      <pre class="code"><span class="info file"># File 'lib/optimization/lvn.rb', line 151</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_insert_value'>insert_value</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='ivar'>@index_to_value</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
@@ -381,9 +381,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Mar 23 15:21:27 2024 by
+  Generated on Sat Apr  6 19:23:39 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.34 (ruby-3.3.0).
+  0.9.36 (ruby-3.3.0).
 </div>
 
     </div>

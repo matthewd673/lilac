@@ -4,7 +4,7 @@
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
-  Class: Interpreter::InterpreterValue
+  Class: Graph::Edge
   
     &mdash; Documentation by YARD 0.9.36
   
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../css/common.css" type="text/css" />
 
 <script type="text/javascript">
-  pathId = "Interpreter::InterpreterValue";
+  pathId = "Graph::Edge";
   relpath = '../';
 </script>
 
@@ -36,10 +36,10 @@
       <div id="header">
         <div id="menu">
   
-    <a href="../_index.html">Index (I)</a> &raquo;
-    <span class='title'><span class='object_link'><a href="../Interpreter.html" title="Interpreter (module)">Interpreter</a></span></span>
+    <a href="../_index.html">Index (E)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Graph.html" title="Graph (class)">Graph</a></span></span>
      &raquo; 
-    <span class="title">InterpreterValue</span>
+    <span class="title">Edge</span>
   
 </div>
 
@@ -59,7 +59,7 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><h1>Class: Interpreter::InterpreterValue
+      <div id="content"><h1>Class: Graph::Edge
   
   
   
@@ -74,7 +74,7 @@
         <ul class="fullTree">
           <li>Object</li>
           
-            <li class="next">Interpreter::InterpreterValue</li>
+            <li class="next">Graph::Edge</li>
           
         </ul>
         <a href="#" class="inheritanceTree">show all</a>
@@ -87,7 +87,7 @@
   
   <dl>
       <dt>Extended by:</dt>
-      <dd>T::Sig</dd>
+      <dd>T::Generic, T::Sig</dd>
   </dl>
   
   
@@ -99,7 +99,7 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/interpreter.rb</dd>
+    <dd>lib/graph.rb</dd>
   </dl>
   
 </div>
@@ -107,7 +107,7 @@
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
     
-<p>An InterpreterValue is a value that can be returned while evaluating an expression. It abstracts away details about the source of the value (like if its a Constant or came from the symbol table).</p>
+<p>An Edge is a generic data structure representing a directed edge between two nodes in a graph.</p>
 
 
   </div>
@@ -116,6 +116,22 @@
   
 
 </div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="Node-constant" class="">Node =
+          
+        </dt>
+        <dd><pre class="code"><span class='id identifier rubyid_type_member'>type_member</span></pre></dd>
+      
+    </dl>
+  
+
 
 
 
@@ -125,7 +141,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#type-instance_method" title="#type (instance method)">#<strong>type</strong>  &#x21d2; Object </a>
+      <a href="#from-instance_method" title="#from (instance method)">#<strong>from</strong>  &#x21d2; Object </a>
     
 
     
@@ -145,7 +161,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute type.</p>
+<p>Returns the value of attribute from.</p>
 </div></span>
   
 </li>
@@ -154,7 +170,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#value-instance_method" title="#value (instance method)">#<strong>value</strong>  &#x21d2; Object </a>
+      <a href="#to-instance_method" title="#to (instance method)">#<strong>to</strong>  &#x21d2; Object </a>
     
 
     
@@ -174,7 +190,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute value.</p>
+<p>Returns the value of attribute to.</p>
 </div></span>
   
 </li>
@@ -196,7 +212,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(type, value)  &#x21d2; InterpreterValue </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(from, to)  &#x21d2; Edge </a>
     
 
     
@@ -213,30 +229,8 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>A new instance of InterpreterValue.</p>
+<p>Construct a new Edge.</p>
 </div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#to_s-instance_method" title="#to_s (instance method)">#<strong>to_s</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -245,13 +239,14 @@
   
 
 
+  
   <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(type, value)  &#x21d2; <tt><span class='object_link'><a href="" title="Interpreter::InterpreterValue (class)">InterpreterValue</a></span></tt> 
+    #<strong>initialize</strong>(from, to)  &#x21d2; <tt><span class='object_link'><a href="" title="Graph::Edge (class)">Edge</a></span></tt> 
   
 
   
@@ -260,13 +255,49 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns a new instance of InterpreterValue.</p>
+<p>Construct a new Edge.</p>
 
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>from</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="#Node-constant" title="Graph::Edge::Node (constant)">Node</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The node that the edge originates from.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>to</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="#Node-constant" title="Graph::Edge::Node (constant)">Node</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The node that the edge terminates at.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 
 </div><table class="source_code">
   <tr>
@@ -274,17 +305,17 @@
       <pre class="lines">
 
 
-331
-332
-333
-334</pre>
+30
+31
+32
+33</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 331</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 30</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
-  <span class='ivar'>@type</span> <span class='op'>=</span> <span class='id identifier rubyid_type'>type</span>
-  <span class='ivar'>@value</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_from'>from</span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
+  <span class='ivar'>@from</span> <span class='op'>=</span> <span class='id identifier rubyid_from'>from</span>
+  <span class='ivar'>@to</span> <span class='op'>=</span> <span class='id identifier rubyid_to'>to</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -299,9 +330,9 @@
       
       <span id=""></span>
       <div class="method_details first">
-  <h3 class="signature first" id="type-instance_method">
+  <h3 class="signature first" id="from-instance_method">
   
-    #<strong>type</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+    #<strong>from</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -310,7 +341,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute type.</p>
+<p>Returns the value of attribute from.</p>
 
 
   </div>
@@ -324,15 +355,15 @@
       <pre class="lines">
 
 
-326
-327
-328</pre>
+21
+22
+23</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 326</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 21</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_type'>type</span>
-  <span class='ivar'>@type</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_from'>from</span>
+  <span class='ivar'>@from</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -342,9 +373,9 @@
       
       <span id=""></span>
       <div class="method_details ">
-  <h3 class="signature " id="value-instance_method">
+  <h3 class="signature " id="to-instance_method">
   
-    #<strong>value</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+    #<strong>to</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -353,7 +384,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute value.</p>
+<p>Returns the value of attribute to.</p>
 
 
   </div>
@@ -367,15 +398,15 @@
       <pre class="lines">
 
 
-328
-329
-330</pre>
+23
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 328</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 23</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_value'>value</span>
-  <span class='ivar'>@value</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_to'>to</span>
+  <span class='ivar'>@to</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -384,42 +415,6 @@
     
   </div>
 
-
-  <div id="instance_method_details" class="method_details_list">
-    <h2>Instance Method Details</h2>
-
-    
-      <div class="method_details first">
-  <h3 class="signature first" id="to_s-instance_method">
-  
-    #<strong>to_s</strong>  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-337
-338
-339</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 337</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@type</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='ivar'>@value</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-  </div>
 
 </div>
 

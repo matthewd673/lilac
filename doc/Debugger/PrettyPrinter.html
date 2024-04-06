@@ -6,7 +6,7 @@
 <title>
   Class: Debugger::PrettyPrinter
   
-    &mdash; Documentation by YARD 0.9.34
+    &mdash; Documentation by YARD 0.9.36
   
 </title>
 
@@ -334,7 +334,7 @@
         <span class='name'>blocks</span>
       
       
-        <span class='type'>(<tt>T::Array[<span class='object_link'><a href="../Analysis/BB/Block.html" title="Analysis::BB::Block (class)">Analysis::BB::Block</a></span>]</tt>)</span>
+        <span class='type'>(<tt>T::Array[Analysis::BB::Block]</tt>)</span>
       
       
       
@@ -354,17 +354,17 @@
       <pre class="lines">
 
 
-54
-55
-56
-57
 58
 59
 60
-61</pre>
+61
+62
+63
+64
+65</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/debugger/pretty_printer.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'lib/debugger/pretty_printer.rb', line 58</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_print_blocks'>print_blocks</span><span class='lparen'>(</span><span class='id identifier rubyid_blocks'>blocks</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_blocks'>blocks</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_b'>b</span><span class='op'>|</span>
@@ -432,7 +432,11 @@
 44
 45
 46
-47</pre>
+47
+48
+49
+50
+51</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/debugger/pretty_printer.rb', line 40</span>
@@ -440,8 +444,12 @@
 <span class='kw'>def</span> <span class='id identifier rubyid_print_program'>print_program</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_gutter_len'>gutter_len</span> <span class='op'>=</span> <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
   <span class='id identifier rubyid_ctx'>ctx</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="PrettyPrinter/PrettyPrinterContext.html" title="Debugger::PrettyPrinter::PrettyPrinterContext (class)">PrettyPrinterContext</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Debugger::PrettyPrinter#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_gutter_len'>gutter_len</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_item_list'>item_list</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span>
-    <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='ivar'>@visitor</span><span class='period'>.</span><span class='id identifier rubyid_visit'>visit</span><span class='lparen'>(</span><span class='id identifier rubyid_item'>item</span><span class='comma'>,</span> <span class='label'>ctx:</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_func'>each_func</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+    <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='ivar'>@visitor</span><span class='period'>.</span><span class='id identifier rubyid_visit'>visit</span><span class='lparen'>(</span><span class='id identifier rubyid_f'>f</span><span class='comma'>,</span> <span class='label'>ctx:</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='rparen'>)</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_ctx'>ctx</span><span class='period'>.</span><span class='id identifier rubyid_line_number'>line_number</span> <span class='op'>+=</span> <span class='int'>1</span> <span class='comment'># TODO: is this right?
+</span>  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span>
+    <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='ivar'>@visitor</span><span class='period'>.</span><span class='id identifier rubyid_visit'>visit</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='comma'>,</span> <span class='label'>ctx:</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='rparen'>)</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_ctx'>ctx</span><span class='period'>.</span><span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>+=</span> <span class='int'>1</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -455,9 +463,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Mar 23 15:21:27 2024 by
+  Generated on Sat Apr  6 19:23:39 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.34 (ruby-3.3.0).
+  0.9.36 (ruby-3.3.0).
 </div>
 
     </div>

@@ -1,12 +1,16 @@
 # typed: strict
 require "sorbet-runtime"
 
+# A Graph is a generic data structure representing a graph with nodes and
+# edges.
 class Graph
   extend T::Sig
   extend T::Generic
 
   Node = type_member
 
+  # An Edge is a generic data structure representing a directed edge between
+  # two nodes in a graph.
   class Edge
     extend T::Sig
     extend T::Generic
@@ -19,6 +23,10 @@ class Graph
     attr_reader :to
 
     sig { params(from: Node, to: Node).void }
+    # Construct a new Edge.
+    #
+    # @param [Node] from The node that the edge originates from.
+    # @param [Node] to The node that the edge terminates at.
     def initialize(from, to)
       @from = from
       @to = to
@@ -26,6 +34,7 @@ class Graph
   end
 
   sig { void }
+  # Construct a new Graph.
   def initialize
     @nodes = T.let([], T::Array[Node])
     @edges = T.let([], T::Array[Edge[Node]])
@@ -65,6 +74,11 @@ class Graph
   end
 
   sig { params(node: Node).returns(Integer) }
+  # Get the number of predecessors of a given node in the graph.
+  #
+  # @param [Node] node The node for which the predecessors will be counted.
+  # @return [Integer] The number of predecessors of the node. If the node is
+  #   not in the graph this will be +0+.
   def predecessors_length(node)
     preds = @predecessors[node]
     if not preds
@@ -75,6 +89,11 @@ class Graph
   end
 
   sig { params(node: Node).returns(Integer) }
+  # Get the number of successors of a given node in the graph.
+  #
+  # @param [Node] node The node for which the successors will be counted.
+  # @return [Integer] The number of successors of the node. If the node is
+  #   not in the graph this will be +0+.
   def successors_length(node)
     succs = @successors[node]
     if not succs
@@ -112,7 +131,8 @@ class Graph
   # Remove an Edge from the edge list. This will also appropriately
   # update the successors and predecessors lists.
   #
-  # @param [Edge] The Edge to remove from the graph (with a shallow check).
+  # @param [Edge[Node]] edge The Edge to remove from the graph
+  # (with a shallow check).
   def delete_edge(edge)
     @edges.delete(edge)
 
@@ -128,5 +148,4 @@ class Graph
       preds.delete(edge.from)
     end
   end
-
 end

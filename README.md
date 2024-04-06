@@ -6,7 +6,7 @@
 
 Lilac uses [rbenv](https://github.com/rbenv/rbenv) to manage its Ruby version.
 
-To build and run Lilac's (very small) CLI:
+To set up Lilac:
 
 ```
 bundle install
@@ -17,7 +17,12 @@ To build and use Lilac in another gem:
 
 ```
 cd ~/.../lilac
-gem build
+rake
 cd ~/.../other_gem
 gem install --local ~/.../lilac/lilac-X.X.X.gem
+```
+
+Lilac also has a very simple CLI that can be run with the following:
+```
+ruby lib/lilac.rb
 ```
