@@ -20,13 +20,13 @@ class Analysis::LiveVars < Analysis::DFA
           cfg)
   end
 
-  sig { params(cfg: CFG).void }
-  def run(cfg)
-    cfg.each_block { |b|
+  sig { void }
+  def run
+    @cfg.each_block { |b|
       init_sets(b)
     }
 
-    run_dfa(cfg)
+    run_dfa
   end
 
   protected

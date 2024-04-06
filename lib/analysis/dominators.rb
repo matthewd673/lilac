@@ -26,9 +26,13 @@ class Analysis::Dominators < Analysis::DFA
           cfg)
   end
 
-  sig { returns(T::Hash[Integer, T::Set[Integer]]) }
+  sig { void }
   def run
-    return {} # TODO
+    @cfg.each_block { |b|
+      init_sets(b)
+    }
+
+    run_dfa
   end
 
   protected
@@ -56,5 +60,14 @@ class Analysis::Dominators < Analysis::DFA
   def transfer(block)
     # union of IN[B] and GEN[B]
     return get_set(@in, block) | get_set(@gen, block)
+  end
+
+  private
+
+  sig { params(block: BB).void }
+  def init_sets(block)
+    # initialize gen and kill sets
+    @gen[block.id] = Set[block]
+    @kill[block.id] = Set[]
   end
 end

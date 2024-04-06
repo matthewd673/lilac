@@ -34,18 +34,18 @@ class Analysis::DFA
     @kill = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
   end
 
-  sig { params(cfg: CFG).void }
-  def run(cfg)
-    run_dfa(cfg)
+  sig { void }
+  def run
+    run_dfa
   end
 
   protected
 
-  sig { params(cfg: CFG).void }
-  def run_dfa(cfg)
+  sig { void }
+  def run_dfa
     case @direction
-    when Direction::Forwards then run_forwards(cfg)
-    when Direction::Backwards then run_backwards(cfg)
+    when Direction::Forwards then run_forwards
+    when Direction::Backwards then run_backwards
     else T.absurd(@direction)
     end
   end
@@ -74,11 +74,11 @@ class Analysis::DFA
 
   private
 
-  sig { params(cfg: CFG).void }
-  def run_forwards(cfg)
+  sig { void }
+  def run_forwards
     # initialize all nodes
     @out[CFG::ENTRY] = @boundary
-    cfg.each_block { |b|
+    @cfg.each_block { |b|
       if b.id == CFG::ENTRY then next end
       @out[b.id] = @init
     }
@@ -87,7 +87,7 @@ class Analysis::DFA
     changed = T.let(true, T::Boolean)
     while changed
       changed = false
-      cfg.each_block { |b|
+      @cfg.each_block { |b|
         if b.id == CFG::ENTRY then next end
 
         old_out = T.unsafe(@out[b.id])
@@ -108,11 +108,11 @@ class Analysis::DFA
     @in[block.id] = meet(block)
   end
 
-  sig { params(cfg: CFG).void }
-  def run_backwards(cfg)
+  sig { void }
+  def run_backwards
     # initialize all nodes
     @in[CFG::EXIT] = @boundary
-    cfg.each_block { |b|
+    @cfg.each_block { |b|
       if b.id == CFG::EXIT then next end
       @in[b.id] = @init
     }
@@ -121,7 +121,7 @@ class Analysis::DFA
     changed = T.let(true, T::Boolean)
     while changed
       changed = false
-      cfg.each_block { |b|
+      @cfg.each_block { |b|
         if b.id == CFG::EXIT then next end
 
         old_in = T.unsafe(@in[b.id])
