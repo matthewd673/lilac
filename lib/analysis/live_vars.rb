@@ -1,7 +1,7 @@
 # typed: strict
 require "sorbet-runtime"
-require "set"
 require_relative "analysis"
+require_relative "bb"
 require_relative "cfg"
 require_relative "dfa"
 
@@ -12,16 +12,13 @@ class Analysis::LiveVars < Analysis::DFA
   # Domain = variable names
   Domain = type_member {{ lower: String }}
 
-  sig { void }
-  def initialize
+  sig { params(cfg: CFG).void }
+  def initialize(cfg)
     super(Direction::Forwards,
           Set[],
-          Set[])
-
-    @id = T.let("live_vars", String)
-    @description = T.let("Live variables analysis", String)
+          Set[],
+          cfg)
   end
-
 
   sig { params(cfg: CFG).void }
   def run(cfg)
@@ -34,20 +31,23 @@ class Analysis::LiveVars < Analysis::DFA
 
   protected
 
-  sig { params(block: BB, cfg: CFG).void }
-  def transfer(block, cfg)
-    n = block.id
-    @out[n] = meet(block, cfg)
-    @in[n] = T.unsafe(@gen[n]) | (T.unsafe(@out[n]) - T.unsafe(@kill[n]))
+  sig { params(block: BB).returns(T::Set[Domain]) }
+  def meet(block)
+    # union of IN[S] for all successors S of B
+    u = T.let(Set[], T::Set[Domain])
+
+    @cfg.each_successor(block) { |s|
+      u = u | get_set(@in, s)
+    }
+
+    return u
   end
 
-  sig { params(block: BB, cfg: CFG).returns(T::Set[Domain]) }
-  def meet(block, cfg)
-    union = Set[]
-    cfg.each_successor(block) { |s|
-      union = union | T.unsafe(@in[s.id])
-    }
-    return union
+  sig { params(block: BB).returns(T::Set[Domain]) }
+  def transfer(block)
+    # union of GEN[B] and (OUT[b] - KILL[b])
+    return get_set(@gen, block) |
+      (get_set(@out, block) - get_set(@kill, block))
   end
 
   private

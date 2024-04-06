@@ -60,6 +60,18 @@ class Analysis::DFA
     raise("Meet function is unimplemented")
   end
 
+  sig { params(hash: T::Hash[Integer, T::Set[Domain]], block: BB)
+          .returns(T::Set[Domain]) }
+  def get_set(hash, block)
+    set_b = hash[block.id]
+
+    if not set_b
+      set_b = Set[]
+    end
+
+    return set_b
+  end
+
   private
 
   sig { params(cfg: CFG).void }

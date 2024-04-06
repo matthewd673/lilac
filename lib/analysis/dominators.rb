@@ -36,19 +36,12 @@ class Analysis::Dominators < Analysis::DFA
   sig { params(block: BB).returns(T::Set[Domain]) }
   def meet(block)
     # intersection of OUT[P] for all predecessors P of B
-
     i = @all_blocks
     preds = 0
 
     @cfg.each_predecessor(block) { |p|
       preds += 1
-
-      out_p = @out[p.id]
-      if not out_p
-        out_p = Set[]
-      end
-
-      i = i & out_p
+      i = i & get_set(@out, p)
     }
 
     # no predecessors = empty set
@@ -62,17 +55,6 @@ class Analysis::Dominators < Analysis::DFA
   sig { params(block: BB).returns(T::Set[Domain]) }
   def transfer(block)
     # union of IN[B] and GEN[B]
-
-    in_b = @in[block.id]
-    if not in_b
-      in_b = Set[]
-    end
-
-    gen_b = @gen[block.id]
-    if not gen_b
-      gen_b = Set[]
-    end
-
-    return in_b | gen_b
+    return get_set(@in, block) | get_set(@gen, block)
   end
 end
