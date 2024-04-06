@@ -1,6 +1,5 @@
 # typed: strict
 require "sorbet-runtime"
-require "set"
 require_relative "analysis"
 require_relative "bb"
 

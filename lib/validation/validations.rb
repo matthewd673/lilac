@@ -7,6 +7,6 @@ require_relative "typecheck"
 # A definitive list of all validations available in Lilac.
 Validation::VALIDATIONS = T.let([
   IDNaming.new,
-  SSA.new,
+  Validation::SSA.new,
   TypeCheck.new,
 ], T::Array[ValidationPass])
