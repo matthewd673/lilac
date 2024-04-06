@@ -1,29 +1,16 @@
 # typed: strict
 require "sorbet-runtime"
+require_relative "../graph"
 require_relative "analysis"
 require_relative "bb"
 
-class Analysis::CFG
+class Analysis::CFG < Graph
   extend T::Sig
+  extend T::Generic
+
+  Node = type_member { { fixed: BB } }
 
   include Analysis
-
-  class Edge
-    extend T::Sig
-
-    include Analysis
-
-    sig { returns(BB) }
-    attr_reader :from
-    sig { returns(BB) }
-    attr_reader :to
-
-    sig { params(from: BB, to: BB).void }
-    def initialize(from, to)
-      @from = from
-      @to = to
-    end
-  end
 
   # The number used by the ENTRY block in any CFG.
   ENTRY = -1
@@ -44,12 +31,6 @@ class Analysis::CFG
 
   sig { params(block_list: T::Array[BB]).void }
   def initialize(block_list)
-    @blocks = T.let([], T::Array[BB])
-    @edges = T.let([], T::Array[Edge])
-
-    @predecessors = T.let(Hash.new, T::Hash[Integer, T::Set[BB]])
-    @successors = T.let(Hash.new, T::Hash[Integer, T::Set[BB]])
-
     @entry = T.let(BB.new(ENTRY, []), BB)
     @exit = T.let(BB.new(EXIT, []), BB)
 
@@ -57,104 +38,17 @@ class Analysis::CFG
   end
 
   sig { params(block: T.proc.params(arg0: BB).void).void }
+  # Alias for Graph's +each_node+ method.
   def each_block(&block)
-    @blocks.each(&block)
-  end
-
-  sig { params(block: T.proc.params(arg0: Edge).void).void }
-  def each_edge(&block)
-    @edges.each(&block)
-  end
-
-  sig { params(b_block: BB, block: T.proc.params(arg0: BB).void).void }
-  def each_predecessor(b_block, &block)
-    preds = @predecessors[b_block.id]
-    if not preds
-      return []
-    else
-      preds.each(&block)
-    end
-  end
-
-  sig { params(b_block: BB).returns(Integer) }
-  def predecessor_length(b_block)
-    preds = @predecessors[b_block.id]
-    if not preds
-      return 0
-    else
-      return preds.length
-    end
-  end
-
-  sig { params(b_block: BB, block: T.proc.params(arg0: BB).void).void }
-  def each_successor(b_block, &block)
-    succs = @successors[b_block.id]
-    if not succs
-      return []
-    else
-      return succs.each(&block)
-    end
-  end
-
-  sig { params(b_block: BB).returns(Integer) }
-  def successor_length(b_block)
-    succs = @successors[b_block.id]
-    if not succs
-      return 0
-    else
-      return succs.length
-    end
-  end
-
-  sig { params(from: BB, to: BB).void }
-  # Create a new Edge and add it to the edge list. The blocks will also be
-  # added to the appropriate successors and predecessors lists. This should
-  # be used instead of manually creating and pushing Edges.
-  #
-  # @param [BB::Block] from The Block that the edge originates from.
-  # @param [BB::Block] to The Block that the edge terminates at.
-  def create_edge(from, to)
-    edge = Edge.new(from, to)
-    @edges.push(edge)
-
-    # add "to" to "from"s successors
-    if not @successors[from.id]
-      @successors[from.id] = Set[]
-    end
-    T.unsafe(@successors[from.id]).push(to)
-
-    # add "from" to "to"s predecessors
-    if not @predecessors[to.id]
-      @predecessors[to.id] = Set[]
-    end
-    T.unsafe(@predecessors[to.id]).push(from)
-  end
-
-  sig { params(edge: Edge).void }
-  # Remove an Edge from the edge list. This will also appropriately
-  # update the successors and predecessors lists.
-  #
-  # @param [Edge] The Edge to remove from the graph (with a shallow check).
-  def delete_edge(edge)
-    @edges.delete(edge)
-
-    # remove "to" from "from" successors
-    succs = @successors[edge.from.id]
-    if succs # should never be nil
-      succs.delete(edge.to)
-    end
-
-    # remove "from" from "to" predecessors
-    preds = @predecessors[edge.to.id]
-    if preds # should never be nil
-      preds.delete(edge.from)
-    end
+    each_node(&block)
   end
 
   sig { params(block: BB).void }
-  # Add a block to the graph.
+  # Add a basic block to the CFG.
+  #
+  # @param [BB] block The basic block to add.
   def add_block(block)
-    @blocks.push(block)
+    @nodes.push(block)
   end
 
   sig { returns(Integer) }
@@ -174,14 +68,14 @@ class Analysis::CFG
   sig { params(block_list: T::Array[BB]).void }
   def calculate_graph(block_list)
     # just in case this gets run more than once
-    @blocks.clear
+    @nodes.clear
     @edges.clear
 
     label_to_block = {} # label name to node beginning with that label
 
     # remember which labels correspond to which blocks
     block_list.each { |b|
-      @blocks.push(b)
+      @nodes.push(b)
 
       first = b.first_stmt
       if first.is_a?(IL::Label)
@@ -221,14 +115,14 @@ class Analysis::CFG
     }
 
     # create edge from entry to first block
-    first_block = @blocks[0]
+    first_block = @nodes[0]
     if not first_block
       first_block = @exit
     end
     @edges.push(Edge.new(@entry, first_block))
 
     # add entry and exit block nodes to graph
-    @blocks.insert(0, @entry)
-    @blocks.push(@exit)
+    @nodes.insert(0, @entry)
+    @nodes.push(@exit)
   end
 end
