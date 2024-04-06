@@ -69,21 +69,43 @@ class Analysis::CFG
 
   sig { params(b_block: BB, block: T.proc.params(arg0: BB).void).void }
   def each_predecessor(b_block, &block)
-    if not @predecessors[b_block.id]
+    preds = @predecessors[b_block.id]
+    if not preds
       return []
+    else
+      preds.each(&block)
     end
-    T.unsafe(@predecessors[b_block.id]).each(&block)
+  end
+
+  sig { params(b_block: BB).returns(Integer) }
+  def predecessor_length(b_block)
+    preds = @predecessors[b_block.id]
+    if not preds
+      return 0
+    else
+      return preds.length
+    end
   end
 
   sig { params(b_block: BB, block: T.proc.params(arg0: BB).void).void }
   def each_successor(b_block, &block)
-    if not @successors[b_block.id]
+    succs = @successors[b_block.id]
+    if not succs
       return []
+    else
+      return succs.each(&block)
     end
-    T.unsafe(@successors[b_block.id]).each(&block)
   end
 
-  protected
+  sig { params(b_block: BB).returns(Integer) }
+  def successor_length(b_block)
+    succs = @successors[b_block.id]
+    if not succs
+      return 0
+    else
+      return succs.length
+    end
+  end
 
   sig { params(from: BB, to: BB).void }
   # Create a new Edge and add it to the edge list. The blocks will also be
@@ -108,6 +130,47 @@ class Analysis::CFG
     end
     T.unsafe(@predecessors[to.id]).push(from)
   end
+
+  sig { params(edge: Edge).void }
+  # Remove an Edge from the edge list. This will also appropriately
+  # update the successors and predecessors lists.
+  #
+  # @param [Edge] The Edge to remove from the graph (with a shallow check).
+  def delete_edge(edge)
+    @edges.delete(edge)
+
+    # remove "to" from "from" successors
+    succs = @successors[edge.from.id]
+    if succs # should never be nil
+      succs.delete(edge.to)
+    end
+
+    # remove "from" from "to" predecessors
+    preds = @predecessors[edge.to.id]
+    if preds # should never be nil
+      preds.delete(edge.from)
+    end
+  end
+
+  sig { params(block: BB).void }
+  # Add a block to the graph.
+  def add_block(block)
+    @blocks.push(block)
+  end
+
+  sig { returns(Integer) }
+  # Find the maximum block ID in the graph. Requires an O(n) search.
+  #
+  # @return [Integer] The maximum block ID.
+  def max_block_id
+    max = -1 # also = to ENTRY so be careful
+    each_block { |b|
+      if b.id > max then max = b.id end
+    }
+    return max
+  end
+
+  protected
 
   sig { params(block_list: T::Array[BB]).void }
   def calculate_graph(block_list)
