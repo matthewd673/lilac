@@ -1,11 +1,9 @@
 # typed: strict
 require "sorbet-runtime"
-require "set"
 require_relative "analysis"
-require_relative "analysis_pass"
 require_relative "cfg"
 
-class Analysis::DFA < Analysis::AnalysisPass
+class Analysis::DFA
   extend T::Sig
   extend T::Generic
 
@@ -22,15 +20,13 @@ class Analysis::DFA < Analysis::AnalysisPass
 
   sig { params(direction: Direction,
                boundary: T::Set[Domain],
-               init: T::Set[Domain]).void }
-  def initialize(direction, boundary, init)
-    # NOTE: should always be overwritten by subclasses
-    @id = T.let("dfa", String)
-    @description = T.let("Generic data flow analysis", String)
-
+               init: T::Set[Domain],
+               cfg: CFG).void }
+  def initialize(direction, boundary, init, cfg)
     @direction = direction
     @boundary = boundary
     @init = init
+    @cfg = cfg
 
     @out = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
     @in = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
@@ -54,9 +50,14 @@ class Analysis::DFA < Analysis::AnalysisPass
     end
   end
 
-  sig { params(block: BB).void }
+  sig { params(block: BB).returns(T::Set[Domain]) }
   def transfer(block)
-    raise("Transfer function is unimplemented for #{@id}")
+    raise("Transfer function is unimplemented")
+  end
+
+  sig { params(block: BB).returns(T::Set[Domain]) }
+  def meet(block)
+    raise("Meet function is unimplemented")
   end
 
   private
@@ -78,13 +79,21 @@ class Analysis::DFA < Analysis::AnalysisPass
         if b.id == CFG::ENTRY then next end
 
         old_out = T.unsafe(@out[b.id])
-        transfer(b)
+
+        step_forwards(b)
+
         new_out = T.unsafe(@out[b.id])
         if old_out.length != new_out.length
           changed = true
         end
       }
     end
+  end
+
+  sig { params(block: BB).void }
+  def step_forwards(block)
+    @out[block.id] = transfer(block)
+    @in[block.id] = meet(block)
   end
 
   sig { params(cfg: CFG).void }
@@ -104,12 +113,20 @@ class Analysis::DFA < Analysis::AnalysisPass
         if b.id == CFG::EXIT then next end
 
         old_in = T.unsafe(@in[b.id])
-        transfer(b)
+
+        step_backwards(b)
+
         new_in = T.unsafe(@in[b.id])
         if old_in.length != new_in.length
           changed = true
         end
       }
     end
+  end
+
+  sig { params(block: BB).void }
+  def step_backwards(block)
+    @in[block.id] = transfer(block)
+    @out[block.id] = meet(block)
   end
 end
