@@ -11,6 +11,9 @@ class Analysis::DFAOutput
 
   Domain = type_member
 
+  sig { returns(Analysis::CFG) }
+  attr_reader :cfg
+
   sig { params(cfg: Analysis::CFG).void }
   # Construct a new DFAOutput.
   #
@@ -18,12 +21,7 @@ class Analysis::DFAOutput
   def initialize(cfg)
     @facts = T.let(Hash.new,
                    T::Hash[Symbol, T::Hash[Analysis::BB, T::Set[Domain]]])
-    @blocks = T.let(Set[], T::Set[Analysis::BB])
-
-    # note all the blocks in the cfg
-    cfg.each_node { |b|
-      @blocks.add(b)
-    }
+    @cfg = cfg
   end
 
   sig { params(symbol: Symbol, set: T::Hash[Analysis::BB, T::Set[Domain]])

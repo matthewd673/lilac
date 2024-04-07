@@ -8,9 +8,9 @@ class Analysis::CFG < Graph
   extend T::Sig
   extend T::Generic
 
-  Node = type_member { { fixed: BB } }
-
   include Analysis
+
+  Node = type_member { { fixed: BB } }
 
   # The number used by the ENTRY block in any CFG.
   ENTRY = -1
@@ -31,10 +31,12 @@ class Analysis::CFG < Graph
 
   sig { params(block_list: T::Array[BB]).void }
   def initialize(block_list)
+    super()
+
     @entry = T.let(BB.new(ENTRY, []), BB)
     @exit = T.let(BB.new(EXIT, []), BB)
 
-    calculate_graph(block_list)
+    compute_graph(block_list)
   end
 
   sig { params(block: T.proc.params(arg0: BB).void).void }
@@ -63,10 +65,10 @@ class Analysis::CFG < Graph
     return max
   end
 
-  protected
+  private
 
   sig { params(block_list: T::Array[BB]).void }
-  def calculate_graph(block_list)
+  def compute_graph(block_list)
     # just in case this gets run more than once
     @nodes.clear
     @edges.clear
