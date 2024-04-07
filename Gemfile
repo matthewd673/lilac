@@ -1,7 +1,5 @@
 source "https://rubygems.org"
 
-gem "set"
-
 gem "rake"
 
 gem "sorbet", :group => :development

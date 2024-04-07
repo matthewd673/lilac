@@ -14,7 +14,6 @@ GEM
       sorbet-runtime (>= 0.5.9204)
     rdoc (6.6.2)
       psych (>= 4.0.0)
-    set (1.1.0)
     sorbet (0.5.11255)
       sorbet-static (= 0.5.11255)
     sorbet-runtime (0.5.11255)
@@ -53,7 +52,6 @@ PLATFORMS
 DEPENDENCIES
   rake
   rdoc
-  set
   sorbet
   sorbet-runtime
   tapioca
