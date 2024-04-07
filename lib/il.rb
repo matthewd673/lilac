@@ -91,14 +91,13 @@ module IL
     # The key of the ID. Includes both name and number.
     attr_reader :key
 
-    sig { params(name: String, number: Integer).void }
+    sig { params(name: String).void }
     # Construct a new ID.
     #
     # @param [String] name The name of the ID.
-    # @param [Integer] number The number of the ID.
-    def initialize(name, number)
+    def initialize(name)
       @name = name
-      @number = number
+      @number = T.let(0, Integer)
 
       @key = T.let("#{name}##{number}", String)
     end
