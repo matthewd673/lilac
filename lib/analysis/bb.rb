@@ -83,6 +83,18 @@ class Analysis::BB
     return create_blocks(stmt_list)
   end
 
+  sig { params(bb_list: T::Array[Analysis::BB])
+          .returns(T::Array[IL::Statement]) }
+  def self.to_stmt_list(bb_list)
+    stmt_list = []
+    bb_list.each { |b|
+      b.each_stmt { |s|
+        stmt_list.push(s)
+      }
+    }
+    return stmt_list
+  end
+
   private
 
   sig { params(stmt_list: T::Array[IL::Statement])
@@ -93,23 +105,23 @@ class Analysis::BB
 
     stmt_list.each { |s|
       # mark beginning of a block
-      if s.is_a?(IL::Label) and not stmt_list.empty?
-        blocks.push(Analysis::BB.new(blocks.length, stmt_list))
-        stmt_list = []
+      if s.is_a?(IL::Label) and not block_stmts.empty?
+        blocks.push(Analysis::BB.new(blocks.length, block_stmts))
+        block_stmts = []
       end
 
-      stmt_list.push(s)
+      block_stmts.push(s)
 
       # mark end of a block
       if s.is_a?(IL::Jump) # block will never be empty due to above push
-        blocks.push(Analysis::BB.new(blocks.length, stmt_list))
-        stmt_list = []
+        blocks.push(Analysis::BB.new(blocks.length, block_stmts))
+        block_stmts = []
       end
     }
 
     # scoop up stragglers
-    if not stmt_list.empty?
-      blocks.push(Analysis::BB.new(blocks.length, stmt_list))
+    if not block_stmts.empty?
+      blocks.push(Analysis::BB.new(blocks.length, block_stmts))
     end
 
     return blocks
