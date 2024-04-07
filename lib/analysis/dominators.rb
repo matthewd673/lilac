@@ -11,7 +11,7 @@ class Analysis::Dominators < Analysis::DFA
   extend T::Generic
 
   # Domain = basic blocks
-  Domain = type_member {{ lower: BB }}
+  Domain = type_member {{ fixed: BB }}
 
   sig { params(cfg: CFG).void }
   def initialize(cfg)

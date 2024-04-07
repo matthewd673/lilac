@@ -12,7 +12,7 @@ class Analysis::ReachingDefs < DFA
   extend T::Generic
 
   # Domain = definitions
-  Domain = type_member {{ lower: String }}
+  Domain = type_member {{ fixed: String }}
 
   sig { params(cfg: CFG).void }
   def initialize(cfg)

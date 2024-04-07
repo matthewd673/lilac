@@ -11,7 +11,7 @@ class Analysis::LiveVars < Analysis::DFA
   extend T::Generic
 
   # Domain = variable names
-  Domain = type_member {{ lower: String }}
+  Domain = type_member {{ fixed: String }}
 
   sig { params(cfg: CFG).void }
   def initialize(cfg)
