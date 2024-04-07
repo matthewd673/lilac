@@ -7,16 +7,22 @@ include Optimization
 
 class Optimization::RemoveUselessJumps < OptimizationPass
   extend T::Sig
+  extend T::Generic
+
+  Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
   sig { void }
   def initialize
     @id = T.let("remove_useless_jumps", String)
     @description = T.let("Remove jumps to the very next line", String)
     @level = T.let(0, Integer)
+    @unit_type = T.let(UnitType::StatementList, UnitType)
   end
 
-  sig { params(stmt_list: T::Array[IL::Statement]).void }
-  def run(stmt_list)
+  sig { params(unit: Unit).void }
+  def run(unit)
+    stmt_list = unit # alias
+
     deletion = []
 
     stmt_list.each { |s|

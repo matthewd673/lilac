@@ -7,16 +7,22 @@ include Optimization
 
 class Optimization::CondenseLabels < OptimizationPass
   extend T::Sig
+  extend T::Generic
+
+  Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
   sig { void }
   def initialize
     @id = T.let("condense_labels", String)
     @description = T.let("Condense adjacent labels", String)
     @level = T.let(0, Integer)
+    @unit_type = T.let(UnitType::StatementList, UnitType)
   end
 
-  sig { params(stmt_list: T::Array[IL::Statement]).void }
-  def run(stmt_list)
+  sig { params(unit: Unit).void }
+  def run(unit)
+    stmt_list = unit # alias
+
     jump_map = {} # target name -> IL::Goto
     label_adj_map = {} # IL::Label -> the IL::Label immediately above it
 

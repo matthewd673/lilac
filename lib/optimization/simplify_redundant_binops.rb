@@ -8,6 +8,9 @@ include Optimization
 
 class Optimization::SimplifyRedundantBinops < OptimizationPass
   extend T::Sig
+  extend T::Generic
+
+  Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
   sig { void }
   def initialize
@@ -15,10 +18,13 @@ class Optimization::SimplifyRedundantBinops < OptimizationPass
     @description = T.let(
       "Simplify binary operators that have no effect (i.e.: x + 0)", String)
     @level = T.let(0, Integer)
+    @unit_type = T.let(UnitType::StatementList, UnitType)
   end
 
-  sig { params(stmt_list: T::Array[IL::Statement]).void }
-  def run(stmt_list)
+  sig { params(unit: Unit).void }
+  def run(unit)
+    stmt_list = unit # alias
+
     # find all binops (which can only occur in Definitions)
     stmt_list.each { |s|
       if (not s.is_a?(IL::Definition)) or (not s.rhs.is_a?(IL::BinaryOp))
@@ -26,8 +32,10 @@ class Optimization::SimplifyRedundantBinops < OptimizationPass
       end
 
       new = simplify_binop(T.cast(s.rhs, IL::BinaryOp))
-      # returns nil if the binop cannot be simplified
-      if not new then next end
+      # if simplify_binop returned nil, there is no way to simplify so skip
+      if not new
+        next
+      end
 
       # else, replace the binop with the new value
       s.rhs = new

@@ -8,16 +8,22 @@ include Optimization
 
 class Optimization::LVN < OptimizationPass
   extend T::Sig
+  extend T::Generic
+
+  Unit = type_member { { fixed: Analysis::BB } }
 
   sig { void }
   def initialize
     @id = T.let("lvn", String)
     @description = T.let("Local value numbering", String)
     @level = T.let(1, Integer)
+    @unit_type = T.let(UnitType::BasicBlock, UnitType)
   end
 
-  sig { params(block: Analysis::BB).void }
-  def run(block)
+  sig { params(unit: Unit).void }
+  def run(unit)
+    block = unit # alias
+
     value_number_map = ValueNumberMap.new
     id_number_map = IDNumberMap.new
 

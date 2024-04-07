@@ -8,6 +8,7 @@ require_relative "lvn"
 require_relative "precompute_cond_jumps"
 require_relative "remove_unused_labels"
 require_relative "remove_useless_jumps"
+require_relative "simplify_redundant_binops"
 
 # A definitive list of all optimizations available in Lilac.
 Optimization::OPTIMIZATIONS = T.let([
@@ -17,4 +18,4 @@ Optimization::OPTIMIZATIONS = T.let([
   RemoveUnusedLabels.new,
   RemoveUselessJumps.new,
   SimplifyRedundantBinops.new,
-], T::Array[Optimization::OptimizationPass])
+], T::Array[Optimization::OptimizationPass[T.untyped]])
