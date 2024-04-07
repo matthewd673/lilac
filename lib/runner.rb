@@ -24,7 +24,7 @@ class Runner
   # Run a Pass on the Program.
   # @param [Pass] pass The Pass to run.
   def run_pass(pass)
-    pass.run(@program)
+    raise("run_pass is unimplemented")
   end
 
   sig { params(pass_list: T::Array[P]).void }

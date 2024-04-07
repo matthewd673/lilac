@@ -10,5 +10,11 @@ class Validation::ValidationRunner < Runner
 
   include Validation
 
-  P = type_member {{ upper: ValidationPass }}
+  P = type_member {{ fixed: ValidationPass }}
+
+  sig { params(pass: P).void }
+  # Run a ValidationPass on the program.
+  def run_pass(pass)
+    pass.run(@program)
+  end
 end

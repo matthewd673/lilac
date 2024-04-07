@@ -26,21 +26,21 @@ class Optimization::OptimizationRunner < Runner
     # run on main program statements
     case pass.unit_type
     when OptimizationPass::UnitType::StatementList
-      pass.run(program.stmt_list)
+      pass.run(@program.stmt_list)
     when OptimizationPass::UnitType::BasicBlock
-      bb_list = Analysis::BB::from_stmt_list(program.stmt_list)
+      bb_list = Analysis::BB::from_stmt_list(@program.stmt_list)
 
       bb_list.each { |b|
         pass.run(b)
       }
 
       stmt_list = Analysis::BB::to_stmt_list(bb_list)
-      program.stmt_list.clear
-      program.stmt_list.concat(stmt_list)
+      @program.stmt_list.clear
+      @program.stmt_list.concat(stmt_list)
     else
       raise("Unsupported unit type for #{pass.id}")
     end
-    program.each_func { |f|
+    @program.each_func { |f|
       # run on function body
       case pass.unit_type
       when OptimizationPass::UnitType::StatementList

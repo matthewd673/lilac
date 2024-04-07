@@ -21,14 +21,6 @@ class Pass
     @description = T.let("Generic pass", String)
   end
 
-  sig { params(program: IL::Program).void }
-  # Run the Pass on a Program.
-  #
-  # @param [IL::Program] program The Program to run the Pass on.
-  def run(program)
-    raise("Run is unimplemented for #{@id}")
-  end
-
   sig { returns(String) }
   def to_s
     "#{@id}: #{@description}"
