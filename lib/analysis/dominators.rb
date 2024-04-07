@@ -4,6 +4,7 @@ require_relative "analysis"
 require_relative "bb"
 require_relative "cfg"
 require_relative "dfa"
+require_relative "dfa_output"
 
 class Analysis::Dominators < Analysis::DFA
   extend T::Sig
@@ -26,13 +27,13 @@ class Analysis::Dominators < Analysis::DFA
           cfg)
   end
 
-  sig { void }
+  sig { returns(DFAOutput[Domain]) }
   def run
     @cfg.each_block { |b|
       init_sets(b)
     }
 
-    run_dfa
+    super
   end
 
   protected
@@ -67,7 +68,7 @@ class Analysis::Dominators < Analysis::DFA
   sig { params(block: BB).void }
   def init_sets(block)
     # initialize gen and kill sets
-    @gen[block.id] = Set[block]
-    @kill[block.id] = Set[]
+    @gen[block] = Set[block]
+    @kill[block] = Set[]
   end
 end

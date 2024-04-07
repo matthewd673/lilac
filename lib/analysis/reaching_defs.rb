@@ -3,6 +3,7 @@ require "sorbet-runtime"
 require_relative "analysis"
 require_relative "cfg"
 require_relative "dfa"
+require_relative "dfa_output"
 
 include Analysis
 
@@ -23,13 +24,13 @@ class Analysis::ReachingDefs < DFA
           cfg)
   end
 
-  sig { void }
+  sig { returns(DFAOutput[Domain]) }
   def run
     @cfg.each_block { |b|
       init_sets(b)
     }
 
-    run_dfa
+    super
   end
 
   protected
@@ -58,8 +59,8 @@ class Analysis::ReachingDefs < DFA
   sig { params(b: BB).void }
   def init_sets(b)
     # initialize gen and kill sets
-    @gen[b.id] = Set[]
-    @kill[b.id] = Set[]
+    @gen[b] = Set[]
+    @kill[b] = Set[]
 
     # find all definitions in block
     b.each_stmt { |s|
@@ -69,11 +70,11 @@ class Analysis::ReachingDefs < DFA
       end
 
       key = s.id.key
-      T.unsafe(@gen[b.id]).add(key)
+      T.unsafe(@gen[b]).add(key)
     }
 
     # any def not in this block is killed here
-    @kill[b.id] = @all_defs - T.unsafe(@gen[b.id])
+    @kill[b] = @all_defs - T.unsafe(@gen[b])
   end
 
   sig { params(cfg: CFG).returns(T::Set[Domain]) }

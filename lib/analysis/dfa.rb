@@ -2,7 +2,9 @@
 require "sorbet-runtime"
 require_relative "analysis"
 require_relative "cfg"
+require_relative "dfaoutput"
 
+# A DFA is a generic framework for a data-flow analysis.
 class Analysis::DFA
   extend T::Sig
   extend T::Generic
@@ -11,6 +13,7 @@ class Analysis::DFA
 
   Domain = type_member
 
+  # The Direction enum specifies if a DFA runs forwards or backwards.
   class Direction < T::Enum
     enums do
       Forwards = new
@@ -28,15 +31,25 @@ class Analysis::DFA
     @init = init
     @cfg = cfg
 
-    @out = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
-    @in = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
-    @gen = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
-    @kill = T.let(Hash.new, T::Hash[Integer, T::Set[Domain]])
+    @out = T.let(Hash.new, T::Hash[BB, T::Set[Domain]])
+    @in = T.let(Hash.new, T::Hash[BB, T::Set[Domain]])
+    @gen = T.let(Hash.new, T::Hash[BB, T::Set[Domain]])
+    @kill = T.let(Hash.new, T::Hash[BB, T::Set[Domain]])
   end
 
-  sig { void }
+  sig { returns(DFAOutput[Domain]) }
   def run
+    # run the dfa
     run_dfa
+
+    # construct and return a DFAOutput
+    output = DFAOutput.new(@cfg)
+    output.add_fact_hash(:out, @out)
+    output.add_fact_hash(:in, @in)
+    output.add_fact_hash(:gen, @gen)
+    output.add_fact_hash(:kill, @kill)
+
+    return output
   end
 
   protected
@@ -60,10 +73,10 @@ class Analysis::DFA
     raise("Meet function is unimplemented")
   end
 
-  sig { params(hash: T::Hash[Integer, T::Set[Domain]], block: BB)
+  sig { params(hash: T::Hash[BB, T::Set[Domain]], block: BB)
           .returns(T::Set[Domain]) }
   def get_set(hash, block)
-    set_b = hash[block.id]
+    set_b = hash[block]
 
     if not set_b
       set_b = Set[]
@@ -77,10 +90,11 @@ class Analysis::DFA
   sig { void }
   def run_forwards
     # initialize all nodes
-    @out[CFG::ENTRY] = @boundary
+    @out[@cfg.entry] = @boundary
     @cfg.each_block { |b|
-      if b.id == CFG::ENTRY then next end
-      @out[b.id] = @init
+      if b == @cfg.entry then next end
+
+      @out[b] = @init
     }
 
     # iterate
@@ -88,13 +102,13 @@ class Analysis::DFA
     while changed
       changed = false
       @cfg.each_block { |b|
-        if b.id == CFG::ENTRY then next end
+        if b == @cfg.entry then next end
 
-        old_out = T.unsafe(@out[b.id])
+        old_out = T.unsafe(@out[b])
 
         step_forwards(b)
 
-        new_out = T.unsafe(@out[b.id])
+        new_out = T.unsafe(@out[b])
         if old_out.length != new_out.length
           changed = true
         end
@@ -104,17 +118,18 @@ class Analysis::DFA
 
   sig { params(block: BB).void }
   def step_forwards(block)
-    @out[block.id] = transfer(block)
-    @in[block.id] = meet(block)
+    @out[block] = transfer(block)
+    @in[block] = meet(block)
   end
 
   sig { void }
   def run_backwards
     # initialize all nodes
-    @in[CFG::EXIT] = @boundary
+    @in[@cfg.exit] = @boundary
     @cfg.each_block { |b|
-      if b.id == CFG::EXIT then next end
-      @in[b.id] = @init
+      if b == @cfg.exit then next end
+
+      @in[b] = @init
     }
 
     # iterate
@@ -122,13 +137,13 @@ class Analysis::DFA
     while changed
       changed = false
       @cfg.each_block { |b|
-        if b.id == CFG::EXIT then next end
+        if b == @cfg.exit then next end
 
-        old_in = T.unsafe(@in[b.id])
+        old_in = T.unsafe(@in[b])
 
         step_backwards(b)
 
-        new_in = T.unsafe(@in[b.id])
+        new_in = T.unsafe(@in[b])
         if old_in.length != new_in.length
           changed = true
         end
@@ -138,7 +153,7 @@ class Analysis::DFA
 
   sig { params(block: BB).void }
   def step_backwards(block)
-    @in[block.id] = transfer(block)
-    @out[block.id] = meet(block)
+    @in[block] = transfer(block)
+    @out[block] = meet(block)
   end
 end

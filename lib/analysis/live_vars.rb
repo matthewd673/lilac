@@ -4,6 +4,7 @@ require_relative "analysis"
 require_relative "bb"
 require_relative "cfg"
 require_relative "dfa"
+require_relative "dfa_output"
 
 class Analysis::LiveVars < Analysis::DFA
   extend T::Sig
@@ -20,13 +21,13 @@ class Analysis::LiveVars < Analysis::DFA
           cfg)
   end
 
-  sig { void }
+  sig { returns(DFAOutput[Domain]) }
   def run
     @cfg.each_block { |b|
       init_sets(b)
     }
 
-    run_dfa
+    super
   end
 
   protected
@@ -55,8 +56,8 @@ class Analysis::LiveVars < Analysis::DFA
   sig { params(b: BB).void }
   def init_sets(b)
     # initialize gen and kill sets
-    @gen[b.id] = Set[]
-    @kill[b.id] = Set[]
+    @gen[b] = Set[]
+    @kill[b] = Set[]
 
     b.each_stmt { |s|
       # TODO: someday will need to account for function calls
@@ -68,14 +69,14 @@ class Analysis::LiveVars < Analysis::DFA
       # add these to the GEN set
       ue = find_vars(s)
       ue.each { |var|
-        b_kill = T.unsafe(@kill[b.id])
+        b_kill = T.unsafe(@kill[b])
         if not b_kill.include?(var)
-          T.unsafe(@gen[b.id]).add(var)
+          T.unsafe(@gen[b]).add(var)
         end
       }
 
       # add lhs to KILL set
-      T.unsafe(@kill[b.id]).add(s.id)
+      T.unsafe(@kill[b]).add(s.id)
     }
   end
 
