@@ -99,12 +99,18 @@ module IL
       @name = name
       @number = T.let(0, Integer)
 
-      @key = T.let("#{name}##{number}", String)
+      @key = T.let(compute_key, String)
+    end
+
+    sig { params(value: Integer).void }
+    def number=(value)
+      @number = value
+      compute_key # key must be recomputed whenever number changes
     end
 
     sig { returns(String) }
     def to_s
-      "#{@name}##{@number}"
+      @key
     end
 
     sig { params(other: ID).returns(T::Boolean) }
@@ -113,6 +119,13 @@ module IL
     # key).
     def eql?(other)
       return (name == other.name and number == other.number)
+    end
+
+    private
+
+    sig { returns(String) }
+    def compute_key
+      "#{name}##{number}"
     end
   end
 
