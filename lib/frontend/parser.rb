@@ -171,8 +171,21 @@ class Frontend::Parser
 
   sig { returns(IL::Value) }
   def parse_value
-    # TODO
-    raise("Unimplemented")
+    # constant
+    if see?(TokenType::IntConst, TokenType::FloatConst)
+      const_tok = eat(TokenType::IntConst, TokenType::FloatConst)
+      return constant_from_token(const_tok)
+    # id
+    elsif see?(TokenType::ID)
+      id_str = eat(TokenType::ID).image
+      return id_from_string(id_str)
+    # register
+    elsif see?(TokenType::Register)
+      register_str = eat(TokenType::Register).image
+      return register_from_string(register_str)
+    end
+
+    raise("Unexpected token while parsing value")
   end
 
   sig { params(string: String).returns(IL::Type) }
@@ -205,22 +218,57 @@ class Frontend::Parser
     return id
   end
 
+  sig { params(string: String).returns(IL::Register) }
+  def register_from_string(string)
+    number = T.unsafe(string[1..]).to_i
+    return IL::Register.new(number)
+  end
+
   sig { params(token: Token).returns(IL::Constant) }
   def constant_from_token(token)
-    # TODO
-    raise("Unimplemented")
+    # TODO: proper type determination
+    # TWO OPTIONS:
+    # * take in a type as an argument and follow
+    #   it blindly, and then somewhere else we'll have to
+    #   maintain a mini symbol table to know whats expected)
+    # * require types to be denoted on each constant like Rust
+    #   (which of course doesn't require you to but the syntax
+    #    is nice)
+    puts("WARN: constant_from_token is very lazy right now")
+    return IL::Constant.new(IL::Type::I32, token.image.to_i)
   end
 
   sig { params(token: Token, left: IL::Value, right: IL::Value)
           .returns(IL::BinaryOp) }
   def binop_from_token(token, left, right)
-    # TODO
-    raise("Unimplemented")
+    op = case token.image
+    when "+" then IL::BinaryOp::Operator::ADD
+    when "-" then IL::BinaryOp::Operator::SUB
+    when "*" then IL::BinaryOp::Operator::MUL
+    when "/" then IL::BinaryOp::Operator::DIV
+    when "==" then IL::BinaryOp::Operator::EQ
+    when "!=" then IL::BinaryOp::Operator::NEQ
+    when "<" then IL::BinaryOp::Operator::LT
+    when ">" then IL::BinaryOp::Operator::GT
+    when "<=" then IL::BinaryOp::Operator::LEQ
+    when ">=" then IL::BinaryOp::Operator::GEQ
+    when "||" then IL::BinaryOp::Operator::OR
+    when "&&" then IL::BinaryOp::Operator::AND
+    else
+      raise("Invalid BinaryOp token image #{token.image}")
+    end
+
+    return IL::BinaryOp.new(op, left, right)
   end
 
   sig { params(token: Token, value: IL::Value).returns(IL::UnaryOp) }
   def unop_from_token(token, value)
-    # TODO
-    raise("Unimplemented")
+    op = case token.image
+    when "-@" then IL::UnaryOp::Operator::NEG
+    else
+      raise("Invalid UnaryOp token image #{token.image}")
+    end
+
+    return IL::UnaryOp.new(op, value)
   end
 end
