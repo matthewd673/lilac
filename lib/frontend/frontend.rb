@@ -21,6 +21,7 @@ module Frontend
       JumpNotZero = new
       Return = new
       Func = new
+      FuncName = new
       End = new
       LeftParen = new
       RightParen = new
@@ -36,10 +37,10 @@ module Frontend
     sig { returns(TokenType) }
     attr_reader :type
 
-    sig { returns(String) }
+    sig { returns(Regexp) }
     attr_reader :pattern
 
-    sig { params(type: TokenType, pattern: String).void }
+    sig { params(type: TokenType, pattern: Regexp).void }
     def initialize(type, pattern)
       @type = type
       @pattern = pattern
@@ -85,4 +86,37 @@ module Frontend
       @position = position
     end
   end
+
+  TOKEN_DEFS = T.let([
+    TokenDef.new(TokenType::Type, /u8|i16|i32|i64|f32|f64/),
+    TokenDef.new(TokenType::IntConst, /[0-9]+/),
+    TokenDef.new(TokenType::FloatConst, /([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)/),
+    # NOTE: pretty much anything goes for ID names, this is just a
+    # reasonably-broad subset of what the internal IL checks will actually
+    # allow
+    TokenDef.new(TokenType::ID, /[\w!@$^&*()\-+=\[\]:;"',.?\/<>]+#[0-9]+/),
+    TokenDef.new(TokenType::Register, /%[0-9]+/),
+    TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<|>|<=|>=|\|\||\&\&/),
+    # NOTE: -@ isn't really standard anywhere else but it will make things
+    # much easier here
+    TokenDef.new(TokenType::UnaryOp, /-@/),
+    TokenDef.new(TokenType::Phi, /phi/),
+    TokenDef.new(TokenType::Assignment, /=/),
+    # NOTE: again, actual permitted label names are very broad in the IL
+    # (broader than ID names, in fact)
+    TokenDef.new(TokenType::Label, /[\w!@$^&*()\-+=\[\]:;"',.?\/<>]+:/),
+    TokenDef.new(TokenType::Jump, /jmp/),
+    TokenDef.new(TokenType::JumpZero, /jz/),
+    TokenDef.new(TokenType::JumpNotZero, /jnz/),
+    TokenDef.new(TokenType::Return, /ret/),
+    TokenDef.new(TokenType::Func, /func/),
+    # NOTE: parentheses are absent here to make parsing easier (but of course
+    # that isn't actually enforced in the IL)
+    TokenDef.new(TokenType::FuncName, /[\w!@$^&*\-+=\[\]:;"',.?\/<>]+/),
+    TokenDef.new(TokenType::End, /end/),
+    TokenDef.new(TokenType::LeftParen, /\(/),
+    TokenDef.new(TokenType::RightParen, /\)/),
+    TokenDef.new(TokenType::Arrow, /->/),
+    TokenDef.new(TokenType::Call, /call/),
+  ], T::Array[TokenDef])
 end
