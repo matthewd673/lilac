@@ -4,7 +4,7 @@ require_relative "analysis"
 require_relative "bb"
 require_relative "cfg"
 require_relative "dfa"
-require_relative "dfa_output"
+require_relative "cfg_facts"
 
 class Analysis::LiveVars < Analysis::DFA
   extend T::Sig
@@ -21,7 +21,7 @@ class Analysis::LiveVars < Analysis::DFA
           cfg)
   end
 
-  sig { returns(DFAOutput[Domain]) }
+  sig { returns(CFGFacts[Domain]) }
   def run
     @cfg.each_block { |b|
       init_sets(b)

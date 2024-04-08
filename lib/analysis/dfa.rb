@@ -2,7 +2,7 @@
 require "sorbet-runtime"
 require_relative "analysis"
 require_relative "cfg"
-require_relative "dfaoutput"
+require_relative "cfg_facts"
 
 # A DFA is a generic framework for a data-flow analysis.
 class Analysis::DFA
@@ -37,19 +37,19 @@ class Analysis::DFA
     @kill = T.let(Hash.new, T::Hash[BB, T::Set[Domain]])
   end
 
-  sig { returns(DFAOutput[Domain]) }
+  sig { returns(CFGFacts[Domain]) }
   def run
     # run the dfa
     run_dfa
 
     # construct and return a DFAOutput
-    output = DFAOutput.new(@cfg)
-    output.add_fact_hash(:out, @out)
-    output.add_fact_hash(:in, @in)
-    output.add_fact_hash(:gen, @gen)
-    output.add_fact_hash(:kill, @kill)
+    facts = CFGFacts.new(@cfg)
+    facts.add_fact_hash(:out, @out)
+    facts.add_fact_hash(:in, @in)
+    facts.add_fact_hash(:gen, @gen)
+    facts.add_fact_hash(:kill, @kill)
 
-    return output
+    return facts
   end
 
   protected
