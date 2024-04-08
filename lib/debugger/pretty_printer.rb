@@ -247,10 +247,9 @@ class Debugger::PrettyPrinter
 
   VISIT_LAMBDAS = T.let({
     IL::Type => VISIT_TYPE,
-    IL::Value => VISIT_VALUE,
+    IL::Constant => VISIT_CONSTANT,
     IL::ID => VISIT_ID,
     IL::Register => VISIT_REGISTER,
-    IL::Expression => VISIT_EXPRESSION,
     IL::BinaryOp => VISIT_BINARYOP,
     IL::Call => VISIT_CALL,
     IL::Statement => VISIT_STATEMENT,
