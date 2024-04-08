@@ -42,7 +42,7 @@ class Analysis::DFA
     # run the dfa
     run_dfa
 
-    # construct and return a DFAOutput
+    # construct and return a CFGFacts object
     facts = CFGFacts.new(@cfg)
     facts.add_fact_hash(:out, @out)
     facts.add_fact_hash(:in, @in)
