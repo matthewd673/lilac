@@ -61,6 +61,11 @@ class Analysis::BB
     return @stmt_list[-1]
   end
 
+  sig { params(stmt: IL::Statement).void }
+  def unshift_stmt(stmt)
+    @stmt_list.unshift(stmt)
+  end
+
   sig { returns(String) }
   # Convert the block, and its Statements, to a String.
   # @return [String] A String representation of the block.
@@ -70,6 +75,13 @@ class Analysis::BB
       str += s.to_s + "\n"
     }
     return str
+  end
+
+  sig { params(other: Analysis::BB).returns(T::Boolean) }
+  # Returns true if two BBs are equal. BBs are considered equal if they have
+  # the same ID.
+  def eql?(other)
+    return (id == other.id)
   end
 
   sig { params(stmt_list: T::Array[IL::Statement])

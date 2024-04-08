@@ -106,6 +106,14 @@ module IL
     def to_s
       "#{@name}##{@number}"
     end
+
+    sig { params(other: ID).returns(T::Boolean) }
+    # Returns true if two IDs are equal. IDs are considered equal if they
+    # have the same name and same number (by construction this means the same
+    # key).
+    def eql?(other)
+      return (name == other.name and number == other.number)
+    end
   end
 
   # A Register is a type of ID used in the IL to keep track of temporary
