@@ -9,6 +9,16 @@ class Frontend::Parser
 
   include Frontend
 
+  sig { params(filename: String).returns(IL::Program) }
+  def self.parse_file(filename)
+    fp = File.open(filename, "r")
+    source = fp.read
+    fp.close
+
+    parser = Parser.new(source)
+    return parser.parse
+  end
+
   sig { params(string: String).void }
   def initialize(string)
     @scanner = T.let(Scanner.new(string), Scanner)
@@ -46,7 +56,7 @@ class Frontend::Parser
       end
     }
 
-    raise("Syntax error") # TODO: nice errors
+    raise("Syntax error at #{@next_token.position}: saw #{@next_token.type}, expected #{types}") # TODO: nice errors
   end
 
   sig { returns(IL::Program) }
@@ -96,23 +106,35 @@ class Frontend::Parser
     elsif see?(TokenType::Label)
       label_str = eat(TokenType::Label).image
       label_str.chomp!(":") # remove trailing colon that denotes label token
+
+      eat(TokenType::NewLine)
+
       return [IL::Label.new(label_str)]
     # jump
     elsif see?(TokenType::Jump)
       eat(TokenType::Jump)
       target_str = eat(TokenType::JumpTarget).image
+
+      eat(TokenType::NewLine)
+
       return [IL::Jump.new(target_str)]
     # jump zero
     elsif see?(TokenType::JumpZero)
       eat(TokenType::JumpZero)
       value = parse_value
       target_str = eat(TokenType::JumpTarget).image
+
+      eat(TokenType::NewLine)
+
       return [IL::JumpZero.new(value, target_str)]
     # jump not zero
     elsif see?(TokenType::JumpNotZero)
       eat(TokenType::JumpNotZero)
       value = parse_value
       target_str = eat(TokenType::JumpTarget).image
+
+      eat(TokenType::NewLine)
+
       return [IL::JumpNotZero.new(value, target_str)]
     # return
     elsif see?(TokenType::Return)
@@ -136,22 +158,17 @@ class Frontend::Parser
         binop_tok = eat(TokenType::BinaryOp)
         val_r = parse_value
 
-        eat(TokenType::NewLine)
-
         binop = binop_from_token(binop_tok, val_l, val_r)
 
         return binop
       # if don't see a binary op, this must just be a constant
       else
-        eat(TokenType::NewLine)
         return val_l
       end
     # unary op
     elsif see?(TokenType::UnaryOp)
       unop_tok = eat(TokenType::UnaryOp)
       val = parse_value
-
-      eat(TokenType::NewLine)
 
       unop = unop_from_token(unop_tok, val)
 
@@ -191,12 +208,12 @@ class Frontend::Parser
   sig { params(string: String).returns(IL::Type) }
   def type_from_string(string)
     case string
-    when "u8" then IL::Type::U8
-    when "i16" then IL::Type::I16
-    when "i32" then IL::Type::I32
-    when "i64" then IL::Type::I64
-    when "f32" then IL::Type::F32
-    when "f64" then IL::Type::F64
+    when "u8" then return IL::Type::U8
+    when "i16" then return IL::Type::I16
+    when "i32" then return IL::Type::I32
+    when "i64" then return IL::Type::I64
+    when "f32" then return IL::Type::F32
+    when "f64" then return IL::Type::F64
     end
 
     raise("Invalid type string \"#{string}\"")

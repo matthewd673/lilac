@@ -1,40 +1,50 @@
 # typed: strict
-require_relative "sorbet-runtime"
+require "sorbet-runtime"
+require_relative "../il"
 
 # The Frontend module contains tools for parsing IL from text files.
 module Frontend
+  extend T::Sig
+
   # TokenType is an enum of all the tokens in the grammar.
   class TokenType < T::Enum
-    enums do
-      None = new
+    extend T::Sig
 
-      Type = new
-      IntConst = new
-      FloatConst = new
-      ID = new
-      Register = new
-      BinaryOp = new
-      UnaryOp = new
-      Phi = new
-      Assignment = new
-      Label = new
-      JumpTarget = new
-      Jump = new
-      JumpZero = new
-      JumpNotZero = new
-      Return = new
-      Func = new
-      FuncName = new
-      End = new
-      LeftParen = new
-      RightParen = new
-      Arrow = new
-      Call = new
-      Comma = new
+    enums do
+      None = new("None")
+
+      Type = new("Type")
+      IntConst = new("IntConst")
+      FloatConst = new("FloatConst")
+      ID = new("ID")
+      Register = new("Register")
+      BinaryOp = new("BinaryOp")
+      UnaryOp = new("UnaryOp")
+      Phi = new("Phi")
+      Assignment = new("Assignment")
+      Label = new("Label")
+      JumpTarget = new("JumpTarget")
+      Jump = new("Jump")
+      JumpZero = new("JumpZero")
+      JumpNotZero = new("JumpNotZero")
+      Return = new("Return")
+      Func = new("Func")
+      FuncName = new("FuncName")
+      End = new("End")
+      LeftParen = new("LeftParen")
+      RightParen = new("RightParen")
+      Arrow = new("Arrow")
+      Call = new("Call")
+      Comma = new("Comma")
 
       # special tokens
-      NewLine = new
-      EOF = new
+      NewLine = new("NewLine")
+      EOF = new("EOF")
+    end
+
+    sig { returns(String) }
+    def to_s
+      serialize
     end
   end
 
@@ -70,6 +80,11 @@ module Frontend
     def initialize(row, col)
       @row = row
       @col = col
+    end
+
+    sig { returns(String) }
+    def to_s
+      "(#{@row}, #{@col})"
     end
   end
 
