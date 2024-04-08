@@ -27,6 +27,10 @@ module Frontend
       RightParen = new
       Arrow = new
       Call = new
+
+      # special tokens
+      NewLine = new
+      EOF = new
     end
   end
 
@@ -118,5 +122,6 @@ module Frontend
     TokenDef.new(TokenType::RightParen, /\)/),
     TokenDef.new(TokenType::Arrow, /->/),
     TokenDef.new(TokenType::Call, /call/),
+    # NOTE: TokenType::NewLine and ::EOF are special and do not need a TokenDef
   ], T::Array[TokenDef])
 end
