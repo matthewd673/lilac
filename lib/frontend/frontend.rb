@@ -6,6 +6,8 @@ module Frontend
   # TokenType is an enum of all the tokens in the grammar.
   class TokenType < T::Enum
     enums do
+      None = new
+
       Type = new
       IntConst = new
       FloatConst = new
