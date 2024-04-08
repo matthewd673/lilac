@@ -18,6 +18,7 @@ module Frontend
       Phi = new
       Assignment = new
       Label = new
+      JumpTarget = new
       Jump = new
       JumpZero = new
       JumpNotZero = new
@@ -29,6 +30,7 @@ module Frontend
       RightParen = new
       Arrow = new
       Call = new
+      Comma = new
 
       # special tokens
       NewLine = new
@@ -110,7 +112,9 @@ module Frontend
     TokenDef.new(TokenType::Assignment, /=/),
     # NOTE: again, actual permitted label names are very broad in the IL
     # (broader than ID names, in fact)
-    TokenDef.new(TokenType::Label, /[\w!@$^&*()\-+=\[\]:;"',.?\/<>]+:/),
+    TokenDef.new(TokenType::Label, /[\w!@$^&*()\-+=\[\];"',.?\/<>]+:/),
+    # just a modified version of the label regex
+    TokenDef.new(TokenType::JumpTarget, /[\w!@$^&*()\-+=\[\];"',.?\/<>]+/),
     TokenDef.new(TokenType::Jump, /jmp/),
     TokenDef.new(TokenType::JumpZero, /jz/),
     TokenDef.new(TokenType::JumpNotZero, /jnz/),
@@ -124,6 +128,7 @@ module Frontend
     TokenDef.new(TokenType::RightParen, /\)/),
     TokenDef.new(TokenType::Arrow, /->/),
     TokenDef.new(TokenType::Call, /call/),
+    TokenDef.new(TokenType::Comma, /,/),
     # NOTE: TokenType::NewLine and ::EOF are special and do not need a TokenDef
   ], T::Array[TokenDef])
 end
