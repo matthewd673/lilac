@@ -1,6 +1,6 @@
 # typed: strict
 require "sorbet-runtime"
-require "pass"
+require_relative "pass"
 
 # A Runner runs Passes on a Program.
 class Runner

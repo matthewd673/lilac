@@ -10,6 +10,7 @@ require_relative "interpreter"
 require_relative "ansi"
 require_relative "optimization/optimizations"
 require_relative "validation/validations"
+require_relative "frontend/parser"
 
 # The CLI module contains the CLI tools provided by lilac.
 module CLI
@@ -20,6 +21,7 @@ module CLI
   # Handles behavior when the lilac CLI is called with no arguments.
   def self.main
     puts(ANSI.fmt256("lilac", ANSI::LILAC_256, bold: true))
+    puts("  parse <filename>: parse and pretty print an IL text file")
     puts("  optimizations: list all optimizations")
     puts("  validations: list all validations")
   end
@@ -39,6 +41,18 @@ module CLI
       puts(v.id)
     }
   end
+
+  sig { params(filename: T.nilable(String)).void }
+  def self.parse(filename)
+    if not filename
+      puts("No filename provided")
+      return
+    end
+
+    program = Frontend::Parser::parse_file(filename)
+    pp = Debugger::PrettyPrinter.new
+    pp.print_program(program)
+  end
 end
 
 # if lilac is run directly then provide a simple CLI.
@@ -49,6 +63,8 @@ if $PROGRAM_NAME == __FILE__
     CLI.print_optimizations
   elsif ARGV[0] == "validations"
     CLI.print_validations
+  elsif ARGV[0] == "parse"
+    CLI.parse(ARGV[1])
   else # unknown args case
     CLI.main
   end

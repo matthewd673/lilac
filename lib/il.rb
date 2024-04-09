@@ -47,7 +47,11 @@ module IL
   # such as constants and variables.
   class Value
     extend T::Sig
-    # stub
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      other.class == Value
+    end
   end
 
   # A Constant is a constant value of a given type.
@@ -73,6 +77,17 @@ module IL
     def to_s
       "#{@value}"
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Constant
+        return false
+      end
+
+      other = T.cast(other, Constant)
+
+      type.eql?(other.type) and value.eql?(other.value)
+    end
   end
 
   # An ID is the name of a variable. When implemented these will often store
@@ -91,28 +106,46 @@ module IL
     # The key of the ID. Includes both name and number.
     attr_reader :key
 
-    sig { params(name: String).void }
+    sig { params(name: String, number: Integer).void }
     # Construct a new ID.
     #
     # @param [String] name The name of the ID.
-    def initialize(name)
+    # @param [Integer] number The number of the ID. Usually optional when
+    #   constructing a Program that will be converted to SSA in a later step.
+    def initialize(name, number: 0)
       @name = name
-      @number = T.let(0, Integer)
+      @number = number
 
-      @key = T.let("#{name}##{number}", String)
+      @key = T.let(compute_key, String)
+    end
+
+    sig { params(value: Integer).void }
+    def number=(value)
+      @number = value
+      compute_key # key must be recomputed whenever number changes
     end
 
     sig { returns(String) }
     def to_s
-      "#{@name}##{@number}"
+      @key
     end
 
-    sig { params(other: ID).returns(T::Boolean) }
-    # Returns true if two IDs are equal. IDs are considered equal if they
-    # have the same name and same number (by construction this means the same
-    # key).
+    sig { params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      return (name == other.name and number == other.number)
+      if not other.class == ID
+        return false
+      end
+
+      other = T.cast(other, ID)
+
+      name.eql?(other.name) and number.eql?(other.number)
+    end
+
+    private
+
+    sig { returns(String) }
+    def compute_key
+      "#{name}##{number}"
     end
   end
 
@@ -144,6 +177,11 @@ module IL
     # @return [T.untyped] The value of the Expression, likely numeric.
     def calculate
       0
+    end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      other.class == Expression
     end
   end
 
@@ -240,6 +278,17 @@ module IL
       else T.absurd(self)
       end
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == BinaryOp
+        return false
+      end
+
+      other = T.cast(other, BinaryOp)
+
+      op.eql?(other.op) and left.eql?(other.left) and right.eql?(other.right)
+    end
   end
 
   # A UnaryOp is an Expression which computes a value from one operand.
@@ -296,6 +345,17 @@ module IL
       else T.absurd(self)
       end
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == UnaryOp
+        return false
+      end
+
+      other = T.cast(other, UnaryOp)
+
+      op.eql?(other.op) and value.eql?(other.value)
+    end
   end
 
   # A Phi function is an Expression that combines multiple possible SSA
@@ -308,6 +368,17 @@ module IL
     def initialize(values)
       @values = values
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Phi
+        return false
+      end
+
+      other = T.cast(other, Phi)
+
+      values.eql?(other.values)
+    end
   end
 
   # A Statement is a single instruction or "line of code" in the IL.
@@ -316,6 +387,11 @@ module IL
 
     sig { returns(T.nilable(String)) }
     attr_accessor :annotation
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      other.class == Statement
+    end
   end
 
   # A Definition is a Statement that defines an ID with a type and value.
@@ -346,6 +422,17 @@ module IL
     def to_s
       "#{@type} #{@id} = #{@rhs}"
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Definition
+        return false
+      end
+
+      other = T.cast(other, Definition)
+
+      type.eql?(other.type) and id.eql?(other.id) and rhs.eql?(other.rhs)
+    end
   end
 
   # A Label is a Statement that does nothing but can be jumped to by a Jump.
@@ -367,6 +454,17 @@ module IL
     def to_s
       "#{@name}:"
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Label
+        return false
+      end
+
+      other = T.cast(other, Label)
+
+      name.eql?(other.name)
+    end
   end
 
   # A Jump is a Statement that will jump to the target Label unconditionally.
@@ -387,6 +485,17 @@ module IL
     sig { returns(String) }
     def to_s
       "jmp #{@target}"
+    end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Jump
+        return false
+      end
+
+      other = T.cast(other, Jump)
+
+      target.eql?(other.target)
     end
   end
 
@@ -412,6 +521,17 @@ module IL
     def to_s
       "jz #{@cond} #{@target}"
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == JumpZero
+        return false
+      end
+
+      other = T.cast(other, JumpZero)
+
+      cond.eql?(other.cond) and target.eql?(other.target)
+    end
   end
 
   # A JumpNotZero is a Jump that will jump to the target Label only when its
@@ -436,6 +556,17 @@ module IL
     def to_s
       "jnz #{@cond} #{@target}"
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == JumpNotZero
+        return false
+      end
+
+      other = T.cast(other, JumpNotZero)
+
+      cond.eql?(other.cond) and target.eql?(other.target)
+    end
   end
 
   # A Return statement is used to return a value from within a FuncDef.
@@ -453,6 +584,17 @@ module IL
     sig { returns(String) }
     def to_s
       "ret #{@value}"
+    end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Return
+        return false
+      end
+
+      other = T.cast(other, Return)
+
+      value.eql?(other.value)
     end
   end
 
@@ -474,6 +616,17 @@ module IL
     sig { returns(String) }
     def to_s
       "#{@type} #{@id}"
+    end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == FuncParam
+        return false
+      end
+
+      other = T.cast(other, FuncParam)
+
+      type.eql?(other.type) and id.eql?(other.id)
     end
   end
 
@@ -517,6 +670,18 @@ module IL
 
       return "func #{@name}(#{param_str}) -> #{@ret_type}:\n#{stmt_str}\nend"
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == FuncDef
+        return false
+      end
+
+      other = T.cast(other, FuncDef)
+
+      name.eql?(other.name) and params.eql?(other.params) and
+        ret_type.eql?(other.ret_type) and stmt_list.eql?(other.stmt_list)
+    end
   end
 
   # A Call is an Expression that represents a function call.
@@ -543,6 +708,17 @@ module IL
       arg_str.chomp!(", ")
 
       return "call #{@func_name}(#{arg_str})"
+    end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Call
+        return false
+      end
+
+      other = T.cast(other, Call)
+
+      func_name.eql?(other.func_name) and args.eql?(other.args)
     end
   end
 
@@ -589,6 +765,24 @@ module IL
         str += i.to_s + "\n"
       }
       return str
+    end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Program
+        return false
+      end
+
+      other = T.cast(other, Program)
+
+      stmt_list.eql?(other.stmt_list) and func_map.eql?(other.func_map)
+    end
+
+    protected
+
+    sig { returns(T::Hash[String, FuncDef]) }
+    def func_map
+      @func_map
     end
   end
 end
