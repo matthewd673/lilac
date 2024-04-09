@@ -729,10 +729,10 @@ module IL
     sig { returns(T::Array[Statement]) }
     attr_reader :stmt_list
 
-    sig { void }
+    sig { params(stmt_list: T::Array[Statement]).void }
     # Construct a new Program.
-    def initialize
-      @stmt_list = T.let([], T::Array[Statement])
+    def initialize(stmt_list: [])
+      @stmt_list = stmt_list
       @func_map = T.let({}, T::Hash[String, FuncDef])
     end
 
