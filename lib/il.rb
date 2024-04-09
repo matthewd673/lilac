@@ -312,7 +312,7 @@ module IL
       extend T::Sig
 
       enums do
-        NEG = new("-")
+        NEG = new("-@")
       end
 
       sig { returns(String) }

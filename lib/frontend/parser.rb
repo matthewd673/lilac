@@ -2,6 +2,7 @@
 require "sorbet-runtime"
 require_relative "frontend"
 require_relative "scanner"
+require_relative "../il"
 
 class Frontend::Parser
   # NOTE: Parser is adapted from Newt's Parser class

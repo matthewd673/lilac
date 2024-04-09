@@ -11,6 +11,7 @@ require_relative "analysis/bb"
 require_relative "analysis/cfg"
 require_relative "ssa"
 require_relative "interpreter"
+require_relative "frontend/generator"
 
 # load requirements for CLI module (may also benefit external programs)
 require_relative "ansi"
