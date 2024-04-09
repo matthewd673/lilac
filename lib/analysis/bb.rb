@@ -1,6 +1,7 @@
 # typed: strict
 require "sorbet-runtime"
 require_relative "analysis"
+require_relative "cfg"
 require_relative "../il"
 
 # A BB is a data structure representing a basic block.
@@ -70,9 +71,15 @@ class Analysis::BB
   # Convert the block, and its Statements, to a String.
   # @return [String] A String representation of the block.
   def to_s
-    str = "[BLOCK (len=#{length})]\n"
+    id_str = id.to_s
+    if id == Analysis::CFG::ENTRY
+      id_str = "ENTRY"
+    elsif id == Analysis::CFG::EXIT
+      id_str = "EXIT"
+    end
+    str = "[#{id_str}]\n"
     each_stmt { |s|
-      str += s.to_s + "\n"
+      str += "  #{s.to_s}\n"
     }
     return str
   end
