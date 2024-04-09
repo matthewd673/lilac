@@ -119,7 +119,7 @@ module Frontend
   TOKEN_DEFS = T.let([
     # keywords
     TokenDef.new(TokenType::Type, /u8|i16|i32|i64|f32|f64/),
-    TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<|>|<=|>=|\|\||\&\&/),
+    TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<=|>=|<|>|\|\||\&\&/),
     # NOTE: -@ isn't really standard anywhere else but it will make things
     # much easier here
     TokenDef.new(TokenType::UnaryOp, /-@/),
