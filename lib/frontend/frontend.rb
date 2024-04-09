@@ -116,7 +116,7 @@ module Frontend
     TokenDef.new(TokenType::UIntConst, /[0-9]+u8/),
     TokenDef.new(TokenType::IntConst, /-?[0-9]+(i16|i32|i64)/),
     TokenDef.new(TokenType::FloatConst,
-                 /-?([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)(f32|f64)/),
+                 /-?(([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+))(f32|f64)/),
     # NOTE: pretty much anything goes for ID names, this is just a
     # reasonably-broad subset of what the internal IL checks will actually
     # allow

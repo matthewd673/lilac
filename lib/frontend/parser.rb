@@ -247,11 +247,16 @@ class Frontend::Parser
     # find type in constant string
     type_str = string.match(/[uif][0-9]{1,2}/)
     if not type_str
-      raise("No type tag in constant")
+      raise("No type tag in constant: \"#{string}\"")
     end
     type = type_from_string(T.unsafe(type_str[0]))
 
-    return IL::Constant.new(type, string.to_i)
+    numeric = string.to_i
+    if type == IL::Type::F32 or type == IL::Type::F64
+      numeric = string.to_f
+    end
+
+    return IL::Constant.new(type, numeric)
   end
 
   sig { params(token: Token, left: IL::Value, right: IL::Value)
