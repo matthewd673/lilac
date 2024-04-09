@@ -164,6 +164,17 @@ module IL
       @name = "%#{number}"
       @key = @name
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Register
+        return false
+      end
+
+      other = T.cast(other, Register)
+
+      number.eql?(other.number)
+    end
   end
 
   # An Expression is any in-built function in the IL such as common
@@ -742,7 +753,7 @@ module IL
     end
 
     sig { params(funcdef: FuncDef).void }
-    def register_func(funcdef)
+    def add_func(funcdef)
       @func_map[funcdef.name] = funcdef
     end
 
