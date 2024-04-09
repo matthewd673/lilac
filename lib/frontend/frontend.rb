@@ -14,6 +14,7 @@ module Frontend
       None = new("None")
 
       Type = new("Type")
+      UIntConst = new("UIntConst")
       IntConst = new("IntConst")
       FloatConst = new("FloatConst")
       ID = new("ID")
@@ -112,8 +113,10 @@ module Frontend
 
   TOKEN_DEFS = T.let([
     TokenDef.new(TokenType::Type, /u8|i16|i32|i64|f32|f64/),
-    TokenDef.new(TokenType::IntConst, /[0-9]+/),
-    TokenDef.new(TokenType::FloatConst, /([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)/),
+    TokenDef.new(TokenType::UIntConst, /[0-9]+u8/),
+    TokenDef.new(TokenType::IntConst, /-?[0-9]+(i16|i32|i64)/),
+    TokenDef.new(TokenType::FloatConst,
+                 /-?([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)(f32|f64)/),
     # NOTE: pretty much anything goes for ID names, this is just a
     # reasonably-broad subset of what the internal IL checks will actually
     # allow

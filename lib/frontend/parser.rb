@@ -149,7 +149,7 @@ class Frontend::Parser
   sig { returns(T.any(IL::Value, IL::Expression)) }
   def parse_expr_or_value
     # value or binop
-    if see?(TokenType::IntConst, TokenType::FloatConst,
+    if see?(TokenType::UIntConst, TokenType::IntConst, TokenType::FloatConst,
             TokenType::ID, TokenType::Register)
       val_l = parse_value
 
@@ -189,9 +189,10 @@ class Frontend::Parser
   sig { returns(IL::Value) }
   def parse_value
     # constant
-    if see?(TokenType::IntConst, TokenType::FloatConst)
-      const_tok = eat(TokenType::IntConst, TokenType::FloatConst)
-      return constant_from_token(const_tok)
+    if see?(TokenType::UIntConst, TokenType::IntConst, TokenType::FloatConst)
+      const_str = eat(TokenType::UIntConst, TokenType::IntConst,
+                      TokenType::FloatConst).image
+      return constant_from_string(const_str)
     # id
     elsif see?(TokenType::ID)
       id_str = eat(TokenType::ID).image
@@ -241,18 +242,16 @@ class Frontend::Parser
     return IL::Register.new(number)
   end
 
-  sig { params(token: Token).returns(IL::Constant) }
-  def constant_from_token(token)
-    # TODO: proper type determination
-    # TWO OPTIONS:
-    # * take in a type as an argument and follow
-    #   it blindly, and then somewhere else we'll have to
-    #   maintain a mini symbol table to know whats expected)
-    # * require types to be denoted on each constant like Rust
-    #   (which of course doesn't require you to but the syntax
-    #    is nice)
-    puts("WARN: constant_from_token is very lazy right now")
-    return IL::Constant.new(IL::Type::I32, token.image.to_i)
+  sig { params(string: String).returns(IL::Constant) }
+  def constant_from_string(string)
+    # find type in constant string
+    type_str = string.match(/[uif][0-9]{1,2}/)
+    if not type_str
+      raise("No type tag in constant")
+    end
+    type = type_from_string(T.unsafe(type_str[0]))
+
+    return IL::Constant.new(type, string.to_i)
   end
 
   sig { params(token: Token, left: IL::Value, right: IL::Value)
