@@ -24,13 +24,12 @@ module Frontend
       Phi = new("Phi")
       Assignment = new("Assignment")
       Label = new("Label")
-      JumpTarget = new("JumpTarget")
       Jump = new("Jump")
       JumpZero = new("JumpZero")
       JumpNotZero = new("JumpNotZero")
       Return = new("Return")
       Func = new("Func")
-      FuncName = new("FuncName")
+      Name = new("FuncName")
       End = new("End")
       LeftParen = new("LeftParen")
       RightParen = new("RightParen")
@@ -119,10 +118,11 @@ module Frontend
   TOKEN_DEFS = T.let([
     # keywords
     TokenDef.new(TokenType::Type, /u8|i16|i32|i64|f32|f64/),
-    TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<=|>=|<|>|\|\||\&\&/),
     # NOTE: -@ isn't really standard anywhere else but it will make things
     # much easier here
+    TokenDef.new(TokenType::Arrow, /->/),
     TokenDef.new(TokenType::UnaryOp, /-@/),
+    TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<=|>=|<|>|\|\||\&\&/),
     TokenDef.new(TokenType::Phi, /phi/),
     TokenDef.new(TokenType::Assignment, /=/),
     TokenDef.new(TokenType::Jump, /jmp/),
@@ -133,7 +133,6 @@ module Frontend
     TokenDef.new(TokenType::End, /end/),
     TokenDef.new(TokenType::LeftParen, /\(/),
     TokenDef.new(TokenType::RightParen, /\)/),
-    TokenDef.new(TokenType::Arrow, /->/),
     TokenDef.new(TokenType::Call, /call/),
     TokenDef.new(TokenType::Comma, /,/),
 
@@ -150,11 +149,9 @@ module Frontend
     # NOTE: again, actual permitted label names are very broad in the IL
     # (broader than ID names, in fact)
     TokenDef.new(TokenType::Label, /[\w!@$^&*()\-+=\[\];"',.?\/<>]+:/),
-    # just a modified version of the label regex
-    TokenDef.new(TokenType::JumpTarget, /[\w!@$^&*()\-+=\[\];"',.?\/<>]+/),
     # NOTE: parentheses are absent here to make parsing easier (but of course
     # that isn't actually enforced in the IL)
-    TokenDef.new(TokenType::FuncName, /[\w!@$^&*\-+=\[\]:;"',.?\/<>]+/),
+    TokenDef.new(TokenType::Name, /[\w!@$^&*\-+=\[\]:;"',.?\/<>]+/),
 
     # NOTE: TokenType::NewLine and ::EOF are special and do not need a TokenDef
   ], T::Array[TokenDef])

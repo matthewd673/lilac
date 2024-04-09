@@ -116,4 +116,44 @@ class ParseFileTest < Minitest::Test
 
     assert program.eql?(expected)
   end
+
+  sig { void }
+  def test_parse_unop
+    expected = Program.new(stmt_list: [
+      Definition.new(Type::I16, ID.new("a"), UnaryOp.new(
+        UnaryOp::Operator::NEG, Constant.new(Type::I16, 2)))
+    ])
+    program = Frontend::Parser::parse_file("test/il_programs/unop.txt")
+
+    assert program.eql?(expected)
+  end
+
+  sig { void }
+  def test_parse_func
+    expected = Program.new(stmt_list: [
+      Definition.new(Type::I32, ID.new("ans"),
+                     Call.new("multiply", [Constant.new(Type::I32, 3),
+                                           Constant.new(Type::I32, 5)]))
+    ])
+    expected.add_func(FuncDef.new("multiply",
+                                  [
+                                    FuncParam.new(Type::I32, ID.new("a")),
+                                    FuncParam.new(Type::I32, ID.new("b"))
+                                  ],
+                                  Type::I32,
+                                  [
+                                    Definition.new(Type::I32,
+                                                   Register.new(0),
+                                                   BinaryOp.new(
+                                                     BinaryOp::Operator::MUL,
+                                                     ID.new("a"),
+                                                     ID.new("b"))),
+                                    Return.new(Register.new(0)),
+                                  ]
+                                 ))
+
+    program = Frontend::Parser::parse_file("test/il_programs/func.txt")
+
+    assert program.eql?(expected)
+  end
 end

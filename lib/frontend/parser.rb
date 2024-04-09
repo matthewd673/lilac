@@ -62,7 +62,18 @@ class Frontend::Parser
   sig { returns(IL::Program) }
   def parse_program
     program = IL::Program.new
-    program.stmt_list.concat(parse_stmt_list)
+
+    # see statement
+    while not see?(TokenType::EOF)
+    if see?(TokenType::NewLine, TokenType::Type, TokenType::Label,
+            TokenType::Jump, TokenType::JumpZero, TokenType::JumpNotZero,
+            TokenType::Return)
+      program.stmt_list.concat(parse_stmt_list)
+    # func def
+    elsif see?(TokenType::Func)
+      program.add_func(parse_func_def)
+    end
+    end
 
     eat(TokenType::EOF)
 
@@ -74,7 +85,7 @@ class Frontend::Parser
     stmt_list = []
 
     # parse stmts until we reach the end
-    while not see?(TokenType::EOF, TokenType::End)
+    while not see?(TokenType::EOF, TokenType::End, TokenType::Func)
       stmt_list.concat(parse_stmt)
     end
 
@@ -92,8 +103,15 @@ class Frontend::Parser
       type_str = eat(TokenType::Type).image
       type = type_from_string(type_str)
 
-      id_str = eat(TokenType::ID).image
-      id = id_from_string(id_str)
+      if see?(TokenType::ID)
+        id_str = eat(TokenType::ID).image
+        id = id_from_string(id_str)
+      elsif see?(TokenType::Register)
+        register_str = eat(TokenType::Register).image
+        id = register_from_string(register_str)
+      else
+        raise("Expected ID or Register when parsing Definition")
+      end
 
       eat(TokenType::Assignment)
 
@@ -113,7 +131,7 @@ class Frontend::Parser
     # jump
     elsif see?(TokenType::Jump)
       eat(TokenType::Jump)
-      target_str = eat(TokenType::JumpTarget).image
+      target_str = eat(TokenType::Name).image
 
       eat(TokenType::NewLine)
 
@@ -122,7 +140,7 @@ class Frontend::Parser
     elsif see?(TokenType::JumpZero)
       eat(TokenType::JumpZero)
       value = parse_value
-      target_str = eat(TokenType::JumpTarget).image
+      target_str = eat(TokenType::Name).image
 
       eat(TokenType::NewLine)
 
@@ -131,7 +149,7 @@ class Frontend::Parser
     elsif see?(TokenType::JumpNotZero)
       eat(TokenType::JumpNotZero)
       value = parse_value
-      target_str = eat(TokenType::JumpTarget).image
+      target_str = eat(TokenType::Name).image
 
       eat(TokenType::NewLine)
 
@@ -175,8 +193,17 @@ class Frontend::Parser
       return unop
     # func call
     elsif see?(TokenType::Call)
-      # TODO
-      raise("Unimplemented")
+      # eat func name
+      eat(TokenType::Call)
+      func_name = eat(TokenType::Name).image
+
+      # eat args
+      eat(TokenType::LeftParen)
+      args = []
+      parse_call_args(args)
+      eat(TokenType::RightParen)
+
+      return IL::Call.new(func_name, args)
     # phi function
     elsif see?(TokenType::Phi)
       # TODO
@@ -204,6 +231,60 @@ class Frontend::Parser
     end
 
     raise("Unexpected token while parsing value: #{@next_token}")
+  end
+
+  sig { returns(IL::FuncDef) }
+  def parse_func_def
+    # eat func name
+    eat(TokenType::Func)
+    name = eat(TokenType::Name).image
+
+    # eat func params
+    eat(TokenType::LeftParen)
+    func_params = []
+    parse_func_params(func_params)
+    eat(TokenType::RightParen)
+
+    # eat return type
+    eat(TokenType::Arrow)
+    ret_type_str = eat(TokenType::Type).image
+    ret_type = type_from_string(ret_type_str)
+    eat(TokenType::NewLine)
+
+    stmt_list = parse_stmt_list
+
+    eat(TokenType::End)
+
+    return IL::FuncDef.new(name, func_params, ret_type, stmt_list)
+  end
+
+  sig { params(param_list: T::Array[IL::FuncParam]).void }
+  def parse_func_params(param_list)
+    type_str = eat(TokenType::Type).image
+    type = type_from_string(type_str)
+
+    id_str = eat(TokenType::ID).image
+    id = id_from_string(id_str)
+
+    param_list.push(IL::FuncParam.new(type, id))
+
+    # if we see a comma then we have to recurse
+    if see?(TokenType::Comma)
+      eat(TokenType::Comma)
+      parse_func_params(param_list)
+    end
+  end
+
+  sig { params(arg_list: T::Array[IL::Value]).void }
+  def parse_call_args(arg_list)
+    value = parse_value
+    arg_list.push(value)
+
+    # if we see a comma then we have to recurse
+    if see?(TokenType::Comma)
+      eat(TokenType::Comma)
+      parse_call_args(arg_list)
+    end
   end
 
   sig { params(string: String).returns(IL::Type) }
