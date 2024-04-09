@@ -143,7 +143,7 @@ class Frontend::Parser
       return [IL::Return.new(value)]
     end
 
-    raise("Unexpected token while parsing statement")
+    raise("Unexpected token while parsing statement: #{@next_token}")
   end
 
   sig { returns(T.any(IL::Value, IL::Expression)) }
@@ -183,7 +183,7 @@ class Frontend::Parser
       raise("Unimplemented")
     end
 
-    raise("Unexpected token while parsing expression")
+    raise("Unexpected token while parsing expression: #{@next_token}")
   end
 
   sig { returns(IL::Value) }
@@ -203,7 +203,7 @@ class Frontend::Parser
       return register_from_string(register_str)
     end
 
-    raise("Unexpected token while parsing value")
+    raise("Unexpected token while parsing value: #{@next_token}")
   end
 
   sig { params(string: String).returns(IL::Type) }

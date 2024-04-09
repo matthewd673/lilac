@@ -109,10 +109,35 @@ module Frontend
       @image = image
       @position = position
     end
+
+    sig { returns(String) }
+    def to_s
+      "#{@type}"
+    end
   end
 
   TOKEN_DEFS = T.let([
+    # keywords
     TokenDef.new(TokenType::Type, /u8|i16|i32|i64|f32|f64/),
+    TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<|>|<=|>=|\|\||\&\&/),
+    # NOTE: -@ isn't really standard anywhere else but it will make things
+    # much easier here
+    TokenDef.new(TokenType::UnaryOp, /-@/),
+    TokenDef.new(TokenType::Phi, /phi/),
+    TokenDef.new(TokenType::Assignment, /=/),
+    TokenDef.new(TokenType::Jump, /jmp/),
+    TokenDef.new(TokenType::JumpZero, /jz/),
+    TokenDef.new(TokenType::JumpNotZero, /jnz/),
+    TokenDef.new(TokenType::Return, /ret/),
+    TokenDef.new(TokenType::Func, /func/),
+    TokenDef.new(TokenType::End, /end/),
+    TokenDef.new(TokenType::LeftParen, /\(/),
+    TokenDef.new(TokenType::RightParen, /\)/),
+    TokenDef.new(TokenType::Arrow, /->/),
+    TokenDef.new(TokenType::Call, /call/),
+    TokenDef.new(TokenType::Comma, /,/),
+
+    # other
     TokenDef.new(TokenType::UIntConst, /[0-9]+u8/),
     TokenDef.new(TokenType::IntConst, /-?[0-9]+(i16|i32|i64)/),
     TokenDef.new(TokenType::FloatConst,
@@ -122,31 +147,15 @@ module Frontend
     # allow
     TokenDef.new(TokenType::ID, /[\w!@$^&*()\-+=\[\]:;"',.?\/<>]+#[0-9]+/),
     TokenDef.new(TokenType::Register, /%[0-9]+/),
-    TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<|>|<=|>=|\|\||\&\&/),
-    # NOTE: -@ isn't really standard anywhere else but it will make things
-    # much easier here
-    TokenDef.new(TokenType::UnaryOp, /-@/),
-    TokenDef.new(TokenType::Phi, /phi/),
-    TokenDef.new(TokenType::Assignment, /=/),
     # NOTE: again, actual permitted label names are very broad in the IL
     # (broader than ID names, in fact)
     TokenDef.new(TokenType::Label, /[\w!@$^&*()\-+=\[\];"',.?\/<>]+:/),
     # just a modified version of the label regex
     TokenDef.new(TokenType::JumpTarget, /[\w!@$^&*()\-+=\[\];"',.?\/<>]+/),
-    TokenDef.new(TokenType::Jump, /jmp/),
-    TokenDef.new(TokenType::JumpZero, /jz/),
-    TokenDef.new(TokenType::JumpNotZero, /jnz/),
-    TokenDef.new(TokenType::Return, /ret/),
-    TokenDef.new(TokenType::Func, /func/),
     # NOTE: parentheses are absent here to make parsing easier (but of course
     # that isn't actually enforced in the IL)
     TokenDef.new(TokenType::FuncName, /[\w!@$^&*\-+=\[\]:;"',.?\/<>]+/),
-    TokenDef.new(TokenType::End, /end/),
-    TokenDef.new(TokenType::LeftParen, /\(/),
-    TokenDef.new(TokenType::RightParen, /\)/),
-    TokenDef.new(TokenType::Arrow, /->/),
-    TokenDef.new(TokenType::Call, /call/),
-    TokenDef.new(TokenType::Comma, /,/),
+
     # NOTE: TokenType::NewLine and ::EOF are special and do not need a TokenDef
   ], T::Array[TokenDef])
 end
