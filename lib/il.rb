@@ -165,6 +165,11 @@ module IL
       @key = @name
     end
 
+    sig { returns(String) }
+    def to_s
+      "%#{@number}"
+    end
+
     sig { params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == Register
@@ -378,6 +383,17 @@ module IL
     sig { params(values: T::Array[Value]).void }
     def initialize(values)
       @values = values
+    end
+
+    sig { returns(String) }
+    def to_s
+      val_str = ""
+      @values.each { |v|
+        val_str += "#{v.to_s}, "
+      }
+      val_str.chomp!(", ")
+
+      "phi (#{val_str})"
     end
 
     sig { params(other: T.untyped).returns(T::Boolean) }
