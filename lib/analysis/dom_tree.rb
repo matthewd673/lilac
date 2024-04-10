@@ -67,6 +67,7 @@ class Analysis::DomTree < Graph
       # find idom and create an edge from it to this block
       idom = compute_idom(cfg_facts, b)
 
+      puts "idom: #{idom}"
       if not idom # should only be true for ENTRY
         next
       end
@@ -101,8 +102,8 @@ class Analysis::DomTree < Graph
     end
 
     # recursively check all predecessors
-    cfg.each_predecessor(block) { |b|
-      dist = find_dom_dist(cfg, block, dom, dist + 1)
+    cfg.each_predecessor(block) { |p|
+      dist = find_dom_dist(cfg, p, dom, dist + 1)
       if dist >= 0
         return dist
       end

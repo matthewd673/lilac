@@ -118,13 +118,13 @@ class Graph
     if not @successors[from]
       @successors[from] = Set[]
     end
-    T.unsafe(@successors[from]).push(to)
+    T.unsafe(@successors[from]).add(to)
 
     # add "from" to "to"s predecessors
     if not @predecessors[to]
       @predecessors[to] = Set[]
     end
-    T.unsafe(@predecessors[to]).push(from)
+    T.unsafe(@predecessors[to]).add(from)
   end
 
   sig { params(edge: Edge[Node]).void }
