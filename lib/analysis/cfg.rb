@@ -72,6 +72,8 @@ class Analysis::CFG < Graph
     # just in case this gets run more than once
     @nodes.clear
     @edges.clear
+    @predecessors.clear
+    @successors.clear
 
     label_to_block = {} # label name to node beginning with that label
 
@@ -99,7 +101,7 @@ class Analysis::CFG < Graph
         end
 
         # create an edge to the target block
-        @edges.push(Edge.new(b, successor))
+        create_edge(b, successor)
 
         # if jump is NOT conditional then stop after creating this edge
         if last.class == IL::Jump
@@ -110,9 +112,9 @@ class Analysis::CFG < Graph
       # create edge to next block
       following = block_list[b.id + 1]
       if following
-        @edges.push(Edge.new(b, following))
+        create_edge(b, following)
       else # reached the end, point to exit
-        @edges.push(Edge.new(b, @exit))
+        create_edge(b, @exit)
       end
     }
 
@@ -121,7 +123,7 @@ class Analysis::CFG < Graph
     if not first_block
       first_block = @exit
     end
-    @edges.push(Edge.new(@entry, first_block))
+    create_edge(entry, first_block)
 
     # add entry and exit block nodes to graph
     @nodes.insert(0, @entry)

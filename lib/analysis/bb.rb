@@ -77,11 +77,8 @@ class Analysis::BB
     elsif id == Analysis::CFG::EXIT
       id_str = "EXIT"
     end
-    str = "[#{id_str}]\n"
-    each_stmt { |s|
-      str += "  #{s.to_s}\n"
-    }
-    return str
+
+    "BB##{id_str}"
   end
 
   sig { params(other: Analysis::BB).returns(T::Boolean) }
