@@ -50,28 +50,6 @@ class SSA < Pass
     # find global names and add phi functions
     find_globals
     rewrite_with_phi_funcs
-
-    # TODO: temporary debug printing
-    @cfg.each_node { |b|
-      puts("[#{b}]")
-      b.each_stmt { |s|
-        puts(s)
-      }
-      puts
-    }
-
-    # perform renaming
-    puts "Renaming globals"
-    rename_globals(dom_tree)
-
-    # TODO: temporary debug printing
-    @cfg.each_node { |b|
-      puts("[#{b}]")
-      b.each_stmt { |s|
-        puts(s)
-      }
-      puts
-    }
   end
 
   private
@@ -128,7 +106,7 @@ class SSA < Pass
           phi = IL::Definition.new(IL::Type::I32, # TODO: correct types
                                    IL::ID.new(name),
                                    IL::Phi.new([])) # ids will be filled later
-          d.unshift_stmt(phi)
+          d.stmt_list.unshift(phi)
 
           work_list = work_list | [d]
         }
@@ -139,7 +117,7 @@ class SSA < Pass
   sig { params(block: BB, name: String).returns(T.nilable(IL::Phi)) }
   def find_phi(block, name)
     # scan block statements in order for matching phi
-    block.each_stmt { |s|
+    block.stmt_list.each { |s|
       # blocks often start with a label, skip this
       if s.is_a?(IL::Label)
         next
@@ -171,7 +149,7 @@ class SSA < Pass
     @cfg.each_node { |b|
       var_kill = T.let(Set[], T::Set[String])
       # for each statement in b
-      b.each_stmt { |s|
+      b.stmt_list.each { |s|
         case s
         when IL::Definition
           # add names on rhs to globals
@@ -282,7 +260,7 @@ class SSA < Pass
                dom_tree: DomTree).void }
   def rename(block, counter, stack, dom_tree)
     # for each phi function in block, rewrite lhs with new_name
-    block.each_stmt { |s|
+    block.stmt_list.each { |s|
       if s.is_a?(IL::Label)
         next
       end
@@ -296,7 +274,7 @@ class SSA < Pass
     }
 
     # for each definition in block
-    block.each_stmt { |s|
+    block.stmt_list.each { |s|
       # skip past Phi definitions since those were handled above
       if (not s.is_a?(IL::Definition)) or s.rhs.is_a?(IL::Phi)
         next
@@ -336,7 +314,7 @@ class SSA < Pass
 
     # for each definition (and each phi function, which are always definitions
     # in this IL), pop stack[lhs]
-    block.each_stmt { |s|
+    block.stmt_list.each { |s|
       if not s.is_a?(IL::Definition)
         next
       end

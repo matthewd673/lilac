@@ -63,7 +63,7 @@ class Analysis::ReachingDefs < DFA
     @kill[b] = Set[]
 
     # find all definitions in block
-    b.each_stmt { |s|
+    b.stmt_list.each { |s|
       # only definitions are relevant
       if not s.is_a?(IL::Definition)
         next
@@ -82,7 +82,7 @@ class Analysis::ReachingDefs < DFA
     all = Set[]
 
     cfg.each_block { |b|
-      b.each_stmt { |s|
+      b.stmt_list.each { |s|
         # only definitions are relevant
         if not s.is_a?(IL::Definition)
           next

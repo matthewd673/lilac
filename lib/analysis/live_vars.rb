@@ -59,7 +59,7 @@ class Analysis::LiveVars < Analysis::DFA
     @gen[b] = Set[]
     @kill[b] = Set[]
 
-    b.each_stmt { |s|
+    b.stmt_list.each { |s|
       if not s.is_a?(IL::Definition)
         next
       end

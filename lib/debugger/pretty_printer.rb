@@ -58,7 +58,7 @@ class Debugger::PrettyPrinter
   def print_blocks(blocks)
     blocks.each { |b|
       puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))
-      b.each_stmt_with_index { |s, i|
+      b.stmt_list.each_with_index { |s, i|
         puts(@visitor.visit(s))
       }
     }

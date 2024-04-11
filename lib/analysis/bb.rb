@@ -13,7 +13,12 @@ class Analysis::BB
   attr_reader :id
 
   sig { returns(T.nilable(IL::Label)) }
+  # The Label that marks the entry of the block (if one exists)
   attr_reader :entry
+
+  sig { returns(T::Array[IL::Statement]) }
+  # The Statements in the block.
+  attr_reader :stmt_list
 
   sig { params(id: Integer,
                entry: T.nilable(IL::Label),
@@ -37,40 +42,6 @@ class Analysis::BB
   #   Statement list.
   def empty?
     @stmt_list.empty?
-  end
-
-  sig { params(block: T.proc.params(arg0: IL::Statement).void).void }
-  def each_stmt(&block)
-    @stmt_list.each(&block)
-  end
-
-  sig { params(block: T.proc.params(arg0: IL::Statement, arg1: Integer).void)
-          .void }
-  def each_stmt_with_index(&block)
-    @stmt_list.each_with_index(&block)
-  end
-
-  sig { returns(T.nilable(IL::Statement)) }
-  # Get the first Statement in the block.
-  # @return [T.nilable(IL::Statement)] The first Statement in the block.
-  #   If the block is empty this will be nil.
-  def first_stmt
-    if @stmt_list.empty? then return nil end
-    return @stmt_list[0]
-  end
-
-  sig { returns(T.nilable(IL::Statement)) }
-  # Get the last Statement in the block.
-  # @return [T.nilable(IL::Statement)] The last Statement in the block.
-  #   If the block is empty this will be nil.
-  def last_stmt
-    if @stmt_list.empty? then return nil end
-    return @stmt_list[-1]
-  end
-
-  sig { params(stmt: IL::Statement).void }
-  def unshift_stmt(stmt)
-    @stmt_list.unshift(stmt)
   end
 
   sig { returns(String) }
@@ -116,7 +87,7 @@ class Analysis::BB
   def self.to_stmt_list(bb_list)
     stmt_list = []
     bb_list.each { |b|
-      b.each_stmt { |s|
+      b.stmt_list.each { |s|
         stmt_list.push(s)
       }
     }

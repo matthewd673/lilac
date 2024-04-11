@@ -27,7 +27,7 @@ class Optimization::LVN < OptimizationPass
     value_number_map = ValueNumberMap.new
     id_number_map = IDNumberMap.new
 
-    block.each_stmt { |s|
+    block.stmt_list.each { |s|
       # perform constant folding on conditional jump conditions
       # this is a bonus on top of LVN's core task
       if s.is_a?(IL::JumpZero) or s.is_a?(IL::JumpNotZero)

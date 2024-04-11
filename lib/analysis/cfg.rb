@@ -86,7 +86,7 @@ class Analysis::CFG < Graph
 
     # connect blocks into graph nodes
     block_list.each { |b|
-      last = b.last_stmt
+      last = b.stmt_list[-1]
       if not last then next end
 
       # create edge for jump
