@@ -87,8 +87,8 @@ class Frontend::Scanner
       elsif @string.start_with?("\t")
         @string.delete_prefix!("\t")
         @scan_row += 1 # NOTE: assume tab size = 1
-      # trim comments
-      elsif @string.start_with?("#")
+      # trim annotations
+      elsif @string.start_with?("\"")
         while @string.length > 0 and (not @string[0] == "\n")
           @string = T.unsafe(@string[1..])
 

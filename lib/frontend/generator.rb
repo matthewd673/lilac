@@ -66,27 +66,51 @@ class Frontend::Generator
   }, Visitor::Lambda)
 
   VISIT_DEFINITION = T.let(-> (v, o, c) {
-    "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}"
+    annotation = ""
+    if o.annotation
+      annotation = " \" #{o.annotation}"
+    end
+    "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}#{annotation}"
   }, Visitor::Lambda)
 
   VISIT_LABEL = T.let(-> (v, o, c) {
-    "#{o.name}:"
+    annotation = ""
+    if o.annotation
+      annotation = " \" #{o.annotation}"
+    end
+    "#{o.name}:#{annotation}"
   }, Visitor::Lambda)
 
   VISIT_JUMP = T.let(-> (v, o, c) {
-    "jmp #{o.target}"
+    annotation = ""
+    if o.annotation
+      annotation = " \" #{o.annotation}"
+    end
+    "jmp #{o.target}#{annotation}"
   }, Visitor::Lambda)
 
   VISIT_JUMPZERO = T.let(-> (v, o, c) {
-    "jz #{v.visit(o.cond)} #{o.target}"
+    annotation = ""
+    if o.annotation
+      annotation = " \" #{o.annotation}"
+    end
+    "jz #{v.visit(o.cond)} #{o.target}#{annotation}"
   }, Visitor::Lambda)
 
   VISIT_JUMPNOTZERO = T.let(-> (v, o, c) {
-    "jnz #{v.visit(o.cond)} #{o.target}"
+    annotation = ""
+    if o.annotation
+      annotation = " \" #{o.annotation}"
+    end
+    "jnz #{v.visit(o.cond)} #{o.target}#{annotation}"
   }, Visitor::Lambda)
 
   VISIT_RETURN = T.let(-> (v, o, c) {
-    "ret #{v.visit(o.value)}"
+    annotation = ""
+    if o.annotation
+      annotation = " \" #{o.annotation}"
+    end
+    "ret #{v.visit(o.value)}#{annotation}"
   }, Visitor::Lambda)
 
   VISIT_FUNCPARAM = T.let(-> (v, o, c) {
