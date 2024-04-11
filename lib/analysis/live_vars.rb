@@ -60,7 +60,6 @@ class Analysis::LiveVars < Analysis::DFA
     @kill[b] = Set[]
 
     b.each_stmt { |s|
-      # TODO: someday will need to account for function calls
       if not s.is_a?(IL::Definition)
         next
       end
@@ -90,7 +89,7 @@ class Analysis::LiveVars < Analysis::DFA
     elsif node.is_a?(IL::UnaryOp)
       return find_vars(node.value)
     elsif node.is_a?(IL::ID)
-      return Set[node.name]
+      return Set[node.name] # TODO: should this be name or name#number?
     # TODO: will someday need a case for function calls
     end
 
