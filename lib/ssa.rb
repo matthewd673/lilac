@@ -22,8 +22,8 @@ class SSA < Pass
 
     # define some hashes and sets ahead of time for use later
     # NOTE: these constructions will be overwritten on run but thats ok for now
-    @globals = T.let(Set[], T::Set[IL::ID])
-    @blocks = T.let(Hash.new, T::Hash[IL::ID, T::Set[BB]])
+    @globals = T.let(Set[], T::Set[String])
+    @blocks = T.let(Hash.new, T::Hash[String, T::Set[BB]])
     @df_facts = T.let(CFGFacts.new(cfg), CFGFacts[BB])
 
     @id = T.let("ssa", String)
@@ -43,8 +43,6 @@ class SSA < Pass
     dom_cfg_facts = dominators.run
 
     dom_tree = DomTree.new(dom_cfg_facts)
-
-    puts Debugger::GraphVisualizer::generate_graphviz(dom_tree)
 
     dom_frontiers = DomFrontiers.new(@cfg, dom_tree)
     @df_facts = dom_frontiers.run
@@ -85,7 +83,7 @@ class SSA < Pass
 
     # create new block in the middle
     new_id = @cfg.max_block_id + 1
-    new_block = BB.new(new_id, [])
+    new_block = BB.new(new_id, stmt_list: [])
     @cfg.add_block(new_block)
 
     # create new edges to and from the new block
@@ -110,8 +108,8 @@ class SSA < Pass
   sig { void }
   def rewrite_with_phi_funcs
     # for each id in globals
-    @globals.each { |id|
-      work_list = @blocks[id]
+    @globals.each { |name|
+      work_list = @blocks[name]
       if not work_list
         work_list = Set[]
       end
@@ -121,17 +119,16 @@ class SSA < Pass
         # for each block in DF(b)
         @df_facts.get_fact(:df, b).each { |d|
           # if d has no phi function for id...
-          existing_phi = find_phi(d, id.name)
+          existing_phi = find_phi(d, name)
           if existing_phi # skip because it has a phi already
             next
           end
 
           # ...prepend phi for id in d and add d to work list
           phi = IL::Definition.new(IL::Type::I32, # TODO: correct types
-                                   id,
+                                   IL::ID.new(name),
                                    IL::Phi.new([])) # ids will be filled later
-
-          d.unshift_stmt(phi) # TODO: don't insert phis before label
+          d.unshift_stmt(phi)
 
           work_list = work_list | [d]
         }
@@ -168,30 +165,81 @@ class SSA < Pass
   sig { void }
   def find_globals
     @globals.clear
-    @blocks.clear
+    @blocks.clear # block sets will be created as we go
 
-    # run live vars and union all of the upwardly exposed sets
-    live_vars = LiveVars.new(@cfg)
-    facts = live_vars.run
-
+    # for each block b
     @cfg.each_node { |b|
-      facts.get_fact(:in, b).each { |id_name|
-        # NOTE: live vars gives us Strings but we want IL::IDs
-        # (these new IDs will all have number=0 which is find since the
-        #  program isn't in SSA yet)
-        id = IL::ID.new(id_name)
+      var_kill = T.let(Set[], T::Set[String])
+      # for each statement in b
+      b.each_stmt { |s|
+        case s
+        when IL::Definition
+          # add names on rhs to globals
+          names = get_rhs_names(s.rhs)
+          names.each { |n|
+            if not var_kill.include?(n)
+              @globals.add(n)
+            end
+          }
 
-        # add every id to globals set
-        @globals.add(id)
+          # add lhs to var_kill
+          var_kill.add(s.id.name)
 
-        # also note that this id was used within this block
-        if not @blocks[id]
-          @blocks[id] = Set[b]
-        else
-          T.unsafe(@blocks[id]).add(b)
+          # add this block to lhs's blocks set
+          if not @blocks[s.id.name]
+            @blocks[s.id.name] = Set[b]
+          else
+            T.unsafe(@blocks[s.id.name]).add(b)
+          end
+        when IL::JumpZero
+          # add conditional name to globals
+          names = get_rhs_names(s.cond)
+          names.each { |n| # there will only ever be one but whatever
+            if not var_kill.include?(n)
+              @globals.add(n)
+            end
+          }
+        when IL::JumpNotZero
+          # add conditional name to globals
+          names = get_rhs_names(s.cond)
+          names.each { |n| # there will only ever be one but whatever
+            if not var_kill.include?(n)
+              @globals.add(n)
+            end
+          }
+        when IL::Return
+          # add names on rhs to globals
+          names = get_rhs_names(s.value)
+          names.each { |n|
+            if not var_kill.include?(n)
+              @globals.add(n)
+            end
+          }
         end
       }
     }
+  end
+
+  sig { params(rhs: T.any(IL::Value, IL::Expression))
+          .returns(T::Set[String]) }
+  def get_rhs_names(rhs)
+    case rhs
+    when IL::Constant then return Set[]
+    when IL::ID then return Set[rhs.name]
+    when IL::BinaryOp
+      return get_rhs_names(rhs.left) | get_rhs_names(rhs.right)
+    when IL::UnaryOp then return get_rhs_names(rhs.value)
+    when IL::Call
+      names = T.let(Set[], T::Set[String])
+      rhs.args.each { |a|
+        names = names | get_rhs_names(a)
+      }
+      return names
+    # NOTE: Phi intentionally not supported here
+    #   no Phi functions should exist in the IL when this runs
+    else
+      raise("Unsupported rhs: #{rhs.class}")
+    end
   end
 
   sig { params(dom_tree: DomTree).void }
@@ -200,10 +248,9 @@ class SSA < Pass
     stack = Hash.new
 
     # initialize set for each id
-    @globals.each { |id|
-      puts id.name
-      counter[id.name] = 0
-      stack[id.name] = []
+    @globals.each { |name|
+      counter[name] = 0
+      stack[name] = []
     }
 
     # begin on root of dom tree (a.k.a. CFG entry)
@@ -216,12 +263,11 @@ class SSA < Pass
           .returns(IL::ID) }
   def new_name(name, counter, stack)
     # unsafes should never break
-    # puts "read i for #{name}"
     i = T.unsafe(counter[name])
     if not i
       # TODO: fully resolve this and remove this whole condition
       puts("WARN: i for #{name} was nil")
-      i = -1
+      i = 0
       stack[name] = [] # will be needed later
     end
     counter[name] = i + 1
@@ -251,7 +297,8 @@ class SSA < Pass
 
     # for each definition in block
     block.each_stmt { |s|
-      if not s.is_a?(IL::Definition)
+      # skip past Phi definitions since those were handled above
+      if (not s.is_a?(IL::Definition)) or s.rhs.is_a?(IL::Phi)
         next
       end
 
@@ -309,7 +356,6 @@ class SSA < Pass
     when IL::Phi then return
     when IL::ID
       # rewrite id with top of stack[name]
-      puts "read #{rhs.name}"
       rhs.number = T.unsafe(T.unsafe(stack[rhs.name])[-1])
     when IL::BinaryOp
       # recurse on operands

@@ -145,7 +145,6 @@ class Analysis::BB
 
       # don't push labels, they belong in the @entry attribute
       if not s.is_a?(IL::Label)
-        puts "pushing: #{s}"
         block_stmts.push(s)
       end
 
