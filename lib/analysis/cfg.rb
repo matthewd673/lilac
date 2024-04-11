@@ -33,8 +33,9 @@ class Analysis::CFG < Graph
   def initialize(block_list)
     super()
 
-    @entry = T.let(BB.new(ENTRY, []), BB)
-    @exit = T.let(BB.new(EXIT, []), BB)
+    @label_map = T.let(Hash.new, T::Hash[String, BB])
+    @entry = T.let(BB.new(ENTRY, stmt_list: []), BB)
+    @exit = T.let(BB.new(EXIT, stmt_list: []), BB)
 
     compute_graph(block_list)
   end
@@ -51,6 +52,9 @@ class Analysis::CFG < Graph
   # @param [BB] block The basic block to add.
   def add_block(block)
     @nodes.push(block)
+    if block.entry and block.entry.is_a?(IL::Label)
+      @label_map[T.unsafe(block.entry).name] = block
+    end
   end
 
   sig { returns(Integer) }
@@ -75,16 +79,9 @@ class Analysis::CFG < Graph
     @predecessors.clear
     @successors.clear
 
-    label_to_block = {} # label name to node beginning with that label
-
-    # remember which labels correspond to which blocks
+    # add all blocks to the graph nodes
     block_list.each { |b|
-      @nodes.push(b)
-
-      first = b.first_stmt
-      if first.is_a?(IL::Label)
-        label_to_block[first.name] = b
-      end
+      add_block(b)
     }
 
     # connect blocks into graph nodes
@@ -95,7 +92,7 @@ class Analysis::CFG < Graph
       # create edge for jump
       if last.is_a?(IL::Jump)
         # find block that jump is targeting
-        successor = label_to_block[last.target]
+        successor = @label_map[last.target]
         if not successor # this is unlikely but I think possible
           raise("CFG attempted to build edge to label that doesn't exist: \"#{last.target}\"")
         end

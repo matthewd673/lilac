@@ -12,9 +12,15 @@ class Analysis::BB
   # The unique ID of the block.
   attr_reader :id
 
-  sig { params(id: Integer, stmt_list: T::Array[IL::Statement]).void }
-  def initialize(id, stmt_list)
+  sig { returns(T.nilable(IL::Label)) }
+  attr_reader :entry
+
+  sig { params(id: Integer,
+               entry: T.nilable(IL::Label),
+               stmt_list: T::Array[IL::Statement]).void }
+  def initialize(id, entry: nil, stmt_list: [])
     @id = id
+    @entry = entry
     @stmt_list = stmt_list
   end
 
@@ -78,7 +84,13 @@ class Analysis::BB
       id_str = "EXIT"
     end
 
-    "BB##{id_str}"
+    str = "BB##{id_str}"
+
+    if @entry
+      str += " (entry=#{@entry})"
+    end
+
+    return str
   end
 
   sig { params(other: Analysis::BB).returns(T::Boolean) }
@@ -118,26 +130,40 @@ class Analysis::BB
   def self.create_blocks(stmt_list)
     blocks = []
     block_stmts = []
+    current_entry = T.let(nil, T.nilable(IL::Label))
 
     stmt_list.each { |s|
       # mark beginning of a block
-      if s.is_a?(IL::Label) and not block_stmts.empty?
-        blocks.push(Analysis::BB.new(blocks.length, block_stmts))
+      if s.is_a?(IL::Label) # and not block_stmts.empty?
+        # push previous block onto list
+        blocks.push(Analysis::BB.new(blocks.length,
+                                     entry: current_entry,
+                                     stmt_list: block_stmts))
         block_stmts = []
+        current_entry = s
       end
 
-      block_stmts.push(s)
+      # don't push labels, they belong in the @entry attribute
+      if not s.is_a?(IL::Label)
+        puts "pushing: #{s}"
+        block_stmts.push(s)
+      end
 
       # mark end of a block
-      if s.is_a?(IL::Jump) # block will never be empty due to above push
-        blocks.push(Analysis::BB.new(blocks.length, block_stmts))
+      if s.is_a?(IL::Jump)
+        blocks.push(Analysis::BB.new(blocks.length,
+                                     entry: current_entry,
+                                     stmt_list: block_stmts))
         block_stmts = []
+        current_entry = nil
       end
     }
 
     # scoop up stragglers
     if not block_stmts.empty?
-      blocks.push(Analysis::BB.new(blocks.length, block_stmts))
+      blocks.push(Analysis::BB.new(blocks.length,
+                                   entry: current_entry,
+                                   stmt_list: block_stmts))
     end
 
     return blocks
