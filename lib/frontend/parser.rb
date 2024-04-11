@@ -207,11 +207,18 @@ class Frontend::Parser
       return IL::Call.new(func_name, args)
     # phi function
     elsif see?(TokenType::Phi)
-      # TODO
-      raise("Unimplemented")
+      eat(TokenType::Phi)
+
+      # eat id list
+      eat(TokenType::LeftParen)
+      ids = []
+      parse_id_list(ids)
+      eat(TokenType::RightParen)
+
+      return IL::Phi.new(ids)
     end
 
-    raise("Unexpected token while parsing expression: #{@next_token}")
+    raise("Unexpected token while parsing expression: #{@next_token}, #{@next_token.image}")
   end
 
   sig { returns(IL::Value) }
@@ -285,6 +292,28 @@ class Frontend::Parser
     if see?(TokenType::Comma)
       eat(TokenType::Comma)
       parse_call_args(arg_list)
+    end
+  end
+
+  sig { params(id_list: T::Array[IL::ID]).void }
+  def parse_id_list(id_list)
+    id = nil
+    if see?(TokenType::ID)
+      id = id_from_string(eat(TokenType::ID).image)
+    elsif see?(TokenType::Register)
+      id = register_from_string(eat(TokenType::Register).image)
+    end
+
+    if not id
+      raise("Unexpected token when parsing ID list: #{@next_token}")
+    end
+
+    id_list.push(id)
+
+    # parse rest of list
+    if see?(TokenType::Comma)
+      eat(TokenType::Comma)
+      parse_id_list(id_list)
     end
   end
 
