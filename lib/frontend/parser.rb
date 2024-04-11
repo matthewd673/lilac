@@ -218,7 +218,7 @@ class Frontend::Parser
       return IL::Phi.new(ids)
     end
 
-    raise("Unexpected token while parsing expression: #{@next_token}, #{@next_token.image}")
+    raise("Unexpected token while parsing expression: #{@next_token}")
   end
 
   sig { returns(IL::Value) }
