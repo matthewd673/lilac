@@ -58,7 +58,7 @@ class Frontend::Scanner
     }
 
     if not best
-      raise("Invalid symbol") # TODO: nicer errors
+      raise("Invalid symbol: '#{@string[0]}'") # TODO: nicer errors
     end
 
     # trim best match from string and return

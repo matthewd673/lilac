@@ -156,4 +156,36 @@ class ParseFileTest < Minitest::Test
 
     assert program.eql?(expected)
   end
+
+  sig { void }
+  def test_parse_phi
+    expected = Program.new(stmt_list: [
+      Definition.new(Type::I32, ID.new("a"), Constant.new(Type::I32, 1)),
+      Definition.new(Type::I32, ID.new("b"), Constant.new(Type::I32, 2)),
+      Definition.new(Type::I32, Register.new(0),
+                     BinaryOp.new(BinaryOp::Operator::EQ,
+                                  ID.new("a"),
+                                  Constant.new(Type::I32, 1))),
+      JumpZero.new(Register.new(0), "L0"),
+      Definition.new(Type::I32, Register.new(1),
+                     BinaryOp.new(BinaryOp::Operator::MUL,
+                                  ID.new("b"),
+                                  Constant.new(Type::I32, 2))),
+      Definition.new(Type::I32, ID.new("b", number: 1), Register.new(0)),
+      Jump.new("L1"),
+      Label.new("L0"),
+      Definition.new(Type::I32, Register.new(2),
+                     BinaryOp.new(BinaryOp::Operator::ADD,
+                                  ID.new("b"),
+                                  Constant.new(Type::I32, 1))),
+      Definition.new(Type::I32, ID.new("b", number: 2), Register.new(0)),
+      Label.new("L1"),
+      Definition.new(Type::I32, ID.new("b", number: 3),
+                     Phi.new([ID.new("b", number: 1), ID.new("b", number: 2)])),
+      Definition.new(Type::I32, ID.new("c"), ID.new("b", number: 3)),
+    ])
+    program = Frontend::Parser::parse_file("test/il_programs/frontend/phi.txt")
+
+    assert program.eql?(expected)
+  end
 end
