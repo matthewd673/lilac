@@ -118,8 +118,8 @@ class Analysis::DFA
 
   sig { params(block: BB).void }
   def step_forwards(block)
-    @out[block] = transfer(block)
     @in[block] = meet(block)
+    @out[block] = transfer(block)
   end
 
   sig { void }
@@ -153,7 +153,7 @@ class Analysis::DFA
 
   sig { params(block: BB).void }
   def step_backwards(block)
-    @in[block] = transfer(block)
     @out[block] = meet(block)
+    @in[block] = transfer(block)
   end
 end

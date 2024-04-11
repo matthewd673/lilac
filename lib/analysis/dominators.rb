@@ -17,7 +17,7 @@ class Analysis::Dominators < Analysis::DFA
   def initialize(cfg)
     # gather all blocks
     @all_blocks = T.let(Set[], T::Set[Domain])
-    cfg.each_block { |b|
+    cfg.each_node { |b|
       @all_blocks.add(b)
     }
 
@@ -29,7 +29,7 @@ class Analysis::Dominators < Analysis::DFA
 
   sig { returns(CFGFacts[Domain]) }
   def run
-    @cfg.each_block { |b|
+    @cfg.each_node { |b|
       init_sets(b)
     }
 

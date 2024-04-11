@@ -88,8 +88,14 @@ class SSA < Pass
     # for each id in globals
     @globals.each { |name|
       work_list = @blocks[name]
+      processed = @blocks[name]
+
       if not work_list
         work_list = Set[]
+      end
+
+      if not processed
+        processed = Set[]
       end
 
       # for each block in work list
@@ -108,7 +114,13 @@ class SSA < Pass
                                    IL::Phi.new([])) # ids will be filled later
           d.stmt_list.unshift(phi)
 
-          work_list = work_list | [d]
+          # only add each block to this name's work list once
+          if not processed.include?(d)
+            work_list = work_list | [d]
+            processed = processed | [d]
+          else
+            puts "skipped"
+          end
         }
       }
     }
