@@ -11,7 +11,7 @@ class Analysis::DFA
 
   include Analysis
 
-  Domain = type_member
+  Domain = type_member {{ upper: Object }}
 
   # The Direction enum specifies if a DFA runs forwards or backwards.
   class Direction < T::Enum

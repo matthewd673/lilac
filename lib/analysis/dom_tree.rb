@@ -67,7 +67,6 @@ class Analysis::DomTree < Graph
       # find idom and create an edge from it to this block
       idom = compute_idom(cfg_facts, b)
 
-      puts "idom: #{idom}"
       if not idom # should only be true for ENTRY
         next
       end

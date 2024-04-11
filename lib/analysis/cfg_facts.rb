@@ -10,7 +10,7 @@ class Analysis::CFGFacts
 
   include Analysis
 
-  Domain = type_member
+  Domain = type_member {{ upper: Object }}
 
   sig { returns(CFG) }
   attr_reader :cfg
@@ -50,5 +50,24 @@ class Analysis::CFGFacts
     end
 
     return block_facts
+  end
+
+  sig { returns(String) }
+  def to_s
+    str = ""
+    @cfg.each_node { |b|
+      str += "#{b.id} => {\n"
+      @facts.keys.each { |k|
+        str += "  #{k} => {"
+        get_fact(k, b).each { |o|
+          str += o.to_s + ", "
+        }
+        str.chomp!(", ")
+        str += "},\n"
+      }
+      str += "},\n"
+    }
+    str.chomp!("\n")
+    return str
   end
 end
