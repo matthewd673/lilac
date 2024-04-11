@@ -377,23 +377,23 @@ module IL
   # A Phi function is an Expression that combines multiple possible SSA
   # values at a join node.
   class Phi < Expression
-    sig { returns(T::Array[Value]) }
-    attr_reader :values
+    sig { returns(T::Array[ID]) }
+    attr_reader :ids
 
-    sig { params(values: T::Array[Value]).void }
-    def initialize(values)
-      @values = values
+    sig { params(ids: T::Array[ID]).void }
+    def initialize(ids)
+      @ids = ids
     end
 
     sig { returns(String) }
     def to_s
-      val_str = ""
-      @values.each { |v|
-        val_str += "#{v.to_s}, "
+      ids_str = ""
+      @ids.each { |id|
+        ids_str += "#{id.to_s}, "
       }
-      val_str.chomp!(", ")
+      ids_str.chomp!(", ")
 
-      "phi (#{val_str})"
+      "phi (#{ids_str})"
     end
 
     sig { params(other: T.untyped).returns(T::Boolean) }
@@ -404,7 +404,7 @@ module IL
 
       other = T.cast(other, Phi)
 
-      values.eql?(other.values)
+      ids.eql?(other.ids)
     end
   end
 
@@ -428,7 +428,7 @@ module IL
     sig { returns(Type) }
     attr_reader :type
     sig { returns(ID) }
-    attr_reader :id
+    attr_accessor :id
     sig { returns(T.any(Expression, Value)) }
     attr_accessor :rhs
 
