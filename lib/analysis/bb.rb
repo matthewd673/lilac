@@ -16,16 +16,22 @@ class Analysis::BB
   # The Label that marks the entry of the block (if one exists)
   attr_reader :entry
 
+  sig { returns(T.nilable(IL::Jump)) }
+  # The Jmp that marks the exit of the block (if one exists)
+  attr_reader :exit
+
   sig { returns(T::Array[IL::Statement]) }
   # The Statements in the block.
   attr_reader :stmt_list
 
   sig { params(id: Integer,
                entry: T.nilable(IL::Label),
+               exit: T.nilable(IL::Jump),
                stmt_list: T::Array[IL::Statement]).void }
-  def initialize(id, entry: nil, stmt_list: [])
+  def initialize(id, entry: nil, exit: nil, stmt_list: [])
     @id = id
     @entry = entry
+    @exit = exit
     @stmt_list = stmt_list
   end
 
@@ -57,8 +63,16 @@ class Analysis::BB
 
     str = "BB##{id_str}"
 
-    if @entry
-      str += " (entry=#{@entry})"
+    if @entry or @exit
+      str += " ("
+      if @entry
+        str += "entry=#{@entry.class} '#{@entry.name}', "
+      end
+      if @exit
+        str += "exit=#{@exit.class} '#{@exit.to_s}'"
+      end
+      str.chomp!(", ")
+      str += ")"
     end
 
     return str
@@ -105,17 +119,21 @@ class Analysis::BB
 
     stmt_list.each { |s|
       # mark beginning of a block
-      if s.is_a?(IL::Label) # and not block_stmts.empty?
-        # push previous block onto list
-        blocks.push(Analysis::BB.new(blocks.length,
-                                     entry: current_entry,
-                                     stmt_list: block_stmts))
-        block_stmts = []
+      if s.is_a?(IL::Label)
+        if not block_stmts.empty?
+          # push previous block onto list (exit is nil)
+          blocks.push(Analysis::BB.new(blocks.length,
+                                       entry: current_entry,
+                                       stmt_list: block_stmts))
+          block_stmts = []
+        end
+
         current_entry = s
       end
 
-      # don't push labels, they belong in the @entry attribute
-      if not s.is_a?(IL::Label)
+      # don't push labels or jumps
+      # they belong in @entry or @exit
+      if not (s.is_a?(IL::Label) or s.is_a?(IL::Jump))
         block_stmts.push(s)
       end
 
@@ -123,6 +141,7 @@ class Analysis::BB
       if s.is_a?(IL::Jump)
         blocks.push(Analysis::BB.new(blocks.length,
                                      entry: current_entry,
+                                     exit: s,
                                      stmt_list: block_stmts))
         block_stmts = []
         current_entry = nil
