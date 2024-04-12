@@ -4,6 +4,7 @@ require_relative "../graph"
 require_relative "analysis"
 require_relative "bb"
 
+# A CFG is a type of +Graph+ used to represent control flow graphs.
 class Analysis::CFG < Graph
   extend T::Sig
   extend T::Generic
@@ -12,6 +13,8 @@ class Analysis::CFG < Graph
 
   Node = type_member {{ fixed: BB }}
 
+  # A +CFG::Edge+ is a +Graph::Edge+ that stores additional information
+  # relevant for CFGs. All Edges in a CFG should be of this type.
   class Edge < Graph::Edge
     extend T::Sig
     extend T::Generic
@@ -55,6 +58,10 @@ class Analysis::CFG < Graph
   attr_reader :exit
 
   sig { params(block_list: T::Array[BB]).void }
+  # Construct a new CFG from a list of basic blocks.
+  #
+  # @param [T::Array[BB]] block_list The list of basic blocks which will be the
+  #   nodes of this CFG.
   def initialize(block_list)
     super()
 

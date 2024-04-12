@@ -122,7 +122,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#values-instance_method" title="#values (instance method)">#<strong>values</strong>  &#x21d2; Object </a>
+      <a href="#ids-instance_method" title="#ids (instance method)">#<strong>ids</strong>  &#x21d2; Object </a>
     
 
     
@@ -142,7 +142,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute values.</p>
+<p>Returns the value of attribute ids.</p>
 </div></span>
   
 </li>
@@ -164,7 +164,29 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(values)  &#x21d2; Phi </a>
+      <a href="#eql%3F-instance_method" title="#eql? (instance method)">#<strong>eql?</strong>(other)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(ids)  &#x21d2; Phi </a>
     
 
     
@@ -183,6 +205,28 @@
     <span class="summary_desc"><div class='inline'>
 <p>A new instance of Phi.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_s-instance_method" title="#to_s (instance method)">#<strong>to_s</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -208,7 +252,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(values)  &#x21d2; <tt><span class='object_link'><a href="" title="IL::Phi (class)">Phi</a></span></tt> 
+    #<strong>initialize</strong>(ids)  &#x21d2; <tt><span class='object_link'><a href="" title="IL::Phi (class)">Phi</a></span></tt> 
   
 
   
@@ -231,15 +275,15 @@
       <pre class="lines">
 
 
-301
-302
-303</pre>
+385
+386
+387</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 301</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 385</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_values'>values</span><span class='rparen'>)</span>
-  <span class='ivar'>@values</span> <span class='op'>=</span> <span class='id identifier rubyid_values'>values</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='rparen'>)</span>
+  <span class='ivar'>@ids</span> <span class='op'>=</span> <span class='id identifier rubyid_ids'>ids</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -254,9 +298,9 @@
       
       <span id=""></span>
       <div class="method_details first">
-  <h3 class="signature first" id="values-instance_method">
+  <h3 class="signature first" id="ids-instance_method">
   
-    #<strong>values</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+    #<strong>ids</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -265,7 +309,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute values.</p>
+<p>Returns the value of attribute ids.</p>
 
 
   </div>
@@ -279,15 +323,15 @@
       <pre class="lines">
 
 
-298
-299
-300</pre>
+382
+383
+384</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 298</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 382</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_values'>values</span>
-  <span class='ivar'>@values</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_ids'>ids</span>
+  <span class='ivar'>@ids</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -297,10 +341,122 @@
   </div>
 
 
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="eql?-instance_method">
+  
+    #<strong>eql?</strong>(other)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+401
+402
+403
+404
+405
+406
+407
+408
+409</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 401</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="" title="IL::Phi (class)">Phi</a></span></span>
+    <span class='kw'>return</span> <span class='kw'>false</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_other'>other</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_cast'>cast</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="" title="IL::Phi (class)">Phi</a></span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_ids'>ids</span><span class='period'>.</span><span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_ids'>ids</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_s-instance_method">
+  
+    #<strong>to_s</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+390
+391
+392
+393
+394
+395
+396
+397
+398</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 390</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_ids_str'>ids_str</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='ivar'>@ids</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_id'>id</span><span class='op'>|</span>
+    <span class='id identifier rubyid_ids_str'>ids_str</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='embexpr_end'>}</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span>
+  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_ids_str'>ids_str</span><span class='period'>.</span><span class='id identifier rubyid_chomp!'>chomp!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>phi (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ids_str'>ids_str</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
 </div>
 
       <div id="footer">
-  Generated on Sat Apr  6 19:23:38 2024 by
+  Generated on Fri Apr 12 18:45:45 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

@@ -2,7 +2,7 @@
 require "sorbet-runtime"
 
 # A Graph is a generic data structure representing a graph with nodes and
-# edges.
+# directed edges.
 class Graph
   extend T::Sig
   extend T::Generic
@@ -53,16 +53,22 @@ class Graph
   end
 
   sig { params(block: T.proc.params(arg0: Node).void).void }
+  # Iterate over every node in the graph.
   def each_node(&block)
     @nodes.each(&block)
   end
 
   sig { params(block: T.proc.params(arg0: Edge[Node]).void).void }
+  # Iterate over every edge in the graph.
   def each_edge(&block)
     @edges.each(&block)
   end
 
   sig { params(node: Node, block: T.proc.params(arg0: Edge[Node]).void).void }
+  # Iterate over every incoming edge of a given node in the graph.
+  # Incoming edges are edges that terminate at the node.
+  #
+  # @param [Node] node The node to iterate for.
   def each_incoming(node, &block)
     incoming = @incoming[node]
     if not incoming
@@ -73,6 +79,10 @@ class Graph
   end
 
   sig { params(node: Node, block: T.proc.params(arg0: Edge[Node]).void).void }
+  # Iterate over every outgoing edge of a given node in the graph.
+  # Outgoing edges are edges that originate at the node.
+  #
+  # @param [Node] node The node to iterate for.
   def each_outgoing(node, &block)
     outgoing = @outgoing[node]
     if not outgoing
@@ -83,12 +93,18 @@ class Graph
   end
 
   sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
+  # Iterate over every predecessor of a given node in the graph.
+  #
+  # @param [Node] node The node to iterate for.
   def each_predecessor(node, &block)
     each_incoming(node) { |e|
       yield e.from
     }
   end
 
+  # Iterate over every successor of a given node in the graph.
+  #
+  # @param [Node] node The node to iterate for.
   sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
   def each_successor(node, &block)
     each_outgoing(node) { |e|
@@ -127,6 +143,9 @@ class Graph
   end
 
   sig { params(node: Node).void }
+  # Add a node to the graph.
+  #
+  # @param [Node] node The node to add.
   def add_node(node)
     @nodes.push(node)
   end

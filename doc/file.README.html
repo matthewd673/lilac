@@ -62,6 +62,8 @@
 
 <p><img src="https://github.com/matthewd673/lilac/actions/workflows/ruby.yml/badge.svg"></p>
 
+<p>Lilac is a small compiler “middle end” written in Ruby.</p>
+
 <h2 id="label-Build+and+run">Build and run</h2>
 
 <p>Lilac uses <a href="https://github.com/rbenv/rbenv">rbenv</a> to manage its Ruby version.</p>
@@ -80,14 +82,25 @@ cd ~/.../other_gem
 gem install --local ~/.../lilac/lilac-X.X.X.gem
 </code></pre>
 
+<h3 id="label-CLI">CLI</h3>
+
 <p>Lilac also has a very simple CLI that can be run with the following:</p>
 
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_ruby'>ruby</span> <span class='id identifier rubyid_lib'>lib</span><span class='op'>/</span><span class='id identifier rubyid_lilac'>lilac</span><span class='period'>.</span><span class='id identifier rubyid_rb'>rb</span>
 </code></pre>
+
+<p>The Lilac CLI includes tools for printing information about Lilac and parsing Lilac IL source code files.</p>
+
+<h3 id="label-Tests">Tests</h3>
+
+<p>To run Lilac’s tests:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_rake'>rake</span> <span class='id identifier rubyid_test'>test</span>
+</code></pre>
 </div></div>
 
       <div id="footer">
-  Generated on Sat Apr  6 19:23:38 2024 by
+  Generated on Fri Apr 12 18:45:45 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

@@ -111,6 +111,27 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>A CFG is a type of <code>Graph</code> used to represent control flow graphs.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="CFG/Edge.html" title="Analysis::CFG::Edge (class)">Edge</a></span>
+    
+  
+</p>
 
   
     <h2>
@@ -123,7 +144,7 @@
         <dt id="Node-constant" class="">Node =
           
         </dt>
-        <dd><pre class="code"><span class='id identifier rubyid_type_member'>type_member</span> <span class='lbrace'>{</span> <span class='lbrace'>{</span> <span class='label'>fixed:</span> <span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span> <span class='rbrace'>}</span> <span class='rbrace'>}</span></pre></dd>
+        <dd><pre class="code"><span class='id identifier rubyid_type_member'>type_member</span> <span class='lbrace'>{</span><span class='lbrace'>{</span> <span class='label'>fixed:</span> <span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span> <span class='rbrace'>}</span><span class='rbrace'>}</span></pre></dd>
       
         <dt id="ENTRY-constant" class="">ENTRY =
           <div class="docstring">
@@ -241,7 +262,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#add_block-instance_method" title="#add_block (instance method)">#<strong>add_block</strong>(block)  &#x21d2; Object </a>
+      <a href="#add_node-instance_method" title="#add_node (instance method)">#<strong>add_node</strong>(node)  &#x21d2; Object </a>
     
 
     
@@ -306,7 +327,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>A new instance of CFG.</p>
+<p>Construct a new CFG from a list of basic blocks.</p>
 </div></span>
   
 </li>
@@ -357,7 +378,7 @@
   
   
   <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../Graph.html" title="Graph (class)">Graph</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="../Graph.html#create_edge-instance_method" title="Graph#create_edge (method)">#create_edge</a></span>, <span class='object_link'><a href="../Graph.html#delete_edge-instance_method" title="Graph#delete_edge (method)">#delete_edge</a></span>, <span class='object_link'><a href="../Graph.html#each_edge-instance_method" title="Graph#each_edge (method)">#each_edge</a></span>, <span class='object_link'><a href="../Graph.html#each_node-instance_method" title="Graph#each_node (method)">#each_node</a></span>, <span class='object_link'><a href="../Graph.html#each_predecessor-instance_method" title="Graph#each_predecessor (method)">#each_predecessor</a></span>, <span class='object_link'><a href="../Graph.html#each_successor-instance_method" title="Graph#each_successor (method)">#each_successor</a></span>, <span class='object_link'><a href="../Graph.html#predecessors_length-instance_method" title="Graph#predecessors_length (method)">#predecessors_length</a></span>, <span class='object_link'><a href="../Graph.html#successors_length-instance_method" title="Graph#successors_length (method)">#successors_length</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="../Graph.html#add_edge-instance_method" title="Graph#add_edge (method)">#add_edge</a></span>, <span class='object_link'><a href="../Graph.html#delete_edge-instance_method" title="Graph#delete_edge (method)">#delete_edge</a></span>, <span class='object_link'><a href="../Graph.html#each_edge-instance_method" title="Graph#each_edge (method)">#each_edge</a></span>, <span class='object_link'><a href="../Graph.html#each_incoming-instance_method" title="Graph#each_incoming (method)">#each_incoming</a></span>, <span class='object_link'><a href="../Graph.html#each_node-instance_method" title="Graph#each_node (method)">#each_node</a></span>, <span class='object_link'><a href="../Graph.html#each_outgoing-instance_method" title="Graph#each_outgoing (method)">#each_outgoing</a></span>, <span class='object_link'><a href="../Graph.html#each_predecessor-instance_method" title="Graph#each_predecessor (method)">#each_predecessor</a></span>, <span class='object_link'><a href="../Graph.html#each_successor-instance_method" title="Graph#each_successor (method)">#each_successor</a></span>, <span class='object_link'><a href="../Graph.html#predecessors_length-instance_method" title="Graph#predecessors_length (method)">#predecessors_length</a></span>, <span class='object_link'><a href="../Graph.html#successors_length-instance_method" title="Graph#successors_length (method)">#successors_length</a></span></p>
 
   
   <div id="constructor_details" class="method_details_list">
@@ -375,13 +396,33 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns a new instance of CFG.</p>
+<p>Construct a new CFG from a list of basic blocks.</p>
 
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>block_list</span>
+      
+      
+        <span class='type'>(<tt>T::Array[<span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span>]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The list of basic blocks which will be the nodes of this CFG.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 
 </div><table class="source_code">
   <tr>
@@ -389,21 +430,27 @@
       <pre class="lines">
 
 
-33
-34
-35
-36
-37
-38</pre>
+65
+66
+67
+68
+69
+70
+71
+72
+73</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 65</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_block_list'>block_list</span><span class='rparen'>)</span>
-  <span class='ivar'>@entry</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB.html#initialize-instance_method" title="Analysis::BB#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#ENTRY-constant" title="Analysis::CFG::ENTRY (constant)">ENTRY</a></span></span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rparen'>)</span>
-  <span class='ivar'>@exit</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB.html#initialize-instance_method" title="Analysis::BB#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#EXIT-constant" title="Analysis::CFG::EXIT (constant)">EXIT</a></span></span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='rparen'>)</span>
 
-  <span class='id identifier rubyid_calculate_graph'>calculate_graph</span><span class='lparen'>(</span><span class='id identifier rubyid_block_list'>block_list</span><span class='rparen'>)</span>
+  <span class='ivar'>@label_map</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@entry</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB.html#initialize-instance_method" title="Analysis::BB#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#ENTRY-constant" title="Analysis::CFG::ENTRY (constant)">ENTRY</a></span></span><span class='comma'>,</span> <span class='label'>stmt_list:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rparen'>)</span>
+  <span class='ivar'>@exit</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BB.html#initialize-instance_method" title="Analysis::BB#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#EXIT-constant" title="Analysis::CFG::EXIT (constant)">EXIT</a></span></span><span class='comma'>,</span> <span class='label'>stmt_list:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_compute_graph'>compute_graph</span><span class='lparen'>(</span><span class='id identifier rubyid_block_list'>block_list</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -461,12 +508,12 @@
       <pre class="lines">
 
 
-24
-25
-26</pre>
+52
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_entry'>entry</span>
   <span class='ivar'>@entry</span>
@@ -522,12 +569,12 @@
       <pre class="lines">
 
 
-30
-31
-32</pre>
+58
+59
+60</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 58</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_exit'>exit</span>
   <span class='ivar'>@exit</span>
@@ -545,9 +592,9 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="add_block-instance_method">
+  <h3 class="signature first" id="add_node-instance_method">
   
-    #<strong>add_block</strong>(block)  &#x21d2; <tt>Object</tt> 
+    #<strong>add_node</strong>(node)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -567,7 +614,7 @@
   
     <li>
       
-        <span class='name'>block</span>
+        <span class='name'>node</span>
       
       
         <span class='type'>(<tt><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></tt>)</span>
@@ -590,15 +637,21 @@
       <pre class="lines">
 
 
-50
-51
-52</pre>
+85
+86
+87
+88
+89
+90</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 85</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_add_block'>add_block</span><span class='lparen'>(</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_add_node'>add_node</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_entry'>entry</span> <span class='kw'>and</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/Label.html" title="IL::Label (class)">Label</a></span></span><span class='rparen'>)</span>
+    <span class='ivar'>@label_map</span><span class='lbracket'>[</span><span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_unsafe'>unsafe</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_entry'>entry</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -631,12 +684,12 @@
       <pre class="lines">
 
 
-42
-43
-44</pre>
+77
+78
+79</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 77</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each_block'>each_block</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_each_node'>each_node</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -690,16 +743,16 @@
       <pre class="lines">
 
 
-58
-59
-60
-61
-62
-63
-64</pre>
+96
+97
+98
+99
+100
+101
+102</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/cfg.rb', line 96</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_max_block_id'>max_block_id</span>
   <span class='id identifier rubyid_max'>max</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span> <span class='comment'># also = to ENTRY so be careful
@@ -718,7 +771,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Apr  6 19:23:39 2024 by
+  Generated on Fri Apr 12 18:45:46 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

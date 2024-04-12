@@ -190,7 +190,7 @@
         <span class='name'>program</span>
       
       
-        <span class='type'>(<tt><span class='object_link'><a href="IL/Program.html" title="IL::Program (class)">IL::Program</a></span></tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="IL/CFGProgram.html" title="IL::CFGProgram (class)">IL::CFGProgram</a></span></tt>)</span>
       
       
       
@@ -210,8 +210,6 @@
       <pre class="lines">
 
 
-20
-21
 22
 23
 24
@@ -242,21 +240,25 @@
 49
 50
 51
-52</pre>
+52
+53
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 22</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_interpret'>interpret</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='comma'>,</span> <span class='label'>validate:</span> <span class='kw'>true</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Interpreter/Context.html" title="Interpreter::Context (class)">Context</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Interpreter/Context.html#initialize-instance_method" title="Interpreter::Context#initialize (method)">new</a></span></span>
+  <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Interpreter/Context.html" title="Interpreter::Context (class)">Context</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Interpreter/Context.html#initialize-instance_method" title="Interpreter::Context#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_cfg'>cfg</span><span class='period'>.</span><span class='id identifier rubyid_entry'>entry</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_visitor'>visitor</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Visitor.html" title="Visitor (class)">Visitor</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Visitor.html#initialize-instance_method" title="Visitor#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='const'>VISIT_LAMBDAS</span><span class='rparen'>)</span>
 
   <span class='comment'># run all validations before interpreting
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_validate'>validate</span>
-    <span class='id identifier rubyid_validation_runner'>validation_runner</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Validation.html" title="Validation (module)">Validation</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Validation/ValidationRunner.html" title="Validation::ValidationRunner (class)">ValidationRunner</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Runner.html#initialize-instance_method" title="Runner#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_validation_runner'>validation_runner</span><span class='period'>.</span><span class='id identifier rubyid_run_passes'>run_passes</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Validation.html" title="Validation (module)">Validation</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Validation.html#VALIDATIONS-constant" title="Validation::VALIDATIONS (constant)">VALIDATIONS</a></span></span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
+</span>  <span class='comment'># TODO: update to work with CFG (or move all validations to tests)
+</span>  <span class='comment'># if validate
+</span>    <span class='comment'># validation_runner = Validation::ValidationRunner.new(program)
+</span>    <span class='comment'># validation_runner.run_passes(Validation::VALIDATIONS)
+</span>  <span class='comment'># end
+</span>
   <span class='comment'># collect all funcs in the program
 </span>  <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_funcs'>funcs</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_func'>each_func</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
@@ -264,14 +266,14 @@
   <span class='rbrace'>}</span>
 
   <span class='comment'># collect all labels in program -- including within functions
-</span>  <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_indices'>label_indices</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
-  <span class='id identifier rubyid_register_labels'>register_labels</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_indices'>label_indices</span><span class='comma'>,</span> <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_blocks'>label_blocks</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_register_labels'>register_labels</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_blocks'>label_blocks</span><span class='comma'>,</span> <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_cfg'>cfg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_each_func'>each_func</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
-    <span class='id identifier rubyid_register_labels'>register_labels</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_indices'>label_indices</span><span class='comma'>,</span> <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_register_labels'>register_labels</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_label_blocks'>label_blocks</span><span class='comma'>,</span> <span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_cfg'>cfg</span><span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 
   <span class='comment'># begin interpretation
-</span>  <span class='id identifier rubyid_interpret_stmt_list'>interpret_stmt_list</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='comma'>,</span> <span class='id identifier rubyid_visitor'>visitor</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_interpret_cfg'>interpret_cfg</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_cfg'>cfg</span><span class='comma'>,</span> <span class='id identifier rubyid_visitor'>visitor</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>---</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Interpretation complete</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -290,7 +292,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Apr  6 19:23:38 2024 by
+  Generated on Fri Apr 12 18:45:45 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

@@ -4,6 +4,9 @@ require_relative "frontend"
 require_relative "scanner"
 require_relative "../il"
 
+# A Parser can parse human-readable IL source code in +IL::Program+ objects.
+# It provides minimal error reporting as IL source code is not designed to
+# be handwritten (though it certainly can be).
 class Frontend::Parser
   # NOTE: Parser is adapted from Newt's Parser class
   extend T::Sig
@@ -11,6 +14,11 @@ class Frontend::Parser
   include Frontend
 
   sig { params(filename: String).returns(IL::Program) }
+  # Load a file and parse its contents into a program. This also handles the
+  # construction of a Parser internally.
+  #
+  # @param [String] filename The filename of the file to load.
+  # @return [IL::Program] The program represented by the file's source code.
   def self.parse_file(filename)
     fp = File.open(filename, "r")
     source = fp.read
@@ -21,6 +29,9 @@ class Frontend::Parser
   end
 
   sig { params(string: String).void }
+  # Construct a new Parser which will parse IL source code from the given string.
+  #
+  # @param [String] string The string of IL source code while will be parsed.
   def initialize(string)
     @scanner = T.let(Scanner.new(string), Scanner)
     @next_token = T.let(Token.new(TokenType::None, "", Position.new(0, 0)),
@@ -28,6 +39,9 @@ class Frontend::Parser
   end
 
   sig { returns(IL::Program) }
+  # Parse the IL source code in the Parser's string.
+  #
+  # @return [IL::Program] The program represented by the IL source code string.
   def parse
     @next_token = @scanner.scan_next
     return parse_program

@@ -109,7 +109,18 @@
   
 </div>
 
-<div id="subclasses">
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>A DFA is a generic framework for a data-flow analysis.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><div id="subclasses">
   <h2>Direct Known Subclasses</h2>
   <p class="children"><span class='object_link'><a href="Dominators.html" title="Analysis::Dominators (class)">Dominators</a></span>, <span class='object_link'><a href="LiveVars.html" title="Analysis::LiveVars (class)">LiveVars</a></span>, <span class='object_link'><a href="ReachingDefs.html" title="Analysis::ReachingDefs (class)">ReachingDefs</a></span></p>
 </div>
@@ -135,7 +146,7 @@
         <dt id="Domain-constant" class="">Domain =
           
         </dt>
-        <dd><pre class="code"><span class='id identifier rubyid_type_member'>type_member</span></pre></dd>
+        <dd><pre class="code"><span class='id identifier rubyid_type_member'>type_member</span> <span class='lbrace'>{</span><span class='lbrace'>{</span> <span class='label'>upper:</span> <span class='const'>Object</span> <span class='rbrace'>}</span><span class='rbrace'>}</span></pre></dd>
       
     </dl>
   
@@ -174,7 +185,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>A new instance of DFA.</p>
+<p>Construct a new DFA.</p>
 </div></span>
   
 </li>
@@ -183,7 +194,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>  &#x21d2; Object </a>
+      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>  &#x21d2; CFGFacts[Domain] </a>
     
 
     
@@ -197,7 +208,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Run the DFA on the CFG provided in the constructor.</p>
+</div></span>
   
 </li>
 
@@ -228,13 +241,81 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns a new instance of DFA.</p>
+<p>Construct a new DFA. Should only be called by subclasses of DFA which represent a specific analysis. These subclasses should then expose a much simpler constructor.</p>
 
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>direction</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="DFA/Direction.html" title="Analysis::DFA::Direction (class)">Direction</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The direction of the DFA.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>boundary</span>
+      
+      
+        <span class='type'>(<tt>T::Set[<span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span>]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The set of domain objects assigned to either <a href="ENTRY">OUT</a> or <a href="EXIT">IN</a> (depending on direction) when a run begins.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>init</span>
+      
+      
+        <span class='type'>(<tt>T::Set[<span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span>]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The set of domain objects assigned to <a href="block">IN</a> or <a href="block">OUT</a> (depending on direction) for every block when a run begins.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>cfg</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="CFG.html" title="Analysis::CFG (class)">CFG</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The CFG that the DFA will run on.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 
 </div><table class="source_code">
   <tr>
@@ -242,20 +323,20 @@
       <pre class="lines">
 
 
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35</pre>
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/analysis/dfa.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/dfa.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_direction'>direction</span><span class='comma'>,</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='comma'>,</span> <span class='id identifier rubyid_init'>init</span><span class='comma'>,</span> <span class='id identifier rubyid_cfg'>cfg</span><span class='rparen'>)</span>
   <span class='ivar'>@direction</span> <span class='op'>=</span> <span class='id identifier rubyid_direction'>direction</span>
@@ -263,10 +344,10 @@
   <span class='ivar'>@init</span> <span class='op'>=</span> <span class='id identifier rubyid_init'>init</span>
   <span class='ivar'>@cfg</span> <span class='op'>=</span> <span class='id identifier rubyid_cfg'>cfg</span>
 
-  <span class='ivar'>@out</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>Integer</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='ivar'>@in</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>Integer</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='ivar'>@gen</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>Integer</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='ivar'>@kill</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>Integer</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@out</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@in</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@gen</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@kill</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -283,27 +364,76 @@
       <div class="method_details first">
   <h3 class="signature first" id="run-instance_method">
   
-    #<strong>run</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>run</strong>  &#x21d2; <tt><span class='object_link'><a href="CFGFacts.html" title="Analysis::CFGFacts (class)">CFGFacts</a></span>[<span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span>]</tt> 
   
 
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Run the DFA on the CFG provided in the constructor.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="CFGFacts.html" title="Analysis::CFGFacts (class)">CFGFacts</a></span>[<span class='object_link'><a href="#Domain-constant" title="Analysis::DFA::Domain (constant)">Domain</a></span>]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The facts generated by the analysis. By default, DFAs output facts about each block’s IN, OUT, GEN, and KILL sets which are stored in symbols <code>:in</code>, <code>:out</code>, <code>:gen</code>, and <code>:kill</code> in this <code>CFGFacts</code> object.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-38
-39
-40</pre>
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/analysis/dfa.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/analysis/dfa.rb', line 58</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span>
-  <span class='id identifier rubyid_run_dfa'>run_dfa</span>
+  <span class='comment'># run the dfa
+</span>  <span class='id identifier rubyid_run_dfa'>run_dfa</span>
+
+  <span class='comment'># construct and return a CFGFacts object
+</span>  <span class='id identifier rubyid_facts'>facts</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="CFGFacts.html" title="Analysis::CFGFacts (class)">CFGFacts</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="CFGFacts.html#initialize-instance_method" title="Analysis::CFGFacts#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@cfg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_facts'>facts</span><span class='period'>.</span><span class='id identifier rubyid_add_fact_hash'>add_fact_hash</span><span class='lparen'>(</span><span class='symbol'>:out</span><span class='comma'>,</span> <span class='ivar'>@out</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_facts'>facts</span><span class='period'>.</span><span class='id identifier rubyid_add_fact_hash'>add_fact_hash</span><span class='lparen'>(</span><span class='symbol'>:in</span><span class='comma'>,</span> <span class='ivar'>@in</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_facts'>facts</span><span class='period'>.</span><span class='id identifier rubyid_add_fact_hash'>add_fact_hash</span><span class='lparen'>(</span><span class='symbol'>:gen</span><span class='comma'>,</span> <span class='ivar'>@gen</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_facts'>facts</span><span class='period'>.</span><span class='id identifier rubyid_add_fact_hash'>add_fact_hash</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='comma'>,</span> <span class='ivar'>@kill</span><span class='rparen'>)</span>
+
+  <span class='kw'>return</span> <span class='id identifier rubyid_facts'>facts</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -315,7 +445,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Apr  6 19:23:39 2024 by
+  Generated on Fri Apr 12 18:45:46 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

@@ -14,6 +14,12 @@ class Analysis::DomTree < Graph
   Node = type_member { { fixed: BB } }
 
   sig { params(dom_cfg_facts: CFGFacts[BB]).void }
+  # Construct a new dominator tree from the +CFGFacts+ produced by a
+  # dominators analysis.
+  #
+  # @param [CFGFacts[BB]] dom_cfg_facts The output of a dominators analysis
+  #   (such as that produced by +Analysis::Dominators+) which will be used
+  #   to compute the dominator tree.
   def initialize(dom_cfg_facts)
     super()
 

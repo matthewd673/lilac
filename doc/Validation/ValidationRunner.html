@@ -134,7 +134,7 @@
         <dt id="P-constant" class="">P =
           
         </dt>
-        <dd><pre class="code"><span class='id identifier rubyid_type_member'>type_member</span> <span class='lbrace'>{</span><span class='lbrace'>{</span> <span class='label'>upper:</span> <span class='const'><span class='object_link'><a href="ValidationPass.html" title="Validation::ValidationPass (class)">ValidationPass</a></span></span> <span class='rbrace'>}</span><span class='rbrace'>}</span></pre></dd>
+        <dd><pre class="code"><span class='id identifier rubyid_type_member'>type_member</span> <span class='lbrace'>{</span><span class='lbrace'>{</span> <span class='label'>fixed:</span> <span class='const'><span class='object_link'><a href="ValidationPass.html" title="Validation::ValidationPass (class)">ValidationPass</a></span></span> <span class='rbrace'>}</span><span class='rbrace'>}</span></pre></dd>
       
     </dl>
   
@@ -156,6 +156,41 @@
   <p class="inherited"><span class='object_link'><a href="../Runner.html#program-instance_method" title="Runner#program (method)">#program</a></span></p>
 
 
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run_pass-instance_method" title="#run_pass (instance method)">#<strong>run_pass</strong>(pass)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Run a ValidationPass on the program.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
 
   
   
@@ -171,10 +206,10 @@
   
   
   
-  <h2>Method Summary</h2>
+  
   
   <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../Runner.html" title="Runner (class)">Runner</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="../Runner.html#initialize-instance_method" title="Runner#initialize (method)">#initialize</a></span>, <span class='object_link'><a href="../Runner.html#run_pass-instance_method" title="Runner#run_pass (method)">#run_pass</a></span>, <span class='object_link'><a href="../Runner.html#run_passes-instance_method" title="Runner#run_passes (method)">#run_passes</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="../Runner.html#initialize-instance_method" title="Runner#initialize (method)">#initialize</a></span>, <span class='object_link'><a href="../Runner.html#run_passes-instance_method" title="Runner#run_passes (method)">#run_passes</a></span></p>
 
   
   <div id="constructor_details" class="method_details_list">
@@ -185,10 +220,57 @@
 </div>
 
 
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="run_pass-instance_method">
+  
+    #<strong>run_pass</strong>(pass)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Run a ValidationPass on the program.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/validation/validation_runner.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run_pass'>run_pass</span><span class='lparen'>(</span><span class='id identifier rubyid_pass'>pass</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_pass'>pass</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='ivar'>@program</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
 </div>
 
       <div id="footer">
-  Generated on Sat Apr  6 19:23:39 2024 by
+  Generated on Fri Apr 12 18:45:46 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

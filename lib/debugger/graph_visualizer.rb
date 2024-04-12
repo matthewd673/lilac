@@ -4,7 +4,8 @@ require_relative "debugger"
 require_relative "../graph"
 require_relative "../analysis/bb"
 
-# The CFGVisualizer module provides functions to visualize CFG objects.
+# The GraphVisualizer module provides functions to visualize Graph objects.
+# It also includes special features to enhance CFG visualizations.
 module Debugger::GraphVisualizer
   extend T::Sig
 

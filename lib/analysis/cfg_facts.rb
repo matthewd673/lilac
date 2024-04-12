@@ -2,8 +2,8 @@
 require "sorbet-runtime"
 require_relative "analysis"
 
-# An AnalysisOutput stores the sets of facts (e.g.: GEN and KILL) that were
-# computed by an analysis.
+# A CFGFacts object stores the sets of facts (e.g.: GEN and KILL) that were
+# computed by an analysis about a CFG.
 class Analysis::CFGFacts
   extend T::Sig
   extend T::Generic
@@ -24,9 +24,17 @@ class Analysis::CFGFacts
     @cfg = cfg
   end
 
-  sig { params(symbol: Symbol, set: T::Hash[BB, T::Set[Domain]]).void }
-  def add_fact_hash(symbol, set)
-    @facts[symbol] = set
+  sig { params(symbol: Symbol, hash: T::Hash[BB, T::Set[Domain]]).void }
+  # Add a hash of facts (with a mapping of +BB+ => +Set[Domain]+) to the
+  # fact set for a given symbol. For example, the OUT set of all blocks may
+  # be added as a fact hash with symbol +:out+ and a hash of all blocks
+  # mapped to the domain objects in their OUT set.
+  #
+  # @params [Symbol] symbol The symbol of the fact hash.
+  # @params [T::Hash[BB, T::Set[Domain]]] hash The hash of blocks mapped to
+  #   sets of facts.
+  def add_fact_hash(symbol, hash)
+    @facts[symbol] = hash
   end
 
   sig { params(symbol: Symbol, block: BB).returns(T::Set[Domain]) }

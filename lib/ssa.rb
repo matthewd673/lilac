@@ -11,12 +11,17 @@ require_relative "analysis/dominators"
 require_relative "analysis/dom_tree"
 require_relative "analysis/dom_frontiers"
 
+# The SSA pass transforms a CFG into SSA form by optimally  inserting phi
+# functions at join nodes and renaming IDs with unique subscripts.
 class SSA < Pass
   extend T::Sig
 
   include Analysis
 
   sig { params(cfg: CFG).void }
+  # Construct a new SSA pass.
+  #
+  # @param [CFG] cfg The CFG to transform.
   def initialize(cfg)
     @cfg = cfg
 
@@ -32,6 +37,7 @@ class SSA < Pass
   end
 
   sig { void }
+  # Run the SSA transformation on the CFG. It will be modified in place.
   def run
     # find and split all critical edges
     critical_edges = find_critical_edges

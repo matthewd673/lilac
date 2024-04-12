@@ -4,18 +4,27 @@ require_relative "frontend"
 require_relative "../il"
 require_relative "../visitor"
 
+# A Generator generates human-readable IL source code for programs. The
+# output of a Generator can be parsed by a +Parser+ without any modification.
 class Frontend::Generator
   extend T::Sig
 
   include IL
 
   sig { params(program: Program).void }
+  # Construct a new Generator for the given program.
+  #
+  # @param [Program] program The program to generate source code for.
   def initialize(program)
     @program = program
     @visitor = T.let(Visitor.new(VISIT_LAMBDAS), Visitor)
   end
 
   sig { returns(String) }
+  # Generate a String containing the IL source code of the Generator's
+  # program.
+  #
+  # @return [String] A String containing valid IL source code.
   def generate
     output = ""
 

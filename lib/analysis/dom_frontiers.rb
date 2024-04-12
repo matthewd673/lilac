@@ -7,12 +7,18 @@ require_relative "dom_tree"
 require_relative "dfa"
 require_relative "cfg_facts"
 
+# Compute the dominance frontiers for a CFG.
 class Analysis::DomFrontiers
   extend T::Sig
 
   include Analysis
 
   sig { params(cfg: CFG, dom_tree: DomTree).void }
+  # Construct a new dominance frontiers analysis.
+  #
+  # @param [CFG] cfg The graph to perform the analysis on.
+  # @param [DomTree] dom_tree The dominator tree for the CFG (which can be
+  #   computed with a separate DFA).
   def initialize(cfg, dom_tree)
     @cfg = cfg
     @dom_tree = dom_tree
@@ -24,6 +30,11 @@ class Analysis::DomFrontiers
   end
 
   sig { returns(CFGFacts[BB]) }
+  # Run the dominance frontiers analysis.
+  #
+  # @param [CFGFacts[BB]] a +CFGFacts+ object containing dominance frontier
+  #   information for the graph. Dominance frontier information is stored
+  #   in symbol +:df+.
   def run
     # DF algorithm
     # for each predecessor of each join node...

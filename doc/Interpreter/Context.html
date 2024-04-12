@@ -125,6 +125,33 @@
       <li class="public ">
   <span class="summary_signature">
     
+      <a href="#current-instance_method" title="#current (instance method)">#<strong>current</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute current.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#funcs-instance_method" title="#funcs (instance method)">#<strong>funcs</strong>  &#x21d2; Object </a>
     
 
@@ -143,7 +170,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>func name -&gt; FuncDef.</p>
+<p>func name -&gt; CFGFuncDef.</p>
 </div></span>
   
 </li>
@@ -179,7 +206,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#ip-instance_method" title="#ip (instance method)">#<strong>ip</strong>  &#x21d2; Object </a>
+      <a href="#label_blocks-instance_method" title="#label_blocks (instance method)">#<strong>label_blocks</strong>  &#x21d2; Object </a>
     
 
     
@@ -197,7 +224,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute ip.</p>
+<p>label name -&gt; BB object.</p>
 </div></span>
   
 </li>
@@ -206,7 +233,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#label_indices-instance_method" title="#label_indices (instance method)">#<strong>label_indices</strong>  &#x21d2; Object </a>
+      <a href="#step_ct-instance_method" title="#step_ct (instance method)">#<strong>step_ct</strong>  &#x21d2; Object </a>
     
 
     
@@ -224,7 +251,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>label name -&gt; index in stmt_list.</p>
+<p>Returns the value of attribute step_ct.</p>
 </div></span>
   
 </li>
@@ -275,7 +302,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>  &#x21d2; Context </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(entrypoint)  &#x21d2; Context </a>
     
 
     
@@ -308,7 +335,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="Interpreter::Context (class)">Context</a></span></tt> 
+    #<strong>initialize</strong>(entrypoint)  &#x21d2; <tt><span class='object_link'><a href="" title="Interpreter::Context (class)">Context</a></span></tt> 
   
 
   
@@ -331,25 +358,27 @@
       <pre class="lines">
 
 
-459
-460
-461
-462
-463
-464
-465
-466</pre>
+508
+509
+510
+511
+512
+513
+514
+515
+516</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 459</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 508</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
-  <span class='ivar'>@ip</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_entrypoint'>entrypoint</span><span class='rparen'>)</span>
+  <span class='ivar'>@current</span> <span class='op'>=</span> <span class='id identifier rubyid_entrypoint'>entrypoint</span>
+  <span class='ivar'>@step_ct</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='rparen'>)</span>
   <span class='ivar'>@symbols</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="SymbolTable.html" title="Interpreter::SymbolTable (class)">SymbolTable</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="SymbolTable.html#initialize-instance_method" title="Interpreter::SymbolTable#initialize (method)">new</a></span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="SymbolTable.html" title="Interpreter::SymbolTable (class)">SymbolTable</a></span></span><span class='rparen'>)</span>
   <span class='ivar'>@symbols</span><span class='period'>.</span><span class='id identifier rubyid_push_scope'>push_scope</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Scope.html" title="Interpreter::Scope (class)">Scope</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Scope.html#initialize-instance_method" title="Interpreter::Scope#initialize (method)">new</a></span></span><span class='rparen'>)</span> <span class='comment'># symbol table always has top-level scope
-</span>  <span class='ivar'>@funcs</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/FuncDef.html" title="IL::FuncDef (class)">FuncDef</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+</span>  <span class='ivar'>@funcs</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/CFGFuncDef.html" title="IL::CFGFuncDef (class)">CFGFuncDef</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='ivar'>@in_func</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_nilable'>nilable</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/FuncDef.html" title="IL::FuncDef (class)">FuncDef</a></span></span><span class='rparen'>)</span><span class='rparen'>)</span>
-  <span class='ivar'>@label_indices</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@label_blocks</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../Analysis.html" title="Analysis (module)">Analysis</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Analysis/BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -362,11 +391,11 @@
     <h2>Instance Attribute Details</h2>
     
       
-      <span id="funcs=-instance_method"></span>
+      <span id="current=-instance_method"></span>
       <div class="method_details first">
-  <h3 class="signature first" id="funcs-instance_method">
+  <h3 class="signature first" id="current-instance_method">
   
-    #<strong>funcs</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>current</strong>  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -375,7 +404,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>func name -&gt; FuncDef</p>
+<p>Returns the value of attribute current.</p>
 
 
   </div>
@@ -389,12 +418,55 @@
       <pre class="lines">
 
 
-452
-453
-454</pre>
+495
+496
+497</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 452</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 495</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_current'>current</span>
+  <span class='ivar'>@current</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="funcs=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="funcs-instance_method">
+  
+    #<strong>funcs</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>func name -&gt; CFGFuncDef</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+501
+502
+503</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 501</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_funcs'>funcs</span>
   <span class='ivar'>@funcs</span>
@@ -432,12 +504,12 @@
       <pre class="lines">
 
 
-454
-455
-456</pre>
+503
+504
+505</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 454</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 503</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_in_func'>in_func</span>
   <span class='ivar'>@in_func</span>
@@ -448,11 +520,11 @@
 </div>
     
       
-      <span id="ip=-instance_method"></span>
+      <span id="label_blocks=-instance_method"></span>
       <div class="method_details ">
-  <h3 class="signature " id="ip-instance_method">
+  <h3 class="signature " id="label_blocks-instance_method">
   
-    #<strong>ip</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>label_blocks</strong>  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -461,7 +533,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute ip.</p>
+<p>label name -&gt; BB object</p>
 
 
   </div>
@@ -475,15 +547,15 @@
       <pre class="lines">
 
 
-448
-449
-450</pre>
+505
+506
+507</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 448</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 505</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_ip'>ip</span>
-  <span class='ivar'>@ip</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_label_blocks'>label_blocks</span>
+  <span class='ivar'>@label_blocks</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -491,11 +563,11 @@
 </div>
     
       
-      <span id="label_indices=-instance_method"></span>
+      <span id="step_ct=-instance_method"></span>
       <div class="method_details ">
-  <h3 class="signature " id="label_indices-instance_method">
+  <h3 class="signature " id="step_ct-instance_method">
   
-    #<strong>label_indices</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>step_ct</strong>  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -504,7 +576,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>label name -&gt; index in stmt_list</p>
+<p>Returns the value of attribute step_ct.</p>
 
 
   </div>
@@ -518,15 +590,15 @@
       <pre class="lines">
 
 
-456
-457
-458</pre>
+497
+498
+499</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 456</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 497</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_label_indices'>label_indices</span>
-  <span class='ivar'>@label_indices</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_step_ct'>step_ct</span>
+  <span class='ivar'>@step_ct</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -561,12 +633,12 @@
       <pre class="lines">
 
 
-450
-451
-452</pre>
+499
+500
+501</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 450</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 499</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_symbols'>symbols</span>
   <span class='ivar'>@symbols</span>
@@ -582,7 +654,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Apr  6 19:23:39 2024 by
+  Generated on Fri Apr 12 18:45:46 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

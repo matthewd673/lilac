@@ -111,7 +111,18 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>The SSA pass transforms a CFG into SSA form by optimally  inserting phi functions at join nodes and renaming IDs with unique subscripts.</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -134,7 +145,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>  &#x21d2; SSA </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(cfg)  &#x21d2; SSA </a>
     
 
     
@@ -151,7 +162,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>A new instance of SSA.</p>
+<p>Construct a new SSA pass.</p>
 </div></span>
   
 </li>
@@ -160,7 +171,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>(cfg, funcdef: nil)  &#x21d2; Object </a>
+      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>  &#x21d2; Object </a>
     
 
     
@@ -174,7 +185,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Run the SSA transformation on the CFG.</p>
+</div></span>
   
 </li>
 
@@ -207,7 +220,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="SSA (class)">SSA</a></span></tt> 
+    #<strong>initialize</strong>(cfg)  &#x21d2; <tt><span class='object_link'><a href="" title="SSA (class)">SSA</a></span></tt> 
   
 
   
@@ -216,13 +229,33 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns a new instance of SSA.</p>
+<p>Construct a new SSA pass.</p>
 
 
   </div>
 </div>
 <div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
   
+    <li>
+      
+        <span class='name'>cfg</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Analysis/CFG.html" title="Analysis::CFG (class)">CFG</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The CFG to transform.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
 
 </div><table class="source_code">
   <tr>
@@ -230,15 +263,33 @@
       <pre class="lines">
 
 
-16
-17
-18
-19</pre>
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ssa.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'lib/ssa.rb', line 25</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_cfg'>cfg</span><span class='rparen'>)</span>
+  <span class='ivar'>@cfg</span> <span class='op'>=</span> <span class='id identifier rubyid_cfg'>cfg</span>
+
+  <span class='comment'># define some hashes and sets ahead of time for use later
+</span>  <span class='comment'># NOTE: these constructions will be overwritten on run but thats ok for now
+</span>  <span class='ivar'>@globals</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'>String</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@global_types</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="IL/Type.html" title="IL::Type (class)">Type</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@blocks</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Set</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="Analysis/BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@df_facts</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Analysis/CFGFacts.html" title="Analysis::CFGFacts (class)">CFGFacts</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/CFGFacts.html#initialize-instance_method" title="Analysis::CFGFacts#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_cfg'>cfg</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Analysis/CFGFacts.html" title="Analysis::CFGFacts (class)">CFGFacts</a></span></span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="Analysis/BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
   <span class='ivar'>@id</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ssa</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
   <span class='ivar'>@description</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Transform a CFG into SSA form</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -257,41 +308,78 @@
       <div class="method_details first">
   <h3 class="signature first" id="run-instance_method">
   
-    #<strong>run</strong>(cfg, funcdef: nil)  &#x21d2; <tt>Object</tt> 
+    #<strong>run</strong>  &#x21d2; <tt>Object</tt> 
   
 
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Run the SSA transformation on the CFG. It will be modified in place.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31</pre>
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ssa.rb', line 22</span>
+      <pre class="code"><span class="info file"># File 'lib/ssa.rb', line 41</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_cfg'>cfg</span><span class='comma'>,</span> <span class='label'>funcdef:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span>
   <span class='comment'># find and split all critical edges
-</span>  <span class='id identifier rubyid_critical_edges'>critical_edges</span> <span class='op'>=</span> <span class='id identifier rubyid_find_critical_edges'>find_critical_edges</span><span class='lparen'>(</span><span class='id identifier rubyid_cfg'>cfg</span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_critical_edges'>critical_edges</span> <span class='op'>=</span> <span class='id identifier rubyid_find_critical_edges'>find_critical_edges</span>
   <span class='id identifier rubyid_critical_edges'>critical_edges</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span>
-    <span class='id identifier rubyid_split_edge'>split_edge</span><span class='lparen'>(</span><span class='id identifier rubyid_cfg'>cfg</span><span class='comma'>,</span> <span class='id identifier rubyid_e'>e</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_split_edge'>split_edge</span><span class='lparen'>(</span><span class='id identifier rubyid_e'>e</span><span class='rparen'>)</span>
   <span class='rbrace'>}</span>
 
-  <span class='comment'># TODO
-</span>  <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unimplemented</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='comment'># run dominators, dom tree, and dom frontiers analysis
+</span>  <span class='id identifier rubyid_dominators'>dominators</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Analysis/Dominators.html" title="Analysis::Dominators (class)">Dominators</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/Dominators.html#initialize-instance_method" title="Analysis::Dominators#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@cfg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_dom_cfg_facts'>dom_cfg_facts</span> <span class='op'>=</span> <span class='id identifier rubyid_dominators'>dominators</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span>
+
+  <span class='id identifier rubyid_dom_tree'>dom_tree</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Analysis/DomTree.html" title="Analysis::DomTree (class)">DomTree</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/DomTree.html#initialize-instance_method" title="Analysis::DomTree#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_dom_cfg_facts'>dom_cfg_facts</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_dom_frontiers'>dom_frontiers</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Analysis/DomFrontiers.html" title="Analysis::DomFrontiers (class)">DomFrontiers</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/DomFrontiers.html#initialize-instance_method" title="Analysis::DomFrontiers#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@cfg</span><span class='comma'>,</span> <span class='id identifier rubyid_dom_tree'>dom_tree</span><span class='rparen'>)</span>
+  <span class='ivar'>@df_facts</span> <span class='op'>=</span> <span class='id identifier rubyid_dom_frontiers'>dom_frontiers</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span>
+
+  <span class='comment'># find global names and add phi functions
+</span>  <span class='id identifier rubyid_find_globals'>find_globals</span>
+  <span class='id identifier rubyid_rewrite_with_phi_funcs'>rewrite_with_phi_funcs</span>
+
+  <span class='comment'># rename everything to have proper subscripts
+</span>  <span class='id identifier rubyid_rename_globals'>rename_globals</span><span class='lparen'>(</span><span class='id identifier rubyid_dom_tree'>dom_tree</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -303,7 +391,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Apr  6 19:23:38 2024 by
+  Generated on Fri Apr 12 18:45:45 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>
