@@ -50,11 +50,14 @@ class SSA < Pass
     # find global names and add phi functions
     find_globals
     rewrite_with_phi_funcs
+
+    # rename everything to have proper subscripts
+    rename_globals(dom_tree)
   end
 
   private
 
-  sig { params(edge: Graph::Edge[BB]).void }
+  sig { params(edge: CFG::Edge).void }
   def split_edge(edge)
     # delete old edge
     @cfg.delete_edge(edge)
@@ -62,14 +65,15 @@ class SSA < Pass
     # create new block in the middle
     new_id = @cfg.max_block_id + 1
     new_block = BB.new(new_id, stmt_list: [])
-    @cfg.add_block(new_block)
+    @cfg.add_node(new_block)
 
     # create new edges to and from the new block
-    @cfg.create_edge(edge.from, new_block)
-    @cfg.create_edge(new_block, edge.to)
+    was_cond_branch = edge.cond_branch # preserve cond_branch-ness to new block
+    @cfg.add_edge(CFG::Edge.new(edge.from, new_block, was_cond_branch))
+    @cfg.add_edge(CFG::Edge.new(new_block, edge.to, false)) # never cond branch
   end
 
-  sig { returns(T::Array[Graph::Edge[BB]]) }
+  sig { returns(T::Array[CFG::Edge]) }
   def find_critical_edges
     critical_edges = []
 
@@ -118,8 +122,6 @@ class SSA < Pass
           if not processed.include?(d)
             work_list = work_list | [d]
             processed = processed | [d]
-          else
-            puts "skipped"
           end
         }
       }
@@ -255,8 +257,8 @@ class SSA < Pass
     # unsafes should never break
     i = T.unsafe(counter[name])
     if not i
-      # TODO: fully resolve this and remove this whole condition
-      puts("WARN: i for #{name} was nil")
+      # TODO: I think this issue is resolved now but its untested
+      # puts("WARN: i for #{name} was nil")
       i = 0
       stack[name] = [] # will be needed later
     end
