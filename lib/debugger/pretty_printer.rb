@@ -38,7 +38,7 @@ class Debugger::PrettyPrinter
   #
   # @param [IL::Program] program The program to print.
   def print_program(program)
-    gutter_len = program.length.to_s.length
+    gutter_len = program.stmt_list.length.to_s.length
     ctx = PrettyPrinterContext.new(gutter_len, 0, 0)
     program.each_func { |f|
       puts(@visitor.visit(f, ctx: ctx))

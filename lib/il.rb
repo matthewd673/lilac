@@ -1,5 +1,6 @@
 # typed: strict
 require "sorbet-runtime"
+require_relative "analysis/cfg"
 
 # IL contains a set of classes representing the Lilac Intermediate Language.
 module IL
@@ -749,7 +750,7 @@ module IL
     end
   end
 
-  # A Program is a list of Statements.
+  # A Program is a list of Statements and a set of FuncDefs.
   class Program
     extend T::Sig
 
@@ -761,11 +762,6 @@ module IL
     def initialize(stmt_list: [])
       @stmt_list = stmt_list
       @func_map = T.let({}, T::Hash[String, FuncDef])
-    end
-
-    sig { returns(Integer) }
-    def length
-      @stmt_list.length
     end
 
     sig { params(funcdef: FuncDef).void }
@@ -808,6 +804,74 @@ module IL
     protected
 
     sig { returns(T::Hash[String, FuncDef]) }
+    def func_map
+      @func_map
+    end
+  end
+
+  # A CFGFuncDef is a FuncDef whose instructions are stored in a CFG.
+  class CFGFuncDef
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :name
+    sig { returns(T::Array[FuncParam]) }
+    attr_reader :params
+    sig { returns(Type) }
+    attr_reader :ret_type
+    sig { returns(Analysis::CFG) }
+    attr_reader :cfg
+
+    sig { params(name: String,
+                 params: T::Array[FuncParam],
+                 ret_type: Type,
+                 cfg: Analysis::CFG)
+          .void }
+    def initialize(name, params, ret_type, cfg)
+      @name = name
+      @params = params
+      @ret_type = ret_type
+      @cfg = cfg
+    end
+  end
+
+  # A CFGProgram is a Program whose instructions are stored in CFGs.
+  class CFGProgram
+    extend T::Sig
+
+    sig { returns(Analysis::CFG) }
+    attr_reader :cfg
+
+    sig { params(cfg: Analysis::CFG).void }
+    def initialize(cfg)
+      @cfg = cfg
+      @func_map = T.let({}, T::Hash[String, CFGFuncDef])
+    end
+
+    sig { params(cfg_funcdef: CFGFuncDef).void }
+    def add_func(cfg_funcdef)
+      @func_map[cfg_funcdef.name] = cfg_funcdef
+    end
+
+    sig { params(block: T.proc.params(arg0: CFGFuncDef).void).void }
+    def each_func(&block)
+      @func_map.keys.each { |k|
+        yield T.unsafe(@func_map[k])
+      }
+    end
+
+    sig { params(name: String).returns(T.nilable(CFGFuncDef)) }
+    def get_func(name)
+      @func_map[name]
+    end
+
+    # TODO: implement to_s
+
+    # TODO: implement eql?
+
+    protected
+
+    sig { returns(T::Hash[String, CFGFuncDef]) }
     def func_map
       @func_map
     end
