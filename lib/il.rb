@@ -112,7 +112,7 @@ module IL
     #
     # @param [String] name The name of the ID.
     # @param [Integer] number The number of the ID. Usually optional when
-    #   constructing a Program that will be converted to SSA in a later step.
+    #   constructing a Program that has not yet been converted to SSA.
     def initialize(name, number: 0)
       @name = name
       @number = number
@@ -123,7 +123,7 @@ module IL
     sig { params(value: Integer).void }
     def number=(value)
       @number = value
-      compute_key # key must be recomputed whenever number changes
+      @key = compute_key # key must be recomputed whenever number changes
     end
 
     sig { returns(String) }
@@ -146,7 +146,7 @@ module IL
 
     sig { returns(String) }
     def compute_key
-      "#{name}##{number}"
+      "#{@name}##{@number}"
     end
   end
 
