@@ -3,6 +3,8 @@ require "sorbet-runtime"
 require_relative "il"
 require_relative "visitor"
 require_relative "validation/validation_runner"
+require_relative "analysis/bb"
+require_relative "analysis/cfg"
 
 # The Interpreter module provides a simple interpreter for the Lilac IL.
 # Lilac IL is not designed to be an interpreted language (and does
@@ -13,19 +15,20 @@ module Interpreter
   extend T::Sig
   include Kernel
 
-  sig { params(program: IL::Program, validate: T::Boolean).void }
+  sig { params(program: IL::CFGProgram, validate: T::Boolean).void }
   # Interpret a program.
   #
-  # @param [IL::Program] program The program to interpret.
+  # @param [IL::CFGProgram] program The program to interpret.
   def self.interpret(program, validate: true)
-    context = Context.new
+    context = Context.new(program.cfg.entry)
     visitor = Visitor.new(VISIT_LAMBDAS)
 
     # run all validations before interpreting
-    if validate
-      validation_runner = Validation::ValidationRunner.new(program)
-      validation_runner.run_passes(Validation::VALIDATIONS)
-    end
+    # TODO: update to work with CFG (or move all validations to tests)
+    # if validate
+      # validation_runner = Validation::ValidationRunner.new(program)
+      # validation_runner.run_passes(Validation::VALIDATIONS)
+    # end
 
     # collect all funcs in the program
     context.funcs = {}
@@ -34,14 +37,14 @@ module Interpreter
     }
 
     # collect all labels in program -- including within functions
-    context.label_indices = {}
-    register_labels(context.label_indices, program.stmt_list)
+    context.label_blocks = {}
+    register_labels(context.label_blocks, program.cfg)
     program.each_func { |f|
-      register_labels(context.label_indices, f.stmt_list)
+      register_labels(context.label_blocks, f.cfg)
     }
 
     # begin interpretation
-    interpret_stmt_list(program.stmt_list, visitor, context)
+    interpret_cfg(program.cfg, visitor, context)
 
     puts("---")
     puts("Interpretation complete")
@@ -53,49 +56,62 @@ module Interpreter
 
   protected
 
-  sig { params(label_hash: T::Hash[String, Integer],
-               stmt_list: T::Array[IL::Statement]).void }
-  def self.register_labels(label_hash, stmt_list)
-    index = 0
-    stmt_list.each { |s|
-      # register labels in item list
-      if s.is_a?(IL::Label)
-        label_hash[s.name] = index
+  sig { params(label_hash: T::Hash[String, Analysis::BB], cfg: Analysis::CFG).void }
+  def self.register_labels(label_hash, cfg)
+    cfg.each_node { |b|
+      if b.entry
+        label_hash[T.unsafe(b.entry).name] = b
       end
-      index += 1
     }
   end
 
-  sig { params(stmt_list: T::Array[IL::Statement],
-               visitor: Visitor,
-               context: Context).returns(T.nilable(InterpreterValue)) }
-  def self.interpret_stmt_list(stmt_list, visitor, context)
-    while context.ip < stmt_list.length
-      s = stmt_list[context.ip]
+  sig { params(cfg: Analysis::CFG, visitor: Visitor, context: Context)
+          .returns(T.nilable(InterpreterValue)) }
+  def self.interpret_cfg(cfg, visitor, context)
+    while context.current != cfg.exit
+      # interpret the current block
+      context.current.stmt_list.each { |s|
+        # special handling for return
+        if s.is_a?(IL::Return)
+          ret_result = visitor.visit(s.value, ctx: context)
+          context.step_ct += 1
+          return ret_result
+        end
 
-      # skip items that do nothing
-      if s.is_a?(IL::Label)
-        context.ip += 1
-        next
+        # visit a statement normally
+        visitor.visit(s, ctx: context)
+        context.step_ct += 1
+      }
+
+      # once we've reached the end of the current block we must either:
+      # jump (perhaps conditionally) or move to the block's (single) successor
+      # block exits with a conditional jump
+      if context.current.exit and context.current.exit.class != IL::Jump
+        jump = context.current.exit
+        # evaluate conditional and then jump
+        cond_result = visitor.visit(jump, ctx: context)
+        context.step_ct += 1
+        # take appropriate branch
+        cfg.each_outgoing(context.current) { |o|
+          o = T.cast(o, Analysis::CFG::Edge)
+          if not o.cond_branch == cond_result
+            next
+          end
+
+          context.current = o.to
+          break
+        }
+      # block either exits with a jmp or has no @exit
+      else
+        cfg.each_successor(context.current) { |s|
+          context.current = s
+          break # just take the first successor (there should only be one)
+        }
       end
-
-      puts "  #{s}"
-      puts "---"
-      puts context.symbols
-      puts "---"
-
-      # special handling for Return
-      if s.is_a?(IL::Return)
-        return visitor.visit(s.value, ctx: context)
-      end
-
-      # visit a statement normally
-      visitor.visit(s, ctx: context)
-      context.ip += 1
     end
 
-    # if no return statement, return nil
-    # this should only happen at top-level in valid IL
+    # no return statement hit
+    # should only happen at top level in valid IL
     return nil
   end
 
@@ -195,7 +211,7 @@ module Interpreter
     func_name = o.func_name
     args = o.args
     func = context.funcs[func_name]
-    stmt_list = func.stmt_list
+    cfg = func.cfg
 
     # fill in param values with call args
     arg_vals = []
@@ -224,17 +240,46 @@ module Interpreter
     }
 
     # interpret body of function
-    ret_value = interpret_stmt_list(stmt_list, v, context)
+    ret_value = interpret_cfg(cfg, v, context)
 
     # re-enter current func scope
     context.symbols.pop_scope
     if this_func_scope
       context.symbols.push_scope(this_func_scope)
     end
-    context.ip = this_ip
 
     # return value from inside function
     return ret_value
+  }, Visitor::Lambda)
+
+  VISIT_PHI = T.let(-> (v, o, context) {
+    ids = o.ids
+
+    # find the id in the phi function that was last written to
+    last_written = T.let(nil, T.nilable(SymbolInfo))
+    ids.each { |id|
+      id_info = context.symbols.lookup(id.key)
+
+      # can happen if other branch has never been hit so far
+      if not id_info
+        next
+      end
+
+      if not last_written
+        last_written = id_info
+        next
+      end
+
+      if id_info.write_time > last_written.write_time
+        last_written = id_info
+      end
+    }
+
+    if not last_written
+      raise("Failed to lookup value for phi function")
+    end
+
+    return InterpreterValue.new(last_written.type, last_written.value)
   }, Visitor::Lambda)
 
   VISIT_STATEMENT = T.let(-> (v, o, context) {
@@ -254,6 +299,7 @@ module Interpreter
     rhs_eval = v.visit(rhs, ctx: context)
 
     symbol = SymbolInfo.new(id.key, type, rhs_eval.value)
+    symbol.write_time = context.step_ct # note write time
     context.symbols.insert(symbol)
   }, Visitor::Lambda)
 
@@ -272,11 +318,8 @@ module Interpreter
     # evaluate conditional
     cond_eval = v.visit(cond, ctx: context)
 
-    # move instruction pointer there if zero
-    if cond_eval.value == 0
-      index = context.label_indices[target]
-      context.ip = index
-    end
+    # return true if jump should execute
+    return cond_eval.value == 0
   }, Visitor::Lambda)
 
   VISIT_JUMPNOTZERO = T.let(-> (v, o, context) {
@@ -286,16 +329,8 @@ module Interpreter
     # evaluate conditional
     cond_eval = v.visit(cond, ctx: context)
 
-    # move instruction pointer there if not zero
-    if cond_eval.value != 0
-      index = context.label_indices[target]
-      context.ip = index
-    end
-  }, Visitor::Lambda)
-
-  VISIT_RETURN = T.let(-> (v, o, context) {
-    # TODO
-    puts("TODO: implement Return")
+    # return true if jump should execute
+    return cond_eval.value != 0
   }, Visitor::Lambda)
 
   VISIT_LAMBDAS = T.let({
@@ -306,12 +341,13 @@ module Interpreter
     IL::BinaryOp => VISIT_BINARYOP,
     IL::UnaryOp => VISIT_UNARYOP,
     IL::Call => VISIT_CALL,
+    IL::Phi => VISIT_PHI,
     IL::Statement => VISIT_STATEMENT,
     IL::Definition => VISIT_DEFINITION,
     IL::Jump => VISIT_JUMP,
     IL::JumpZero => VISIT_JUMPZERO,
     IL::JumpNotZero => VISIT_JUMPNOTZERO,
-    IL::Return => VISIT_RETURN,
+    # NOTE: IL::Return is handled manually as a special case
   }, Visitor::LambdaHash)
 
   private
@@ -348,14 +384,17 @@ module Interpreter
     attr_reader :key
     sig { returns(IL::Type) }
     attr_reader :type
-    sig { returns T.untyped }
+    sig { returns(T.untyped) }
     attr_accessor :value
+    sig { returns(Integer) }
+    attr_accessor :write_time
 
     sig { params(key: String, type: IL::Type, value: T.untyped).void }
     def initialize(key, type, value)
       @key = key
       @type = type
       @value = value
+      @write_time = T.let(0, Integer)
     end
 
     sig { returns(String) }
@@ -380,7 +419,15 @@ module Interpreter
 
     sig { params(key: String).returns(T.nilable(SymbolInfo)) }
     def lookup(key)
-      @symbols[key]
+      symbol = @symbols[key]
+
+      # FIXME: patch for weird SSA Register renaming
+      #        REMOVE once SSA renaming is fixed!
+      if (not symbol) and (not key.include?("#"))
+        symbol = @symbols[key + "#0"]
+      end
+
+      return symbol
     end
 
     sig { returns(String) }
@@ -444,25 +491,28 @@ module Interpreter
   class Context
     extend T::Sig
 
+    sig { returns(Analysis::BB) }
+    attr_accessor :current
     sig { returns(Integer) }
-    attr_accessor :ip
+    attr_accessor :step_ct
     sig { returns(SymbolTable) }
     attr_reader :symbols
-    sig { returns(T::Hash[String, IL::FuncDef]) }
-    attr_accessor :funcs # func name -> FuncDef
+    sig { returns(T::Hash[String, IL::CFGFuncDef]) }
+    attr_accessor :funcs # func name -> CFGFuncDef
     sig { returns(T.nilable(IL::FuncDef)) }
     attr_accessor :in_func
-    sig { returns(T::Hash[String, Integer]) }
-    attr_accessor :label_indices # label name -> index in stmt_list
+    sig { returns(T::Hash[String, Analysis::BB]) }
+    attr_accessor :label_blocks # label name -> BB object
 
-    sig { void }
-    def initialize
-      @ip = T.let(0, Integer)
+    sig { params(entrypoint: Analysis::BB).void }
+    def initialize(entrypoint)
+      @current = entrypoint
+      @step_ct = T.let(0, Integer)
       @symbols = T.let(SymbolTable.new, SymbolTable)
       @symbols.push_scope(Scope.new) # symbol table always has top-level scope
-      @funcs = T.let(Hash.new, T::Hash[String, IL::FuncDef])
+      @funcs = T.let(Hash.new, T::Hash[String, IL::CFGFuncDef])
       @in_func = T.let(nil, T.nilable(IL::FuncDef))
-      @label_indices = T.let(Hash.new, T::Hash[String, Integer])
+      @label_blocks = T.let(Hash.new, T::Hash[String, Analysis::BB])
     end
   end
 end

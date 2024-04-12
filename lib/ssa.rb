@@ -275,10 +275,6 @@ class SSA < Pass
   def rename(block, counter, stack, dom_tree)
     # for each phi function in block, rewrite lhs with new_name
     block.stmt_list.each { |s|
-      if s.is_a?(IL::Label)
-        next
-      end
-
       if (not s.is_a?(IL::Definition)) or (not s.rhs.is_a?(IL::Phi))
         break
       end
@@ -314,6 +310,7 @@ class SSA < Pass
         # if there is a phi for it, add the current subscript to the phi
         number = T.unsafe(stack[name])[-1]
         if not number # TODO: unsure how this can happen but it does
+          # puts("WARN: no number found for name being pushed to phi")
           next
         end
 
