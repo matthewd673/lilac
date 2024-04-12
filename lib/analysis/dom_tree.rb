@@ -27,12 +27,17 @@ class Analysis::DomTree < Graph
   # @return [T.nilable(BB)] The IDOM of the block. In a valid dominator tree
   #   this will only be nil for the ENTRY block in the CFG.
   def get_idom(block)
-    preds = @predecessors[block]
-    if not preds
+    incoming = @incoming[block]
+    if not incoming
       nil
     else
       # there is only one IDOM in a valid graph
-      preds.to_a[0]
+      idom_edge = incoming.to_a[0]
+      if not idom_edge
+        return nil
+      end
+
+      return idom_edge.from
     end
   end
 
@@ -45,13 +50,13 @@ class Analysis::DomTree < Graph
   #   this set will only be empty for the ENTRY block in the CFG.
   def get_sdom(block)
     sdom = T.let(Set[], T::Set[BB])
-    preds = @predecessors[block]
-    if not preds
+    incoming = @incoming[block]
+    if not incoming
       return Set[]
     end
 
-    preds.each { |p|
-      sdom = sdom | get_sdom(p)
+    incoming.each { |e|
+      sdom = sdom | get_sdom(e.from)
     }
 
     return sdom
@@ -62,7 +67,7 @@ class Analysis::DomTree < Graph
   sig { params(cfg_facts: CFGFacts[BB]).void }
   def compute_graph(cfg_facts)
     cfg_facts.cfg.each_node { |b|
-      @nodes.push(b)
+      add_node(b)
 
       # find idom and create an edge from it to this block
       idom = compute_idom(cfg_facts, b)
@@ -71,7 +76,7 @@ class Analysis::DomTree < Graph
         next
       end
 
-      create_edge(idom, b)
+      add_edge(Edge.new(idom, b))
     }
   end
 

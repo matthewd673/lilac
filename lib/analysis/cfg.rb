@@ -10,7 +10,32 @@ class Analysis::CFG < Graph
 
   include Analysis
 
-  Node = type_member { { fixed: BB } }
+  Node = type_member {{ fixed: BB }}
+
+  class Edge < Graph::Edge
+    extend T::Sig
+    extend T::Generic
+
+    include Analysis
+
+    Node = type_member {{ fixed: BB }}
+
+    sig { returns(T::Boolean) }
+    # Indicates if this edge is taken by a conditional jump (when it is true).
+    attr_reader :cond_branch
+
+    sig { params(from: Node, to: Node, cond_branch: T::Boolean).void }
+    # Construct a new CFG Edge.
+    #
+    # @param [Node] from The node that the edge originates from.
+    # @param [Node] to The node that the edge terminates at.
+    # @param [T::Boolean] cond_branch Determines if the edge is taken by a
+    #   conditional branch when it evaluates to +true+.
+    def initialize(from, to, cond_branch)
+      super(from, to)
+      @cond_branch = cond_branch
+    end
+  end
 
   # The number used by the ENTRY block in any CFG.
   ENTRY = -1
@@ -46,14 +71,14 @@ class Analysis::CFG < Graph
     each_node(&block)
   end
 
-  sig { params(block: BB).void }
+  sig { params(node: BB).void }
   # Add a basic block to the CFG.
   #
-  # @param [BB] block The basic block to add.
-  def add_block(block)
-    @nodes.push(block)
-    if block.entry and block.entry.is_a?(IL::Label)
-      @label_map[T.unsafe(block.entry).name] = block
+  # @param [BB] node The basic block to add.
+  def add_node(node)
+    @nodes.push(node)
+    if node.entry and node.entry.is_a?(IL::Label)
+      @label_map[T.unsafe(node.entry).name] = node
     end
   end
 
@@ -76,32 +101,32 @@ class Analysis::CFG < Graph
     # just in case this gets run more than once
     @nodes.clear
     @edges.clear
-    @predecessors.clear
-    @successors.clear
+    @incoming.clear
+    @outgoing.clear
 
     # add all blocks to the graph nodes
     block_list.each { |b|
-      add_block(b)
+      add_node(b)
     }
 
     # connect blocks into graph nodes
     block_list.each { |b|
-      last = b.stmt_list[-1]
-      if not last then next end
-
-      # create edge for jump
-      if last.is_a?(IL::Jump)
+      # create edge for block exit (some IL::Jump)
+      if b.exit
+        jump = T.unsafe(b.exit) # to placate Sorbet below
         # find block that jump is targeting
-        successor = @label_map[last.target]
+        successor = @label_map[jump.target]
         if not successor # this is unlikely but I think possible
-          raise("CFG attempted to build edge to label that doesn't exist: \"#{last.target}\"")
+          raise("CFG attempted to build edge to label that doesn't exist: \"#{jump.target}\"")
         end
 
         # create an edge to the target block
-        create_edge(b, successor)
+        # if jump IS conditional then the edge must be (and we can easily check
+        # if a jump is conditional based on its class)
+        add_edge(Edge.new(b, successor, jump.class != IL::Jump))
 
         # if jump is NOT conditional then stop after creating this edge
-        if last.class == IL::Jump
+        if jump.class == IL::Jump
           next
         end
       end
@@ -109,9 +134,9 @@ class Analysis::CFG < Graph
       # create edge to next block
       following = block_list[b.id + 1]
       if following
-        create_edge(b, following)
+        add_edge(Edge.new(b, following, false))
       else # reached the end, point to exit
-        create_edge(b, @exit)
+        add_edge(Edge.new(b, @exit, false))
       end
     }
 
@@ -120,7 +145,7 @@ class Analysis::CFG < Graph
     if not first_block
       first_block = @exit
     end
-    create_edge(entry, first_block)
+    add_edge(Edge.new(entry, first_block, false))
 
     # add entry and exit block nodes to graph
     @nodes.insert(0, @entry)

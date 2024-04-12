@@ -7,7 +7,7 @@ class Graph
   extend T::Sig
   extend T::Generic
 
-  Node = type_member
+  Node = type_member {{ upper: Object }}
 
   # An Edge is a generic data structure representing a directed edge between
   # two nodes in a graph.
@@ -15,7 +15,7 @@ class Graph
     extend T::Sig
     extend T::Generic
 
-    Node = type_member
+    Node = type_member {{ upper: Object }}
 
     sig { returns(Node) }
     attr_reader :from
@@ -31,6 +31,15 @@ class Graph
       @from = from
       @to = to
     end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if other.class != Edge
+        return false
+      end
+
+      return (to.eql?(other.to) and from.eql?(other.from))
+    end
   end
 
   sig { void }
@@ -39,8 +48,8 @@ class Graph
     @nodes = T.let([], T::Array[Node])
     @edges = T.let([], T::Array[Edge[Node]])
 
-    @predecessors = T.let(Hash.new, T::Hash[Node, T::Set[Node]])
-    @successors = T.let(Hash.new, T::Hash[Node, T::Set[Node]])
+    @incoming = T.let(Hash.new, T::Hash[Node, T::Set[Edge[Node]]])
+    @outgoing = T.let(Hash.new, T::Hash[Node, T::Set[Edge[Node]]])
   end
 
   sig { params(block: T.proc.params(arg0: Node).void).void }
@@ -53,24 +62,38 @@ class Graph
     @edges.each(&block)
   end
 
-  sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
-  def each_predecessor(node, &block)
-    preds = @predecessors[node]
-    if not preds
+  sig { params(node: Node, block: T.proc.params(arg0: Edge[Node]).void).void }
+  def each_incoming(node, &block)
+    incoming = @incoming[node]
+    if not incoming
       []
     else
-      preds.each(&block)
+      incoming.each(&block)
+    end
+  end
+
+  sig { params(node: Node, block: T.proc.params(arg0: Edge[Node]).void).void }
+  def each_outgoing(node, &block)
+    outgoing = @outgoing[node]
+    if not outgoing
+      []
+    else
+      outgoing.each(&block)
     end
   end
 
   sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
+  def each_predecessor(node, &block)
+    each_incoming(node) { |e|
+      yield e.from
+    }
+  end
+
+  sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
   def each_successor(node, &block)
-    succs = @successors[node]
-    if not succs
-      []
-    else
-      succs.each(&block)
-    end
+    each_outgoing(node) { |e|
+      yield e.to
+    }
   end
 
   sig { params(node: Node).returns(Integer) }
@@ -80,11 +103,11 @@ class Graph
   # @return [Integer] The number of predecessors of the node. If the node is
   #   not in the graph this will be +0+.
   def predecessors_length(node)
-    preds = @predecessors[node]
-    if not preds
+    incoming = @incoming[node]
+    if not incoming
       0
     else
-      preds.length
+      incoming.length
     end
   end
 
@@ -95,36 +118,39 @@ class Graph
   # @return [Integer] The number of successors of the node. If the node is
   #   not in the graph this will be +0+.
   def successors_length(node)
-    succs = @successors[node]
-    if not succs
+    outgoing = @outgoing[node]
+    if not outgoing
       0
     else
-      succs.length
+      outgoing.length
     end
   end
 
-  sig { params(from: Node, to: Node).void }
-  # Create a new Edge and add it to the edge list. The nodes will also be
+  sig { params(node: Node).void }
+  def add_node(node)
+    @nodes.push(node)
+  end
+
+  sig { params(edge: Edge[Node]).void }
+  # Add an Edge to the Graph's edge list. The nodes will also be
   # added to the appropriate successors and predecessors lists. This should
-  # be used instead of manually creating and pushing Edges.
+  # be used instead of manually pushing Edges.
   #
-  # @param [Node] from The node that the edge originates from.
-  # @param [Node] to The node that the edge terminates at.
-  def create_edge(from, to)
-    edge = Edge.new(from, to)
+  # @param [Edge] edge The edge to add.
+  def add_edge(edge)
     @edges.push(edge)
 
-    # add "to" to "from"s successors
-    if not @successors[from]
-      @successors[from] = Set[]
+    # add this edge to "from"'s outgoing
+    if not @outgoing[edge.from]
+      @outgoing[edge.from] = Set[]
     end
-    T.unsafe(@successors[from]).add(to)
+    T.unsafe(@outgoing[edge.from]).add(edge)
 
-    # add "from" to "to"s predecessors
-    if not @predecessors[to]
-      @predecessors[to] = Set[]
+    # add this edge to "to"'s incoming
+    if not @incoming[edge.to]
+      @incoming[edge.to] = Set[]
     end
-    T.unsafe(@predecessors[to]).add(from)
+    T.unsafe(@incoming[edge.to]).add(edge)
   end
 
   sig { params(edge: Edge[Node]).void }
@@ -136,16 +162,16 @@ class Graph
   def delete_edge(edge)
     @edges.delete(edge)
 
-    # remove "to" from "from" successors
-    succs = @successors[edge.from]
-    if succs # should never be nil
-      succs.delete(edge.to)
+    # remove this edge from "from"'s outgoing
+    outgoing = @outgoing[edge.from]
+    if outgoing # should never be nil
+      outgoing.delete(edge)
     end
 
-    # remove "from" from "to" predecessors
-    preds = @predecessors[edge.to]
-    if preds # should never be nil
-      preds.delete(edge.from)
+    # remove this edge from "to"'s incoming
+    incoming = @incoming[edge.to]
+    if incoming # should never be nil
+      incoming.delete(edge)
     end
   end
 end

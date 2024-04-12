@@ -23,7 +23,7 @@ module Debugger::GraphVisualizer
       label = name
       shape = "box"
 
-      # special case for CFGs
+      # special case for CFGs: make ENTRY and EXIT pretty
       if n.is_a?(Analysis::BB)
         name = n.id
         label = n.id
@@ -42,14 +42,17 @@ module Debugger::GraphVisualizer
     # define edges
     graph.each_edge { |e|
       from_name = e.from.id
-      # if e.from == graph.entry then from_name = "ENTRY"
-      # elsif e.from == graph.exit then from_name = "EXIT" end
-
       to_name = e.to.id
-      # if e.to == graph.entry then to_name = "ENTRY"
-      # elsif e.to == graph.exit then to_name = "EXIT" end
 
-      str += "#{from_name} -> #{to_name} [constraint=false]\n"
+      color = "black"
+      # special case for CFGs: highlight cond_branch edges
+      if e.is_a?(Analysis::CFG::Edge)
+        if e.cond_branch
+          color = "blue"
+        end
+      end
+
+      str += "#{from_name} -> #{to_name} [constraint=false color=#{color}]\n"
     }
 
     str += "}"
