@@ -23,6 +23,7 @@ class SSA < Pass
     # define some hashes and sets ahead of time for use later
     # NOTE: these constructions will be overwritten on run but thats ok for now
     @globals = T.let(Set[], T::Set[String])
+    @global_types = T.let(Hash.new, T::Hash[String, IL::Type])
     @blocks = T.let(Hash.new, T::Hash[String, T::Set[BB]])
     @df_facts = T.let(CFGFacts.new(cfg), CFGFacts[BB])
 
@@ -113,7 +114,7 @@ class SSA < Pass
           end
 
           # ...prepend phi for id in d and add d to work list
-          phi = IL::Definition.new(IL::Type::I32, # TODO: correct types
+          phi = IL::Definition.new(T.unsafe(@global_types[name]),
                                    IL::ID.new(name),
                                    IL::Phi.new([])) # ids will be filled later
           d.stmt_list.unshift(phi)
@@ -176,6 +177,9 @@ class SSA < Pass
 
           # add lhs to var_kill
           var_kill.add(s.id.name)
+
+          # note the type of the lhs
+          @global_types[s.id.name] = s.type
 
           # add this block to lhs's blocks set
           if not @blocks[s.id.name]
