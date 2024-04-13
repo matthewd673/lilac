@@ -1,6 +1,6 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "../../code_gen"
+require_relative "wasm"
 require_relative "../../table"
 require_relative "type"
 require_relative "instructions"

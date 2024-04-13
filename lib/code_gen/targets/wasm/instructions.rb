@@ -1,6 +1,6 @@
 # typed: strict
-require_relative "sorbet-runtime"
-require_relative "../../code_gen"
+require "sorbet-runtime"
+require_relative "wasm"
 require_relative "../../instruction"
 
 module CodeGen::Targets::Wasm::Instructions
