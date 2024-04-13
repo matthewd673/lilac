@@ -12,6 +12,8 @@ require_relative "analysis/cfg"
 require_relative "ssa"
 require_relative "interpreter"
 require_relative "frontend/generator"
+require_relative "code_gen/generator"
+require_relative "code_gen/targets/wasm/table"
 
 # load requirements for CLI module (may also benefit external programs)
 require_relative "ansi"
