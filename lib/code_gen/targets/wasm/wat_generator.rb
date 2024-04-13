@@ -7,7 +7,7 @@ require_relative "../../../il"
 require_relative "../../../visitor"
 require_relative "table"
 
-class CodeGen::Targets::Wasm::WATGenerator < CodeGen::Generator
+class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   extend T::Sig
 
   include CodeGen::Targets::Wasm::Instructions

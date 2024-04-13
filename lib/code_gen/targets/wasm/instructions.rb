@@ -7,32 +7,14 @@ module CodeGen::Targets::Wasm::Instructions
   include CodeGen
   include CodeGen::Targets::Wasm
 
-  IntegerType = T.type_alias { T.any(Type::I32, Type::I64) }
-
   # NUMERIC INSTRUCTIONS
   # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Numeric
 
   # CONSTANTS
 
-  # Represents the +const+ instructions: +i32.const+, +i64.const+,
-  # +f32.const+, and +f64.const+.
+  # Represents the +const+ instructions.
   # Declare a constant number.
-  class Const < Instruction
-    extend T::Sig
-
-    include CodeGen::Targets::Wasm
-
-    sig { returns(Type) }
-    attr_reader :type
-    sig { returns(T.untyped) }
-    attr_reader :value
-
-    sig { params(type: Type, value: T.untyped).void }
-    def initialize(type, value)
-      @type = type
-      @value = value
-    end
-
+  class Const < TypedInstruction
     sig { override.returns(Integer) }
     def opcode
       case @type
@@ -46,23 +28,9 @@ module CodeGen::Targets::Wasm::Instructions
 
   # COMPARISON
 
-  # Represents the +eq+ instructions: +i32.eq+, +i64.eq+, +f32.eq+,
-  # and +f64.eq+.
-  # +eqz+ instructions are represented by +EqualZ+.
+  # Represents the +eq+ instructions.
   # Check if two numbers are equal.
-  class Equal < Instruction
-    extend T::Sig
-
-    include CodeGen::Targets::Wasm
-
-    sig { returns(Type) }
-    attr_reader :type
-
-    sig { params(type: Type).void }
-    def initialize(type)
-      @type = type
-    end
-
+  class Equal < TypedInstruction
     sig { override.returns(Integer) }
     def opcode
       case @type
@@ -74,21 +42,9 @@ module CodeGen::Targets::Wasm::Instructions
     end
   end
 
-  # Represents the +eqz+ instructions: +i32.eqz+ and +i64.eqz+.
+  # Represents the +eqz+ instructions.
   # Check if a number is equal to zero.
-  class EqualZ < Instruction
-    extend T::Sig
-
-    include CodeGen::Targets::Wasm
-
-    sig { returns(IntegerType) }
-    attr_reader :type
-
-    sig { params(type: IntegerType).void }
-    def initialize(type)
-      @type = type
-    end
-
+  class EqualZ < IntegerInstruction
     sig { override.returns(Integer) }
     def opcode
       case @type
@@ -97,4 +53,57 @@ module CodeGen::Targets::Wasm::Instructions
       end
     end
   end
+
+  # Represents the +ne+ instructions.
+  # Check if two numbers are not equal.
+  class NotEqual < TypedInstruction
+    sig { override.returns(Integer) }
+    def opcode
+      case @type
+      when Type::I32 then 0x47
+      when Type::I64 then 0x52
+      when Type::F32 then 0x5c
+      when Type::F64 then 0x62
+      end
+    end
+  end
+
+  # TODO: GreaterThan
+  # TODO: LessThan
+  # TODO: GreaterOrEqual
+  # TODO: LessOrEqual
+
+  # ARITHMETIC
+
+  # Represents the +add+ instructions.
+  # Add up two numbers.
+  class Add < TypedInstruction
+    sig { override.returns(Integer) }
+    def opcode
+      case @type
+      when Type::I32 then 0x6a
+      when Type::I64 then 0x7c
+      when Type::F32 then 0x92
+      when Type::F64 then 0xa0
+      end
+    end
+  end
+
+  # Represents the +sub+ instructions.
+  # Subtract one number from another number.
+  class Subtract < TypedInstruction
+    sig { override.returns(Integer) }
+    def opcode
+      case @type
+      when Type::I32 then 0x6b
+      when Type::I64 then 0x7d
+      when Type::F32 then 0x93
+      when Type::F64 then 0xa1
+      end
+    end
+  end
+
+  # TODO: Multiplication
+  # TODO: Division
+  # TODO: Remainder
 end
