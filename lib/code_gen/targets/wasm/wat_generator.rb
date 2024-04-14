@@ -10,7 +10,7 @@ require_relative "table"
 class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   extend T::Sig
 
-  include CodeGen::Targets::Wasm::Instructions
+  include CodeGen::Targets::Wasm
 
   sig { params(cfg_program: IL::CFGProgram).void }
   def initialize(cfg_program)
@@ -22,6 +22,43 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   def generate
     instructions = generate_instructions
     @visitor.visit(instructions)
+  end
+
+  protected
+
+  sig { returns(T::Array[Instruction]) }
+  # NOTE: adapted from CodeGen::Generator.generate_instructions
+  def generate_instructions
+    # generate instructions
+    instructions = []
+
+    # keep track of local variable declarations
+    locals = []
+
+    # TODO: add function support
+    @program.cfg.each_node { |b|
+      b.stmt_list.each { |s|
+        # insert declarations for local variables when appropriate
+        if s.is_a?(IL::Definition)
+          # only declare once
+          if locals.include?(s.id.name)
+            next
+          end
+
+          # TODO: proper type for decl
+          decl = Instructions::Local.new(Type::I32, s.id.name)
+          instructions.push(decl)
+          locals.push(s.id.name)
+        end
+      }
+
+      b.stmt_list.each { |s|
+        # transform instruction like normal
+        instructions.concat(@table.transform(s))
+      }
+    }
+
+    return instructions
   end
 
   private

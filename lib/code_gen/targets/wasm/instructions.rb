@@ -459,9 +459,35 @@ module CodeGen::Targets::Wasm::Instructions
   # VARIABLE INSTRUCTIONS
   # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Variables
 
-  # NOTE: MDN describes a +local+ instruction to declare a new local variable.
-  # However, this is not included in the Wasm Index of Instructions:
-  # https://webassembly.github.io/spec/core/appendix/index-instructions.html
+  # Represents the +local+ instruction.
+  # Declare a local variable.
+  class Local < Instruction
+    extend T::Sig
+
+    include CodeGen::Targets::Wasm
+
+    sig { returns(Type) }
+    attr_reader :type
+
+    sig { returns(String) }
+    attr_reader :variable
+
+    sig { params(type: Type, variable: String).void }
+    def initialize(type, variable)
+      @type = type
+      @variable = variable
+    end
+
+    sig { override.returns(Integer) }
+    def opcode
+      raise("FIXME: no opcode") # FIXME
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "(local $#{@variable} #{@type.to_s})"
+    end
+  end
 
   # Represents the +local.get+ instruction.
   # Load the value of a local variable onto the stack.

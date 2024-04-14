@@ -14,13 +14,13 @@ class CodeGen::Generator
     @program = cfg_program
   end
 
+  protected
+
   sig { returns(T::Array[Instruction]) }
   def generate_instructions
-    # TODO: a lot of temp stuff here
-
     instructions = []
 
-    first_stmt = T.let(nil, T.nilable(IL::Statement))
+    # TODO: add function support
     @program.cfg.each_node { |b|
       b.stmt_list.each { |s|
         instructions.concat(@table.transform(s))
