@@ -3,6 +3,7 @@ require "sorbet-runtime"
 require_relative "code_gen"
 require_relative "instruction"
 require_relative "pattern"
+require_relative "../il"
 
 class CodeGen::Table
   extend T::Sig
@@ -12,18 +13,22 @@ class CodeGen::Table
 
   Rule = T.type_alias { T.any(IL::Statement, IL::Expression, IL::Value) }
 
+  TreeTransform = T.type_alias {
+    T.proc.params(arg0: IL::ILObject).returns(T::Array[CodeGen::Instruction])
+  }
+
   class RuleValue # TODO: there has to be a better name for this
     extend T::Sig
 
     sig { returns(Integer) }
     attr_reader :cost
-    sig { returns(CodeGen::Instruction) }
-    attr_reader :instruction
+    sig { returns(TreeTransform) }
+    attr_reader :transform
 
-    sig { params(cost: Integer, instruction: CodeGen::Instruction).void }
-    def initialize(cost, instruction)
+    sig { params(cost: Integer, transform: TreeTransform).void }
+    def initialize(cost, transform)
       @cost = cost
-      @instruction = instruction
+      @transform = transform
     end
   end
 
@@ -37,22 +42,48 @@ class CodeGen::Table
     @rules.keys.each(&block)
   end
 
-  sig { params(rule: Rule).returns(T.nilable(Instruction)) }
-  def get_rule_instruction(rule)
+  sig { params(object: IL::ILObject).returns(T::Array[Instruction]) }
+  def transform(object)
+    # find all rules that could apply to this object
+    rules = find_rules_for_object(object)
+    if rules.empty?
+      raise("No rules found for object #{object}")
+    end
+
+    # sort rules by cost (cheapest at index 0)
+    rules.sort!
+
+    # apply the lowest-cost rule to the object
+    return apply_rule(T.unsafe(rules[0]), object)
+  end
+
+  protected
+
+  sig { params(rule: Rule, cost: Integer, transform: TreeTransform)
+          .void }
+  def add_rule(rule, cost, transform)
+    @rules[rule] = RuleValue.new(cost, transform)
+  end
+
+  private
+
+  sig { params(rule: Rule, object: IL::ILObject)
+          .returns(T::Array[Instruction]) }
+  def apply_rule(rule, object)
     value = @rules[rule]
     if not value
-      nil
+      raise("Rule does not exist in this table: #{rule}")
     else
-      value.instruction
+      value.transform.call(object)
     end
   end
 
-  sig { params(rule: Rule).returns(T::Array[Rule]) }
-  def find_rule_matches(rule)
+  sig { params(object: IL::ILObject).returns(T::Array[Rule]) }
+  def find_rules_for_object(object)
     rules = []
 
     each_rule { |r|
-      if matches?(r, rule)
+      if matches?(r, object)
         rules.push(r)
       end
     }
@@ -60,44 +91,43 @@ class CodeGen::Table
     return rules
   end
 
-  protected
-
-  sig { params(rule: Rule, cost: Integer, instruction: Instruction).void }
-  def add_rule(rule, cost, instruction)
-    @rules[rule] = RuleValue.new(cost, instruction)
-  end
-
-  private
-
-  sig { params(a: Rule, b: Rule).returns(T::Boolean) }
-  def matches?(a, b)
-    case a
-    # match wildcards (easy)
+  sig { params(rule: Rule, object: IL::ILObject).returns(T::Boolean) }
+  def matches?(rule, object)
+    case rule
+    # WILDCARDS
+    # Statement wildcards
+    when Pattern::DefinitionWildcard
+      return (object.is_a?(IL::Definition) and matches?(rule.rhs, object.rhs))
     when Pattern::StatementWildcard
-      return b.is_a?(IL::Statement)
+      return object.is_a?(IL::Statement)
+    # Right-hand side wildcard
+    when Pattern::RhsWildcard
+      return (object.is_a?(IL::Expression) or object.is_a?(IL::Value))
+    # Expression wildcards
     when Pattern::BinaryOpWildcard
-      if not b.is_a?(IL::BinaryOp)
+      if not object.is_a?(IL::BinaryOp)
         false
       end
-      b = T.cast(b, IL::BinaryOp)
-      matches?(a.left, b.left) and matches?(a.right, b.right)
+      object = T.cast(object, IL::BinaryOp)
+      matches?(rule.left, object.left) and matches?(rule.right, object.right)
     when Pattern::UnaryOpWildcard
-      if not b.is_a?(IL::UnaryOp)
+      if not object.is_a?(IL::UnaryOp)
         false
       end
-      b = T.cast(b, IL::UnaryOp)
-      matches?(a.value, b.value)
+      object = T.cast(object, IL::UnaryOp)
+      matches?(rule.value, object.value)
     when Pattern::ExpressionWildcard
-      return b.is_a?(IL::Expression)
+      return object.is_a?(IL::Expression)
+    # Value wildcards
     when Pattern::IDWildcard
-      return b.is_a?(IL::ID)
+      return object.is_a?(IL::ID)
     when Pattern::ConstantWildcard
-      return b.is_a?(IL::Constant)
+      return object.is_a?(IL::Constant)
     when Pattern::ValueWildcard
-      return b.is_a?(IL::Value)
+      return object.is_a?(IL::Value)
     # TODO: implement non-wildcard matches
     end
 
-    raise("Unsupported pattern match between \"#{a}\" and \"#{b}\"")
+    raise("Unsupported pattern match between \"#{rule}\" and \"#{object}\"")
   end
 end

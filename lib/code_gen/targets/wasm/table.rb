@@ -14,10 +14,38 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
   sig { void }
   def initialize
     super
+    define_rules
+  end
 
-    # define all rules for this table
-    add_rule(Pattern::StatementWildcard.new,
+  private
+
+  sig { void }
+  def define_rules
+    # statement rules
+    add_rule(Pattern::DefinitionWildcard.new(Pattern::RhsWildcard.new),
              0,
-             Instructions::Const.new(Type::I32, 5))
+             -> (object) {
+               type = il_type_to_wasm_type(object.type)
+               [Instructions::Const.new(type, 9999)] # TODO: temp
+             })
+    # value rules
+    add_rule(Pattern::ConstantWildcard.new,
+             0,
+             -> (object) {
+               type = il_type_to_wasm_type(object.type)
+               [Instructions::Const.new(type, object.value)]
+             })
+  end
+
+  sig { params(il_type: IL::Type).returns(Type) }
+  def il_type_to_wasm_type(il_type)
+    case il_type
+    when IL::Type::I32 then Type::I32
+    when IL::Type::I64 then Type::I64
+    when IL::Type::F32 then Type::F32
+    when IL::Type::F64 then Type::F64
+    else
+      raise("IL type #{il_type} is not supported by Wasm")
+    end
   end
 end
