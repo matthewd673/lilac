@@ -8,13 +8,13 @@ class CodeGen::Generator
 
   include CodeGen
 
-  sig { params(table: Table, program: IL::CFGProgram).void }
-  def initialize(table, program)
+  sig { params(table: Table, cfg_program: IL::CFGProgram).void }
+  def initialize(table, cfg_program)
     @table = table
-    @program = program
+    @program = cfg_program
   end
 
-  sig { returns(T.nilable(Instruction)) }
+  sig { returns(T::Array[Instruction]) }
   # TODO: placeholder-ish function to just generate an
   # Instruction from a single Statement. The actual
   # generate function should do a whole Program (probably
@@ -35,12 +35,6 @@ class CodeGen::Generator
       puts "first stmt: #{first_stmt}"
     end
 
-    @table.find_rule_matches(first_stmt).each { |r|
-      rule_ins = @table.get_rule_instruction(r)
-      puts rule_ins
-      return rule_ins
-    }
-
-    return nil
+    return @table.transform(first_stmt)
   end
 end

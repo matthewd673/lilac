@@ -12,34 +12,35 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
 
   include CodeGen::Targets::Wasm::Instructions
 
-  sig { params(program: IL::CFGProgram).void }
-  def initialize(program)
-    super(CodeGen::Targets::Wasm::Table.new, program)
+  sig { params(cfg_program: IL::CFGProgram).void }
+  def initialize(cfg_program)
+    super(CodeGen::Targets::Wasm::Table.new, cfg_program)
     @visitor = T.let(Visitor.new(VISIT_LAMBDAS), Visitor)
   end
 
-  sig { void }
+  sig { returns(String) }
   def generate
     # TODO: return a nice string eventually
-    instruction = generate_instructions
-    puts @visitor.visit(instruction)
+    instructions = generate_instructions
+    @visitor.visit(instructions)
   end
 
   private
 
-  VISIT_TYPE = T.let(-> (v, o, c) {
-    o.to_s
+  VISIT_ARRAY = T.let(-> (v, o, c) {
+    str = ""
+    o.each { |instruction|
+      str += v.visit(instruction)
+    }
+    return str
   }, Visitor::Lambda)
 
-  VISIT_CONST = T.let(-> (v, o, c) {
-    type = o.type
-    value = o.value
-
-    "#{v.visit(type)}.const #{value}"
+  VISIT_INSTRUCTION = T.let(-> (v, o, c) {
+    o.wat
   }, Visitor::Lambda)
 
   VISIT_LAMBDAS = T.let({
-    CodeGen::Targets::Wasm::Type => VISIT_TYPE,
-    Const => VISIT_CONST,
+    Array => VISIT_ARRAY,
+    CodeGen::Targets::Wasm::Instruction => VISIT_INSTRUCTION,
   }, Visitor::LambdaHash)
 end
