@@ -54,6 +54,25 @@ class CodeGen::Targets::Wasm::IntegerInstruction <
   end
 end
 
+class CodeGen::Targets::Wasm::FloatInstruction <
+  CodeGen::Targets::Wasm::Instruction
+
+  extend T::Sig
+  extend T::Helpers
+
+  abstract!
+
+  include CodeGen::Targets::Wasm
+
+  sig { returns(T.any(Type::F32, Type::F64)) }
+  attr_reader :type
+
+  sig { params(type: T.any(Type::F32, Type::F64)).void }
+  def initialize(type)
+    @type = type
+  end
+end
+
 class CodeGen::Targets::Wasm::VariableInstruction <
   CodeGen::Targets::Wasm::Instruction
 
