@@ -124,11 +124,39 @@ class CodeGen::Table
       return object.is_a?(IL::ID)
     when Pattern::ConstantWildcard
       return object.is_a?(IL::Constant)
+    when Pattern::IntegerConstantWildcard
+      return (object.is_a?(IL::Constant) and
+              case object.type # match with the four integer types
+              when IL::Type::U8 then true
+              when IL::Type::I16 then true
+              when IL::Type::I32 then true
+              when IL::Type::I64 then true
+              else false
+              end and
+              constant_value_matches?(rule.value, object.value))
+    when Pattern::FloatConstantWildcard
+      return (object.is_a?(IL::Constant) and
+              case object.type # match with the two floating point types
+              when IL::Type::F32 then true
+              when IL::Type::F64 then true
+              else false
+              end and
+              constant_value_matches?(rule.value, object.value))
     when Pattern::ValueWildcard
       return object.is_a?(IL::Value)
     # TODO: implement non-wildcard matches
     end
 
     raise("Unsupported pattern match between \"#{rule}\" and \"#{object}\"")
+  end
+
+  sig { params(rule: T.any(Pattern::ConstantValueWildcard, T.untyped),
+               value: T.untyped)
+          .returns(T::Boolean) }
+  def constant_value_matches?(rule, value)
+    case rule
+      when Pattern::ConstantValueWildcard then return true
+      else return rule == value
+    end
   end
 end

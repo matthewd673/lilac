@@ -49,6 +49,7 @@ module CodeGen::Pattern
     end
   end
 
+  # A wildcard for an +IL::UnaryOp+ with any operator.
   class UnaryOpWildcard < IL::Expression
     sig { returns(IL::Value) }
     attr_reader :value
@@ -59,17 +60,47 @@ module CodeGen::Pattern
     end
   end
 
+  # A wildcard for any +IL::Value+.
   class ValueWildcard < IL::Value
-    # NOTE: stub
+    sig { void }
+    def initialize
+    end
   end
 
+  # A wildcard for any +IL::ID+.
   class IDWildcard < IL::ID
-    # NOTE: stub
+    sig { void }
+    def initialize
+    end
   end
 
+  # A wildcard for an +IL::Constant+ of any type and with any value.
   class ConstantWildcard < IL::Constant
     sig { void }
     def initialize
     end
+  end
+
+  # A wildcard for any +IL::Constant+ with an integer type (+U8+, +I16+,
+  # +I32+, or +I64+).
+  class IntegerConstantWildcard < IL::Constant
+    sig { params(value: T.untyped).void }
+    def initialize(value)
+      @value = value
+    end
+  end
+
+  # A wildcard for any +IL::Constant+ with a floating point type (+F32+,
+  # +F64+).
+  class FloatConstantWildcard < IL::Constant
+    sig { params(value: T.untyped).void }
+    def initialize(value)
+      @value = value
+    end
+  end
+
+  # A wildcard for the numeric value stored in an +IL::Constant+.
+  class ConstantValueWildcard
+    # NOTE: stub
   end
 end
