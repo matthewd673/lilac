@@ -1,6 +1,7 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "code_gen"
+require_relative "wasm"
+require_relative "../../instruction"
 
 class CodeGen::Targets::Wasm::Instruction < CodeGen::Instruction
   extend T::Sig
@@ -10,9 +11,14 @@ class CodeGen::Targets::Wasm::Instruction < CodeGen::Instruction
 
   sig { abstract.returns(Integer) }
   def opcode; end
+
+  sig { abstract.returns(String) }
+  def wat; end
 end
 
-class CodeGen::Targets::Wasm::TypedInstruction < CodeGen::Instruction
+class CodeGen::Targets::Wasm::TypedInstruction <
+  CodeGen::Targets::Wasm::Instruction
+
   extend T::Sig
   extend T::Helpers
 
@@ -27,12 +33,11 @@ class CodeGen::Targets::Wasm::TypedInstruction < CodeGen::Instruction
   def initialize(type)
     @type = type
   end
-
-  sig { abstract.returns(Integer) }
-  def opcode; end
 end
 
-class CodeGen::Targets::Wasm::IntegerInstruction < CodeGen::Instruction
+class CodeGen::Targets::Wasm::IntegerInstruction <
+  CodeGen::Targets::Wasm::Instruction
+
   extend T::Sig
   extend T::Helpers
 
@@ -47,7 +52,4 @@ class CodeGen::Targets::Wasm::IntegerInstruction < CodeGen::Instruction
   def initialize(type)
     @type = type
   end
-
-  sig { abstract.returns(Integer) }
-  def opcode; end
 end

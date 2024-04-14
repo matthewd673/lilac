@@ -1,7 +1,7 @@
 # typed: strict
 require "sorbet-runtime"
 require_relative "wasm"
-require_relative "../../instruction"
+require_relative "instruction"
 
 module CodeGen::Targets::Wasm::Instructions
   include CodeGen
@@ -15,6 +15,18 @@ module CodeGen::Targets::Wasm::Instructions
   # Represents the +const+ instructions.
   # Declare a constant number.
   class Const < TypedInstruction
+    include CodeGen::Targets::Wasm
+
+    sig { returns(T.untyped) }
+    attr_reader :value
+
+    sig { params(type: Type, value: T.untyped).void }
+    def initialize(type, value)
+      super(type)
+
+      @value = value
+    end
+
     sig { override.returns(Integer) }
     def opcode
       case @type
@@ -23,6 +35,11 @@ module CodeGen::Targets::Wasm::Instructions
       when Type::F32 then 0x43
       when Type::F64 then 0x44
       end
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "#{@type.to_s}.const #{@value}"
     end
   end
 
@@ -40,17 +57,27 @@ module CodeGen::Targets::Wasm::Instructions
       when Type::F64 then 0x61
       end
     end
+
+    sig { override.returns(String) }
+    def wat
+      "#{@type.to_s}.eq"
+    end
   end
 
   # Represents the +eqz+ instructions.
   # Check if a number is equal to zero.
-  class EqualZ < IntegerInstruction
+  class EqualZero < IntegerInstruction
     sig { override.returns(Integer) }
     def opcode
       case @type
       when Type::I32 then 0x45
       when Type::I64 then 0x50
       end
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "#{@type.to_s}.eqz"
     end
   end
 
@@ -65,6 +92,11 @@ module CodeGen::Targets::Wasm::Instructions
       when Type::F32 then 0x5c
       when Type::F64 then 0x62
       end
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "#{@type.to_s}.ne"
     end
   end
 
@@ -87,6 +119,11 @@ module CodeGen::Targets::Wasm::Instructions
       when Type::F64 then 0xa0
       end
     end
+
+    sig { override.returns(String) }
+    def wat
+      "#{@type.to_s}.add"
+    end
   end
 
   # Represents the +sub+ instructions.
@@ -100,6 +137,11 @@ module CodeGen::Targets::Wasm::Instructions
       when Type::F32 then 0x93
       when Type::F64 then 0xa1
       end
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "#{@type.to_s}.sub"
     end
   end
 
