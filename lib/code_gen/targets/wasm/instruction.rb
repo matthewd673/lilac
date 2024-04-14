@@ -53,3 +53,20 @@ class CodeGen::Targets::Wasm::IntegerInstruction <
     @type = type
   end
 end
+
+class CodeGen::Targets::Wasm::VariableInstruction <
+  CodeGen::Targets::Wasm::Instruction
+
+  extend T::Sig
+  extend T::Helpers
+
+  abstract!
+
+  sig { returns(String) }
+  attr_reader :variable
+
+  sig { params(variable: String).void }
+  def initialize(variable)
+    @variable = variable
+  end
+end

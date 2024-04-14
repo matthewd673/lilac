@@ -148,4 +148,37 @@ module CodeGen::Targets::Wasm::Instructions
   # TODO: Multiplication
   # TODO: Division
   # TODO: Remainder
+
+  # VARIABLE INSTRUCTIONS
+  # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Variables
+
+  # TODO: Declare local
+
+  # Represents the +local.get+ instruction.
+  # Load the value of a local variable onto the stack.
+  class LocalGet < VariableInstruction
+    sig { override.returns(Integer) }
+    def opcode
+      0x20
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "local.get $#{@variable}"
+    end
+  end
+
+  # Represents the +local.set+ instruction.
+  # Set the value of a local variable.
+  class LocalSet < VariableInstruction
+    sig { override.returns(Integer) }
+    def opcode
+      0x21
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "local.set $#{@variable}"
+    end
+  end
 end
