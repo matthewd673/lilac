@@ -20,7 +20,6 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
 
   sig { returns(String) }
   def generate
-    # TODO: return a nice string eventually
     instructions = generate_instructions
     @visitor.visit(instructions)
   end
@@ -30,8 +29,9 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   VISIT_ARRAY = T.let(-> (v, o, c) {
     str = ""
     o.each { |instruction|
-      str += v.visit(instruction)
+      str += v.visit(instruction) + "\n"
     }
+    str.chomp!
     return str
   }, Visitor::Lambda)
 

@@ -14,7 +14,8 @@ class CodeGen::Table
   Rule = T.type_alias { T.any(IL::Statement, IL::Expression, IL::Value) }
 
   TreeTransform = T.type_alias {
-    T.proc.params(arg0: IL::ILObject).returns(T::Array[CodeGen::Instruction])
+    T.proc.params(arg0: IL::ILObject, arg1: Method)
+      .returns(T::Array[CodeGen::Instruction])
   }
 
   class RuleValue # TODO: there has to be a better name for this
@@ -54,7 +55,7 @@ class CodeGen::Table
     rules.sort!
 
     # apply the lowest-cost rule to the object
-    return apply_rule(T.unsafe(rules[0]), object)
+    return apply_rule(T.unsafe(rules[0]), object, method(:transform))
   end
 
   protected
@@ -67,14 +68,14 @@ class CodeGen::Table
 
   private
 
-  sig { params(rule: Rule, object: IL::ILObject)
+  sig { params(rule: Rule, object: IL::ILObject, recursive_method: Method)
           .returns(T::Array[Instruction]) }
-  def apply_rule(rule, object)
+  def apply_rule(rule, object, recursive_method)
     value = @rules[rule]
     if not value
       raise("Rule does not exist in this table: #{rule}")
     else
-      value.transform.call(object)
+      value.transform.call(object, recursive_method)
     end
   end
 

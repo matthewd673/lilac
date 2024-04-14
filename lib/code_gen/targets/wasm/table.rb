@@ -24,14 +24,16 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
     # statement rules
     add_rule(Pattern::DefinitionWildcard.new(Pattern::RhsWildcard.new),
              0,
-             -> (object) {
+             -> (object, recurse) {
                type = il_type_to_wasm_type(object.type)
-               [Instructions::Const.new(type, 9999)] # TODO: temp
+               rhs = recurse.call(object.rhs)
+               [rhs,
+                Instructions::LocalSet.new(object.id.name)] # TODO: temp
              })
     # value rules
     add_rule(Pattern::ConstantWildcard.new,
              0,
-             -> (object) {
+             -> (object, recurse) {
                type = il_type_to_wasm_type(object.type)
                [Instructions::Const.new(type, object.value)]
              })
