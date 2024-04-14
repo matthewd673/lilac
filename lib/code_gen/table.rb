@@ -144,7 +144,14 @@ class CodeGen::Table
               constant_value_matches?(rule.value, object.value))
     when Pattern::ValueWildcard
       return object.is_a?(IL::Value)
+    # NON-WILDCARDS
     # TODO: implement non-wildcard matches
+    when IL::BinaryOp
+      return (object.is_a?(IL::BinaryOp) and rule.op == object.op and
+        matches?(rule.left, object.left) and matches?(rule.right, object.right))
+    when IL::UnaryOp
+      return (object.is_a?(IL::UnaryOp) and rule.op == object.op and
+        matches?(rule.value, object.value))
     end
 
     raise("Unsupported pattern match between \"#{rule}\" and \"#{object}\"")

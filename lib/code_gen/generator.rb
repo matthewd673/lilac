@@ -15,26 +15,18 @@ class CodeGen::Generator
   end
 
   sig { returns(T::Array[Instruction]) }
-  # TODO: placeholder-ish function to just generate an
-  # Instruction from a single Statement. The actual
-  # generate function should do a whole Program (probably
-  # a CFGProgram).
   def generate_instructions
     # TODO: a lot of temp stuff here
-    # TESTING: get first statement in cfg and try to match it
+
+    instructions = []
+
     first_stmt = T.let(nil, T.nilable(IL::Statement))
     @program.cfg.each_node { |b|
-      if b == @program.cfg.entry then next end
-      first_stmt = b.stmt_list[0]
-      break
+      b.stmt_list.each { |s|
+        instructions.concat(@table.transform(s))
+      }
     }
 
-    if not first_stmt
-      raise("No statement in program")
-    else
-      puts "first stmt: #{first_stmt}"
-    end
-
-    return @table.transform(first_stmt)
+    return instructions
   end
 end
