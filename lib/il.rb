@@ -848,6 +848,27 @@ module IL
       @func_map = T.let({}, T::Hash[String, CFGFuncDef])
     end
 
+    sig { params(program: Program).returns(CFGProgram) }
+    def self.from_program(program)
+      # convert main program stmt list to bb and cfg
+      main_bb = Analysis::BB.from_stmt_list(program.stmt_list)
+      main_cfg = Analysis::CFG.new(main_bb)
+
+      # create CFGProgram from main
+      cfg_program = CFGProgram.new(main_cfg)
+
+      # convert all functions to cfg and add them
+      program.each_func { |f|
+        func_bb = Analysis::BB.from_stmt_list(f.stmt_list)
+        func_cfg = Analysis::CFG.new(func_bb)
+        cfg_funcdef = CFGFuncDef.new(f.name, f.params, f.ret_type, func_cfg)
+
+        cfg_program.add_func(cfg_funcdef)
+      }
+
+      return cfg_program
+    end
+
     sig { params(cfg_funcdef: CFGFuncDef).void }
     def add_func(cfg_funcdef)
       @func_map[cfg_funcdef.name] = cfg_funcdef
