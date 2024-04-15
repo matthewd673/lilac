@@ -139,7 +139,32 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
                type = get_type(object.left)
                [left, right, Instructions::Multiply.new(type)]
              })
-    # TODO: division
+    # division
+    add_rule(IL::BinaryOp.new(IL::BinaryOp::Operator::DIV,
+                              Pattern::ValueWildcard.new,
+                              Pattern::ValueWildcard.new),
+             0,
+             -> (object, recurse) {
+               left = recurse.call(object.left)
+               right = recurse.call(object.right)
+
+               il_type = get_il_type(object.left)
+
+               # choose between div_s, div_u, and div
+               div = nil
+               if signed?(il_type)
+                 type = Instructions::to_integer_type(il_type)
+                 div = Instructions::DivideSigned.new(type)
+               elsif unsigned?(il_type)
+                 type = Instructions::to_integer_type(il_type)
+                 div = Instructions::DivideUnsigned.new(type)
+               elsif float?(il_type)
+                 type = Instructions::to_float_type(il_type)
+                 div = Instructions::Divide.new(type)
+               end
+
+               [left, right, div]
+             })
     # less than
     add_rule(IL::BinaryOp.new(IL::BinaryOp::Operator::LT,
                               Pattern::ValueWildcard.new,
