@@ -51,7 +51,7 @@ class Validation::TypeCheck < ValidationPass
       end
 
       # register id in symbol table for every def (since this is SSA)
-      symbols.insert(ILSymbol.new(i.id.key, i.type))
+      symbols.insert(ILSymbol.new(i.id, i.type))
 
       # find the type of the rhs
       if i.rhs.is_a?(IL::Constant)
