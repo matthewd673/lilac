@@ -133,6 +133,7 @@ module Interpreter
     key = o.key
 
     info = context.symbols.lookup(key)
+
     return InterpreterValue.new(info.type, info.value)
   }, Visitor::Lambda)
 
@@ -224,12 +225,12 @@ module Interpreter
     if context.in_func
       this_func_scope = context.symbols.pop_scope
     end
-    this_ip = context.ip
+    this_current = context.current
 
     # enter new scope for function
     context.symbols.push_scope(Scope.new)
     context.in_func = func
-    context.ip = 0
+    context.current = func.cfg.entry
 
     # fill in params with args (that were computed in this_func_scope)
     arg_index = 0
@@ -247,6 +248,7 @@ module Interpreter
     if this_func_scope
       context.symbols.push_scope(this_func_scope)
     end
+    context.current = this_current
 
     # return value from inside function
     return ret_value
@@ -499,7 +501,7 @@ module Interpreter
     attr_reader :symbols
     sig { returns(T::Hash[String, IL::CFGFuncDef]) }
     attr_accessor :funcs # func name -> CFGFuncDef
-    sig { returns(T.nilable(IL::FuncDef)) }
+    sig { returns(T.nilable(IL::CFGFuncDef)) }
     attr_accessor :in_func
     sig { returns(T::Hash[String, Analysis::BB]) }
     attr_accessor :label_blocks # label name -> BB object
@@ -511,7 +513,7 @@ module Interpreter
       @symbols = T.let(SymbolTable.new, SymbolTable)
       @symbols.push_scope(Scope.new) # symbol table always has top-level scope
       @funcs = T.let(Hash.new, T::Hash[String, IL::CFGFuncDef])
-      @in_func = T.let(nil, T.nilable(IL::FuncDef))
+      @in_func = T.let(nil, T.nilable(IL::CFGFuncDef))
       @label_blocks = T.let(Hash.new, T::Hash[String, Analysis::BB])
     end
   end

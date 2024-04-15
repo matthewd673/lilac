@@ -42,7 +42,7 @@ class Debugger::PrettyPrinter
     ctx = PrettyPrinterContext.new(gutter_len, 0, 0)
     program.each_func { |f|
       puts(@visitor.visit(f, ctx: ctx))
-      ctx.line_number += 1 # TODO: is this right?
+      ctx.line_num += 1 # TODO: is this right?
     }
     program.stmt_list.each { |s|
       puts(@visitor.visit(s, ctx: ctx))
