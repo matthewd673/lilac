@@ -2,10 +2,27 @@
 require "sorbet-runtime"
 require_relative "wasm"
 require_relative "instruction"
+require_relative "../../../il"
 
 module CodeGen::Targets::Wasm::Instructions
+  extend T::Sig
+
   include CodeGen
   include CodeGen::Targets::Wasm
+
+  # HELPER FUNCTIONS
+  sig { params(il_type: IL::Type).returns(Type) }
+  def self.il_type_to_wasm_type(il_type)
+    case il_type
+    when IL::Type::I32 then Type::I32
+    when IL::Type::I64 then Type::I64
+    when IL::Type::F32 then Type::F32
+    when IL::Type::F64 then Type::F64
+    else
+      raise("IL type #{il_type} is not supported by Wasm")
+    end
+  end
+
 
   # NUMERIC INSTRUCTIONS
   # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Numeric

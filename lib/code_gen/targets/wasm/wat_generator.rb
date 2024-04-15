@@ -29,29 +29,43 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   sig { returns(T::Array[Instruction]) }
   # NOTE: adapted from CodeGen::Generator.generate_instructions
   def generate_instructions
+    # scan forwards to build a symbol table of all locals and their types.
+    symbols = SymbolTable.new
+    symbols.push_scope
+
+    @program.cfg.each_node { |b|
+      # scan each block for definitions and log them
+      # a previous validation should have already ensured that there are no
+      # inconsistent types, so we don't need any checks here.
+      b.stmt_list.each { |s|
+        if not s.is_a?(IL::Definition)
+          next
+        end
+
+        # NOTE: if not in SSA (which it will never be by this point) this will
+        # lead to duplicate inserts but the types should never change so thats
+        # fine.
+        id_symbol = ILSymbol.new(s.id, s.type)
+        symbols.insert(id_symbol)
+      }
+    }
+
     # generate instructions
     instructions = []
 
-    # keep track of local variable declarations
-    locals = []
+    # insert local declarations at the top
+    local_scope = symbols.top_scope
+    if not local_scope # this should never happen
+      raise "No scope in symbol table"
+    end
+    local_scope.each_symbol { |sym|
+      type = Instructions::il_type_to_wasm_type(sym.type)
+      decl = Instructions::Local.new(type, sym.id.name)
+      instructions.push(decl)
+    }
 
     # TODO: add function support
     @program.cfg.each_node { |b|
-      b.stmt_list.each { |s|
-        # insert declarations for local variables when appropriate
-        if s.is_a?(IL::Definition)
-          # only declare once
-          if locals.include?(s.id.name)
-            next
-          end
-
-          # TODO: proper type for decl
-          decl = Instructions::Local.new(Type::I32, s.id.name)
-          instructions.push(decl)
-          locals.push(s.id.name)
-        end
-      }
-
       b.stmt_list.each { |s|
         # transform instruction like normal
         instructions.concat(@table.transform(s))

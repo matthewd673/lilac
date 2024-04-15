@@ -13,20 +13,4 @@ class CodeGen::Generator
     @table = table
     @program = cfg_program
   end
-
-  protected
-
-  sig { returns(T::Array[Instruction]) }
-  def generate_instructions
-    instructions = []
-
-    # TODO: add function support
-    @program.cfg.each_node { |b|
-      b.stmt_list.each { |s|
-        instructions.concat(@table.transform(s))
-      }
-    }
-
-    return instructions
-  end
 end
