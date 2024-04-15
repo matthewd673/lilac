@@ -7,6 +7,9 @@ require_relative "../../../il"
 require_relative "../../../visitor"
 require_relative "../../../symbol_table"
 require_relative "table"
+require_relative "instructions/instructions"
+require_relative "instructions/instruction_set"
+require_relative "constructs"
 
 class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   extend T::Sig
@@ -30,7 +33,7 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
 
   protected
 
-  sig { returns(T::Array[Instruction]) }
+  sig { returns(Constructs::Module) }
   # NOTE: adapted from CodeGen::Generator.generate_instructions
   def generate_instructions
     # scan forwards to build a symbol table of all locals and their types.
@@ -76,26 +79,48 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
       }
     }
 
-    return instructions
+    constructs = []
+
+    constructs.push(Constructs::Func.new("__lilac_main", instructions))
+    constructs.push(Constructs::Start.new("__lilac_main"))
+
+    wasm_module = Constructs::Module.new(constructs)
+
+    return wasm_module
   end
 
   private
 
   VISIT_ARRAY = T.let(-> (v, o, c) {
     str = ""
-    o.each { |instruction|
-      str += v.visit(instruction) + "\n"
+    o.each { |element|
+      str += "#{v.visit(element, ctx: c)}\n"
     }
     str.chomp!
     return str
   }, Visitor::Lambda)
 
+  VISIT_MODULE = T.let(-> (v, o, c) {
+    "(module\n#{v.visit(o.constructs, ctx: "  ")}\n)"
+  }, Visitor::Lambda)
+
+  VISIT_FUNC = T.let(-> (v, o, c) {
+    "#{c}(func $#{o.name}\n#{v.visit(o.instructions, ctx: c + "  ")}\n#{c})"
+  }, Visitor::Lambda)
+
+  VISIT_START = T.let(-> (v, o, c) {
+    "#{c}(start $#{o.name})"
+  }, Visitor::Lambda)
+
   VISIT_INSTRUCTION = T.let(-> (v, o, c) {
-    o.wat
+    "#{c}#{o.wat}"
   }, Visitor::Lambda)
 
   VISIT_LAMBDAS = T.let({
     Array => VISIT_ARRAY,
-    CodeGen::Targets::Wasm::Instruction => VISIT_INSTRUCTION,
+    Constructs::Module => VISIT_MODULE,
+    Constructs::Func => VISIT_FUNC,
+    Constructs::Start => VISIT_START,
+    Instruction => VISIT_INSTRUCTION,
   }, Visitor::LambdaHash)
 end
