@@ -34,7 +34,7 @@ class Validation::SSA < ValidationPass
         if symbols.lookup(p.id.key)
           raise("Multiple definitions of ID '#{p.id.key}'")
         end
-        symbols.insert(ILSymbol.new(p.id.key, p.type))
+        symbols.insert(ILSymbol.new(p.id, p.type))
       }
 
       # recursive scan
@@ -56,7 +56,7 @@ class Validation::SSA < ValidationPass
       if symbols.lookup(s.id.key)
         raise("Multiple definitions of ID '#{s.id.key}'")
       end
-      symbols.insert(ILSymbol.new(s.id.key, s.type))
+      symbols.insert(ILSymbol.new(s.id, s.type))
     }
   end
 end
