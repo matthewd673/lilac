@@ -134,6 +134,22 @@ class CodeGen::Table
               else false
               end and
               constant_value_matches?(rule.value, object.value))
+    when Pattern::SignedConstantWildcard
+      return (object.is_a?(IL::Constant) and
+              case object.type
+              when IL::Type::I16 then true
+              when IL::Type::I32 then true
+              when IL::Type::I64 then true
+              else false
+              end and
+              constant_value_matches?(rule.value, object.value))
+    when Pattern::UnsignedConstantWildcard
+      return (object.is_a?(IL::Constant) and
+              case object.type
+              when IL::Type::U8 then true
+              else false
+              end and
+              constant_value_matches?(rule.value, object.value))
     when Pattern::FloatConstantWildcard
       return (object.is_a?(IL::Constant) and
               case object.type # match with the two floating point types

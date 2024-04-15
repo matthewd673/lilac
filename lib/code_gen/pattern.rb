@@ -81,9 +81,24 @@ module CodeGen::Pattern
     end
   end
 
-  # A wildcard for any +IL::Constant+ with an integer type (+U8+, +I16+,
-  # +I32+, or +I64+).
+  # A wildcard for any +IL::Constant+ with an integer type.
   class IntegerConstantWildcard < IL::Constant
+    sig { params(value: T.untyped).void }
+    def initialize(value)
+      @value = value
+    end
+  end
+
+  # A wildcard for any +IL::Constant+ with a signed integer type.
+  class SignedConstantWildcard < IL::Constant
+    sig { params(value: T.untyped).void }
+    def initialize(value)
+      @value = value
+    end
+  end
+
+  # A wildcard for any +IL::Constant+ with an unsigned integer type.
+  class UnsignedConstantWildcard < IL::Constant
     sig { params(value: T.untyped).void }
     def initialize(value)
       @value = value
