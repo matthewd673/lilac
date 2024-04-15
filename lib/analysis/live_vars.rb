@@ -89,7 +89,7 @@ class Analysis::LiveVars < Analysis::DFA
     elsif node.is_a?(IL::UnaryOp)
       return find_vars(node.value)
     elsif node.is_a?(IL::ID)
-      return Set[node.name] # TODO: should this be name or name#number?
+      return Set[node.name]
     # TODO: will someday need a case for function calls
     end
 

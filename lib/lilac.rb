@@ -19,13 +19,13 @@ require_relative "optimization/optimizations"
 require_relative "validation/validations"
 require_relative "frontend/parser"
 
-# The CLI module contains the CLI tools provided by lilac.
+# The CLI module contains the CLI tools provided by Lilac.
 module CLI
   extend T::Sig
   include Kernel
 
   sig { void }
-  # Handles behavior when the lilac CLI is called with no arguments.
+  # Handles behavior when the Lilac CLI is called with no arguments.
   def self.main
     puts(ANSI.fmt256("lilac", ANSI::LILAC_256, bold: true))
     puts("  optimizations: list all optimizations")
@@ -51,6 +51,10 @@ module CLI
   end
 
   sig { params(filename: T.nilable(String)).void }
+  # Parse a file using +Frontend::Parser+ and pretty-print it.
+  #
+  # @param [T.nilable(String)] filename The name of the file to parse
+  #   (or +nil+ which will be handled nicely).
   def self.parse(filename)
     if not filename
       puts("usage: lilac parse <filename>")
@@ -63,6 +67,11 @@ module CLI
   end
 
   sig { params(filename: T.nilable(String)).void }
+  # Parse a file using +Frontend::Parser+, build a CFG of its top-level
+  # statement list, and print a Graphviz DOT representation of the CFG.
+  #
+  # @param [T.nilable(String)] filename The name of the file to parse
+  #   (or +nil+ which will be handled nicely).
   def self.cfg(filename)
     if not filename
       puts("usage: lilac cfg <filename>")
@@ -87,7 +96,7 @@ module CLI
   end
 end
 
-# if lilac is run directly then provide a simple CLI.
+# if Lilac is run directly then provide a simple CLI.
 if $PROGRAM_NAME == __FILE__
   if ARGV.length == 0 # no args case
     CLI.main
