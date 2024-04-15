@@ -117,6 +117,8 @@ class CodeGen::Table
       end
       object = T.cast(object, IL::UnaryOp)
       matches?(rule.value, object.value)
+    when Pattern::CallWildcard
+      return object.is_a?(IL::Call)
     when Pattern::ExpressionWildcard
       return object.is_a?(IL::Expression)
     # Value wildcards
