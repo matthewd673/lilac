@@ -36,7 +36,7 @@ class Analysis::Dominators < Analysis::DFA
   sig { returns(CFGFacts[Domain]) }
   # Run the Dominators analysis.
   #
-  # @param [CFGFacts[Domain]] A +CFGFacts+ containing information about
+  # @return [CFGFacts[Domain]] A +CFGFacts+ containing information about
   #   each block's dominators (which are stored in +:out+).
   def run
     @cfg.each_node { |b|

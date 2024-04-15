@@ -30,8 +30,8 @@ class Analysis::CFGFacts
   # be added as a fact hash with symbol +:out+ and a hash of all blocks
   # mapped to the domain objects in their OUT set.
   #
-  # @params [Symbol] symbol The symbol of the fact hash.
-  # @params [T::Hash[BB, T::Set[Domain]]] hash The hash of blocks mapped to
+  # @param [Symbol] symbol The symbol of the fact hash.
+  # @param [T::Hash[BB, T::Set[Domain]]] hash The hash of blocks mapped to
   #   sets of facts.
   def add_fact_hash(symbol, hash)
     @facts[symbol] = hash

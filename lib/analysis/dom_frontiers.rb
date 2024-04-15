@@ -32,7 +32,7 @@ class Analysis::DomFrontiers
   sig { returns(CFGFacts[BB]) }
   # Run the dominance frontiers analysis.
   #
-  # @param [CFGFacts[BB]] a +CFGFacts+ object containing dominance frontier
+  # @return [CFGFacts[BB]] A +CFGFacts+ object containing dominance frontier
   #   information for the graph. Dominance frontier information is stored
   #   in symbol +:df+.
   def run

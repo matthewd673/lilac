@@ -96,7 +96,7 @@
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
     
-<p>The CLI module contains the CLI tools provided by lilac.</p>
+<p>The CLI module contains the CLI tools provided by Lilac.</p>
 
 
   </div>
@@ -136,7 +136,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Parse a file using <code>Frontend::Parser</code>, build a CFG of its top-level statement list, and print a Graphviz DOT representation of the CFG.</p>
+</div></span>
   
 </li>
 
@@ -159,7 +161,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Handles behavior when the lilac CLI is called with no arguments.</p>
+<p>Handles behavior when the Lilac CLI is called with no arguments.</p>
 </div></span>
   
 </li>
@@ -182,7 +184,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Parse a file using <code>Frontend::Parser</code> and pretty-print it.</p>
+</div></span>
   
 </li>
 
@@ -255,22 +259,43 @@
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Parse a file using <code>Frontend::Parser</code>, build a CFG of its top-level statement list, and print a Graphviz DOT representation of the CFG.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>filename</span>
+      
+      
+        <span class='type'>(<tt>T.nilable(String)</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The name of the file to parse (or <code>nil</code> which will be handled nicely).</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
 76
 77
 78
@@ -282,10 +307,20 @@
 84
 85
 86
-87</pre>
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 76</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_cfg'>cfg</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_filename'>filename</span>
@@ -326,7 +361,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Handles behavior when the lilac CLI is called with no arguments.</p>
+<p>Handles behavior when the Lilac CLI is called with no arguments.</p>
 
 
   </div>
@@ -340,16 +375,16 @@
       <pre class="lines">
 
 
-29
 30
 31
 32
 33
 34
-35</pre>
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_main'>main</span>
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="ANSI.html" title="ANSI (module)">ANSI</a></span></span><span class='period'>.</span><span class='id identifier rubyid_fmt256'><span class='object_link'><a href="ANSI.html#fmt256-class_method" title="ANSI.fmt256 (method)">fmt256</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>lilac</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="ANSI.html" title="ANSI (module)">ANSI</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="ANSI.html#LILAC_256-constant" title="ANSI::LILAC_256 (constant)">LILAC_256</a></span></span><span class='comma'>,</span> <span class='label'>bold:</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -372,25 +407,56 @@
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Parse a file using <code>Frontend::Parser</code> and pretty-print it.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>filename</span>
+      
+      
+        <span class='type'>(<tt>T.nilable(String)</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The name of the file to parse (or <code>nil</code> which will be handled nicely).</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-54
-55
-56
-57
-58
 59
 60
 61
 62
-63</pre>
+63
+64
+65
+66
+67
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_filename'>filename</span>
@@ -433,14 +499,14 @@
       <pre class="lines">
 
 
-39
 40
 41
 42
-43</pre>
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 39</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 40</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_print_optimizations'>print_optimizations</span>
   <span class='const'><span class='object_link'><a href="Optimization.html" title="Optimization (module)">Optimization</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Optimization.html#OPTIMIZATIONS-constant" title="Optimization::OPTIMIZATIONS (constant)">OPTIMIZATIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_o'>o</span><span class='op'>|</span>
@@ -478,14 +544,14 @@
       <pre class="lines">
 
 
-47
 48
 49
 50
-51</pre>
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_print_validations'>print_validations</span>
   <span class='const'><span class='object_link'><a href="Validation.html" title="Validation (module)">Validation</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Validation.html#VALIDATIONS-constant" title="Validation::VALIDATIONS (constant)">VALIDATIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
@@ -502,7 +568,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Apr 12 18:45:45 2024 by
+  Generated on Mon Apr 15 16:14:12 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

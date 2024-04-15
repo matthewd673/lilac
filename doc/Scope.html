@@ -104,7 +104,18 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>A Scope is a set of symbols that are present within a local scope (such as a <code>IL::FuncDef</code>) in a program.</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -118,6 +129,30 @@
     </h2>
 
     <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_symbol-instance_method" title="#each_symbol (instance method)">#<strong>each_symbol</strong>(&amp;block)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Iterate over all the symbols in this scope.</p>
+</div></span>
+  
+</li>
+
       
         <li class="public ">
   <span class="summary_signature">
@@ -139,7 +174,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>A new instance of Scope.</p>
+<p>Construct a new Scope.</p>
 </div></span>
   
 </li>
@@ -162,7 +197,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Insert a symbol into this scope.</p>
+</div></span>
   
 </li>
 
@@ -170,7 +207,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#lookup-instance_method" title="#lookup (instance method)">#<strong>lookup</strong>(key)  &#x21d2; Object </a>
+      <a href="#lookup-instance_method" title="#lookup (instance method)">#<strong>lookup</strong>(key)  &#x21d2; T.nilable(ILSymbol) </a>
     
 
     
@@ -184,7 +221,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Find the symbol with a given key in this scope.</p>
+</div></span>
   
 </li>
 
@@ -208,7 +247,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns a new instance of Scope.</p>
+<p>Construct a new Scope.</p>
 
 
   </div>
@@ -222,12 +261,12 @@
       <pre class="lines">
 
 
-24
-25
-26</pre>
+34
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/symbol_table.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/symbol_table.rb', line 34</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
   <span class='ivar'>@symbols</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="ILSymbol.html" title="ILSymbol (class)">ILSymbol</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -245,7 +284,48 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="insert-instance_method">
+  <h3 class="signature first" id="each_symbol-instance_method">
+  
+    #<strong>each_symbol</strong>(&amp;block)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Iterate over all the symbols in this scope.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+59
+60
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/symbol_table.rb', line 59</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_symbol'>each_symbol</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='ivar'>@symbols</span><span class='period'>.</span><span class='id identifier rubyid_each_value'>each_value</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="insert-instance_method">
   
     #<strong>insert</strong>(symbol)  &#x21d2; <tt>Object</tt> 
   
@@ -253,21 +333,52 @@
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Insert a symbol into this scope. A single scope cannot have any duplicate keys.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>symbol</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="ILSymbol.html" title="ILSymbol (class)">ILSymbol</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The symbol to insert.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-29
-30
-31</pre>
+43
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/symbol_table.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/symbol_table.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_insert'>insert</span><span class='lparen'>(</span><span class='id identifier rubyid_symbol'>symbol</span><span class='rparen'>)</span>
-  <span class='ivar'>@symbols</span><span class='lbracket'>[</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_symbol'>symbol</span>
+  <span class='ivar'>@symbols</span><span class='lbracket'>[</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_symbol'>symbol</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -277,24 +388,73 @@
       <div class="method_details ">
   <h3 class="signature " id="lookup-instance_method">
   
-    #<strong>lookup</strong>(key)  &#x21d2; <tt>Object</tt> 
+    #<strong>lookup</strong>(key)  &#x21d2; <tt>T.nilable(<span class='object_link'><a href="ILSymbol.html" title="ILSymbol (class)">ILSymbol</a></span>)</tt> 
   
 
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Find the symbol with a given key in this scope.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>key</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The key of the symbol to search for.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>T.nilable(<span class='object_link'><a href="ILSymbol.html" title="ILSymbol (class)">ILSymbol</a></span>)</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The symbol with the given key. If the symbol does not exist in this scope it will return <code>nil</code>.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-34
-35
-36</pre>
+53
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/symbol_table.rb', line 34</span>
+      <pre class="code"><span class="info file"># File 'lib/symbol_table.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lookup'>lookup</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='ivar'>@symbols</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span>
@@ -309,7 +469,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Apr 12 18:45:46 2024 by
+  Generated on Mon Apr 15 16:14:13 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>
