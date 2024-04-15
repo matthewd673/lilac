@@ -4,7 +4,7 @@ require_relative "wasm"
 require_relative "../../table"
 require_relative "../../../symbol_table"
 require_relative "type"
-require_relative "instructions"
+require_relative "instructions/instructions"
 
 class CodeGen::Targets::Wasm::Table < CodeGen::Table
   extend T::Sig
