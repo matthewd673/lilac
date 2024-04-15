@@ -2,6 +2,7 @@
 require "sorbet-runtime"
 require_relative "wasm"
 require_relative "../../table"
+require_relative "../../../symbol_table"
 require_relative "type"
 require_relative "instructions"
 
@@ -11,13 +12,83 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
   include CodeGen
   include CodeGen::Targets::Wasm
 
-  sig { void }
-  def initialize
-    super
+  TypeLookup = T.type_alias { T.proc.params(arg0: String).returns(IL::Type) }
+
+  sig { params(symbol_table: SymbolTable).void }
+  def initialize(symbol_table)
+    super()
+    @symbol_table = symbol_table
     define_rules
   end
 
+  sig { params(object: IL::ILObject).returns(T::Array[CodeGen::Instruction]) }
+  def transform(object)
+    super(object)
+  end
+
   private
+
+  sig { params(value: IL::Value).returns(IL::Type) }
+  def get_il_type(value)
+    case value
+    when IL::ID
+      symbol = @symbol_table.lookup(value.key)
+      if not symbol
+        raise "Symbol #{value} not in symbol table"
+      end
+      return symbol.type
+    when IL::Constant then value.type
+    when IL::Value
+      raise "Cannot get type of IL::Value stub class"
+    end
+  end
+
+  sig { params(type: IL::Type).returns(T::Boolean) }
+  def signed?(type)
+    case type
+    when IL::Type::I16 then true
+    when IL::Type::I32 then true
+    when IL::Type::I64 then true
+    else false
+    end
+  end
+
+  sig { params(type: IL::Type).returns(T::Boolean) }
+  def unsigned?(type)
+    case type
+    when IL::Type::U8 then true
+    else false
+    end
+  end
+
+  sig { params(type: IL::Type).returns(T::Boolean) }
+  def float?(type)
+    case type
+    when IL::Type::F32 then true
+    when IL::Type::F64 then true
+    else false
+    end
+  end
+
+  sig { params(rhs: T.any(IL::Expression, IL::Value)).returns(Type) }
+  def get_type(rhs)
+    case rhs
+    when IL::BinaryOp
+      return get_type(rhs.left) # left and right should always match
+    when IL::UnaryOp
+      return get_type(rhs.value)
+    when IL::ID
+      symbol = @symbol_table.lookup(rhs.key)
+      if not symbol
+        raise "Symbol #{rhs} not in symbol table"
+      end
+      return Instructions::to_wasm_type(symbol.type)
+    when IL::Constant
+      return Instructions::to_wasm_type(rhs.type)
+    else
+      raise "Unable to determine type of #{rhs}"
+    end
+  end
 
   sig { void }
   def define_rules
@@ -28,7 +99,6 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
     add_rule(Pattern::DefinitionWildcard.new(Pattern::RhsWildcard.new),
              0,
              -> (object, recurse) {
-               type = Instructions::il_type_to_wasm_type(object.type)
                rhs = recurse.call(object.rhs)
                [rhs,
                 Instructions::LocalSet.new(object.id.name)] # TODO: temp
@@ -44,8 +114,8 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
              -> (object, recurse) {
                left = recurse.call(object.left)
                right = recurse.call(object.right)
-               # TODO: specify proper type for addition
-               [left, right, Instructions::Add.new(Type::I32)]
+               type = get_type(object.left)
+               [left, right, Instructions::Add.new(type)]
              })
     # subtraction
     add_rule(IL::BinaryOp.new(IL::BinaryOp::Operator::SUB,
@@ -55,8 +125,8 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
              -> (object, recurse) {
                left = recurse.call(object.left)
                right = recurse.call(object.right)
-               # TODO: specify proper type for subtraction
-               [left, right, Instructions::Subtract.new(Type::I32)]
+               type = get_type(object.left)
+               [left, right, Instructions::Subtract.new(type)]
              })
     # multiplication
     add_rule(IL::BinaryOp.new(IL::BinaryOp::Operator::MUL,
@@ -66,8 +136,8 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
              -> (object, recurse) {
                left = recurse.call(object.left)
                right = recurse.call(object.right)
-               # TODO: specify proper type for multiplication
-               [left, right, Instructions::Multiply.new(Type::I32)]
+               type = get_type(object.left)
+               [left, right, Instructions::Multiply.new(type)]
              })
     # TODO: division
     # less than
@@ -78,9 +148,23 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
              -> (object, recurse) {
                left = recurse.call(object.left)
                right = recurse.call(object.right)
-               # TODO: choose between lt_s, lt_u, and lt
-               # TODO: specify proper type for less than
-               [left, right, Instructions::LessThanSigned.new(Type::I32)]
+
+               il_type = get_il_type(object.left)
+
+               # choose between lt_s, lt_u, and lt
+               lt = nil
+               if signed?(il_type)
+                 type = Instructions::to_integer_type(il_type)
+                 lt = Instructions::LessThanSigned.new(type)
+               elsif unsigned?(il_type)
+                 type = Instructions::to_integer_type(il_type)
+                 lt = Instructions::LessThanUnsigned.new(type)
+               elsif float?(il_type)
+                 type = Instructions::to_float_type(il_type)
+                 lt = Instructions::LessThan.new(type)
+               end
+
+               [left, right, lt]
              })
     # VALUE RULES
     add_rule(Pattern::IDWildcard.new,
@@ -91,7 +175,7 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
     add_rule(Pattern::ConstantWildcard.new,
              0,
              -> (object, recurse) {
-               type = Instructions::il_type_to_wasm_type(object.type)
+               type = Instructions::to_wasm_type(object.type)
                [Instructions::Const.new(type, object.value)]
              })
   end

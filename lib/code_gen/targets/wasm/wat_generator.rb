@@ -5,6 +5,7 @@ require_relative "../../generator"
 require_relative "../../instruction"
 require_relative "../../../il"
 require_relative "../../../visitor"
+require_relative "../../../symbol_table"
 require_relative "table"
 
 class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
@@ -14,8 +15,11 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
 
   sig { params(cfg_program: IL::CFGProgram).void }
   def initialize(cfg_program)
-    super(CodeGen::Targets::Wasm::Table.new, cfg_program)
+    @symbols = T.let(SymbolTable.new, SymbolTable)
+    wasm_table = CodeGen::Targets::Wasm::Table.new(@symbols)
     @visitor = T.let(Visitor.new(VISIT_LAMBDAS), Visitor)
+
+    super(wasm_table, cfg_program)
   end
 
   sig { returns(String) }
@@ -30,8 +34,7 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   # NOTE: adapted from CodeGen::Generator.generate_instructions
   def generate_instructions
     # scan forwards to build a symbol table of all locals and their types.
-    symbols = SymbolTable.new
-    symbols.push_scope
+    @symbols.push_scope
 
     @program.cfg.each_node { |b|
       # scan each block for definitions and log them
@@ -46,7 +49,7 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
         # lead to duplicate inserts but the types should never change so thats
         # fine.
         id_symbol = ILSymbol.new(s.id, s.type)
-        symbols.insert(id_symbol)
+        @symbols.insert(id_symbol)
       }
     }
 
@@ -54,16 +57,17 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     instructions = []
 
     # insert local declarations at the top
-    local_scope = symbols.top_scope
+    local_scope = @symbols.top_scope
     if not local_scope # this should never happen
       raise "No scope in symbol table"
     end
     local_scope.each_symbol { |sym|
-      type = Instructions::il_type_to_wasm_type(sym.type)
+      type = Instructions::to_wasm_type(sym.type)
       decl = Instructions::Local.new(type, sym.id.name)
       instructions.push(decl)
     }
 
+    # generate the rest of the instructions
     # TODO: add function support
     @program.cfg.each_node { |b|
       b.stmt_list.each { |s|
