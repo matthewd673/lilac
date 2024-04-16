@@ -38,6 +38,11 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     components = []
     @symbols.push_scope # always have scope for globals and top-level
 
+    # import all extern functions
+    @program.each_extern_func { |f|
+      components.push(generate_import(f))
+    }
+
     # generate all functions
     @program.each_func { |f|
       components.push(generate_func(f))
@@ -54,6 +59,23 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     wasm_module = Components::Module.new(components)
 
     return wasm_module
+  end
+
+  sig { params(extern_funcdef: IL::ExternFuncDef).returns(Components::Import) }
+  def generate_import(extern_funcdef)
+    param_types = [] # list of param types for function signature
+    extern_funcdef.param_types.each { |t|
+      param_types.push(Instructions::to_wasm_type(t))
+    }
+    if extern_funcdef.ret_type
+      result = Instructions::to_wasm_type(T.unsafe(extern_funcdef.ret_type))
+    end
+
+    import = Components::Import.new(extern_funcdef.source,
+                                    extern_funcdef.name,
+                                    param_types,
+                                    result)
+    return import
   end
 
   sig { params(cfg_funcdef: IL::CFGFuncDef).returns(Components::Func) }
@@ -76,10 +98,10 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     @symbols.pop_scope
 
     # construct func with appropriate params and return type
-    ret_type = Instructions::to_wasm_type(cfg_funcdef.ret_type)
+    result = Instructions::to_wasm_type(cfg_funcdef.ret_type)
     func = Components::Func.new(cfg_funcdef.name,
                                 params,
-                                ret_type,
+                                result,
                                 instructions)
     return func
   end
@@ -142,6 +164,25 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     "(module\n#{v.visit(o.components, ctx: "  ")}\n)"
   }, Visitor::Lambda)
 
+  VISIT_IMPORT = T.let(-> (v, o, c) {
+    import_str = "(import \"#{o.module_name}\" \"#{o.func_name}\")"
+
+    # stringify param types
+    params_str = " "
+    o.param_types.each { |t|
+      params_str += "(param #{t})"
+    }
+    params_str.chomp!(" ")
+
+    # stringify return type
+    result_str = ""
+    if o.result
+      result_str = " (result #{o.result})"
+    end
+
+    "#{c}(func $#{o.func_name} #{import_str}#{params_str}#{result_str})"
+  }, Visitor::Lambda)
+
   VISIT_FUNC = T.let(-> (v, o, c) {
     # stringify params
     params_str = " "
@@ -178,6 +219,7 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   VISIT_LAMBDAS = T.let({
     Array => VISIT_ARRAY,
     Components::Module => VISIT_MODULE,
+    Components::Import => VISIT_IMPORT,
     Components::Func => VISIT_FUNC,
     Components::FuncParam => VISIT_FUNCPARAM,
     Components::Start => VISIT_START,
