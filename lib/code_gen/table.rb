@@ -52,7 +52,7 @@ class CodeGen::Table
     end
 
     # sort rules by cost (cheapest at index 0)
-    rules.sort!
+    rules.sort! { |a, b| a.cost <=> b.cost }
 
     # apply the lowest-cost rule to the object
     return apply_rule(T.unsafe(rules[0]), object, method(:transform))
@@ -68,24 +68,19 @@ class CodeGen::Table
 
   private
 
-  sig { params(rule: Rule, object: IL::ILObject, recursive_method: Method)
+  sig { params(value: RuleValue, object: IL::ILObject, recursive_method: Method)
           .returns(T::Array[Instruction]) }
-  def apply_rule(rule, object, recursive_method)
-    value = @rules[rule]
-    if not value
-      raise("Rule does not exist in this table: #{rule}")
-    else
-      value.transform.call(object, recursive_method)
-    end
+  def apply_rule(value, object, recursive_method)
+    value.transform.call(object, recursive_method)
   end
 
-  sig { params(object: IL::ILObject).returns(T::Array[Rule]) }
+  sig { params(object: IL::ILObject).returns(T::Array[RuleValue]) }
   def find_rules_for_object(object)
     rules = []
 
     each_rule { |r|
       if matches?(r, object)
-        rules.push(r)
+        rules.push(@rules[r])
       end
     }
 

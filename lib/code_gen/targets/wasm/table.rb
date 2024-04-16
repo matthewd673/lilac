@@ -172,6 +172,47 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
 
                [left, right, div]
              })
+    # equality
+    # normal equality
+    add_rule(IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
+                              Pattern::ValueWildcard.new,
+                              Pattern::ValueWildcard.new),
+             1,
+             -> (object, recurse) {
+               left = recurse.call(object.left)
+               right = recurse.call(object.right)
+
+               type = get_type(object.left)
+
+               [left, right, Instructions::Equal.new(type)]
+             })
+    # eqz (for 0 on left or right)
+    add_rule(IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
+                              Pattern::IntegerConstantWildcard.new(0),
+                              Pattern::ValueWildcard.new),
+             0,
+             -> (object, recurse) {
+               right = recurse.call(object.right)
+
+               # lookup type based on constant
+               il_type = get_il_type(object.left)
+               type = Instructions::to_integer_type(il_type)
+
+               [right, Instructions::EqualZero.new(type)]
+             })
+    add_rule(IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
+                              Pattern::ValueWildcard.new,
+                              Pattern::IntegerConstantWildcard.new(0)),
+             0,
+             -> (object, recurse) {
+               left = recurse.call(object.left)
+
+               # lookup type based on constant
+               il_type = get_il_type(object.right)
+               type = Instructions::to_integer_type(il_type)
+
+               [left, Instructions::EqualZero.new(type)]
+             })
     # less than
     add_rule(IL::BinaryOp.new(IL::BinaryOp::Operator::LT,
                               Pattern::ValueWildcard.new,
