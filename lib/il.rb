@@ -375,6 +375,44 @@ module IL
     end
   end
 
+  # A Call is an Expression that represents a function call.
+  class Call < Expression
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :func_name
+    sig { returns(T::Array[Value]) }
+    attr_reader :args
+
+    sig { params(func_name: String, args: T::Array[Value]).void }
+    def initialize(func_name, args)
+      @func_name = func_name
+      @args = args
+    end
+
+    sig { returns(String) }
+    def to_s
+      arg_str = ""
+      @args.each { |a|
+        arg_str += "#{a}, "
+      }
+      arg_str.chomp!(", ")
+
+      return "call #{@func_name}(#{arg_str})"
+    end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Call
+        return false
+      end
+
+      other = T.cast(other, Call)
+
+      func_name.eql?(other.func_name) and args.eql?(other.args)
+    end
+  end
+
   # A Phi function is an Expression that combines multiple possible SSA
   # values at a join node.
   class Phi < Expression
@@ -712,41 +750,46 @@ module IL
     end
   end
 
-  # A Call is an Expression that represents a function call.
-  class Call < Expression
+  # An ExternFuncDef is a description of a function described elsewhere.
+  class ExternFuncDef
     extend T::Sig
 
     sig { returns(String) }
-    attr_reader :func_name
-    sig { returns(T::Array[Value]) }
-    attr_reader :args
+    attr_reader :source
+    sig { returns(String) }
+    attr_reader :name
+    sig { returns(T::Array[Type]) }
+    attr_reader :param_types
+    sig { returns(T.nilable(Type)) }
+    attr_reader :ret_type
 
-    sig { params(func_name: String, args: T::Array[Value]).void }
-    def initialize(func_name, args)
-      @func_name = func_name
-      @args = args
+    sig { params(source: String,
+                 name: String,
+                 param_types: T::Array[Type],
+                 ret_type: T.nilable(Type)).void }
+    def initialize(source, name, param_types, ret_type)
+      @source = source
+      @name = name
+      @param_types = param_types
+      @ret_type = ret_type
     end
 
     sig { returns(String) }
-    def to_s
-      arg_str = ""
-      @args.each { |a|
-        arg_str += "#{a}, "
-      }
-      arg_str.chomp!(", ")
-
-      return "call #{@func_name}(#{arg_str})"
+    def key
+      "#{@source}##{@name}"
     end
 
     sig { params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Call
+      if not other.class == ExternFuncDef
         return false
       end
 
-      other = T.cast(other, Call)
+      other = T.cast(other, ExternFuncDef)
 
-      func_name.eql?(other.func_name) and args.eql?(other.args)
+      source.eql?(other.source) and name.eql?(other.name) and
+        # TODO: if ret_type comparison goes last then this is nilable. Why?
+        ret_type.eql?(other.ret_type) and param_types.eql?(other.param_types)
     end
   end
 
@@ -762,6 +805,7 @@ module IL
     def initialize(stmt_list: [])
       @stmt_list = stmt_list
       @func_map = T.let({}, T::Hash[String, FuncDef])
+      @extern_func_map = T.let({}, T::Hash[String, ExternFuncDef])
     end
 
     sig { params(funcdef: FuncDef).void }
@@ -779,6 +823,23 @@ module IL
     sig { params(name: String).returns(T.nilable(FuncDef)) }
     def get_func(name)
       @func_map[name]
+    end
+
+    sig { params(extern_funcdef: ExternFuncDef).void }
+    def add_extern_func(extern_funcdef)
+      @extern_func_map[extern_funcdef.key] = extern_funcdef
+    end
+
+    sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
+    def each_extern_func(&block)
+      @extern_func_map.keys.each { |k|
+        yield T.unsafe(@extern_func_map[k])
+      }
+    end
+
+    sig { params(key: String).returns(T.nilable(ExternFuncDef)) }
+    def get_extern_func(key)
+      @extern_func_map[key]
     end
 
     sig { returns(String) }
@@ -806,6 +867,11 @@ module IL
     sig { returns(T::Hash[String, FuncDef]) }
     def func_map
       @func_map
+    end
+
+    sig { returns(T::Hash[String, ExternFuncDef]) }
+    def extern_func_map
+      @extern_func_map
     end
   end
 
@@ -846,6 +912,7 @@ module IL
     def initialize(cfg)
       @cfg = cfg
       @func_map = T.let({}, T::Hash[String, CFGFuncDef])
+      @extern_func_map = T.let({}, T::Hash[String, ExternFuncDef])
     end
 
     sig { params(program: Program).returns(CFGProgram) }
@@ -866,6 +933,11 @@ module IL
         cfg_program.add_func(cfg_funcdef)
       }
 
+      # add all extern functions (which have no body so don't need conversion)
+      program.each_extern_func { |f|
+        cfg_program.add_extern_func(f)
+      }
+
       return cfg_program
     end
 
@@ -884,6 +956,23 @@ module IL
     sig { params(name: String).returns(T.nilable(CFGFuncDef)) }
     def get_func(name)
       @func_map[name]
+    end
+
+    sig { params(extern_funcdef: ExternFuncDef).void }
+    def add_extern_func(extern_funcdef)
+      @extern_func_map[extern_funcdef.key] = extern_funcdef
+    end
+
+    sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
+    def each_extern_func(&block)
+      @extern_func_map.keys.each { |k|
+        yield T.unsafe(@extern_func_map[k])
+      }
+    end
+
+    sig { params(key: String).returns(T.nilable(ExternFuncDef)) }
+    def get_extern_func(key)
+      @extern_func_map[key]
     end
 
     # TODO: implement to_s
