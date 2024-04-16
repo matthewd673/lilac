@@ -563,6 +563,49 @@ module CodeGen::Targets::Wasm::Instructions
 
   # TODO: memory instructions
 
-  # TODO: control flow instructions
+  # CONTROL FLOW INSTRUCTIONS
+  # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Control_flow
+
+  # TODO: most control flow instructions
+
+  # Represents the +call+ instruction.
+  # Call a function.
+  class Call < WasmInstruction
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :func_name
+
+    sig { params(func_name: String).void }
+    def initialize(func_name)
+      @func_name = func_name
+    end
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x10
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "call $#{@func_name}"
+    end
+  end
+
+  # Represents the +return+ instruction.
+  # Returns from a function.
+  class Return < WasmInstruction
+    extend T::Sig
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x0f
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "return"
+    end
+  end
 end
 
