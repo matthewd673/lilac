@@ -170,6 +170,8 @@ class CodeGen::Table
     when IL::UnaryOp
       return (object.is_a?(IL::UnaryOp) and rule.op == object.op and
         matches?(rule.value, object.value))
+    when IL::Return
+      return (object.is_a?(IL::Return) and matches?(rule.value, object.value))
     end
 
     raise("Unsupported pattern match between \"#{rule}\" and \"#{object}\"")

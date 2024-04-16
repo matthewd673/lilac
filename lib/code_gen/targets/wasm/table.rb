@@ -191,6 +191,27 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
 
                [left, right, lt]
              })
+    # CALL RULES
+    add_rule(Pattern::CallWildcard.new,
+             0,
+             -> (object, recurse) {
+               instructions = []
+
+               # push all arguments
+               object.args.each { |a|
+                 instructions.concat(recurse.call(a))
+               }
+
+               instructions.push(Instructions::Call.new(object.func_name))
+               instructions
+             })
+    add_rule(IL::Return.new(Pattern::ValueWildcard.new),
+             0,
+             -> (object, recurse) {
+               value = recurse.call(object.value)
+
+               [value, Instructions::Return.new]
+             })
     # VALUE RULES
     add_rule(Pattern::IDWildcard.new,
              0,
