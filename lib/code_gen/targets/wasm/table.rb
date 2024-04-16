@@ -100,6 +100,13 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
              0,
              -> (object, recurse) {
                rhs = recurse.call(object.rhs)
+
+               # TODO: this is ugly
+               # special case for handling a call to an external void func
+               if object.rhs.is_a?(IL::ExternCall) and object.rhs.void
+                 return [rhs]
+               end
+
                [rhs,
                 Instructions::LocalSet.new(object.id.name)] # TODO: temp
              })

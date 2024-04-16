@@ -413,6 +413,41 @@ module IL
     end
   end
 
+  # An ExternCall is an Expression that represents a call to an external
+  # function.
+  class ExternCall < Call
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :func_source
+    sig { returns(T::Boolean) }
+    attr_reader :void
+
+    sig { params(func_source: String,
+                 func_name: String,
+                 args: T::Array[Value],
+                 void: T::Boolean).void }
+    def initialize(func_source, func_name, args, void: false)
+      @func_source = func_source
+      @func_name = func_name
+      @args = args
+      @void = void
+    end
+
+    sig { params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == ExternCall
+        return false
+      end
+
+      other = T.cast(other, ExternCall)
+
+      # TODO: result is nilable if void goes last
+      func_source.eql?(other.func_source) and void.eql?(other.void) and
+        func_name.eql?(other.func_name) and args.eql?(other.args)
+    end
+  end
+
   # A Phi function is an Expression that combines multiple possible SSA
   # values at a join node.
   class Phi < Expression
