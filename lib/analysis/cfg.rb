@@ -121,6 +121,7 @@ class Analysis::CFG < Graph
       # create edge for block exit (some IL::Jump)
       if b.exit
         jump = T.unsafe(b.exit) # to placate Sorbet below
+
         # find block that jump is targeting
         successor = @label_map[jump.target]
         if not successor # this is unlikely but I think possible
