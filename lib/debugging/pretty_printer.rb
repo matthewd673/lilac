@@ -38,11 +38,27 @@ class Debugging::PrettyPrinter
   #
   # @param [IL::Program] program The program to print.
   def print_program(program)
-    gutter_len = program.stmt_list.length.to_s.length
+    # approximate total line count for gutter length
+    approx_lines = program.stmt_list.length
+    program.each_extern_func { |f|
+      approx_lines += 1
+    }
+    program.each_func { |f|
+      approx_lines += f.stmt_list.length + 2
+    }
+
+    # create context
+    gutter_len = approx_lines.to_s.length
     ctx = PrettyPrinterContext.new(gutter_len, 0, 0)
+
+    # print all lines
+    program.each_extern_func { |f|
+      puts(@visitor.visit(f, ctx: ctx))
+      ctx.line_num += 1
+    }
     program.each_func { |f|
       puts(@visitor.visit(f, ctx: ctx))
-      ctx.line_num += 1 # TODO: is this right?
+      ctx.line_num += 1
     }
     program.stmt_list.each { |s|
       puts(@visitor.visit(s, ctx: ctx))
@@ -78,7 +94,11 @@ class Debugging::PrettyPrinter
   }, Visitor::Lambda)
 
   VISIT_CONSTANT = T.let(-> (v, o, c) {
-    ANSI.fmt(o.to_s, color: PALETTE[IL::Constant])
+    if o.type.eql?(IL::Type::Void)
+      ANSI.fmt("void", color: PALETTE[IL::Constant])
+    else
+      ANSI.fmt(o.to_s, color: PALETTE[IL::Constant])
+    end
   }, Visitor::Lambda)
 
   VISIT_ID = T.let(-> (v, o, c) {
@@ -101,7 +121,16 @@ class Debugging::PrettyPrinter
   }, Visitor::Lambda)
 
   VISIT_CALL = T.let(-> (v, o, c) {
-    s = "#{ANSI.fmt(o.func_name, bold: true)} ("
+    s = "#{ANSI.fmt("call", bold: true)} #{o.func_name}("
+    o.args.each { |a|
+      s += "#{v.visit(a)}, "
+    }
+    s.chomp!(", ")
+    s += ")"
+  }, Visitor::Lambda)
+
+  VISIT_EXTERNCALL = T.let(-> (v, o, c) {
+    s = "#{ANSI.fmt("extern call", bold: true)} #{o.func_source} #{o.func_name}("
     o.args.each { |a|
       s += "#{v.visit(a)}, "
     }
@@ -212,13 +241,29 @@ class Debugging::PrettyPrinter
     return s
   }, Visitor::Lambda)
 
+  VISIT_VOIDCALL = T.let(-> (v, o, c) {
+    # line number and indent
+    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    pad = indent(c.indent)
+    s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
+
+    s += "#{ANSI.fmt("void", bold: true)} #{v.visit(o.call)}"
+
+    # annotation
+    if o.annotation
+      s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
+    end
+
+    return s
+  }, Visitor::Lambda)
+
   VISIT_FUNCDEF = T.let(-> (v, o, c) {
     # line number
     num = left_pad(c.line_num.to_s, c.gutter_len) + " "
     c.line_num += 1
     s = ANSI.fmt(num, color: PALETTE[:gutter])
 
-    s += "#{ANSI.fmt(o.name, bold: true)} ("
+    s += "#{ANSI.fmt("func", bold: true)} #{o.name}("
 
     # print params
     o.params.each { |p|
@@ -226,7 +271,7 @@ class Debugging::PrettyPrinter
     }
     s.chomp!(", ")
 
-    s += ") -> #{v.visit(o.ret_type)}:\n"
+    s += ") -> #{v.visit(o.ret_type)}\n"
 
     # print body
     c.indent = 1
@@ -238,11 +283,40 @@ class Debugging::PrettyPrinter
     # fix line number and indent
     c.line_num -= 1
     c.indent = 0
+
+    # print end
+    new_num = left_pad(c.line_num.to_s, c.gutter_len)
+    s += "#{ANSI.fmt(new_num, color: PALETTE[:gutter])} "
+    s += "#{ANSI.fmt("end", bold: true)}"
+
     return s
   }, Visitor::Lambda)
 
   VISIT_FUNCPARAM = T.let(-> (v, o, c) {
     "#{v.visit(o.type)} #{v.visit(o.id)}"
+  }, Visitor::Lambda)
+
+  VISIT_EXTERNFUNCDEF = T.let(-> (v, o, c) {
+    # line number
+    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    c.line_num += 1
+    s = ANSI.fmt(num, color: PALETTE[:gutter])
+
+    s += "#{ANSI.fmt("extern func", bold: true)} #{o.source} #{o.name}("
+
+    # print param types
+    o.param_types.each { |t|
+      s += "#{v.visit(t)}, "
+    }
+    s.chomp!(", ")
+
+    s += ") -> #{v.visit(o.ret_type)}\n"
+
+    # fix line number and indent
+    c.line_num -= 1
+    c.indent = 0
+    return s
+
   }, Visitor::Lambda)
 
   VISIT_LAMBDAS = T.let({
@@ -252,6 +326,7 @@ class Debugging::PrettyPrinter
     IL::Register => VISIT_REGISTER,
     IL::BinaryOp => VISIT_BINARYOP,
     IL::Call => VISIT_CALL,
+    IL::ExternCall => VISIT_EXTERNCALL,
     IL::Statement => VISIT_STATEMENT,
     IL::Definition => VISIT_DEFINITION,
     IL::Label => VISIT_LABEL,
@@ -259,8 +334,10 @@ class Debugging::PrettyPrinter
     IL::JumpZero => VISIT_JUMPZERO,
     IL::JumpNotZero => VISIT_JUMPNOTZERO,
     IL::Return => VISIT_RETURN,
+    IL::VoidCall => VISIT_VOIDCALL,
     IL::FuncDef => VISIT_FUNCDEF,
     IL::FuncParam => VISIT_FUNCPARAM,
+    IL::ExternFuncDef => VISIT_EXTERNFUNCDEF,
   }, Visitor::LambdaHash)
 
   private
