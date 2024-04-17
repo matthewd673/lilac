@@ -1,6 +1,6 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "debugger"
+require_relative "debugging"
 require_relative "../ansi"
 require_relative "../il"
 require_relative "../visitor"
@@ -8,7 +8,7 @@ require_relative "../analysis/bb"
 
 # A PrettyPrinter contains functions that make it easy to pretty-print various
 # internal lilac data structures, like +IL::Program+, to the terminal.
-class Debugger::PrettyPrinter
+class Debugging::PrettyPrinter
   extend T::Sig
 
   # A Map representing the color palette used by PrettyPrinter.

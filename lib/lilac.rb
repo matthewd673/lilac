@@ -5,8 +5,8 @@ require "sorbet-runtime"
 # NOTE: this is not comprehensive
 require_relative "optimization/optimization_runner"
 require_relative "validation/validation_runner"
-require_relative "debugger/pretty_printer"
-require_relative "debugger/graph_visualizer"
+require_relative "debugging/pretty_printer"
+require_relative "debugging/graph_visualizer"
 require_relative "analysis/bb"
 require_relative "analysis/cfg"
 require_relative "ssa"
@@ -63,7 +63,7 @@ module CLI
     end
 
     program = Frontend::Parser::parse_file(filename)
-    pp = Debugger::PrettyPrinter.new
+    pp = Debugging::PrettyPrinter.new
     pp.print_program(program)
   end
 
@@ -92,7 +92,7 @@ module CLI
 
     bb = Analysis::BB::from_stmt_list(program.stmt_list)
     cfg = Analysis::CFG.new(bb)
-    graphviz = Debugger::GraphVisualizer::generate_graphviz(cfg)
+    graphviz = Debugging::GraphVisualizer::generate_graphviz(cfg)
     puts(graphviz)
   end
 end

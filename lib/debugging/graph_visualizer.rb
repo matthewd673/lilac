@@ -1,12 +1,12 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "debugger"
+require_relative "debugging"
 require_relative "../graph"
 require_relative "../analysis/bb"
 
 # The GraphVisualizer module provides functions to visualize Graph objects.
 # It also includes special features to enhance CFG visualizations.
-module Debugger::GraphVisualizer
+module Debugging::GraphVisualizer
   extend T::Sig
 
   sig { params(graph: Graph[T.untyped]).returns(String) }
