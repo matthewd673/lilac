@@ -6,7 +6,7 @@ require_relative "../../instruction"
 require_relative "../../../il"
 require_relative "../../../visitor"
 require_relative "../../../symbol_table"
-require_relative "table"
+require_relative "wasm_il_transformer"
 require_relative "instructions/instructions"
 require_relative "instructions/instruction_set"
 require_relative "components"
@@ -19,10 +19,10 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   sig { params(cfg_program: IL::CFGProgram).void }
   def initialize(cfg_program)
     @symbols = T.let(SymbolTable.new, SymbolTable)
-    wasm_table = CodeGen::Targets::Wasm::Table.new(@symbols)
+    wasm_translator = CodeGen::Targets::Wasm::WasmILTransformer.new(@symbols)
     @visitor = T.let(Visitor.new(VISIT_LAMBDAS), Visitor)
 
-    super(wasm_table, cfg_program)
+    super(wasm_translator, cfg_program)
   end
 
   sig { returns(String) }
@@ -149,7 +149,7 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     cfg.each_node { |b|
       b.stmt_list.each { |s|
         # transform instruction like normal
-        instructions.concat(@table.transform(s))
+        instructions.concat(@transformer.transform(s))
       }
     }
 

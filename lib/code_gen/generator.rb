@@ -8,9 +8,9 @@ class CodeGen::Generator
 
   include CodeGen
 
-  sig { params(table: Table, cfg_program: IL::CFGProgram).void }
-  def initialize(table, cfg_program)
-    @table = table
+  sig { params(transformer: ILTransformer, cfg_program: IL::CFGProgram).void }
+  def initialize(transformer, cfg_program)
+    @transformer = transformer
     @program = cfg_program
   end
 end

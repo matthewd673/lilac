@@ -5,40 +5,23 @@ require_relative "instruction"
 require_relative "pattern"
 require_relative "../il"
 
-class CodeGen::Table
+class CodeGen::ILTransformer
   extend T::Sig
 
   include CodeGen
   include CodeGen::Pattern
 
-  Rule = T.type_alias { T.any(IL::Statement, IL::Expression, IL::Value) }
-
-  TreeTransform = T.type_alias {
-    T.proc.params(arg0: IL::ILObject, arg1: Method)
+  Transform = T.type_alias {
+    T.proc.params(arg0: CodeGen::ILTransformer, arg1: IL::ILObject)
       .returns(T::Array[CodeGen::Instruction])
   }
 
-  class RuleValue # TODO: there has to be a better name for this
-    extend T::Sig
-
-    sig { returns(Integer) }
-    attr_reader :cost
-    sig { returns(TreeTransform) }
-    attr_reader :transform
-
-    sig { params(cost: Integer, transform: TreeTransform).void }
-    def initialize(cost, transform)
-      @cost = cost
-      @transform = transform
-    end
-  end
-
   sig { void }
   def initialize
-    @rules = T.let(Hash.new, T::Hash[Rule, RuleValue])
+    @rules = T.let(Hash.new, T::Hash[IL::ILObject, Transform])
   end
 
-  sig { params(block: T.proc.params(arg0: Rule).void).void }
+  sig { params(block: T.proc.params(arg0: IL::ILObject).void).void }
   def each_rule(&block)
     @rules.keys.each(&block)
   end
@@ -46,48 +29,38 @@ class CodeGen::Table
   sig { params(object: IL::ILObject).returns(T::Array[Instruction]) }
   def transform(object)
     # find all rules that could apply to this object
-    rules = find_rules_for_object(object)
-    if rules.empty?
+    rule = find_rule_for_object(object)
+    if not rule
       raise("No rules found for object #{object}")
     end
 
-    # sort rules by cost (cheapest at index 0)
-    rules.sort! { |a, b| a.cost <=> b.cost }
-
-    # apply the lowest-cost rule to the object
-    return apply_rule(T.unsafe(rules[0]), object, method(:transform))
-  end
-
-  protected
-
-  sig { params(rule: Rule, cost: Integer, transform: TreeTransform)
-          .void }
-  def add_rule(rule, cost, transform)
-    @rules[rule] = RuleValue.new(cost, transform)
+    # apply the rule to the object
+    return apply_transform(rule, object, self)
   end
 
   private
 
-  sig { params(value: RuleValue, object: IL::ILObject, recursive_method: Method)
+  sig { params(transform: Transform,
+               object: IL::ILObject,
+               transformer: CodeGen::ILTransformer)
           .returns(T::Array[Instruction]) }
-  def apply_rule(value, object, recursive_method)
-    value.transform.call(object, recursive_method)
+  def apply_transform(transform, object, transformer)
+    transform.call(transformer, object)
   end
 
-  sig { params(object: IL::ILObject).returns(T::Array[RuleValue]) }
-  def find_rules_for_object(object)
-    rules = []
-
+  sig { params(object: IL::ILObject).returns(T.nilable(Transform)) }
+  def find_rule_for_object(object)
+    rule = T.let(nil, T.nilable(Transform))
     each_rule { |r|
       if matches?(r, object)
-        rules.push(@rules[r])
+        rule = @rules[r]
+        break
       end
     }
-
-    return rules
+    rule
   end
 
-  sig { params(rule: Rule, object: IL::ILObject).returns(T::Boolean) }
+  sig { params(rule: IL::ILObject, object: IL::ILObject).returns(T::Boolean) }
   def matches?(rule, object)
     case rule
     # WILDCARDS
