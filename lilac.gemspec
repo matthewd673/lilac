@@ -1,6 +1,7 @@
 Gem::Specification.new do |s|
   s.name          = "lilac"
   s.version       = "0.0.0"
+  s.license       = "Apache-2.0"
   s.summary       = "Compiler infrastructure"
   s.description   = "Lilac is a small compiler infrastructure."
   s.authors       = ["Matthew Daly"]
