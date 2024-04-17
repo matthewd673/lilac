@@ -158,6 +158,12 @@ class CodeGen::Table
     when Pattern::ValueWildcard
       return object.is_a?(IL::Value)
     # NON-WILDCARDS
+    # Statements
+    when IL::VoidCall
+      return (object.is_a?(IL::VoidCall) and matches?(rule.call, object.call))
+    when IL::Return
+      return (object.is_a?(IL::Return) and matches?(rule.value, object.value))
+    # Expressions
     # TODO: implement non-wildcard matches
     when IL::BinaryOp
       return (object.is_a?(IL::BinaryOp) and rule.op == object.op and

@@ -63,14 +63,18 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
 
   sig { params(extern_funcdef: IL::ExternFuncDef).returns(Components::Import) }
   def generate_import(extern_funcdef)
-    param_types = [] # list of param types for function signature
+    # generate param types for function signature
+    param_types = []
     extern_funcdef.param_types.each { |t|
       param_types.push(Instructions::to_wasm_type(t))
     }
-    if extern_funcdef.ret_type
+
+    # result type for void functions in Wasm is just nil
+    if extern_funcdef.ret_type != IL::Type::Void
       result = Instructions::to_wasm_type(T.unsafe(extern_funcdef.ret_type))
     end
 
+    # construct import object
     import = Components::Import.new(extern_funcdef.source,
                                     extern_funcdef.name,
                                     param_types,
@@ -98,7 +102,10 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     @symbols.pop_scope
 
     # construct func with appropriate params and return type
-    result = Instructions::to_wasm_type(cfg_funcdef.ret_type)
+    # if return type is void then result is simply nil
+    if cfg_funcdef.ret_type != IL::Type::Void
+      result = Instructions::to_wasm_type(cfg_funcdef.ret_type)
+    end
     func = Components::Func.new(cfg_funcdef.name,
                                 params,
                                 result,

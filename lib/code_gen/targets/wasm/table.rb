@@ -93,6 +93,7 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
   sig { void }
   def define_rules
     # TODO: costs for rules have not had any consideration yet
+    # TODO: this format for defining rules is ugly and should be changed
 
     # STATEMENT RULES
     # definition
@@ -101,16 +102,17 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
              -> (object, recurse) {
                rhs = recurse.call(object.rhs)
 
-               # TODO: this is ugly
-               # special case for handling a call to an external void func
-               if object.rhs.is_a?(IL::ExternCall) and object.rhs.void
-                 return [rhs]
-               end
-
                [rhs,
-                Instructions::LocalSet.new(object.id.name)] # TODO: temp
+                Instructions::LocalSet.new(object.id.name)]
              })
+    # void call
+    add_rule(IL::VoidCall.new(Pattern::CallWildcard.new),
+             0,
+             -> (object, recurse) {
+               call = recurse.call(object.call)
 
+               [call]
+             })
     # EXPRESSION RULES
     # binary ops
     # addition
@@ -269,6 +271,12 @@ class CodeGen::Targets::Wasm::Table < CodeGen::Table
     add_rule(Pattern::ConstantWildcard.new,
              0,
              -> (object, recurse) {
+               # produce nothing for void constants
+               # these are only used by return statements
+               if object.type == IL::Type::Void
+                 return []
+               end
+
                type = Instructions::to_wasm_type(object.type)
                [Instructions::Const.new(type, object.value)]
              })

@@ -61,8 +61,11 @@ module CodeGen::Pattern
   end
 
   # A wildcard for any +IL::Call+.
-  class CallWildcard < IL::Expression
-    # NOTE: stub
+  class CallWildcard < IL::Call
+    sig { void }
+    def initialize
+      @args = [] # to prevent errors
+    end
   end
 
   # A wildcard for any +IL::Value+.
