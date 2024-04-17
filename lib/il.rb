@@ -1,6 +1,5 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "analysis/cfg"
 
 # IL contains a set of classes representing the Lilac Intermediate Language.
 module IL
@@ -937,7 +936,8 @@ module IL
 
       other = T.cast(other, Program)
 
-      stmt_list.eql?(other.stmt_list) and func_map.eql?(other.func_map)
+      stmt_list.eql?(other.stmt_list) and func_map.eql?(other.func_map) and
+        extern_func_map.eql?(other.extern_func_map)
     end
 
     protected

@@ -191,6 +191,32 @@ class ParseFileTest < Minitest::Test
 
   sig { void }
   def test_parse_extern
+    expected = Program.new(stmt_list: [
+      VoidCall.new(Call.new("main", [])),
+    ])
+    expected.add_func(FuncDef.new("main", [], Type::Void, [
+      Definition.new(Type::I32, Register.new(1), Call.new("divide", [
+                                                  Constant.new(Type::F64, 6.0),
+                                                  Constant.new(Type::F64, 3.3)]
+                                                         )),
+      Definition.new(Type::F64, ID.new("ans"), Register.new(1)),
+      VoidCall.new(ExternCall.new("console", "log", [ID.new("ans")])),
+      Return.new(Constant.new(Type::Void, nil)),
+    ]))
+    expected.add_func(FuncDef.new("divide",
+                                  [FuncParam.new(Type::F64, ID.new("a")),
+                                   FuncParam.new(Type::F64, ID.new("b"))],
+                                  Type::F64,
+                                  [
+      Definition.new(Type::F64, Register.new(0), BinaryOp.new(
+                                                  BinaryOp::Operator::DIV,
+                                                  ID.new("a"), ID.new("b"))),
+      Return.new(Register.new(0))
+    ]))
+    expected.add_extern_func(
+      ExternFuncDef.new("console", "log", [Type::F64], Type::Void))
     program = Frontend::Parser::parse_file("test/il_programs/frontend/extern.txt")
+
+    assert program.eql?(expected)
   end
 end
