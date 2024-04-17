@@ -15,23 +15,26 @@ module IL
     extend T::Sig
 
     enums do
-      # An unsigned 8-bit integer
+      # Void type. Should only be used by functions.
+      Void = new
+      # An unsigned 8-bit integer.
       U8 = new
-      # A signed 16-bit integer
+      # A signed 16-bit integer.
       I16 = new
-      # A signed 32-bit integer
+      # A signed 32-bit integer.
       I32 = new
-      # A signed 64-bit integer
+      # A signed 64-bit integer.
       I64 = new
-      # A 32-bit floating point number
+      # A 32-bit floating point number.
       F32 = new
-      # A 64-bit floating point number
+      # A 64-bit floating point number.
       F64 = new
     end
 
     sig { returns(String) }
     def to_s
       case self
+      when Void then "void"
       when U8 then "u8"
       when I16 then "i16"
       when I32 then "i32"
@@ -420,18 +423,14 @@ module IL
 
     sig { returns(String) }
     attr_reader :func_source
-    sig { returns(T::Boolean) }
-    attr_reader :void
 
     sig { params(func_source: String,
                  func_name: String,
-                 args: T::Array[Value],
-                 void: T::Boolean).void }
-    def initialize(func_source, func_name, args, void: false)
+                 args: T::Array[Value]).void }
+    def initialize(func_source, func_name, args)
       @func_source = func_source
       @func_name = func_name
       @args = args
-      @void = void
     end
 
     sig { override.returns(String) }
@@ -453,8 +452,7 @@ module IL
 
       other = T.cast(other, ExternCall)
 
-      # TODO: result is nilable if void goes last
-      func_source.eql?(other.func_source) and void.eql?(other.void) and
+      func_source.eql?(other.func_source) and
         func_name.eql?(other.func_name) and args.eql?(other.args)
     end
   end
@@ -714,6 +712,36 @@ module IL
     end
   end
 
+  # A VoidCall statement is used to call a +Void+ function without expecting
+  # any output.
+  class VoidCall < Statement
+    extend T::Sig
+
+    sig { returns(Call) }
+    attr_reader :call
+
+    sig { params(call: Call).void }
+    def initialize(call)
+      @call = call
+    end
+
+    sig { override.returns(String) }
+    def to_s
+      "void #{@call}"
+    end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == VoidCall
+        return false
+      end
+
+      other = T.cast(other, VoidCall)
+
+      call.eql?(other.call)
+    end
+  end
+
   # A FuncParam defines a parameter accepted by a FuncDef.
   class FuncParam
     extend T::Sig
@@ -810,13 +838,13 @@ module IL
     attr_reader :name
     sig { returns(T::Array[Type]) }
     attr_reader :param_types
-    sig { returns(T.nilable(Type)) }
+    sig { returns(Type) }
     attr_reader :ret_type
 
     sig { params(source: String,
                  name: String,
                  param_types: T::Array[Type],
-                 ret_type: T.nilable(Type)).void }
+                 ret_type: Type).void }
     def initialize(source, name, param_types, ret_type)
       @source = source
       @name = name
