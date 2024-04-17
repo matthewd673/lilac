@@ -78,16 +78,19 @@ class Frontend::Parser
   def parse_program
     program = IL::Program.new
 
-    # see statement
+    # parse top level items (which include statements and other components)
     while not see?(TokenType::EOF)
-    if see?(TokenType::NewLine, TokenType::Type, TokenType::Label,
-            TokenType::Jump, TokenType::JumpZero, TokenType::JumpNotZero,
-            TokenType::Return)
-      program.stmt_list.concat(parse_stmt_list)
-    # func def
-    elsif see?(TokenType::Func)
-      program.add_func(parse_func_def)
-    end
+      if see?(TokenType::NewLine, TokenType::Type, TokenType::Label,
+              TokenType::Jump, TokenType::JumpZero, TokenType::JumpNotZero,
+              TokenType::Return, TokenType::VoidConst)
+        program.stmt_list.concat(parse_stmt_list)
+      # func def
+      elsif see?(TokenType::Func)
+        program.add_func(parse_func_def)
+      # extern func def
+      elsif see?(TokenType::Extern)
+        program.add_extern_func(parse_extern_func_def)
+      end
     end
 
     eat(TokenType::EOF)
@@ -132,23 +135,17 @@ class Frontend::Parser
 
       rhs = parse_expr_or_value
 
-      eat(TokenType::NewLine)
-
       return [IL::Definition.new(type, id, rhs)]
     # label
     elsif see?(TokenType::Label)
       label_str = eat(TokenType::Label).image
       label_str.chomp!(":") # remove trailing colon that denotes label token
 
-      eat(TokenType::NewLine)
-
       return [IL::Label.new(label_str)]
     # jump
     elsif see?(TokenType::Jump)
       eat(TokenType::Jump)
       target_str = eat(TokenType::Name).image
-
-      eat(TokenType::NewLine)
 
       return [IL::Jump.new(target_str)]
     # jump zero
@@ -157,8 +154,6 @@ class Frontend::Parser
       value = parse_value
       target_str = eat(TokenType::Name).image
 
-      eat(TokenType::NewLine)
-
       return [IL::JumpZero.new(value, target_str)]
     # jump not zero
     elsif see?(TokenType::JumpNotZero)
@@ -166,14 +161,19 @@ class Frontend::Parser
       value = parse_value
       target_str = eat(TokenType::Name).image
 
-      eat(TokenType::NewLine)
-
       return [IL::JumpNotZero.new(value, target_str)]
     # return
     elsif see?(TokenType::Return)
       eat(TokenType::Return)
       value = parse_value
+
       return [IL::Return.new(value)]
+    # void call
+    elsif see?(TokenType::VoidConst)
+      eat(TokenType::VoidConst)
+      call = parse_call
+
+      return [IL::VoidCall.new(call)]
     end
 
     raise("Unexpected token while parsing statement: #{@next_token}")
@@ -206,19 +206,9 @@ class Frontend::Parser
       unop = unop_from_token(unop_tok, val)
 
       return unop
-    # func call
-    elsif see?(TokenType::Call)
-      # eat func name
-      eat(TokenType::Call)
-      func_name = eat(TokenType::Name).image
-
-      # eat args
-      eat(TokenType::LeftParen)
-      args = []
-      parse_call_args(args)
-      eat(TokenType::RightParen)
-
-      return IL::Call.new(func_name, args)
+    # calls
+    elsif see?(TokenType::Call, TokenType::Extern)
+      return parse_call
     # phi function
     elsif see?(TokenType::Phi)
       eat(TokenType::Phi)
@@ -235,6 +225,41 @@ class Frontend::Parser
     raise("Unexpected token while parsing expression: #{@next_token}")
   end
 
+  sig { returns(IL::Call) }
+  def parse_call
+    # func call
+    if see?(TokenType::Call)
+      # eat func name
+      eat(TokenType::Call)
+      func_name = eat(TokenType::Name).image
+
+      # eat args
+      eat(TokenType::LeftParen)
+      args = []
+      parse_call_args(args)
+      eat(TokenType::RightParen)
+
+      return IL::Call.new(func_name, args)
+    # extern func call
+    elsif see?(TokenType::Extern)
+      # eat func source and name
+      eat(TokenType::Extern)
+      eat(TokenType::Call)
+      func_source = eat(TokenType::Name).image
+      func_name = eat(TokenType::Name).image
+
+      # eat args
+      eat(TokenType::LeftParen)
+      args = []
+      parse_call_args(args)
+      eat(TokenType::RightParen)
+
+      return IL::ExternCall.new(func_source, func_name, args)
+    end
+
+    raise("Unexpected token while parsing call: #{@next_token}")
+  end
+
   sig { returns(IL::Value) }
   def parse_value
     # constant
@@ -242,6 +267,10 @@ class Frontend::Parser
       const_str = eat(TokenType::UIntConst, TokenType::IntConst,
                       TokenType::FloatConst).image
       return constant_from_string(const_str)
+    # void constant
+    elsif see?(TokenType::VoidConst)
+      eat(TokenType::VoidConst)
+      return IL::Constant.new(IL::Type::Void, nil)
     # id
     elsif see?(TokenType::ID)
       id_str = eat(TokenType::ID).image
@@ -269,7 +298,7 @@ class Frontend::Parser
 
     # eat return type
     eat(TokenType::Arrow)
-    ret_type_str = eat(TokenType::Type).image
+    ret_type_str = eat(TokenType::Type, TokenType::VoidConst).image
     ret_type = type_from_string(ret_type_str)
     eat(TokenType::NewLine)
 
@@ -280,8 +309,36 @@ class Frontend::Parser
     return IL::FuncDef.new(name, func_params, ret_type, stmt_list)
   end
 
+  sig { returns(IL::ExternFuncDef) }
+  def parse_extern_func_def
+    # eat func source and name
+    eat(TokenType::Extern)
+    eat(TokenType::Func)
+    source = eat(TokenType::Name).image
+    name = eat(TokenType::Name).image
+
+    # eat func param types
+    eat(TokenType::LeftParen)
+    func_param_types = []
+    parse_extern_func_param_types(func_param_types)
+    eat(TokenType::RightParen)
+
+    # eat return type
+    eat(TokenType::Arrow)
+    ret_type_str = eat(TokenType::Type, TokenType::VoidConst).image
+    ret_type = type_from_string(ret_type_str)
+    eat(TokenType::NewLine)
+
+    return IL::ExternFuncDef.new(source, name, func_param_types, ret_type)
+  end
+
   sig { params(param_list: T::Array[IL::FuncParam]).void }
   def parse_func_params(param_list)
+    # epsilon
+    if see?(TokenType::RightParen)
+      return
+    end
+
     type_str = eat(TokenType::Type).image
     type = type_from_string(type_str)
 
@@ -297,8 +354,32 @@ class Frontend::Parser
     end
   end
 
+  sig { params(param_type_list: T::Array[IL::Type]).void }
+  def parse_extern_func_param_types(param_type_list)
+    # epsilon
+    if see?(TokenType::RightParen)
+      return
+    end
+
+    type_str = eat(TokenType::Type).image
+    type = type_from_string(type_str)
+
+    param_type_list.push(type)
+
+    # if we see a comma then we have to recurse
+    if see?(TokenType::Comma)
+      eat(TokenType::Comma)
+      parse_extern_func_param_types(param_type_list)
+    end
+  end
+
   sig { params(arg_list: T::Array[IL::Value]).void }
   def parse_call_args(arg_list)
+    # epsilon
+    if see?(TokenType::RightParen)
+      return
+    end
+
     value = parse_value
     arg_list.push(value)
 
@@ -334,6 +415,7 @@ class Frontend::Parser
   sig { params(string: String).returns(IL::Type) }
   def type_from_string(string)
     case string
+    when "void" then return IL::Type::Void
     when "u8" then return IL::Type::U8
     when "i16" then return IL::Type::I16
     when "i32" then return IL::Type::I32

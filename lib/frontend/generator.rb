@@ -28,6 +28,10 @@ class Frontend::Generator
   def generate
     output = ""
 
+    @program.each_extern_func { |f|
+      output += @visitor.visit(f)
+    }
+
     @program.each_func { |f|
       output += @visitor.visit(f)
     }
@@ -122,6 +126,14 @@ class Frontend::Generator
     "ret #{v.visit(o.value)}#{annotation}"
   }, Visitor::Lambda)
 
+  VISIT_VOIDCALL = T.let(-> (v, o, c) {
+    annotation = ""
+    if o.annotation
+      annotation = " \" #{o.annotation}"
+    end
+    "void #{v.visit(o.call)}#{annotation}"
+  }, Visitor::Lambda)
+
   VISIT_FUNCPARAM = T.let(-> (v, o, c) {
     "#{v.visit(o.type)} #{v.visit(o.id)}"
   }, Visitor::Lambda)
@@ -141,6 +153,16 @@ class Frontend::Generator
     "func #{o.name} (#{param_str}) -> #{v.visit(o.ret_type)}#{stmt_str}\nend\n"
   }, Visitor::Lambda)
 
+  VISIT_EXTERNFUNCDEF = T.let(-> (v, o, c) {
+    param_type_str = ""
+    o.param_types.each { |t|
+      param_type_str += "#{v.visit(t)}, "
+    }
+    param_type_str.chomp!(", ")
+
+    "extern func #{o.source} #{o.name} (#{param_type_str}) -> #{v.visit(o.ret_type)}\n"
+  }, Visitor::Lambda)
+
   VISIT_CALL = T.let(-> (v, o, c) {
     arg_str = ""
     o.args.each { |a|
@@ -149,6 +171,16 @@ class Frontend::Generator
     arg_str.chomp!(", ")
 
     "call #{o.func_name} (#{arg_str})"
+  }, Visitor::Lambda)
+
+  VISIT_EXTERNCALL = T.let(-> (v, o, c) {
+    arg_str = ""
+    o.args.each { |a|
+      arg_str += "#{v.visit(a)}, "
+    }
+    arg_str.chomp!(", ")
+
+    "extern call #{o.func_source} #{o.func_name} (#{arg_str})"
   }, Visitor::Lambda)
 
   VISIT_LAMBDAS = T.let({
@@ -165,8 +197,11 @@ class Frontend::Generator
     IL::JumpZero => VISIT_JUMPZERO,
     IL::JumpNotZero => VISIT_JUMPNOTZERO,
     IL::Return => VISIT_RETURN,
+    IL::VoidCall => VISIT_VOIDCALL,
     IL::FuncParam => VISIT_FUNCPARAM,
     IL::FuncDef => VISIT_FUNCDEF,
+    IL::ExternFuncDef => VISIT_EXTERNFUNCDEF,
     IL::Call => VISIT_CALL,
+    IL::ExternCall => VISIT_EXTERNCALL,
   }, Visitor::LambdaHash)
 end

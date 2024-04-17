@@ -17,6 +17,7 @@ module Frontend
       UIntConst = new("UIntConst")
       IntConst = new("IntConst")
       FloatConst = new("FloatConst")
+      VoidConst = new("VoidConst")
       ID = new("ID")
       Register = new("Register")
       BinaryOp = new("BinaryOp")
@@ -36,6 +37,7 @@ module Frontend
       Arrow = new("Arrow")
       Call = new("Call")
       Comma = new("Comma")
+      Extern = new("Extern")
 
       # special tokens
       NewLine = new("NewLine")
@@ -135,8 +137,10 @@ module Frontend
     TokenDef.new(TokenType::RightParen, /\)/),
     TokenDef.new(TokenType::Call, /call/),
     TokenDef.new(TokenType::Comma, /,/),
+    TokenDef.new(TokenType::Extern, /extern/),
 
     # other
+    TokenDef.new(TokenType::VoidConst, /void/),
     TokenDef.new(TokenType::UIntConst, /[0-9]+u8/),
     TokenDef.new(TokenType::IntConst, /-?[0-9]+(i16|i32|i64)/),
     TokenDef.new(TokenType::FloatConst,

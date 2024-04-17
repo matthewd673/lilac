@@ -188,4 +188,9 @@ class ParseFileTest < Minitest::Test
 
     assert program.eql?(expected)
   end
+
+  sig { void }
+  def test_parse_extern
+    program = Frontend::Parser::parse_file("test/il_programs/frontend/extern.txt")
+  end
 end
