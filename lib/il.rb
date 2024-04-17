@@ -48,11 +48,15 @@ module IL
   # such as constants and variables.
   class Value
     extend T::Sig
+    extend T::Helpers
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
-    def eql?(other)
-      other.class == Value
-    end
+    abstract!
+
+    sig { abstract.returns(String) }
+    def to_s; end
+
+    sig { abstract.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other); end
   end
 
   # A Constant is a constant value of a given type.
@@ -74,12 +78,12 @@ module IL
       @value = value
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "#{@value}"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == Constant
         return false
@@ -126,12 +130,12 @@ module IL
       @key = compute_key # key must be recomputed whenever number changes
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       @key
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == ID
         return false
@@ -166,12 +170,12 @@ module IL
       @key = @name
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "%#{@number}"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == Register
         return false
@@ -187,19 +191,15 @@ module IL
   # arithmetic operations. Expressions cannot be nested.
   class Expression
     extend T::Sig
+    extend T::Helpers
 
-    sig { returns(T.untyped) }
-    # Calculate the value of an Expression.
-    #
-    # @return [T.untyped] The value of the Expression, likely numeric.
-    def calculate
-      0
-    end
+    abstract!
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
-    def eql?(other)
-      other.class == Expression
-    end
+    sig { abstract.returns(String) }
+    def to_s; end
+
+    sig { abstract.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other); end
   end
 
   # A BinaryOp is an Expression which computes a value from two operands.
@@ -252,7 +252,7 @@ module IL
       @right = right
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "#{@left} #{@op} #{@right}"
     end
@@ -296,7 +296,7 @@ module IL
       end
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == BinaryOp
         return false
@@ -342,7 +342,7 @@ module IL
       @value = value
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "#{@op}#{@value}"
     end
@@ -363,7 +363,7 @@ module IL
       end
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == UnaryOp
         return false
@@ -390,7 +390,7 @@ module IL
       @args = args
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       arg_str = ""
       @args.each { |a|
@@ -401,7 +401,7 @@ module IL
       return "call #{@func_name}(#{arg_str})"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == Call
         return false
@@ -434,7 +434,18 @@ module IL
       @void = void
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.returns(String) }
+    def to_s
+      arg_str = ""
+      @args.each { |a|
+        arg_str += "#{a}, "
+      }
+      arg_str.chomp!(", ")
+
+      return "extern_call #{@func_source}.#{@func_name}(#{arg_str})"
+    end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == ExternCall
         return false
@@ -459,7 +470,7 @@ module IL
       @ids = ids
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       ids_str = ""
       @ids.each { |id|
@@ -470,7 +481,7 @@ module IL
       "phi (#{ids_str})"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == Phi
         return false
@@ -485,14 +496,18 @@ module IL
   # A Statement is a single instruction or "line of code" in the IL.
   class Statement
     extend T::Sig
+    extend T::Helpers
+
+    abstract!
 
     sig { returns(T.nilable(String)) }
     attr_accessor :annotation
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
-    def eql?(other)
-      other.class == Statement
-    end
+    sig { abstract.returns(String) }
+    def to_s; end
+
+    sig { abstract.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other); end
   end
 
   # A Definition is a Statement that defines an ID with a type and value.
@@ -519,12 +534,12 @@ module IL
       @rhs = rhs
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "#{@type} #{@id} = #{@rhs}"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == Definition
         return false
@@ -551,12 +566,12 @@ module IL
       @name = name
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "#{@name}:"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == Label
         return false
@@ -583,12 +598,12 @@ module IL
       @target = target
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "jmp #{@target}"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == Jump
         return false
@@ -618,12 +633,12 @@ module IL
       @target = target
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "jz #{@cond} #{@target}"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == JumpZero
         return false
@@ -653,12 +668,12 @@ module IL
       @target = target
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "jnz #{@cond} #{@target}"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == JumpNotZero
         return false
@@ -682,12 +697,12 @@ module IL
       @value = value
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "ret #{@value}"
     end
 
-    sig { params(other: T.untyped).returns(T::Boolean) }
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
       if not other.class == Return
         return false

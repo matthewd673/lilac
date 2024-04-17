@@ -290,7 +290,7 @@ class Optimization::LVN < OptimizationPass
       @number = number
     end
 
-    sig { returns(String) }
+    sig { override.returns(String) }
     def to_s
       "##{@number}"
     end
