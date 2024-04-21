@@ -44,6 +44,56 @@ module IL
         T.absurd(self)
       end
     end
+
+    sig { returns(T::Boolean) }
+    # Check if this is an integer type (signed or unsigned).
+    #
+    # @return [T::Boolean] True if the type is an integer type.
+    def integer?
+      case self
+      when U8 then true
+      when I16 then true
+      when I32 then true
+      when I64 then true
+      else false
+      end
+    end
+
+    sig { returns(T::Boolean) }
+    # Check if this is a signed integer type.
+    #
+    # @return [T::Boolean] True if the type is a signed integer type.
+    def signed?
+      case self
+      when I16 then true
+      when I32 then true
+      when I64 then true
+      else false
+      end
+    end
+
+    sig { returns(T::Boolean) }
+    # Check if this is an unsigned integer type.
+    #
+    # @return [T::Boolean] True if the type is an unsigned integer type.
+    def unsigned?
+      case self
+      when U8 then true
+      else false
+      end
+    end
+
+    sig { returns(T::Boolean) }
+    # Check if this is a floating-point type.
+    #
+    # @return [T::Boolean] True if the type is a floating-point type.
+    def float?
+      case self
+      when F32 then true
+      when F64 then true
+      else false
+      end
+    end
   end
 
   # A Value is anything that can correspond to a typed value in the IL

@@ -29,66 +29,28 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     super(object)
   end
 
-  sig { params(value: IL::Value).returns(IL::Type) }
-  def get_il_type(value)
-    case value
-    when IL::ID
-      symbol = @symbol_table.lookup(value.key)
-      if not symbol
-        raise "Symbol #{value} not in symbol table"
-      end
-      return symbol.type
-    when IL::Constant then value.type
-    when IL::Value
-      raise "Cannot get type of IL::Value stub class"
-    end
-  end
-
-  sig { params(type: IL::Type).returns(T::Boolean) }
-  def self.signed?(type)
-    case type
-    when IL::Type::I16 then true
-    when IL::Type::I32 then true
-    when IL::Type::I64 then true
-    else false
-    end
-  end
-
-  sig { params(type: IL::Type).returns(T::Boolean) }
-  def self.unsigned?(type)
-    case type
-    when IL::Type::U8 then true
-    else false
-    end
-  end
-
-  sig { params(type: IL::Type).returns(T::Boolean) }
-  def self.float?(type)
-    case type
-    when IL::Type::F32 then true
-    when IL::Type::F64 then true
-    else false
-    end
-  end
-
-  sig { params(rhs: T.any(IL::Expression, IL::Value)).returns(Type) }
-  def get_type(rhs)
+  sig { params(rhs: T.any(IL::Expression, IL::Value)).returns(IL::Type) }
+  def get_il_type(rhs)
     case rhs
     when IL::BinaryOp
-      return get_type(rhs.left) # left and right should always match
+      return get_il_type(rhs.left) # left and right should always match
     when IL::UnaryOp
-      return get_type(rhs.value)
+      return get_il_type(rhs.value)
     when IL::ID
       symbol = @symbol_table.lookup(rhs.key)
       if not symbol
         raise "Symbol #{rhs} not in symbol table"
       end
-      return Instructions::to_wasm_type(symbol.type)
-    when IL::Constant
-      return Instructions::to_wasm_type(rhs.type)
+      return symbol.type
+    when IL::Constant then rhs.type
     else
       raise "Unable to determine type of #{rhs}"
     end
+  end
+
+  sig { params(rhs: T.any(IL::Expression, IL::Value)).returns(Type) }
+  def get_type(rhs)
+    Instructions::to_wasm_type(get_il_type(rhs))
   end
 
   private
@@ -154,13 +116,13 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
 
         # choose between div_s, div_u, and div
         div = nil
-        if signed?(il_type)
+        if il_type.signed?
           type = Instructions::to_integer_type(il_type)
           div = Instructions::DivideSigned.new(type)
-        elsif unsigned?(il_type)
+        elsif il_type.unsigned?
           type = Instructions::to_integer_type(il_type)
           div = Instructions::DivideUnsigned.new(type)
-        elsif float?(il_type)
+        elsif il_type.float?
           type = Instructions::to_float_type(il_type)
           div = Instructions::Divide.new(type)
         end
@@ -217,13 +179,13 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
 
         # choose between lt_s, lt_u, and lt
         lt = nil
-        if signed?(il_type)
+        if il_type.signed?
           type = Instructions::to_integer_type(il_type)
           lt = Instructions::LessThanSigned.new(type)
-        elsif unsigned?(il_type)
+        elsif il_type.unsigned?
           type = Instructions::to_integer_type(il_type)
           lt = Instructions::LessThanUnsigned.new(type)
-        elsif float?(il_type)
+        elsif il_type.float?
           type = Instructions::to_float_type(il_type)
           lt = Instructions::LessThan.new(type)
         end
