@@ -102,10 +102,10 @@ class Graph
     }
   end
 
+  sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
   # Iterate over every successor of a given node in the graph.
   #
   # @param [Node] node The node to iterate for.
-  sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
   def each_successor(node, &block)
     each_outgoing(node) { |e|
       yield e.to
@@ -192,5 +192,21 @@ class Graph
     if incoming # should never be nil
       incoming.delete(edge)
     end
+  end
+
+  sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
+  def postorder(node, &block)
+    each_successor(node) { |s|
+     postorder(s, &block)
+    }
+    yield node
+  end
+
+  sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
+  def reverse_postorder(node, &block)
+    each_predecessor(node) { |p|
+      postorder(p, &block)
+    }
+    yield node
   end
 end

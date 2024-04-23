@@ -13,6 +13,9 @@ class Analysis::DomTree < Graph
 
   Node = type_member { { fixed: BB } }
 
+  sig { returns(BB) }
+  attr_reader :entry
+
   sig { params(dom_cfg_facts: CFGFacts[BB]).void }
   # Construct a new dominator tree from the +CFGFacts+ produced by a
   # dominators analysis.
@@ -24,6 +27,8 @@ class Analysis::DomTree < Graph
     super()
 
     compute_graph(dom_cfg_facts)
+
+    @entry = T.let(dom_cfg_facts.cfg.entry, BB)
   end
 
   sig { params(block: BB).returns(T.nilable(BB)) }
