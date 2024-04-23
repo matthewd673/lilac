@@ -17,22 +17,29 @@ class Analysis::BB
   attr_reader :entry
 
   sig { returns(T.nilable(IL::Jump)) }
-  # The Jmp that marks the exit of the block (if one exists)
+  # The Jump that marks the exit of the block (if one exists)
   attr_reader :exit
 
   sig { returns(T::Array[IL::Statement]) }
   # The Statements in the block.
   attr_reader :stmt_list
 
+  sig { returns(T::Boolean) }
+  # Determines if a block is visited by the true branch of a
+  # conditional jump.
+  attr_accessor :true_branch
+
   sig { params(id: Integer,
                entry: T.nilable(IL::Label),
                exit: T.nilable(IL::Jump),
-               stmt_list: T::Array[IL::Statement]).void }
-  def initialize(id, entry: nil, exit: nil, stmt_list: [])
+               stmt_list: T::Array[IL::Statement],
+               true_branch: T::Boolean).void }
+  def initialize(id, entry: nil, exit: nil, stmt_list: [], true_branch: false)
     @id = id
     @entry = entry
     @exit = exit
     @stmt_list = stmt_list
+    @true_branch = true_branch
   end
 
   sig { returns(Integer) }
