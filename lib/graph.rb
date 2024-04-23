@@ -92,6 +92,26 @@ class Graph
     end
   end
 
+  sig { params(node: Node).returns(Integer) }
+  def incoming_length(node)
+    incoming = @incoming[node]
+    if not incoming
+      0
+    else
+      incoming.length
+    end
+  end
+
+  sig { params(node: Node).returns(Integer) }
+  def outgoing_length(node)
+    outgoing = @outgoing[node]
+    if not outgoing
+      0
+    else
+      outgoing.length
+    end
+  end
+
   sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
   # Iterate over every predecessor of a given node in the graph.
   #
@@ -195,18 +215,32 @@ class Graph
   end
 
   sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
-  def postorder(node, &block)
+  def postorder_traversal(node, &block)
     each_successor(node) { |s|
-     postorder(s, &block)
+     postorder_traversal(s, &block)
     }
     yield node
   end
 
-  sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
-  def reverse_postorder(node, &block)
-    each_predecessor(node) { |p|
-      postorder(p, &block)
+  sig { params(node: Node).returns(T::Hash[Analysis::BB, Integer]) }
+  def postorder_numbering(node)
+    numbering = {}
+    i = 0
+    postorder_traversal(node) { |n|
+      numbering[n] = i
+      i += 1
     }
-    yield node
+    return numbering
+  end
+
+  sig { params(node: Node).returns(T::Hash[Analysis::BB, Integer]) }
+  def reverse_postorder_numbering(node)
+    numbering = {}
+    i = @nodes.length - 1
+    postorder_traversal(node) { |n|
+      numbering[n] = i
+      i -= 1
+    }
+    return numbering
   end
 end
