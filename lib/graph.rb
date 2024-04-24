@@ -40,6 +40,11 @@ class Graph
 
       return (to.eql?(other.to) and from.eql?(other.from))
     end
+
+    sig { returns(String) }
+    def to_s
+      "#{from} -> #{to}"
+    end
   end
 
   sig { void }
@@ -62,6 +67,16 @@ class Graph
   # Iterate over every edge in the graph.
   def each_edge(&block)
     @edges.each(&block)
+  end
+
+  sig { returns(Integer) }
+  def nodes_length
+    @nodes.length
+  end
+
+  sig { returns(Integer) }
+  def edges_length
+    @edges.length
   end
 
   sig { params(node: Node, block: T.proc.params(arg0: Edge[Node]).void).void }
@@ -170,6 +185,23 @@ class Graph
     @nodes.push(node)
   end
 
+  sig { params(node: Node).void }
+  # Delete a node from the graph. Its incoming and outgoing edges will also
+  # be deleted from the graph.
+  #
+  # @param [Node] node The node to delete.
+  def delete_node(node)
+    @nodes.delete(node)
+
+    each_outgoing(node) { |o|
+      delete_edge(o)
+    }
+
+    each_incoming(node) { |i|
+      delete_edge(i)
+    }
+  end
+
   sig { params(edge: Edge[Node]).void }
   # Add an Edge to the Graph's edge list. The nodes will also be
   # added to the appropriate successors and predecessors lists. This should
@@ -214,6 +246,17 @@ class Graph
     end
   end
 
+  sig { params(from: Node, to: Node).returns(T.nilable(Edge[Node])) }
+  def find_edge(from, to)
+    each_outgoing(from) { |o|
+      if o.to == to
+        return o
+      end
+    }
+
+    nil
+  end
+
   sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
   def postorder_traversal(node, &block)
     postorder_traversal_helper(node, Set.new, &block)
@@ -239,6 +282,20 @@ class Graph
       i -= 1
     }
     return numbering
+  end
+
+  sig { returns(Graph[Node]) }
+  def clone
+    new_graph = Graph.new
+
+    @nodes.each { |n|
+      new_graph.add_node(n)
+    }
+    @edges.each { |e|
+      new_graph.add_edge(e)
+    }
+
+    return new_graph
   end
 
   private
