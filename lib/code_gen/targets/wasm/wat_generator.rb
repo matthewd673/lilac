@@ -10,6 +10,9 @@ require_relative "wasm_il_transformer"
 require_relative "instructions/instructions"
 require_relative "instructions/instruction_set"
 require_relative "components"
+require_relative "../../../analysis/dominators"
+require_relative "../../../analysis/dom_tree"
+require_relative "relooper"
 
 class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   extend T::Sig
@@ -116,6 +119,12 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   sig { params(cfg: Analysis::CFG)
           .returns(T::Array[Instructions::WasmInstruction]) }
   def generate_instructions(cfg)
+    # run relooper on the cfg
+    dom_facts = Analysis::Dominators.new(cfg).run
+    dom_tree = Analysis::DomTree.new(dom_facts)
+    relooper = Relooper.new(cfg, dom_tree)
+    relooper.translate
+
     instructions = []
 
     # scan forwards to build a symbol table of all locals and their types.
