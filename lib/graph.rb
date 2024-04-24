@@ -216,10 +216,7 @@ class Graph
 
   sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
   def postorder_traversal(node, &block)
-    each_successor(node) { |s|
-     postorder_traversal(s, &block)
-    }
-    yield node
+    postorder_traversal_helper(node, Set.new, &block)
   end
 
   sig { params(node: Node).returns(T::Hash[Analysis::BB, Integer]) }
@@ -242,5 +239,24 @@ class Graph
       i -= 1
     }
     return numbering
+  end
+
+  private
+
+  sig { params(node: Node,
+               seen: T::Set[Node],
+               block: T.proc.params(arg0: Node).void)
+          .void }
+  def postorder_traversal_helper(node, seen, &block)
+    if seen.include?(node)
+      return
+    end
+
+    seen.add(node)
+
+    each_successor(node) { |s|
+     postorder_traversal_helper(s, seen, &block)
+    }
+    yield node
   end
 end

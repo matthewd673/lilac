@@ -128,10 +128,12 @@ class Analysis::BB
       # mark beginning of a block
       if s.is_a?(IL::Label)
         # push previous block onto list (exit is nil)
-        blocks.push(Analysis::BB.new(blocks.length,
-                                     entry: current_entry,
-                                     stmt_list: block_stmts))
-        block_stmts = []
+        if not (block_stmts.empty? and !current_entry)
+          blocks.push(Analysis::BB.new(blocks.length,
+                                       entry: current_entry,
+                                       stmt_list: block_stmts))
+          block_stmts = []
+        end
         current_entry = s
       end
 
