@@ -568,16 +568,8 @@ module CodeGen::Targets::Wasm::Instructions
 
   # Represents the +block+ instruction.
   # Create a label that can be branched out of.
-  class Block < WasmInstruction
+  class Block < LabelInstruction
     extend T::Sig
-
-    sig { returns(String) }
-    attr_reader :label
-
-    sig { params(label: String).void }
-    def initialize(label)
-      @label = label
-    end
 
     sig { override.returns(Integer) }
     def opcode
@@ -592,16 +584,8 @@ module CodeGen::Targets::Wasm::Instructions
 
   # Represents the +br+ instruction.
   # Branch to a loop or block.
-  class Branch < WasmInstruction
+  class Branch < LabelInstruction
     extend T::Sig
-
-    sig { returns(String) }
-    attr_reader :label
-
-    sig { params(label: String).void }
-    def initialize(label)
-      @label = label
-    end
 
     sig { override.returns(Integer) }
     def opcode
@@ -611,6 +595,22 @@ module CodeGen::Targets::Wasm::Instructions
     sig { override.returns(String) }
     def wat
       "br $#{@label}"
+    end
+  end
+
+  # Represents the +br_if+ instruction.
+  # Conditional branch to a loop or block.
+  class BranchIf < LabelInstruction
+    extend T::Sig
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x0d
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "br_if $#{@label}"
     end
   end
 
@@ -697,16 +697,8 @@ module CodeGen::Targets::Wasm::Instructions
 
   # Represents the +loop+ instruction.
   # Create a label which can be branched to.
-  class Loop < WasmInstruction
+  class Loop < LabelInstruction
     extend T::Sig
-
-    sig { returns(String) }
-    attr_reader :label
-
-    sig { params(label: String).void }
-    def initialize(label)
-      @label = label
-    end
 
     sig { override.returns(Integer) }
     def opcode
