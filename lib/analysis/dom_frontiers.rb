@@ -49,9 +49,9 @@ class Analysis::DomFrontiers
         runner = T.let(p, T.nilable(BB))
 
         # NOTE: original algorithm does not enforce runner != nil
-        while runner and runner != @dom_tree.get_idom(j)
+        while runner and runner != @dom_tree.idom(j)
           @df[runner] = T.unsafe(@df[runner]) | [j] # add j to runner's DF
-          runner = @dom_tree.get_idom(runner) # continue moving up dom tree
+          runner = @dom_tree.idom(runner) # continue moving up dom tree
         end
       }
     }

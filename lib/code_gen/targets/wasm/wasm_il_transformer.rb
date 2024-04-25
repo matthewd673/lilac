@@ -130,18 +130,6 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
         [left, right, div]
       },
     # equality
-    # normal equality
-    IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
-              Pattern::ValueWildcard.new,
-              Pattern::ValueWildcard.new) =>
-      -> (t, o) {
-        left = t.transform(o.left)
-        right = t.transform(o.right)
-
-        type = t.get_type(o.left)
-
-        [left, right, Instructions::Equal.new(type)]
-      },
     # eqz (for 0 on left or right)
     IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
                      Pattern::IntegerConstantWildcard.new(0),
@@ -167,6 +155,55 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
 
         [left, Instructions::EqualZero.new(type)]
       },
+    # normal equality
+    IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
+              Pattern::ValueWildcard.new,
+              Pattern::ValueWildcard.new) =>
+      -> (t, o) {
+        left = t.transform(o.left)
+        right = t.transform(o.right)
+
+        type = t.get_type(o.left)
+
+        [left, right, Instructions::Equal.new(type)]
+      },
+    # not equal
+    IL::BinaryOp.new(IL::BinaryOp::Operator::NEQ,
+              Pattern::ValueWildcard.new,
+              Pattern::ValueWildcard.new) =>
+      -> (t, o) {
+        left = t.transform(o.left)
+        right = t.transform(o.right)
+
+        type = t.get_type(o.left)
+
+        [left, right, Instructions::NotEqual.new(type)]
+      },
+    # greater than
+    IL::BinaryOp.new(IL::BinaryOp::Operator::GT,
+                     Pattern::ValueWildcard.new,
+                     Pattern::ValueWildcard.new) =>
+      -> (t, o) {
+        left = t.transform(o.left)
+        right = t.transform(o.right)
+
+        il_type = t.get_il_type(o.left)
+
+        # choose between gt_s, gt_u, and gt
+        gt = nil
+        if il_type.signed?
+          type = Instructions::to_integer_type(il_type)
+          gt = Instructions::GreaterThanSigned.new(type)
+        elsif il_type.unsigned?
+          type = Instructions::to_integer_type(il_type)
+          gt = Instructions::GreaterThanUnsigned.new(type)
+        elsif il_type.float?
+          type = Instructions::to_float_type(il_type)
+          gt = Instructions::GreaterThan.new(type)
+        end
+
+        [left, right, gt]
+      },
     # less than
     IL::BinaryOp.new(IL::BinaryOp::Operator::LT,
                      Pattern::ValueWildcard.new,
@@ -191,6 +228,56 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
         end
 
         [left, right, lt]
+      },
+    # greater than equal
+    IL::BinaryOp.new(IL::BinaryOp::Operator::GEQ,
+                     Pattern::ValueWildcard.new,
+                     Pattern::ValueWildcard.new) =>
+      -> (t, o) {
+        left = t.transform(o.left)
+        right = t.transform(o.right)
+
+        il_type = t.get_il_type(o.left)
+
+        # choose between ge_s, ge_u, and ge
+        ge = nil
+        if il_type.signed?
+          type = Instructions::to_integer_type(il_type)
+          ge = Instructions::GreaterOrEqualSigned.new(type)
+        elsif il_type.unsigned?
+          type = Instructions::to_integer_type(il_type)
+          ge = Instructions::GreaterOrEqualUnsigned.new(type)
+        elsif il_type.float?
+          type = Instructions::to_float_type(il_type)
+          ge = Instructions::GreaterOrEqual.new(type)
+        end
+
+        [left, right, ge]
+      },
+    # less than equal
+    IL::BinaryOp.new(IL::BinaryOp::Operator::LEQ,
+                     Pattern::ValueWildcard.new,
+                     Pattern::ValueWildcard.new) =>
+      -> (t, o) {
+        left = t.transform(o.left)
+        right = t.transform(o.right)
+
+        il_type = t.get_il_type(o.left)
+
+        # choose between le_s, le_u, and le
+        le = nil
+        if il_type.signed?
+          type = Instructions::to_integer_type(il_type)
+          le = Instructions::LessOrEqualSigned.new(type)
+        elsif il_type.unsigned?
+          type = Instructions::to_integer_type(il_type)
+          le = Instructions::LessOrEqualUnsigned.new(type)
+        elsif il_type.float?
+          type = Instructions::to_float_type(il_type)
+          le = Instructions::LessOrEqual.new(type)
+        end
+
+        [left, right, le]
       },
     # CALL RULES
     Pattern::CallWildcard.new =>

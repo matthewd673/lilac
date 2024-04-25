@@ -31,14 +31,14 @@ class Analysis::DomTree < Graph
     @entry = T.let(dom_cfg_facts.cfg.entry, BB)
   end
 
-  sig { params(block: BB).returns(T.nilable(BB)) }
-  # Get the IDOM for a block in the tree by traversing the tree.
+  sig { params(node: BB).returns(T.nilable(BB)) }
+  # Find the node that immediately dominates the given node.
   #
-  # @param [BB] block Find IDOM of this block.
+  # @param [BB] node Find IDOM of this block.
   # @return [T.nilable(BB)] The IDOM of the block. In a valid dominator tree
   #   this will only be nil for the ENTRY block in the CFG.
-  def get_idom(block)
-    incoming = @incoming[block]
+  def idom(node)
+    incoming = @incoming[node]
     if not incoming
       nil
     else
@@ -52,25 +52,27 @@ class Analysis::DomTree < Graph
     end
   end
 
-  sig { params(block: BB).returns(T::Set[BB]) }
-  # Get the SDOM set for a block in the tree by recursively traversing the
-  # tree.
+  sig { params(node: BB, block: T.proc.params(arg0: BB).void).void }
+  # Iterate over the nodes that strictly dominate the given node.
   #
-  # @param [BB] block Find SDOM of this block.
-  # @return [T::Set[BB]] The SDOM set of the block. In a valid dominator tree
-  #   this set will only be empty for the ENTRY block in the CFG.
-  def get_sdom(block)
-    sdom = T.let(Set[], T::Set[BB])
-    incoming = @incoming[block]
-    if not incoming
-      return Set[]
-    end
-
-    incoming.each { |e|
-      sdom = sdom | get_sdom(e.from)
+  # @param [BB] node Find SDOM of this block.
+  def sdom(node, &block)
+    # yield each predecessor and recurse on them
+    each_incoming(node) { |i|
+      yield i.from
+      sdom(node, &block)
     }
+  end
 
-    return sdom
+  sig { params(node: BB, block: T.proc.params(arg0: BB).void).void }
+  # Iterate over the nodes that are dominated by this node.
+  #
+  # @param [BB] node The node to search from.
+  def dom_by(node, &block)
+    yield node
+    each_outgoing(node) { |o|
+      dom_by(o.to, &block)
+    }
   end
 
   private
