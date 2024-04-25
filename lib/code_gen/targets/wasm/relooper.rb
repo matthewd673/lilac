@@ -36,15 +36,13 @@ class CodeGen::Targets::Wasm::Relooper
                      T::Hash[Analysis::BB, Integer])
   end
 
-  sig { void }
+  sig { returns(WasmBlock) }
   def translate
     # classify each node in the CFG
     classify_nodes
 
-    # call do_tree on entry
-    translation = do_tree(@cfg.entry)
-
-    print_wasm_block(translation, 0)
+    # translate everything starting at entry
+    return do_tree(@cfg.entry)
   end
 
   private

@@ -13,6 +13,7 @@ require_relative "components"
 require_relative "../../../analysis/dominators"
 require_relative "../../../analysis/dom_tree"
 require_relative "relooper"
+require_relative "wasm_block"
 
 class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
   extend T::Sig
@@ -25,6 +26,9 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     wasm_translator = CodeGen::Targets::Wasm::WasmILTransformer.new(@symbols)
     @visitor = T.let(Visitor.new(VISIT_LAMBDAS), Visitor)
 
+    @loop_ct = T.let(0, Integer)
+    @block_ct = T.let(0, Integer)
+
     super(wasm_translator, cfg_program)
   end
 
@@ -34,7 +38,7 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     @visitor.visit(wasm_module)
   end
 
-  protected
+  private
 
   sig { returns(Components::Module) }
   def generate_module
@@ -123,7 +127,6 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     dom_facts = Analysis::Dominators.new(cfg).run
     dom_tree = Analysis::DomTree.new(dom_facts)
     relooper = Relooper.new(cfg, dom_tree)
-    relooper.translate
 
     instructions = []
 
@@ -154,18 +157,174 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
       }
     }
 
-    # generate the rest of the instructions
-    cfg.each_node { |b|
-      b.stmt_list.each { |s|
-        # transform instruction like normal
-        instructions.concat(@transformer.transform(s))
-      }
-    }
+    # translate the WasmBlocks from relooper and return it
+    root = relooper.translate
+    instructions.concat(translate_wasm_block(root))
 
     return instructions
   end
 
-  private
+  sig { params(block: WasmBlock)
+          .returns(T::Array[Instructions::WasmInstruction])}
+  def translate_wasm_block(block)
+    case block
+      when WasmIfBlock
+        instructions = []
+
+        # translate all the conditional stuff
+        block.bb.stmt_list.each { |s|
+          instructions.concat(@transformer.transform(s))
+        }
+
+        # push the conditional and create the if
+        bb_exit = T.unsafe(block.bb.exit)
+        if not bb_exit
+          raise "Basic block did not have a exit"
+        end
+        instructions.push(push_value(bb_exit.cond))
+        # TODO: handle jump_zero with non-int conditional value
+        if bb_exit.is_a?(IL::JumpZero)
+          cond_il_type = T.cast(@transformer, WasmILTransformer)
+                          .get_il_type(bb_exit.cond)
+          cond_type = Instructions.to_integer_type(cond_il_type)
+          instructions.push(Instructions::EqualZero.new(cond_type))
+        end
+        instructions.push(Instructions::If.new)
+
+        # no true branch = invalid WasmIfBlock
+        if not block.true_branch
+          raise "WasmIfBlock has no true branch"
+        end
+
+        # translate true branch
+        if_true_branch = translate_wasm_block(T.unsafe(block.true_branch))
+        instructions.concat(if_true_branch)
+
+        # false branch is optional
+        if block.false_branch
+          # create the else
+          instructions.push(Instructions::Else.new)
+
+          # translate false branch
+          if_false_branch = translate_wasm_block(T.unsafe(block.false_branch))
+          instructions.concat(if_false_branch)
+        end
+
+        # end the if else statement
+        instructions.push(Instructions::End.new)
+
+        # translate the following blocks
+        if block.next_block
+          instructions.concat(translate_wasm_block(T.unsafe(block.next_block)))
+        end
+
+        return instructions
+      when WasmLoopBlock
+        instructions = []
+        block_label = alloc_block_label
+        loop_label = alloc_loop_label
+
+        # translate all the conditional stuff
+        # this will be placed at the beginning of the _block_ and
+        # the end of the _loop_
+        cond_insts = []
+        block.bb.stmt_list.each { |s|
+          cond_insts.concat(@transformer.transform(s))
+        }
+        bb_exit = T.unsafe(block.bb.exit)
+        if not bb_exit
+          raise "Basic block did not have a exit"
+        end
+        cond_insts.push(push_value(bb_exit.cond))
+        # TODO: handle jz with non-int cond value
+        if bb_exit.is_a?(IL::JumpZero)
+          cond_il_type = T.cast(@transformer, WasmILTransformer)
+                          .get_il_type(bb_exit.cond)
+          cond_type = Instructions.to_integer_type(cond_il_type)
+          cond_insts.push(Instructions::EqualZero.new(cond_type))
+        end
+
+        # create the outer block
+        instructions.push(Instructions::Block.new(block_label))
+
+        # conditional check before entering the loop
+        # (since this is emulating a while, not a do-while)
+        instructions.concat(cond_insts)
+        # push conditional branch
+        instructions.push(Instructions::BranchIf.new(block_label))
+
+        # create the loop
+        instructions.push(Instructions::Loop.new(loop_label))
+
+        # translate the inner of the loop (not optional)
+        if not block.inner
+          raise "WasmLoopBlock has no inner"
+        end
+        inner = translate_wasm_block(T.unsafe(block.inner))
+        instructions.concat(inner)
+
+        # conditional check at end of the loop to see if we should exit
+        instructions.concat(cond_insts)
+        instructions.push(Instructions::BranchIf.new(block_label))
+
+        # unconditional jump back after the check
+        instructions.push(Instructions::Branch.new(loop_label))
+
+        # end the loop and the block
+        instructions.push(Instructions::End.new)
+        instructions.push(Instructions::End.new)
+
+        # translate the following blocks
+        if block.next_block
+          instructions.concat(translate_wasm_block(T.unsafe(block.next_block)))
+        end
+
+        return instructions
+      when WasmBlock
+        instructions = []
+
+        # translate block
+        block.bb.stmt_list.each { |s|
+          instructions.concat(@transformer.transform(s))
+        }
+
+        # translate next block
+        if block.next_block
+          instructions.concat(translate_wasm_block(T.unsafe(block.next_block)))
+        end
+
+        return instructions
+    end
+  end
+
+  sig { params(value: IL::Value).returns(Instructions::WasmInstruction) }
+  def push_value(value)
+    case value
+    when IL::Constant
+      Instructions::Const.new(Instructions.to_wasm_type(value.type),
+                              value.value)
+    when IL::ID
+      Instructions::LocalGet.new(value.name)
+    when IL::Value # cannot happen, IL::Value is abstract
+      raise "Attempted to push value of stub IL::Value"
+    else
+      T.absurd(value)
+    end
+  end
+
+  sig { returns(String) }
+  def alloc_block_label
+    label = "__lilac_block#{@block_ct}"
+    @block_ct += 1
+    return label
+  end
+
+  sig { returns(String) }
+  def alloc_loop_label
+    label = "__lilac_loop_#{@loop_ct}"
+    @loop_ct += 1
+    return label
+  end
 
   VISIT_ARRAY = T.let(-> (v, o, c) {
     str = ""
