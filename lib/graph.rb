@@ -40,6 +40,11 @@ class Graph
 
       return (to.eql?(other.to) and from.eql?(other.from))
     end
+
+    sig { returns(String) }
+    def to_s
+      "#{from} -> #{to}"
+    end
   end
 
   sig { void }
@@ -62,6 +67,16 @@ class Graph
   # Iterate over every edge in the graph.
   def each_edge(&block)
     @edges.each(&block)
+  end
+
+  sig { returns(Integer) }
+  def nodes_length
+    @nodes.length
+  end
+
+  sig { returns(Integer) }
+  def edges_length
+    @edges.length
   end
 
   sig { params(node: Node, block: T.proc.params(arg0: Edge[Node]).void).void }
@@ -89,6 +104,26 @@ class Graph
       []
     else
       outgoing.each(&block)
+    end
+  end
+
+  sig { params(node: Node).returns(Integer) }
+  def incoming_length(node)
+    incoming = @incoming[node]
+    if not incoming
+      0
+    else
+      incoming.length
+    end
+  end
+
+  sig { params(node: Node).returns(Integer) }
+  def outgoing_length(node)
+    outgoing = @outgoing[node]
+    if not outgoing
+      0
+    else
+      outgoing.length
     end
   end
 
@@ -150,6 +185,23 @@ class Graph
     @nodes.push(node)
   end
 
+  sig { params(node: Node).void }
+  # Delete a node from the graph. Its incoming and outgoing edges will also
+  # be deleted from the graph.
+  #
+  # @param [Node] node The node to delete.
+  def delete_node(node)
+    @nodes.delete(node)
+
+    each_outgoing(node) { |o|
+      delete_edge(o)
+    }
+
+    each_incoming(node) { |i|
+      delete_edge(i)
+    }
+  end
+
   sig { params(edge: Edge[Node]).void }
   # Add an Edge to the Graph's edge list. The nodes will also be
   # added to the appropriate successors and predecessors lists. This should
@@ -194,18 +246,73 @@ class Graph
     end
   end
 
-  sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
-  def postorder(node, &block)
-    each_successor(node) { |s|
-     postorder(s, &block)
+  sig { params(from: Node, to: Node).returns(T.nilable(Edge[Node])) }
+  def find_edge(from, to)
+    each_outgoing(from) { |o|
+      if o.to == to
+        return o
+      end
     }
-    yield node
+
+    nil
   end
 
   sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
-  def reverse_postorder(node, &block)
-    each_predecessor(node) { |p|
-      postorder(p, &block)
+  def postorder_traversal(node, &block)
+    postorder_traversal_helper(node, Set.new, &block)
+  end
+
+  sig { params(node: Node).returns(T::Hash[Analysis::BB, Integer]) }
+  def postorder_numbering(node)
+    numbering = {}
+    i = 0
+    postorder_traversal(node) { |n|
+      numbering[n] = i
+      i += 1
+    }
+    return numbering
+  end
+
+  sig { params(node: Node).returns(T::Hash[Analysis::BB, Integer]) }
+  def reverse_postorder_numbering(node)
+    numbering = {}
+    i = @nodes.length - 1
+    postorder_traversal(node) { |n|
+      numbering[n] = i
+      i -= 1
+    }
+    return numbering
+  end
+
+  sig { returns(Graph[Node]) }
+  def clone
+    new_graph = Graph.new
+
+    @nodes.each { |n|
+      new_graph.add_node(n)
+    }
+    @edges.each { |e|
+      new_graph.add_edge(e)
+    }
+
+    return new_graph
+  end
+
+  private
+
+  sig { params(node: Node,
+               seen: T::Set[Node],
+               block: T.proc.params(arg0: Node).void)
+          .void }
+  def postorder_traversal_helper(node, seen, &block)
+    if seen.include?(node)
+      return
+    end
+
+    seen.add(node)
+
+    each_successor(node) { |s|
+     postorder_traversal_helper(s, seen, &block)
     }
     yield node
   end

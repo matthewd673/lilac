@@ -93,8 +93,7 @@ module Interpreter
         context.step_ct += 1
         # take appropriate branch
         cfg.each_outgoing(context.current) { |o|
-          o = T.cast(o, Analysis::CFG::Edge)
-          if not o.cond_branch == cond_result
+          if not o.to.true_branch == cond_result
             next
           end
 

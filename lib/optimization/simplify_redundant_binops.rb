@@ -60,47 +60,47 @@ class Optimization::SimplifyRedundantBinops < OptimizationPass
     case binop.op
     when IL::BinaryOp::Operator::ADD
       # check for adding 0
-      if is_const?(binop.left, 0)
+      if const?(binop.left, 0)
         return binop.right
-      elsif is_const?(binop.right, 0)
+      elsif const?(binop.right, 0)
         return binop.left
       end
     when IL::BinaryOp::Operator::SUB
       # check for subtracting 0
-      if is_const?(binop.right, 0) # not associative
+      if const?(binop.right, 0) # not associative
         return binop.left
       end
     when IL::BinaryOp::Operator::MUL
       # check for mul by 1
-      if is_const?(binop.left, 1)
+      if const?(binop.left, 1)
         return binop.right
-      elsif is_const?(binop.right, 1)
+      elsif const?(binop.right, 1)
         return binop.left
       end
 
       # check for mul by 0
-      if is_const?(binop.left, 0)
+      if const?(binop.left, 0)
         return binop.left # return the zero
-      elsif is_const?(binop.right, 0)
+      elsif const?(binop.right, 0)
         return binop.right # same idea
       end
     when IL::BinaryOp::Operator::DIV
       # check for div by 1
-      if is_const?(binop.right, 1) # not associative
+      if const?(binop.right, 1) # not associative
         return binop.left
       end
     when IL::BinaryOp::Operator::OR
       # check for or with something non-zero (which is always true)
-      if is_const?(binop.left, 0, neg: true)
+      if const?(binop.left, 0, neg: true)
         return binop.left # return the non-zero
-      elsif is_const?(binop.right, 0, neg: true)
+      elsif const?(binop.right, 0, neg: true)
         return binop.right # return the non-zero
       end
     when IL::BinaryOp::Operator::AND
       # check for and with something zero (which is always false)
-      if is_const?(binop.left, 0)
+      if const?(binop.left, 0)
         return binop.left # return the zero because thats what it evals to
-      elsif is_const?(binop.right, 0)
+      elsif const?(binop.right, 0)
         return binop.right # same idea
       end
     end
@@ -109,7 +109,7 @@ class Optimization::SimplifyRedundantBinops < OptimizationPass
   end
 
     sig { params(value: IL::Value, const: T.untyped, neg: T::Boolean).returns(T::Boolean) }
-  def is_const?(value, const, neg: false)
+  def const?(value, const, neg: false)
     case value
     # NOTE: the below should work for any numeric type
     when IL::Constant
