@@ -1,28 +1,22 @@
 # typed: strict
 require "sorbet-runtime"
-require_relative "il"
 
-# A Pass represents a process that can be run on a Program.
-# Some passes may modify a Program in place.
+# A Pass represents a process that can be run on an object.
 # Passes should be created once and then reused.
 class Pass
   extend T::Sig
+  extend T::Generic
+  extend T::Helpers
 
-  sig { returns(String) }
-  attr_reader :id
-  sig { returns(String) }
-  attr_reader :description
+  abstract!
 
-  sig { void }
-  # Construct a new Pass.
-  def initialize
-    # NOTE: these should always be overwritten by subclasses
-    @id = T.let("pass", String)
-    @description = T.let("Generic pass", String)
-  end
+  sig { abstract.returns(String) }
+  def id; end
+  sig { abstract.returns(String) }
+  def description; end
 
   sig { returns(String) }
   def to_s
-    "#{@id}: #{@description}"
+    "#{id}: #{description}"
   end
 end

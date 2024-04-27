@@ -13,10 +13,14 @@ include Validation
 class Validation::IDNaming < ValidationPass
   extend T::Sig
 
-  sig { void }
-  def initialize
-    @id = "id_naming"
-    @description = "Ensure that ID names do not include reserved characters"
+  sig { override.returns(String) }
+  def id
+    "id_naming"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Ensure that ID names do not include reserved characters"
   end
 
   sig { params(program: IL::Program).void }

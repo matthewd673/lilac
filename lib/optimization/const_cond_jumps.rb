@@ -5,18 +5,30 @@ require_relative "optimization_pass"
 
 include Optimization
 
-class Optimization::PrecomputeCondJumps < OptimizationPass
+class Optimization::ConstCondJumps < OptimizationPass
   extend T::Sig
   extend T::Generic
 
   Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
-  sig { void }
-  def initialize
-    @id = T.let("precompute_cond_jumps", String)
-    @description = T.let("Replace constant conditional jumps with unconditional jumps", String)
-    @level = T.let(1, Integer)
-    @unit_type = T.let(UnitType::StatementList, UnitType)
+  sig { override.returns(String) }
+  def id
+    "const_cond_jumps"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Replace constant conditional jumps with unconditional jumps"
+  end
+
+  sig { override.returns(Integer) }
+  def level
+    1
+  end
+
+  sig { override.returns(UnitType) }
+  def unit_type
+    UnitType::StatementList
   end
 
   sig { params(unit: Unit).void }

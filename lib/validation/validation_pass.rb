@@ -6,22 +6,17 @@ require_relative "../il"
 
 class Validation::ValidationPass < Pass
   extend T::Sig
+  extend T::Helpers
 
-  sig { void }
-  # Construct a new ValidationPass
-  def initialize
-    # NOTE: these should always be overwritten by subclasses
-    @id = T.let("validation", String)
-    @description = T.let("Generic validation stub", String)
-  end
+  abstract!
 
   sig { params(program: IL::Program).void }
   def run(program)
-    # stub
+    raise "run is unimplemented for #{id}"
   end
 
   sig { returns(String) }
   def to_s
-    "#{@id}: #{@description}"
+    "#{id}: #{description}"
   end
 end

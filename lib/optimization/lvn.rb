@@ -12,12 +12,24 @@ class Optimization::LVN < OptimizationPass
 
   Unit = type_member { { fixed: Analysis::BB } }
 
-  sig { void }
-  def initialize
-    @id = T.let("lvn", String)
-    @description = T.let("Local value numbering", String)
-    @level = T.let(1, Integer)
-    @unit_type = T.let(UnitType::BasicBlock, UnitType)
+  sig { override.returns(String) }
+  def id
+    "lvn"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Local value numbering"
+  end
+
+  sig { override.returns(Integer) }
+  def level
+    1
+  end
+
+  sig { override.returns(UnitType) }
+  def unit_type
+    UnitType::BasicBlock
   end
 
   sig { params(unit: Unit).void }

@@ -12,10 +12,14 @@ include Validation
 class Validation::TypeCheck < ValidationPass
   extend T::Sig
 
-  sig { void }
-  def initialize
-    @id = "typecheck"
-    @description = "Detect type mismatchs in definitions and expressions"
+  sig { override.returns(String) }
+  def id
+    "typecheck"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Detect type mismatches in definitions and expressions"
   end
 
   sig { params(program: IL::Program).void }

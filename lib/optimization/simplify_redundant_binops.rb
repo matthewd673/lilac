@@ -12,13 +12,24 @@ class Optimization::SimplifyRedundantBinops < OptimizationPass
 
   Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
-  sig { void }
-  def initialize
-    @id = T.let("simplify_redundant_binops", String)
-    @description = T.let(
-      "Simplify binary operators that have no effect (i.e.: x + 0)", String)
-    @level = T.let(0, Integer)
-    @unit_type = T.let(UnitType::StatementList, UnitType)
+  sig { override.returns(String) }
+  def id
+    "simplify_redundant_binops"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Simplify binary operators that have no effect (i.e.: x + 0)"
+  end
+
+  sig { override.returns(Integer) }
+  def level
+    0
+  end
+
+  sig { override.returns(UnitType) }
+  def unit_type
+    UnitType::StatementList
   end
 
   sig { params(unit: Unit).void }

@@ -14,7 +14,7 @@ require_relative "simplify_redundant_binops"
 Optimization::OPTIMIZATIONS = T.let([
   CondenseLabels.new,
   LVN.new,
-  PrecomputeCondJumps.new,
+  ConstCondJumps.new,
   RemoveUnusedLabels.new,
   RemoveUselessJumps.new,
   SimplifyRedundantBinops.new,
