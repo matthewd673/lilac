@@ -12,11 +12,6 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
   include CodeGen
   include CodeGen::Targets::Wasm
 
-  WasmTreeTransform = T.type_alias {
-    T.proc.params(arg0: IL::ILObject, arg1: WasmILTransformer)
-      .returns(T::Array[CodeGen::Instruction])
-  }
-
   sig { params(symbol_table: SymbolTable).void }
   def initialize(symbol_table)
     super()
