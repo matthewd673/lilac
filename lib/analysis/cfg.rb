@@ -13,33 +13,6 @@ class Analysis::CFG < Graph
 
   Node = type_member {{ fixed: BB }}
 
-  # A +CFG::Edge+ is a +Graph::Edge+ that stores additional information
-  # relevant for CFGs. All Edges in a CFG should be of this type.
-  class Edge < Graph::Edge
-    extend T::Sig
-    extend T::Generic
-
-    include Analysis
-
-    Node = type_member {{ fixed: BB }}
-
-    sig { returns(T::Boolean) }
-    # Indicates if this edge is taken by a conditional jump (when it is true).
-    attr_reader :cond_branch
-
-    sig { params(from: Node, to: Node, cond_branch: T::Boolean).void }
-    # Construct a new CFG Edge.
-    #
-    # @param [Node] from The node that the edge originates from.
-    # @param [Node] to The node that the edge terminates at.
-    # @param [T::Boolean] cond_branch Determines if the edge is taken by a
-    #   conditional branch when it evaluates to +true+.
-    def initialize(from, to, cond_branch)
-      super(from, to)
-      @cond_branch = cond_branch
-    end
-  end
-
   # The number used by the ENTRY block in any CFG.
   ENTRY = -1
   # The number used by the EXIT block in any CFG.
@@ -131,7 +104,8 @@ class Analysis::CFG < Graph
         # create an edge to the target block
         # if jump IS conditional then the edge must be (and we can easily check
         # if a jump is conditional based on its class)
-        add_edge(Edge.new(b, successor, jump.class != IL::Jump))
+        successor.true_branch = jump.class != IL::Jump
+        add_edge(Edge.new(b, successor))
 
         # if jump is NOT conditional then stop after creating this edge
         if jump.class == IL::Jump
@@ -142,9 +116,11 @@ class Analysis::CFG < Graph
       # create edge to next block
       following = block_list[b.id + 1]
       if following
-        add_edge(Edge.new(b, following, false))
+        following.true_branch = false
+        add_edge(Edge.new(b, following))
       else # reached the end, point to exit
-        add_edge(Edge.new(b, @exit, false))
+        @exit.true_branch = false
+        add_edge(Edge.new(b, @exit))
       end
     }
 
@@ -153,7 +129,8 @@ class Analysis::CFG < Graph
     if not first_block
       first_block = @exit
     end
-    add_edge(Edge.new(entry, first_block, false))
+    first_block.true_branch = false
+    add_edge(Edge.new(entry, first_block))
 
     # add entry and exit block nodes to graph
     @nodes.insert(0, @entry)

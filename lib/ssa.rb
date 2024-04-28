@@ -71,7 +71,7 @@ class SSA < Pass
 
   private
 
-  sig { params(edge: CFG::Edge).void }
+  sig { params(edge: Graph::Edge[BB]).void }
   def split_edge(edge)
     # delete old edge
     @cfg.delete_edge(edge)
@@ -81,13 +81,16 @@ class SSA < Pass
     new_block = BB.new(new_id, stmt_list: [])
     @cfg.add_node(new_block)
 
+    # if old "to" was a true_branch, move that status to "new_block"
+    new_block.true_branch = edge.to.true_branch
+    edge.to.true_branch = false
+
     # create new edges to and from the new block
-    was_cond_branch = edge.cond_branch # preserve cond_branch-ness to new block
-    @cfg.add_edge(CFG::Edge.new(edge.from, new_block, was_cond_branch))
-    @cfg.add_edge(CFG::Edge.new(new_block, edge.to, false)) # never cond branch
+    @cfg.add_edge(Graph::Edge.new(edge.from, new_block))
+    @cfg.add_edge(Graph::Edge.new(new_block, edge.to))
   end
 
-  sig { returns(T::Array[CFG::Edge]) }
+  sig { returns(T::Array[Graph::Edge[BB]]) }
   def find_critical_edges
     critical_edges = []
 

@@ -122,4 +122,19 @@ module CodeGen::Targets::Wasm::Instructions
       @variable = variable
     end
   end
+
+  class LabelInstruction < WasmInstruction
+    extend T::Sig
+    extend T::Helpers
+
+    abstract!
+
+    sig { returns(String) }
+    attr_reader :label
+
+    sig { params(label: String).void }
+    def initialize(label)
+      @label = label
+    end
+  end
 end

@@ -566,7 +566,53 @@ module CodeGen::Targets::Wasm::Instructions
   # CONTROL FLOW INSTRUCTIONS
   # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Control_flow
 
-  # TODO: most control flow instructions
+  # Represents the +block+ instruction.
+  # Create a label that can be branched out of.
+  class Block < LabelInstruction
+    extend T::Sig
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x02
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "block $#{@label}"
+    end
+  end
+
+  # Represents the +br+ instruction.
+  # Branch to a loop or block.
+  class Branch < LabelInstruction
+    extend T::Sig
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x0c
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "br $#{@label}"
+    end
+  end
+
+  # Represents the +br_if+ instruction.
+  # Conditional branch to a loop or block.
+  class BranchIf < LabelInstruction
+    extend T::Sig
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x0d
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "br_if $#{@label}"
+    end
+  end
 
   # Represents the +call+ instruction.
   # Call a function.
@@ -592,8 +638,81 @@ module CodeGen::Targets::Wasm::Instructions
     end
   end
 
+  # Represents the +end+ instruction.
+  # Mark the end of a +block+, +if+, +loop+, etc.
+  class End < WasmInstruction
+    extend T::Sig
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x0b
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "end"
+    end
+  end
+
+  # Represents the +if+ instruction.
+  # Execute a statement if the last item on the stack is true.
+  class If < WasmInstruction
+    extend T::Sig
+
+    sig { returns(T.nilable(Else)) }
+    attr_accessor :else_branch
+
+    sig { params(else_branch: T.nilable(Else)).void }
+    def initialize(else_branch: nil)
+      @else_branch = else_branch
+    end
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x04
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "if"
+    end
+  end
+
+  # Represents the +else+ instruction.
+  # Can be used with the +if+ instruction to execute a statement if the last
+  # item on the stack is false.
+  class Else < WasmInstruction
+    extend T::Sig
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x05
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "else"
+    end
+  end
+
+  # Represents the +loop+ instruction.
+  # Create a label which can be branched to.
+  class Loop < LabelInstruction
+    extend T::Sig
+
+    sig { override.returns(Integer) }
+    def opcode
+      0x03
+    end
+
+    sig { override.returns(String) }
+    def wat
+      "loop $#{@label}"
+    end
+  end
+
   # Represents the +return+ instruction.
-  # Returns from a function.
+  # Return from a function.
   class Return < WasmInstruction
     extend T::Sig
 

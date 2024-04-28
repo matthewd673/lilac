@@ -46,9 +46,9 @@ module Debugging::GraphVisualizer
       to_name = e.to.id
 
       color = "black"
-      # special case for CFGs: highlight cond_branch edges
-      if e.is_a?(Analysis::CFG::Edge)
-        if e.cond_branch
+      # special case for CFGs: highlight true conditional branch edges
+      if e.to.is_a?(Analysis::BB)
+        if e.to.true_branch
           color = "blue"
         end
       end
