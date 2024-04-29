@@ -18,6 +18,16 @@ class SSA < Pass
 
   include Analysis
 
+  sig { override.returns(String) }
+  def id
+    "ssa"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Transform a CFG into SSA form"
+  end
+
   sig { params(cfg: CFG).void }
   # Construct a new SSA pass.
   #
@@ -31,9 +41,6 @@ class SSA < Pass
     @global_types = T.let(Hash.new, T::Hash[String, IL::Type])
     @blocks = T.let(Hash.new, T::Hash[String, T::Set[BB]])
     @df_facts = T.let(CFGFacts.new(cfg), CFGFacts[BB])
-
-    @id = T.let("ssa", String)
-    @description = T.let("Transform a CFG into SSA form", String)
   end
 
   sig { void }

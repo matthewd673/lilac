@@ -1,25 +1,26 @@
 # typed: strict
 require "sorbet-runtime"
+require_relative "../../component"
 
 module CodeGen::Targets::Wasm::Components
-  class Component
+  class WasmComponent < CodeGen::Component
     # NOTE: stub
   end
 
-  class Module
+  class Module < WasmComponent
     extend T::Sig
 
-    sig { returns(T::Array[Component]) }
+    sig { returns(T::Array[WasmComponent]) }
     attr_reader :components
 
-    sig { params(components: T::Array[Component]).void }
+    sig { params(components: T::Array[WasmComponent]).void }
     def initialize(components)
       @components = components
     end
   end
 
   # Represents the +start+ component of a module.
-  class Start < Component
+  class Start < WasmComponent
     extend T::Sig
 
     sig { returns(String) }
@@ -32,7 +33,7 @@ module CodeGen::Targets::Wasm::Components
   end
 
   # Represents the +func+ component of a module.
-  class Func < Component
+  class Func < WasmComponent
     extend T::Sig
 
     include CodeGen::Targets::Wasm::Instructions
@@ -77,7 +78,7 @@ module CodeGen::Targets::Wasm::Components
   end
 
   # Represents an +import+ component in a module.
-  class Import < Component
+  class Import < WasmComponent
     extend T::Sig
 
     include CodeGen::Targets::Wasm

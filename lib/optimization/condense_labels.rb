@@ -11,12 +11,24 @@ class Optimization::CondenseLabels < OptimizationPass
 
   Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
-  sig { void }
-  def initialize
-    @id = T.let("condense_labels", String)
-    @description = T.let("Condense adjacent labels", String)
-    @level = T.let(0, Integer)
-    @unit_type = T.let(UnitType::StatementList, UnitType)
+  sig { override.returns(String) }
+  def id
+    "condense_labels"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Condense adjacent labels"
+  end
+
+  sig { override.returns(Integer) }
+  def level
+    0
+  end
+
+  sig { override.returns(UnitType) }
+  def unit_type
+    UnitType::StatementList
   end
 
   sig { params(unit: Unit).void }

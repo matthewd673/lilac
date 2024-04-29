@@ -7,8 +7,11 @@ require_relative "../il"
 class Optimization::OptimizationPass < Pass
   extend T::Sig
   extend T::Generic
+  extend T::Helpers
 
-  Unit = type_member
+  abstract!
+
+  Unit = type_member {{ upper: Object }}
 
   class UnitType < T::Enum
     extend T::Sig
@@ -17,31 +20,23 @@ class Optimization::OptimizationPass < Pass
       None = new
       StatementList = new
       BasicBlock = new
+      InstructionList = new
     end
   end
 
-  sig { returns(Integer) }
-  attr_reader :level
+  sig { abstract.returns(Integer) }
+  def level; end
 
-  sig { returns(UnitType) }
-  attr_reader :unit_type
-
-  sig { void }
-  def initialize
-    # NOTE: these should be overwritten by subclasses
-    @id = T.let("optimization", String)
-    @description = T.let("Generic optimization pass", String)
-    @level = T.let(-1, Integer)
-    @unit_type = T.let(UnitType::None, UnitType)
-  end
+  sig { abstract.returns(UnitType) }
+  def unit_type; end
 
   sig { params(unit: Unit).void }
   def run(unit)
-    raise("run is unimplemented for #{@id}")
+    raise "run is unimplemented for #{id}"
   end
 
   sig { returns(String) }
   def to_s
-    "#{@id} (#{@level}): #{@description}"
+    "#{id} (#{level}): #{description}"
   end
 end

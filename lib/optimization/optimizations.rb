@@ -5,7 +5,7 @@ require_relative "optimization_pass"
 
 require_relative "condense_labels"
 require_relative "lvn"
-require_relative "precompute_cond_jumps"
+require_relative "const_cond_jumps"
 require_relative "remove_unused_labels"
 require_relative "remove_useless_jumps"
 require_relative "simplify_redundant_binops"
@@ -14,7 +14,7 @@ require_relative "simplify_redundant_binops"
 Optimization::OPTIMIZATIONS = T.let([
   CondenseLabels.new,
   LVN.new,
-  PrecomputeCondJumps.new,
+  ConstCondJumps.new,
   RemoveUnusedLabels.new,
   RemoveUselessJumps.new,
   SimplifyRedundantBinops.new,

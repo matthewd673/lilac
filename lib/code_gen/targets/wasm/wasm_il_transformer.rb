@@ -12,11 +12,6 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
   include CodeGen
   include CodeGen::Targets::Wasm
 
-  WasmTreeTransform = T.type_alias {
-    T.proc.params(arg0: IL::ILObject, arg1: WasmILTransformer)
-      .returns(T::Array[CodeGen::Instruction])
-  }
-
   sig { params(symbol_table: SymbolTable).void }
   def initialize(symbol_table)
     super()
@@ -60,17 +55,18 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     # definition
     Pattern::DefinitionWildcard.new(Pattern::RhsWildcard.new) =>
       -> (t, o) {
-        rhs = t.transform(o.rhs)
+        instructions = []
 
-        [rhs,
-         Instructions::LocalSet.new(o.id.name)]
+        # recurse on rhs then push local set
+        instructions.concat(t.transform(o.rhs))
+        instructions.push(Instructions::LocalSet.new(o.id.name))
+
+        instructions
       },
     # void call
     IL::VoidCall.new(Pattern::CallWildcard.new) =>
       -> (t, o) {
-        call = t.transform(o.call)
-
-        [call]
+        t.transform(o.call) # easy, since this stmt just wraps the call expr
       },
     # EXPRESSION RULES
     # binary ops
@@ -79,30 +75,45 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
       -> (t, o) {
-        left = t.transform(o.left)
-        right = t.transform(o.right)
+        instructions = []
+
+        # translate left, right, and then push op
+        instructions.concat(t.transform(o.left))
+        instructions.concat(t.transform(o.right))
         type = t.get_type(o.left)
-        [left, right, Instructions::Add.new(type)]
+        instructions.push(Instructions::Add.new(type))
+
+        instructions
       },
     # subtraction
     IL::BinaryOp.new(IL::BinaryOp::Operator::SUB,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
       -> (t, o) {
-        left = t.transform(o.left)
-        right = t.transform(o.right)
+        instructions = []
+
+        # translate left, right, and then push op
+        instructions.concat(t.transform(o.left))
+        instructions.concat(t.transform(o.right))
         type = t.get_type(o.left)
-        [left, right, Instructions::Subtract.new(type)]
+        instructions.push(Instructions::Subtract.new(type))
+
+        instructions
       },
     # multiplication
     IL::BinaryOp.new(IL::BinaryOp::Operator::MUL,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
       -> (t, o) {
-        left = t.transform(o.left)
-        right = t.transform(o.right)
+        instructions = []
+
+        # translate left, right, and then push op
+        instructions.concat(t.transform(o.left))
+        instructions.concat(t.transform(o.right))
         type = t.get_type(o.left)
-        [left, right, Instructions::Multiply.new(type)]
+        instructions.push(Instructions::Multiply.new(type))
+
+        instructions
       },
     # division
     IL::BinaryOp.new(IL::BinaryOp::Operator::DIV,
@@ -127,7 +138,12 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
           div = Instructions::Divide.new(type)
         end
 
-        [left, right, div]
+        instructions = []
+        instructions.concat(left)
+        instructions.concat(right)
+        instructions.push(div)
+
+        instructions
       },
     # equality
     # eqz (for 0 on left or right)
@@ -141,7 +157,11 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
         il_type = t.get_il_type(o.left)
         type = Instructions::to_integer_type(il_type)
 
-        [right, Instructions::EqualZero.new(type)]
+        instructions = []
+        instructions.concat(right)
+        instructions.push(Instructions::EqualZero.new(type))
+
+        instructions
       },
     IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
                      Pattern::ValueWildcard.new,
@@ -153,7 +173,11 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
         il_type = t.get_il_type(o.right)
         type = Instructions::to_integer_type(il_type)
 
-        [left, Instructions::EqualZero.new(type)]
+        instructions = []
+        instructions.concat(left)
+        instructions.push(Instructions::EqualZero.new(type))
+
+        instructions
       },
     # normal equality
     IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
@@ -227,7 +251,12 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
           lt = Instructions::LessThan.new(type)
         end
 
-        [left, right, lt]
+        instructions = []
+        instructions.concat(left)
+        instructions.concat(right)
+        instructions.push(lt)
+
+        instructions
       },
     # greater than equal
     IL::BinaryOp.new(IL::BinaryOp::Operator::GEQ,
@@ -296,7 +325,11 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
       -> (t, o) {
         value = t.transform(o.value)
 
-        [value, Instructions::Return.new]
+        instructions = []
+        instructions.concat(value)
+        instructions.push(Instructions::Return.new)
+
+        instructions
       },
     # VALUE RULES
     Pattern::IDWildcard.new =>

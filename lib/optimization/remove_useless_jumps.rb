@@ -11,12 +11,24 @@ class Optimization::RemoveUselessJumps < OptimizationPass
 
   Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
-  sig { void }
-  def initialize
-    @id = T.let("remove_useless_jumps", String)
-    @description = T.let("Remove jumps to the very next line", String)
-    @level = T.let(0, Integer)
-    @unit_type = T.let(UnitType::StatementList, UnitType)
+  sig { override.returns(String) }
+  def id
+    "remove_useless_jumps"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Remove jumps to the very next statement"
+  end
+
+  sig { override.returns(Integer) }
+  def level
+    0
+  end
+
+  sig { override.returns(UnitType) }
+  def unit_type
+    UnitType::StatementList
   end
 
   sig { params(unit: Unit).void }

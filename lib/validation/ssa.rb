@@ -10,10 +10,14 @@ include Validation
 class Validation::SSA < ValidationPass
   extend T::Sig
 
-  sig { void }
-  def initialize
-    @id = "ssa"
-    @description = "Ensure the program is in valid SSA form"
+  sig { override.returns(String) }
+  def id
+    "ssa"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Ensure the program is in valid SSA form"
   end
 
   sig { params(program: IL::Program).void }

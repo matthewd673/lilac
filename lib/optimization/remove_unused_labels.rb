@@ -12,12 +12,24 @@ class Optimization::RemoveUnusedLabels < OptimizationPass
 
   Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
-  sig { void }
-  def initialize
-    @id = T.let("remove_unused_labels", String)
-    @description = T.let("Remove labels that are never targeted", String)
-    @level = T.let(0, Integer)
-    @unit_type = T.let(UnitType::StatementList, UnitType)
+  sig { override.returns(String) }
+  def id
+    "remove_unused_labels"
+  end
+
+  sig { override.returns(String) }
+  def description
+    "Remove labels that are never targeted"
+  end
+
+  sig { override.returns(Integer) }
+  def level
+    0
+  end
+
+  sig { override.returns(UnitType) }
+  def unit_type
+    UnitType::StatementList
   end
 
   sig { params(unit: Unit).void }
