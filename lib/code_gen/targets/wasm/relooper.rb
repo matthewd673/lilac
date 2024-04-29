@@ -26,7 +26,10 @@ class CodeGen::Targets::Wasm::Relooper
     @dom_tree = dom_tree
 
     reducible = Analysis::Reducible.new(cfg).run
-    # TODO: convert if not reducible
+    # TODO: convert to reducible if it isn't already
+    if not reducible
+      raise "CFG is not reducible"
+    end
 
     # to be filled in later
     @props = T.let({}, T::Hash[Analysis::BB, T::Set[BlockProperty]])
