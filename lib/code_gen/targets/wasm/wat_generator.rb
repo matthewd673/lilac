@@ -21,9 +21,8 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     super(root_component)
   end
 
-  sig { returns(String) }
+  sig { override.returns(String) }
   def generate
-    # NOTE: expect @components to be a single Module
     @visitor.visit(@root_component)
   end
 

@@ -5,6 +5,9 @@ require_relative "instruction"
 
 class CodeGen::Generator
   extend T::Sig
+  extend T::Helpers
+
+  abstract!
 
   include CodeGen
 
@@ -12,4 +15,7 @@ class CodeGen::Generator
   def initialize(root_component)
     @root_component = root_component
   end
+
+  sig { abstract.returns(String) }
+  def generate; end
 end
