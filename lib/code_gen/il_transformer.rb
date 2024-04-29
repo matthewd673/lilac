@@ -5,6 +5,9 @@ require_relative "instruction"
 require_relative "pattern"
 require_relative "../il"
 
+# An ILTransformer mechanically transforms Lilac IL code into some
+# machine-dependent code representation based on a set of pattern-matching
+# rules.
 class CodeGen::ILTransformer
   extend T::Sig
 

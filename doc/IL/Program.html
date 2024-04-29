@@ -167,7 +167,51 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#add_extern_func-instance_method" title="#add_extern_func (instance method)">#<strong>add_extern_func</strong>(extern_funcdef)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#add_func-instance_method" title="#add_func (instance method)">#<strong>add_func</strong>(funcdef)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_extern_func-instance_method" title="#each_extern_func (instance method)">#<strong>each_extern_func</strong>(&amp;block)  &#x21d2; Object </a>
     
 
     
@@ -212,6 +256,28 @@
   <span class="summary_signature">
     
       <a href="#eql%3F-instance_method" title="#eql? (instance method)">#<strong>eql?</strong>(other)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_extern_func-instance_method" title="#get_extern_func (instance method)">#<strong>get_extern_func</strong>(key)  &#x21d2; Object </a>
     
 
     
@@ -333,17 +399,19 @@
       <pre class="lines">
 
 
-762
-763
-764
-765</pre>
+932
+933
+934
+935
+936</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 762</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 932</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>stmt_list:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='ivar'>@stmt_list</span> <span class='op'>=</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span>
   <span class='ivar'>@func_map</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="FuncDef.html" title="IL::FuncDef (class)">FuncDef</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@extern_func_map</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="ExternFuncDef.html" title="IL::ExternFuncDef (class)">ExternFuncDef</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -383,12 +451,12 @@
       <pre class="lines">
 
 
-758
-759
-760</pre>
+928
+929
+930</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 758</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 928</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_stmt_list'>stmt_list</span>
   <span class='ivar'>@stmt_list</span>
@@ -406,7 +474,37 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="add_func-instance_method">
+  <h3 class="signature first" id="add_extern_func-instance_method">
+  
+    #<strong>add_extern_func</strong>(extern_funcdef)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+956
+957
+958</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 956</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_extern_func'>add_extern_func</span><span class='lparen'>(</span><span class='id identifier rubyid_extern_funcdef'>extern_funcdef</span><span class='rparen'>)</span>
+  <span class='ivar'>@extern_func_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_extern_funcdef'>extern_funcdef</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_extern_funcdef'>extern_funcdef</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="add_func-instance_method">
   
     #<strong>add_func</strong>(funcdef)  &#x21d2; <tt>Object</tt> 
   
@@ -420,15 +518,49 @@
       <pre class="lines">
 
 
-768
-769
-770</pre>
+939
+940
+941</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 768</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 939</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_func'>add_func</span><span class='lparen'>(</span><span class='id identifier rubyid_funcdef'>funcdef</span><span class='rparen'>)</span>
   <span class='ivar'>@func_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_funcdef'>funcdef</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_funcdef'>funcdef</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="each_extern_func-instance_method">
+  
+    #<strong>each_extern_func</strong>(&amp;block)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+961
+962
+963
+964
+965</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 961</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_extern_func'>each_extern_func</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='ivar'>@extern_func_map</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='op'>|</span>
+    <span class='kw'>yield</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_unsafe'>unsafe</span><span class='lparen'>(</span><span class='ivar'>@extern_func_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -450,14 +582,14 @@
       <pre class="lines">
 
 
-773
-774
-775
-776
-777</pre>
+944
+945
+946
+947
+948</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 773</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 944</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each_func'>each_func</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='ivar'>@func_map</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='op'>|</span>
@@ -506,18 +638,19 @@
       <pre class="lines">
 
 
-794
-795
-796
-797
-798
-799
-800
-801
-802</pre>
+982
+983
+984
+985
+986
+987
+988
+989
+990
+991</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 794</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 982</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="" title="IL::Program (class)">Program</a></span></span>
@@ -526,7 +659,38 @@
 
   <span class='id identifier rubyid_other'>other</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_cast'>cast</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="" title="IL::Program (class)">Program</a></span></span><span class='rparen'>)</span>
 
-  <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span> <span class='kw'>and</span> <span class='id identifier rubyid_func_map'>func_map</span><span class='period'>.</span><span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_func_map'>func_map</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='period'>.</span><span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span> <span class='kw'>and</span> <span class='id identifier rubyid_func_map'>func_map</span><span class='period'>.</span><span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_func_map'>func_map</span><span class='rparen'>)</span> <span class='kw'>and</span>
+    <span class='id identifier rubyid_extern_func_map'>extern_func_map</span><span class='period'>.</span><span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_extern_func_map'>extern_func_map</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_extern_func-instance_method">
+  
+    #<strong>get_extern_func</strong>(key)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+968
+969
+970</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 968</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_extern_func'>get_extern_func</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='ivar'>@extern_func_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -548,12 +712,12 @@
       <pre class="lines">
 
 
-780
-781
-782</pre>
+951
+952
+953</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 780</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 951</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_func'>get_func</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='ivar'>@func_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span>
@@ -578,16 +742,16 @@
       <pre class="lines">
 
 
-785
-786
-787
-788
-789
-790
-791</pre>
+973
+974
+975
+976
+977
+978
+979</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 785</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 973</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_str'>str</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -606,7 +770,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:13 2024 by
+  Generated on Mon Apr 29 19:22:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

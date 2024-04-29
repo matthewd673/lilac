@@ -87,7 +87,7 @@
   
   <dl>
       <dt>Extended by:</dt>
-      <dd>T::Sig</dd>
+      <dd>T::Helpers, T::Sig</dd>
   </dl>
   
   
@@ -109,7 +109,18 @@
   
 </div>
 
-<div id="subclasses">
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>A Generator is used to turn a root component of some machine-dependent code into a valid string representation of that component.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><div id="subclasses">
   <h2>Direct Known Subclasses</h2>
   <p class="children"><span class='object_link'><a href="Targets/Wasm/WatGenerator.html" title="CodeGen::Targets::Wasm::WatGenerator (class)">Targets::Wasm::WatGenerator</a></span></p>
 </div>
@@ -131,7 +142,29 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(table, cfg_program)  &#x21d2; Generator </a>
+      <a href="#generate-instance_method" title="#generate (instance method)">#<strong>generate</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(root_component)  &#x21d2; Generator </a>
     
 
     
@@ -164,13 +197,14 @@
   
   
   
+  
   <div id="constructor_details" class="method_details_list">
   <h2>Constructor Details</h2>
   
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(table, cfg_program)  &#x21d2; <tt><span class='object_link'><a href="" title="CodeGen::Generator (class)">Generator</a></span></tt> 
+    #<strong>initialize</strong>(root_component)  &#x21d2; <tt><span class='object_link'><a href="" title="CodeGen::Generator (class)">Generator</a></span></tt> 
   
 
   
@@ -193,17 +227,15 @@
       <pre class="lines">
 
 
-12
-13
-14
-15</pre>
+17
+18
+19</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_gen/generator.rb', line 12</span>
+      <pre class="code"><span class="info file"># File 'lib/code_gen/generator.rb', line 17</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_table'>table</span><span class='comma'>,</span> <span class='id identifier rubyid_cfg_program'>cfg_program</span><span class='rparen'>)</span>
-  <span class='ivar'>@table</span> <span class='op'>=</span> <span class='id identifier rubyid_table'>table</span>
-  <span class='ivar'>@program</span> <span class='op'>=</span> <span class='id identifier rubyid_cfg_program'>cfg_program</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_root_component'>root_component</span><span class='rparen'>)</span>
+  <span class='ivar'>@root_component</span> <span class='op'>=</span> <span class='id identifier rubyid_root_component'>root_component</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -213,10 +245,42 @@
 </div>
 
 
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="generate-instance_method">
+  
+    #<strong>generate</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+22</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/code_gen/generator.rb', line 22</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_generate'>generate</span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:13 2024 by
+  Generated on Mon Apr 29 19:22:49 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

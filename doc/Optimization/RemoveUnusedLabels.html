@@ -130,16 +130,6 @@
 
 
 
-  <h2>Instance Attribute Summary</h2>
-  
-  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="OptimizationPass.html" title="Optimization::OptimizationPass (class)">OptimizationPass</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="OptimizationPass.html#level-instance_method" title="Optimization::OptimizationPass#level (method)">#level</a></span>, <span class='object_link'><a href="OptimizationPass.html#unit_type-instance_method" title="Optimization::OptimizationPass#unit_type (method)">#unit_type</a></span></p>
-
-  
-  
-  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="../Pass.html" title="Pass (class)">Pass</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="../Pass.html#description-instance_method" title="Pass#description (method)">#description</a></span>, <span class='object_link'><a href="../Pass.html#id-instance_method" title="Pass#id (method)">#id</a></span></p>
-
 
   
     <h2>
@@ -152,14 +142,34 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>  &#x21d2; RemoveUnusedLabels </a>
+      <a href="#description-instance_method" title="#description (instance method)">#<strong>description</strong>  &#x21d2; Object </a>
     
 
     
   </span>
   
   
-    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#id-instance_method" title="#id (instance method)">#<strong>id</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
   
   
   
@@ -168,9 +178,29 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>A new instance of RemoveUnusedLabels.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#level-instance_method" title="#level (instance method)">#<strong>level</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -179,6 +209,28 @@
   <span class="summary_signature">
     
       <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>(unit)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unit_type-instance_method" title="#unit_type (instance method)">#<strong>unit_type</strong>  &#x21d2; Object </a>
     
 
     
@@ -224,33 +276,58 @@
   
   
   
+  
   <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../Pass.html" title="Pass (class)">Pass</a></span></h3>
   <p class="inherited"><span class='object_link'><a href="../Pass.html#to_s-instance_method" title="Pass#to_s (method)">#to_s</a></span></p>
 
-  <div id="constructor_details" class="method_details_list">
-  <h2>Constructor Details</h2>
   
-    <div class="method_details first">
-  <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="Optimization::RemoveUnusedLabels (class)">RemoveUnusedLabels</a></span></tt> 
   
 
-  
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
 
-  
-</h3><div class="docstring">
-  <div class="discussion">
     
-<p>Returns a new instance of RemoveUnusedLabels.</p>
-
-
-  </div>
-</div>
-<div class="tags">
+      <div class="method_details first">
+  <h3 class="signature first" id="description-instance_method">
+  
+    #<strong>description</strong>  &#x21d2; <tt>Object</tt> 
   
 
-</div><table class="source_code">
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+21
+22
+23</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/optimization/remove_unused_labels.rb', line 21</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_description'>description</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Remove labels that are never targeted</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="id-instance_method">
+  
+    #<strong>id</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
@@ -258,34 +335,51 @@
 
 16
 17
-18
-19
-20
-21</pre>
+18</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/optimization/remove_unused_labels.rb', line 16</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
-  <span class='ivar'>@id</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>remove_unused_labels</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
-  <span class='ivar'>@description</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Remove labels that are never targeted</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
-  <span class='ivar'>@level</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='const'>Integer</span><span class='rparen'>)</span>
-  <span class='ivar'>@unit_type</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="OptimizationPass/UnitType.html" title="Optimization::OptimizationPass::UnitType (class)">UnitType</a></span></span><span class='op'>::</span><span class='const'>StatementList</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="OptimizationPass/UnitType.html" title="Optimization::OptimizationPass::UnitType (class)">UnitType</a></span></span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_id'>id</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>remove_unused_labels</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
 </div>
-  
-</div>
-
-
-  <div id="instance_method_details" class="method_details_list">
-    <h2>Instance Method Details</h2>
-
     
-      <div class="method_details first">
-  <h3 class="signature first" id="run-instance_method">
+      <div class="method_details ">
+  <h3 class="signature " id="level-instance_method">
+  
+    #<strong>level</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+26
+27
+28</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/optimization/remove_unused_labels.rb', line 26</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_level'>level</span>
+  <span class='int'>0</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="run-instance_method">
   
     #<strong>run</strong>(unit)  &#x21d2; <tt>Object</tt> 
   
@@ -299,18 +393,6 @@
       <pre class="lines">
 
 
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
 36
 37
 38
@@ -328,10 +410,22 @@
 50
 51
 52
-53</pre>
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/optimization/remove_unused_labels.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/optimization/remove_unused_labels.rb', line 36</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_unit'>unit</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_stmt_list'>stmt_list</span> <span class='op'>=</span> <span class='id identifier rubyid_unit'>unit</span> <span class='comment'># alias
@@ -368,12 +462,42 @@
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="unit_type-instance_method">
+  
+    #<strong>unit_type</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/optimization/remove_unused_labels.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unit_type'>unit_type</span>
+  <span class='const'><span class='object_link'><a href="OptimizationPass/UnitType.html" title="Optimization::OptimizationPass::UnitType (class)">UnitType</a></span></span><span class='op'>::</span><span class='const'>StatementList</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:14 2024 by
+  Generated on Mon Apr 29 19:22:49 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

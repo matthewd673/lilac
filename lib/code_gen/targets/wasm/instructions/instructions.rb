@@ -3,6 +3,9 @@ require "sorbet-runtime"
 require_relative "../wasm"
 require_relative "../../../instruction"
 
+# The Wasm::Instructions module contains definitions for classes of
+# instructions in Wasm as well as the actual instructions defined in the
+# Wasm spec.
 module CodeGen::Targets::Wasm::Instructions
   extend T::Sig
 
@@ -10,7 +13,13 @@ module CodeGen::Targets::Wasm::Instructions
   include CodeGen::Targets::Wasm
 
   # HELPER FUNCTIONS
+
   sig { params(il_type: IL::Type).returns(Type) }
+  # Convert an IL::Type into a Wasm type. Not all IL types are supported by
+  # Wasm.
+  #
+  # @param [IL::Type] il_type The IL type to convert.
+  # @return [Type] The corresponding Wasm type.
   def self.to_wasm_type(il_type)
     case il_type
     when IL::Type::I32 then Type::I32
@@ -23,6 +32,12 @@ module CodeGen::Targets::Wasm::Instructions
   end
 
   sig { params(il_type: IL::Type).returns(IntegerType) }
+  # Convert an IL::Type into a Wasm integer type (I32 or I64). If the provided
+  # IL type cannot be converted to an integer type this will raise an
+  # exception.
+  #
+  # @param [IL::Type] il_type The IL type to convert.
+  # @return [Type] An integer Wasm type (either I32 or I64).
   def self.to_integer_type(il_type)
     case il_type
     when IL::Type::I32 then Type::I32
@@ -33,6 +48,12 @@ module CodeGen::Targets::Wasm::Instructions
   end
 
   sig { params(il_type: IL::Type).returns(FloatType) }
+  # Convert an IL::Type into a Wasm floating point type (F32 or F64).
+  # If the provided IL type cannot be converted to a floating point type this
+  # will raise an exception.
+  #
+  # @param [IL::Type] il_type The IL type to convert.
+  # @return [Type] An integer Wasm type (either F32 or F64).
   def self.to_float_type(il_type)
     case il_type
     when IL::Type::F32 then Type::F32
@@ -44,6 +65,7 @@ module CodeGen::Targets::Wasm::Instructions
 
   # INSTRUCTION CLASSES
 
+  # A generic Wasm instruction.
   class WasmInstruction < CodeGen::Instruction
     extend T::Sig
     extend T::Helpers
@@ -57,6 +79,7 @@ module CodeGen::Targets::Wasm::Instructions
     def wat; end
   end
 
+  # A Wasm instruction with a type (e.g.: +add+).
   class TypedInstruction < WasmInstruction
     extend T::Sig
     extend T::Helpers
@@ -74,6 +97,7 @@ module CodeGen::Targets::Wasm::Instructions
     end
   end
 
+  # A Wasm instruction that requires an integer type argument (e.g.: +div_s+).
   class IntegerInstruction < WasmInstruction
     extend T::Sig
     extend T::Helpers
@@ -91,6 +115,8 @@ module CodeGen::Targets::Wasm::Instructions
     end
   end
 
+  # A Wasm instruction that requires a floating point type argument
+  # (e.g.: +div+).
   class FloatInstruction < WasmInstruction
     extend T::Sig
     extend T::Helpers
@@ -108,6 +134,8 @@ module CodeGen::Targets::Wasm::Instructions
     end
   end
 
+  # A Wasm instruction that requires a variable name argument
+  # (e.g.: +local.get+).
   class VariableInstruction < WasmInstruction
     extend T::Sig
     extend T::Helpers
@@ -123,6 +151,7 @@ module CodeGen::Targets::Wasm::Instructions
     end
   end
 
+  # A Wasm instruction that requires a label name (e.g.: +loop+).
   class LabelInstruction < WasmInstruction
     extend T::Sig
     extend T::Helpers

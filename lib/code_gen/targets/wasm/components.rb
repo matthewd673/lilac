@@ -2,11 +2,14 @@
 require "sorbet-runtime"
 require_relative "../../component"
 
+# The Wasm::Components module contains Wasm component definitions.
 module CodeGen::Targets::Wasm::Components
+  # A generic Wasm component.
   class WasmComponent < CodeGen::Component
     # NOTE: stub
   end
 
+  # Represents a Wasm +module+.
   class Module < WasmComponent
     extend T::Sig
 

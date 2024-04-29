@@ -358,7 +358,6 @@
       <pre class="lines">
 
 
-508
 509
 510
 511
@@ -366,10 +365,11 @@
 513
 514
 515
-516</pre>
+516
+517</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 508</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 509</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_entrypoint'>entrypoint</span><span class='rparen'>)</span>
   <span class='ivar'>@current</span> <span class='op'>=</span> <span class='id identifier rubyid_entrypoint'>entrypoint</span>
@@ -377,7 +377,7 @@
   <span class='ivar'>@symbols</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="SymbolTable.html" title="Interpreter::SymbolTable (class)">SymbolTable</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="SymbolTable.html#initialize-instance_method" title="Interpreter::SymbolTable#initialize (method)">new</a></span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="SymbolTable.html" title="Interpreter::SymbolTable (class)">SymbolTable</a></span></span><span class='rparen'>)</span>
   <span class='ivar'>@symbols</span><span class='period'>.</span><span class='id identifier rubyid_push_scope'>push_scope</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Scope.html" title="Interpreter::Scope (class)">Scope</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Scope.html#initialize-instance_method" title="Interpreter::Scope#initialize (method)">new</a></span></span><span class='rparen'>)</span> <span class='comment'># symbol table always has top-level scope
 </span>  <span class='ivar'>@funcs</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/CFGFuncDef.html" title="IL::CFGFuncDef (class)">CFGFuncDef</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='ivar'>@in_func</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_nilable'>nilable</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/FuncDef.html" title="IL::FuncDef (class)">FuncDef</a></span></span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='ivar'>@in_func</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_nilable'>nilable</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../IL.html" title="IL (module)">IL</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../IL/CFGFuncDef.html" title="IL::CFGFuncDef (class)">CFGFuncDef</a></span></span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='ivar'>@label_blocks</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../Analysis.html" title="Analysis (module)">Analysis</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Analysis/BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -418,12 +418,12 @@
       <pre class="lines">
 
 
-495
 496
-497</pre>
+497
+498</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 495</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 496</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_current'>current</span>
   <span class='ivar'>@current</span>
@@ -461,12 +461,12 @@
       <pre class="lines">
 
 
-501
 502
-503</pre>
+503
+504</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 501</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 502</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_funcs'>funcs</span>
   <span class='ivar'>@funcs</span>
@@ -504,12 +504,12 @@
       <pre class="lines">
 
 
-503
 504
-505</pre>
+505
+506</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 503</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 504</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_in_func'>in_func</span>
   <span class='ivar'>@in_func</span>
@@ -547,12 +547,12 @@
       <pre class="lines">
 
 
-505
 506
-507</pre>
+507
+508</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 505</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 506</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_label_blocks'>label_blocks</span>
   <span class='ivar'>@label_blocks</span>
@@ -590,12 +590,12 @@
       <pre class="lines">
 
 
-497
 498
-499</pre>
+499
+500</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 497</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 498</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_step_ct'>step_ct</span>
   <span class='ivar'>@step_ct</span>
@@ -633,12 +633,12 @@
       <pre class="lines">
 
 
-499
 500
-501</pre>
+501
+502</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 499</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 500</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_symbols'>symbols</span>
   <span class='ivar'>@symbols</span>
@@ -654,7 +654,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:13 2024 by
+  Generated on Mon Apr 29 19:22:49 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

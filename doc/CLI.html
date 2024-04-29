@@ -296,8 +296,6 @@
       <pre class="lines">
 
 
-76
-77
 78
 79
 80
@@ -317,10 +315,12 @@
 94
 95
 96
-97</pre>
+97
+98
+99</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 76</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 78</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_cfg'>cfg</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_filename'>filename</span>
@@ -341,7 +341,7 @@
 
   <span class='id identifier rubyid_bb'>bb</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Analysis.html" title="Analysis (module)">Analysis</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Analysis/BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='op'>::</span><span class='id identifier rubyid_from_stmt_list'><span class='object_link'><a href="Analysis/BB.html#from_stmt_list-class_method" title="Analysis::BB.from_stmt_list (method)">from_stmt_list</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='period'>.</span><span class='id identifier rubyid_stmt_list'>stmt_list</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_cfg'>cfg</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Analysis.html" title="Analysis (module)">Analysis</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Analysis/CFG.html" title="Analysis::CFG (class)">CFG</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Analysis/CFG.html#initialize-instance_method" title="Analysis::CFG#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_bb'>bb</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_graphviz'>graphviz</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Debugger.html" title="Debugger (module)">Debugger</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Debugger/GraphVisualizer.html" title="Debugger::GraphVisualizer (module)">GraphVisualizer</a></span></span><span class='op'>::</span><span class='id identifier rubyid_generate_graphviz'><span class='object_link'><a href="Debugger/GraphVisualizer.html#generate_graphviz-class_method" title="Debugger::GraphVisualizer.generate_graphviz (method)">generate_graphviz</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_cfg'>cfg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_graphviz'>graphviz</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Debugging.html" title="Debugging (module)">Debugging</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Debugging/GraphVisualizer.html" title="Debugging::GraphVisualizer (module)">GraphVisualizer</a></span></span><span class='op'>::</span><span class='id identifier rubyid_generate_graphviz'><span class='object_link'><a href="Debugging/GraphVisualizer.html#generate_graphviz-class_method" title="Debugging::GraphVisualizer.generate_graphviz (method)">generate_graphviz</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_cfg'>cfg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='id identifier rubyid_graphviz'>graphviz</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -375,16 +375,16 @@
       <pre class="lines">
 
 
-30
-31
 32
 33
 34
 35
-36</pre>
+36
+37
+38</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 32</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_main'>main</span>
   <span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="ANSI.html" title="ANSI (module)">ANSI</a></span></span><span class='period'>.</span><span class='id identifier rubyid_fmt256'><span class='object_link'><a href="ANSI.html#fmt256-class_method" title="ANSI.fmt256 (method)">fmt256</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>lilac</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="ANSI.html" title="ANSI (module)">ANSI</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="ANSI.html#LILAC_256-constant" title="ANSI::LILAC_256 (constant)">LILAC_256</a></span></span><span class='comma'>,</span> <span class='label'>bold:</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -444,8 +444,6 @@
       <pre class="lines">
 
 
-59
-60
 61
 62
 63
@@ -453,10 +451,12 @@
 65
 66
 67
-68</pre>
+68
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 59</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 61</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_filename'>filename</span>
@@ -465,7 +465,7 @@
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_program'>program</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Frontend.html" title="Frontend (module)">Frontend</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Frontend/Parser.html" title="Frontend::Parser (class)">Parser</a></span></span><span class='op'>::</span><span class='id identifier rubyid_parse_file'><span class='object_link'><a href="Frontend/Parser.html#parse_file-class_method" title="Frontend::Parser.parse_file (method)">parse_file</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_pp'>pp</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Debugger.html" title="Debugger (module)">Debugger</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Debugger/PrettyPrinter.html" title="Debugger::PrettyPrinter (class)">PrettyPrinter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Debugger/PrettyPrinter.html#initialize-instance_method" title="Debugger::PrettyPrinter#initialize (method)">new</a></span></span>
+  <span class='id identifier rubyid_pp'>pp</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Debugging.html" title="Debugging (module)">Debugging</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Debugging/PrettyPrinter.html" title="Debugging::PrettyPrinter (class)">PrettyPrinter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Debugging/PrettyPrinter.html#initialize-instance_method" title="Debugging::PrettyPrinter#initialize (method)">new</a></span></span>
   <span class='id identifier rubyid_pp'>pp</span><span class='period'>.</span><span class='id identifier rubyid_print_program'>print_program</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -499,14 +499,14 @@
       <pre class="lines">
 
 
-40
-41
 42
 43
-44</pre>
+44
+45
+46</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 40</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_print_optimizations'>print_optimizations</span>
   <span class='const'><span class='object_link'><a href="Optimization.html" title="Optimization (module)">Optimization</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Optimization.html#OPTIMIZATIONS-constant" title="Optimization::OPTIMIZATIONS (constant)">OPTIMIZATIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_o'>o</span><span class='op'>|</span>
@@ -544,14 +544,14 @@
       <pre class="lines">
 
 
-48
-49
 50
 51
-52</pre>
+52
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/lilac.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_print_validations'>print_validations</span>
   <span class='const'><span class='object_link'><a href="Validation.html" title="Validation (module)">Validation</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Validation.html#VALIDATIONS-constant" title="Validation::VALIDATIONS (constant)">VALIDATIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
@@ -568,7 +568,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:12 2024 by
+  Generated on Mon Apr 29 19:22:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

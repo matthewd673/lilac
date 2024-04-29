@@ -64,6 +64,55 @@
 
 <p>Lilac is a small compiler “middle end” written in Ruby.</p>
 
+<h2 id="label-Features">Features</h2>
+<ul><li>
+<p>Tiny intermediate language (Lilac IL)</p>
+</li><li>
+<p>Analyses</p>
+</li><li>
+<p>Compute basic blocks and CFG for IL code</p>
+</li><li>
+<p>Data-flow analysis framework</p>
+<ul><li>
+<p>Dominators, live variables, reaching definitions, etc.</p>
+</li></ul>
+</li><li>
+<p>Compute dominance tree from CFG</p>
+</li><li>
+<p>Machine-independent optimizations</p>
+</li><li>
+<p>Various peephole optimizations</p>
+</li><li>
+<p>LVN</p>
+</li><li>
+<p>Convert arbitrary IL code to SSA form</p>
+</li><li>
+<p>Machine-dependent code generation</p>
+</li><li>
+<p>Wasm target</p>
+<ul><li>
+<p>Relooper</p>
+</li><li>
+<p>Wasm-dependent optimizations</p>
+</li><li>
+<p>Wat generation</p>
+</li></ul>
+</li><li>
+<p>Simple interpreter for Lilac IL</p>
+</li><li>
+<p>Parser and generator for Lilac IL</p>
+</li><li>
+<p>Available via CLI</p>
+</li><li>
+<p>Debugging tools</p>
+</li><li>
+<p>IL pretty printer, CFG to Graphviz, etc.</p>
+</li></ul>
+
+<h2 id="label-Documentation">Documentation</h2>
+
+<p>API docs for Lilac are available <a href="https://matthewd673.github.io/lilac/">here</a>. Documentation is generated automatically with <a href="https://yardoc.org">Yard</a> whenever <code>master</code> changes.</p>
+
 <h2 id="label-Build+and+run">Build and run</h2>
 
 <p>Lilac uses <a href="https://github.com/rbenv/rbenv">rbenv</a> to manage its Ruby version.</p>
@@ -100,7 +149,7 @@ gem install --local ~/.../lilac/lilac-X.X.X.gem
 </div></div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:12 2024 by
+  Generated on Mon Apr 29 19:22:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

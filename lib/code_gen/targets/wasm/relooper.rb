@@ -11,16 +11,20 @@ require_relative "../../../analysis/reducible"
 # structured control flow form. It is not based on the relooper algorithm
 # presented in the original Emscripten paper but rather on the algorithm
 # described in the "Beyond Relooper" paper:
-# Norman Ramsey. 2022. Beyond Relooper: recursive translation of unstructured
-#   control flow to structured control flow (functional pearl). Proc.
-#   ACM Program. Lang. 6, ICFP, Article 90 (August 2022), 22 pages.
-#   https://doi.org/10.1145/3547621
+#   Norman Ramsey. 2022. Beyond Relooper: recursive translation of unstructured
+#     control flow to structured control flow (functional pearl). Proc.
+#     ACM Program. Lang. 6, ICFP, Article 90 (August 2022), 22 pages.
+#     https://doi.org/10.1145/3547621
 class CodeGen::Targets::Wasm::Relooper
   extend T::Sig
 
   include CodeGen::Targets::Wasm
 
   sig { params(cfg: Analysis::CFG, dom_tree: Analysis::DomTree).void }
+  # Initialize a new Relooper.
+  #
+  # @param [Analysis::CFG] cfg The CFG to run the Relooper algorithm on.
+  # @param [Analysis::DomTree] dom_tree The dominance tree for the given CFG.
   def initialize(cfg, dom_tree)
     @cfg = cfg
     @dom_tree = dom_tree
@@ -40,6 +44,10 @@ class CodeGen::Targets::Wasm::Relooper
   end
 
   sig { returns(WasmBlock) }
+  # Translate the provided CFG into a nested set of structured control
+  # flow blocks.
+  #
+  # @return [WasmBlock] The root structured control flow block.
   def translate
     # classify each node in the CFG
     classify_nodes

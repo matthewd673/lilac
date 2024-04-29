@@ -3,6 +3,8 @@ require "sorbet-runtime"
 require_relative "code_gen"
 require_relative "../il"
 
+# The Pattern module contains wildcard definitions that can be used for
+# matching patterns in Lilac IL.
 module CodeGen::Pattern
   extend T::Sig
 

@@ -6,6 +6,8 @@ require_relative "../../../symbol_table"
 require_relative "type"
 require_relative "instructions/instructions"
 
+# A WasmILTransformer transforms a sequence of Lilac IL statements into Wasm
+# instructions.
 class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
   extend T::Sig
 
@@ -13,6 +15,10 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
   include CodeGen::Targets::Wasm
 
   sig { params(symbol_table: SymbolTable).void }
+  # Construct a new WasmILTransformer.
+  #
+  # @param [SymbolTable] symbol_table The symbol table for the statement list
+  #   being transformed. Used for variable type lookups, etc.
   def initialize(symbol_table)
     super()
     @symbol_table = symbol_table
@@ -20,11 +26,20 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
   end
 
   sig { params(object: IL::ILObject).returns(T::Array[CodeGen::Instruction]) }
+  # For internal use. Translate an ILObject into a sequence of Instructions.
+  #
+  # @param [IL::ILObject] object The ILObject to transform.
+  # @return [T::Array[CodeGen::Instruction]] A sequence of instructions.
   def transform(object)
     super(object)
   end
 
   sig { params(rhs: T.any(IL::Expression, IL::Value)).returns(IL::Type) }
+  # For internal use. Get the IL::Type of an expression or value.
+  #
+  # @param [T.any(IL::Expression, IL::Value)] rhs The expression or value to
+  #   perform type lookup on.
+  # @return [IL::Type] The type of the expression or value.
   def get_il_type(rhs)
     case rhs
     when IL::BinaryOp
@@ -44,6 +59,11 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
   end
 
   sig { params(rhs: T.any(IL::Expression, IL::Value)).returns(Type) }
+  # For internal use. Get the Wasm::Type of an expression or value.
+  #
+  # @param [T.any(IL::Expression, IL::Value)] rhs The expression or value to
+  #   perform type lookup on.
+  # @return [Wasm::Type] The Wasm type of the expression or value.
   def get_type(rhs)
     Instructions::to_wasm_type(get_il_type(rhs))
   end

@@ -382,9 +382,9 @@
 </span>      <span class='id identifier rubyid_runner'>runner</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='id identifier rubyid_p'>p</span><span class='comma'>,</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_nilable'>nilable</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BB.html" title="Analysis::BB (class)">BB</a></span></span><span class='rparen'>)</span><span class='rparen'>)</span>
 
       <span class='comment'># NOTE: original algorithm does not enforce runner != nil
-</span>      <span class='kw'>while</span> <span class='id identifier rubyid_runner'>runner</span> <span class='kw'>and</span> <span class='id identifier rubyid_runner'>runner</span> <span class='op'>!=</span> <span class='ivar'>@dom_tree</span><span class='period'>.</span><span class='id identifier rubyid_get_idom'>get_idom</span><span class='lparen'>(</span><span class='id identifier rubyid_j'>j</span><span class='rparen'>)</span>
+</span>      <span class='kw'>while</span> <span class='id identifier rubyid_runner'>runner</span> <span class='kw'>and</span> <span class='id identifier rubyid_runner'>runner</span> <span class='op'>!=</span> <span class='ivar'>@dom_tree</span><span class='period'>.</span><span class='id identifier rubyid_idom'>idom</span><span class='lparen'>(</span><span class='id identifier rubyid_j'>j</span><span class='rparen'>)</span>
         <span class='ivar'>@df</span><span class='lbracket'>[</span><span class='id identifier rubyid_runner'>runner</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_unsafe'>unsafe</span><span class='lparen'>(</span><span class='ivar'>@df</span><span class='lbracket'>[</span><span class='id identifier rubyid_runner'>runner</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_j'>j</span><span class='rbracket'>]</span> <span class='comment'># add j to runner&#39;s DF
-</span>        <span class='id identifier rubyid_runner'>runner</span> <span class='op'>=</span> <span class='ivar'>@dom_tree</span><span class='period'>.</span><span class='id identifier rubyid_get_idom'>get_idom</span><span class='lparen'>(</span><span class='id identifier rubyid_runner'>runner</span><span class='rparen'>)</span> <span class='comment'># continue moving up dom tree
+</span>        <span class='id identifier rubyid_runner'>runner</span> <span class='op'>=</span> <span class='ivar'>@dom_tree</span><span class='period'>.</span><span class='id identifier rubyid_idom'>idom</span><span class='lparen'>(</span><span class='id identifier rubyid_runner'>runner</span><span class='rparen'>)</span> <span class='comment'># continue moving up dom tree
 </span>      <span class='kw'>end</span>
     <span class='rbrace'>}</span>
   <span class='rbrace'>}</span>
@@ -404,7 +404,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:13 2024 by
+  Generated on Mon Apr 29 19:22:49 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

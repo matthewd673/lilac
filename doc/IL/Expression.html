@@ -87,7 +87,7 @@
   
   <dl>
       <dt>Extended by:</dt>
-      <dd>T::Sig</dd>
+      <dd>T::Helpers, T::Sig</dd>
   </dl>
   
   
@@ -137,7 +137,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#calculate-instance_method" title="#calculate (instance method)">#<strong>calculate</strong>  &#x21d2; T.untyped </a>
+      <a href="#eql%3F-instance_method" title="#eql? (instance method)">#<strong>eql?</strong>(other)  &#x21d2; Boolean </a>
     
 
     
@@ -151,9 +151,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Calculate the value of an Expression.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -161,7 +159,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#eql%3F-instance_method" title="#eql? (instance method)">#<strong>eql?</strong>(other)  &#x21d2; Boolean </a>
+      <a href="#to_s-instance_method" title="#to_s (instance method)">#<strong>to_s</strong>  &#x21d2; Object </a>
     
 
     
@@ -185,72 +183,14 @@
 
 
   
+  
 
   <div id="instance_method_details" class="method_details_list">
     <h2>Instance Method Details</h2>
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="calculate-instance_method">
-  
-    #<strong>calculate</strong>  &#x21d2; <tt>T.untyped</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-<p>Calculate the value of an Expression.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>T.untyped</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'>
-<p>The value of the Expression, likely numeric.</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-195
-196
-197</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 195</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_calculate'>calculate</span>
-  <span class='int'>0</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="eql?-instance_method">
+  <h3 class="signature first" id="eql?-instance_method">
   
     #<strong>eql?</strong>(other)  &#x21d2; <tt>Boolean</tt> 
   
@@ -286,16 +226,38 @@
       <pre class="lines">
 
 
-200
-201
-202</pre>
+254</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/il.rb', line 200</span>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 254</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="" title="IL::Expression (class)">Expression</a></span></span>
-<span class='kw'>end</span></pre>
+<span class='kw'>def</span> <span class='id identifier rubyid_eql?'>eql?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_s-instance_method">
+  
+    #<strong>to_s</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+251</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/il.rb', line 251</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -306,7 +268,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:13 2024 by
+  Generated on Mon Apr 29 19:22:48 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

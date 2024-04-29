@@ -3,6 +3,8 @@ require "sorbet-runtime"
 require_relative "code_gen"
 require_relative "instruction"
 
+# A Generator is used to turn a root component of some machine-dependent code
+# into a valid string representation of that component.
 class CodeGen::Generator
   extend T::Sig
   extend T::Helpers

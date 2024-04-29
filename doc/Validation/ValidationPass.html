@@ -89,7 +89,7 @@
   
   <dl>
       <dt>Extended by:</dt>
-      <dd>T::Sig</dd>
+      <dd>T::Helpers, T::Sig</dd>
   </dl>
   
   
@@ -116,11 +116,6 @@
 
 
 
-  <h2>Instance Attribute Summary</h2>
-  
-  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="../Pass.html" title="Pass (class)">Pass</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="../Pass.html#description-instance_method" title="Pass#description (method)">#description</a></span>, <span class='object_link'><a href="../Pass.html#id-instance_method" title="Pass#id (method)">#id</a></span></p>
-
 
   
     <h2>
@@ -129,32 +124,6 @@
     </h2>
 
     <ul class="summary">
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>  &#x21d2; ValidationPass </a>
-    
-
-    
-  </span>
-  
-  
-    <span class="note title constructor">constructor</span>
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-<p>Construct a new ValidationPass.</p>
-</div></span>
-  
-</li>
-
       
         <li class="public ">
   <span class="summary_signature">
@@ -211,56 +180,15 @@
   
   
   
-  <div id="constructor_details" class="method_details_list">
-  <h2>Constructor Details</h2>
   
-    <div class="method_details first">
-  <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>  &#x21d2; <tt><span class='object_link'><a href="" title="Validation::ValidationPass (class)">ValidationPass</a></span></tt> 
   
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../Pass.html" title="Pass (class)">Pass</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Pass.html#description-instance_method" title="Pass#description (method)">#description</a></span>, <span class='object_link'><a href="../Pass.html#id-instance_method" title="Pass#id (method)">#id</a></span></p>
 
   
-
   
-</h3><div class="docstring">
-  <div class="discussion">
-    
-<p>Construct a new ValidationPass</p>
-
-
-  </div>
-</div>
-<div class="tags">
   
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-12
-13
-14
-15
-16</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/validation/validation_pass.rb', line 12</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
-  <span class='comment'># NOTE: these should always be overwritten by subclasses
-</span>  <span class='ivar'>@id</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>validation</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
-  <span class='ivar'>@description</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Generic validation stub</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>String</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-  
-</div>
-
 
   <div id="instance_method_details" class="method_details_list">
     <h2>Instance Method Details</h2>
@@ -281,16 +209,16 @@
       <pre class="lines">
 
 
-19
-20
-21</pre>
+14
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/validation/validation_pass.rb', line 19</span>
+      <pre class="code"><span class="info file"># File 'lib/validation/validation_pass.rb', line 14</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_program'>program</span><span class='rparen'>)</span>
-  <span class='comment'># stub
-</span><span class='kw'>end</span></pre>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>run is unimplemented for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -311,15 +239,15 @@
       <pre class="lines">
 
 
-24
-25
-26</pre>
+19
+20
+21</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/validation/validation_pass.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/validation/validation_pass.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
-  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@id</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='ivar'>@description</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_description'>description</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -331,7 +259,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:13 2024 by
+  Generated on Mon Apr 29 19:22:49 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

@@ -211,6 +211,28 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#clone-instance_method" title="#clone (instance method)">#<strong>clone</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#delete_edge-instance_method" title="#delete_edge (instance method)">#<strong>delete_edge</strong>(edge)  &#x21d2; Object </a>
     
 
@@ -227,6 +249,30 @@
   
     <span class="summary_desc"><div class='inline'>
 <p>Remove an Edge from the edge list.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#delete_node-instance_method" title="#delete_node (instance method)">#<strong>delete_node</strong>(node)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Delete a node from the graph.</p>
 </div></span>
   
 </li>
@@ -369,6 +415,74 @@
   
 
   
+    <span class="summary_desc"><div class='inline'>
+<p>Iterate over every successor of a given node in the graph.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#edges_length-instance_method" title="#edges_length (instance method)">#<strong>edges_length</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#find_edge-instance_method" title="#find_edge (instance method)">#<strong>find_edge</strong>(from, to)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#incoming_length-instance_method" title="#incoming_length (instance method)">#<strong>incoming_length</strong>(node)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
     <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
@@ -403,6 +517,94 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#nodes_length-instance_method" title="#nodes_length (instance method)">#<strong>nodes_length</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#outgoing_length-instance_method" title="#outgoing_length (instance method)">#<strong>outgoing_length</strong>(node)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#postorder_numbering-instance_method" title="#postorder_numbering (instance method)">#<strong>postorder_numbering</strong>(node)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#postorder_traversal-instance_method" title="#postorder_traversal (instance method)">#<strong>postorder_traversal</strong>(node, &amp;block)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#predecessors_length-instance_method" title="#predecessors_length (instance method)">#<strong>predecessors_length</strong>(node)  &#x21d2; Integer </a>
     
 
@@ -420,6 +622,28 @@
     <span class="summary_desc"><div class='inline'>
 <p>Get the number of predecessors of a given node in the graph.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reverse_postorder_numbering-instance_method" title="#reverse_postorder_numbering (instance method)">#<strong>reverse_postorder_numbering</strong>(node)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -482,16 +706,16 @@
       <pre class="lines">
 
 
-47
-48
-49
-50
-51
 52
-53</pre>
+53
+54
+55
+56
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
   <span class='ivar'>@nodes</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Array</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#Node-constant" title="Graph::Node (constant)">Node</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -558,24 +782,24 @@
       <pre class="lines">
 
 
-159
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
-170
-171
-172
-173</pre>
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 159</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 211</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_edge'>add_edge</span><span class='lparen'>(</span><span class='id identifier rubyid_edge'>edge</span><span class='rparen'>)</span>
   <span class='ivar'>@edges</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_edge'>edge</span><span class='rparen'>)</span>
@@ -643,15 +867,63 @@
       <pre class="lines">
 
 
-149
-150
-151</pre>
+184
+185
+186</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 149</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 184</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_node'>add_node</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="clone-instance_method">
+  
+    #<strong>clone</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 288</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_clone'>clone</span>
+  <span class='id identifier rubyid_new_graph'>new_graph</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="Graph (class)">Graph</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Graph#initialize (method)">new</a></span></span>
+
+  <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='op'>|</span>
+    <span class='id identifier rubyid_new_graph'>new_graph</span><span class='period'>.</span><span class='id identifier rubyid_add_node'>add_node</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
+  <span class='ivar'>@edges</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span>
+    <span class='id identifier rubyid_new_graph'>new_graph</span><span class='period'>.</span><span class='id identifier rubyid_add_edge'>add_edge</span><span class='lparen'>(</span><span class='id identifier rubyid_e'>e</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
+
+  <span class='kw'>return</span> <span class='id identifier rubyid_new_graph'>new_graph</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -706,24 +978,24 @@
       <pre class="lines">
 
 
-181
-182
-183
-184
-185
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195</pre>
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 181</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 233</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_delete_edge'>delete_edge</span><span class='lparen'>(</span><span class='id identifier rubyid_edge'>edge</span><span class='rparen'>)</span>
   <span class='ivar'>@edges</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_edge'>edge</span><span class='rparen'>)</span>
@@ -739,6 +1011,83 @@
   <span class='kw'>if</span> <span class='id identifier rubyid_incoming'>incoming</span> <span class='comment'># should never be nil
 </span>    <span class='id identifier rubyid_incoming'>incoming</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_edge'>edge</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="delete_node-instance_method">
+  
+    #<strong>delete_node</strong>(node)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Delete a node from the graph. Its incoming and outgoing edges will also be deleted from the graph.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>node</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="#Node-constant" title="Graph::Node (constant)">Node</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The node to delete.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 193</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_delete_node'>delete_node</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_each_outgoing'>each_outgoing</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_o'>o</span><span class='op'>|</span>
+    <span class='id identifier rubyid_delete_edge'>delete_edge</span><span class='lparen'>(</span><span class='id identifier rubyid_o'>o</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_each_incoming'>each_incoming</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
+    <span class='id identifier rubyid_delete_edge'>delete_edge</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -771,12 +1120,12 @@
       <pre class="lines">
 
 
-63
-64
-65</pre>
+68
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each_edge'>each_edge</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='ivar'>@edges</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -832,17 +1181,17 @@
       <pre class="lines">
 
 
-72
-73
-74
-75
-76
-77
-78
-79</pre>
+87
+88
+89
+90
+91
+92
+93
+94</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 72</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each_incoming'>each_incoming</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_incoming'>incoming</span> <span class='op'>=</span> <span class='ivar'>@incoming</span><span class='lbracket'>[</span><span class='id identifier rubyid_node'>node</span><span class='rbracket'>]</span>
@@ -883,12 +1232,12 @@
       <pre class="lines">
 
 
-57
-58
-59</pre>
+62
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each_node'>each_node</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -944,17 +1293,17 @@
       <pre class="lines">
 
 
-86
-87
-88
-89
-90
-91
-92
-93</pre>
+101
+102
+103
+104
+105
+106
+107
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 86</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 101</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each_outgoing'>each_outgoing</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_outgoing'>outgoing</span> <span class='op'>=</span> <span class='ivar'>@outgoing</span><span class='lbracket'>[</span><span class='id identifier rubyid_node'>node</span><span class='rbracket'>]</span>
@@ -1015,14 +1364,14 @@
       <pre class="lines">
 
 
-99
-100
-101
-102
-103</pre>
+134
+135
+136
+137
+138</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 99</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 134</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_each_predecessor'>each_predecessor</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_each_incoming'>each_incoming</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span>
@@ -1043,25 +1392,310 @@
   
 
   
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Iterate over every successor of a given node in the graph.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>node</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="#Node-constant" title="Graph::Node (constant)">Node</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The node to iterate for.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+144
+145
+146
+147
+148</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 144</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_successor'>each_successor</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_each_outgoing'>each_outgoing</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span>
+    <span class='kw'>yield</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_to'>to</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="edges_length-instance_method">
+  
+    #<strong>edges_length</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
 </h3><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-109
-110
-111
-112
-113</pre>
+78
+79
+80</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 109</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 78</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_each_successor'>each_successor</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_each_outgoing'>each_outgoing</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span>
-    <span class='kw'>yield</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_to'>to</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_edges_length'>edges_length</span>
+  <span class='ivar'>@edges</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="find_edge-instance_method">
+  
+    #<strong>find_edge</strong>(from, to)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+250
+251
+252
+253
+254
+255
+256
+257
+258</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 250</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_find_edge'>find_edge</span><span class='lparen'>(</span><span class='id identifier rubyid_from'>from</span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_each_outgoing'>each_outgoing</span><span class='lparen'>(</span><span class='id identifier rubyid_from'>from</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_o'>o</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_o'>o</span><span class='period'>.</span><span class='id identifier rubyid_to'>to</span> <span class='op'>==</span> <span class='id identifier rubyid_to'>to</span>
+      <span class='kw'>return</span> <span class='id identifier rubyid_o'>o</span>
+    <span class='kw'>end</span>
   <span class='rbrace'>}</span>
+
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="incoming_length-instance_method">
+  
+    #<strong>incoming_length</strong>(node)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+111
+112
+113
+114
+115
+116
+117
+118</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 111</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_incoming_length'>incoming_length</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_incoming'>incoming</span> <span class='op'>=</span> <span class='ivar'>@incoming</span><span class='lbracket'>[</span><span class='id identifier rubyid_node'>node</span><span class='rbracket'>]</span>
+  <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_incoming'>incoming</span>
+    <span class='int'>0</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_incoming'>incoming</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="nodes_length-instance_method">
+  
+    #<strong>nodes_length</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+73
+74
+75</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 73</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_nodes_length'>nodes_length</span>
+  <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="outgoing_length-instance_method">
+  
+    #<strong>outgoing_length</strong>(node)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+121
+122
+123
+124
+125
+126
+127
+128</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 121</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_outgoing_length'>outgoing_length</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_outgoing'>outgoing</span> <span class='op'>=</span> <span class='ivar'>@outgoing</span><span class='lbracket'>[</span><span class='id identifier rubyid_node'>node</span><span class='rbracket'>]</span>
+  <span class='kw'>if</span> <span class='kw'>not</span> <span class='id identifier rubyid_outgoing'>outgoing</span>
+    <span class='int'>0</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_outgoing'>outgoing</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="postorder_numbering-instance_method">
+  
+    #<strong>postorder_numbering</strong>(node)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+266
+267
+268
+269
+270
+271
+272
+273
+274</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 266</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_postorder_numbering'>postorder_numbering</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_numbering'>numbering</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_i'>i</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_postorder_traversal'>postorder_traversal</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='op'>|</span>
+    <span class='id identifier rubyid_numbering'>numbering</span><span class='lbracket'>[</span><span class='id identifier rubyid_n'>n</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_i'>i</span>
+    <span class='id identifier rubyid_i'>i</span> <span class='op'>+=</span> <span class='int'>1</span>
+  <span class='rbrace'>}</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_numbering'>numbering</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="postorder_traversal-instance_method">
+  
+    #<strong>postorder_traversal</strong>(node, &amp;block)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+261
+262
+263</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 261</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_postorder_traversal'>postorder_traversal</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_postorder_traversal_helper'>postorder_traversal_helper</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1132,17 +1766,17 @@
       <pre class="lines">
 
 
-121
-122
-123
-124
-125
-126
-127
-128</pre>
+156
+157
+158
+159
+160
+161
+162
+163</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 121</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 156</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_predecessors_length'>predecessors_length</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_incoming'>incoming</span> <span class='op'>=</span> <span class='ivar'>@incoming</span><span class='lbracket'>[</span><span class='id identifier rubyid_node'>node</span><span class='rbracket'>]</span>
@@ -1151,6 +1785,48 @@
   <span class='kw'>else</span>
     <span class='id identifier rubyid_incoming'>incoming</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reverse_postorder_numbering-instance_method">
+  
+    #<strong>reverse_postorder_numbering</strong>(node)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+277
+278
+279
+280
+281
+282
+283
+284
+285</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 277</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reverse_postorder_numbering'>reverse_postorder_numbering</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_numbering'>numbering</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_i'>i</span> <span class='op'>=</span> <span class='ivar'>@nodes</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>-</span> <span class='int'>1</span>
+  <span class='id identifier rubyid_postorder_traversal'>postorder_traversal</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='op'>|</span>
+    <span class='id identifier rubyid_numbering'>numbering</span><span class='lbracket'>[</span><span class='id identifier rubyid_n'>n</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_i'>i</span>
+    <span class='id identifier rubyid_i'>i</span> <span class='op'>-=</span> <span class='int'>1</span>
+  <span class='rbrace'>}</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_numbering'>numbering</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1221,17 +1897,17 @@
       <pre class="lines">
 
 
-136
-137
-138
-139
-140
-141
-142
-143</pre>
+171
+172
+173
+174
+175
+176
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 136</span>
+      <pre class="code"><span class="info file"># File 'lib/graph.rb', line 171</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_successors_length'>successors_length</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_outgoing'>outgoing</span> <span class='op'>=</span> <span class='ivar'>@outgoing</span><span class='lbracket'>[</span><span class='id identifier rubyid_node'>node</span><span class='rbracket'>]</span>
@@ -1251,7 +1927,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:13 2024 by
+  Generated on Mon Apr 29 19:22:49 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>

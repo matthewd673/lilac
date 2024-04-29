@@ -255,12 +255,12 @@
       <pre class="lines">
 
 
-411
 412
-413</pre>
+413
+414</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 411</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 412</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
   <span class='ivar'>@symbols</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Hash</span><span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="SymbolInfo.html" title="Interpreter::SymbolInfo (class)">SymbolInfo</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -292,12 +292,12 @@
       <pre class="lines">
 
 
-416
 417
-418</pre>
+418
+419</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 416</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 417</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_insert'>insert</span><span class='lparen'>(</span><span class='id identifier rubyid_symbol'>symbol</span><span class='rparen'>)</span>
   <span class='ivar'>@symbols</span><span class='lbracket'>[</span><span class='id identifier rubyid_symbol'>symbol</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_symbol'>symbol</span>
@@ -322,7 +322,6 @@
       <pre class="lines">
 
 
-421
 422
 423
 424
@@ -332,10 +331,11 @@
 428
 429
 430
-431</pre>
+431
+432</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 421</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 422</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lookup'>lookup</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_symbol'>symbol</span> <span class='op'>=</span> <span class='ivar'>@symbols</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span>
@@ -368,17 +368,17 @@
       <pre class="lines">
 
 
-434
 435
 436
 437
 438
 439
 440
-441</pre>
+441
+442</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 434</span>
+      <pre class="code"><span class="info file"># File 'lib/interpreter.rb', line 435</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -398,7 +398,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Apr 15 16:14:13 2024 by
+  Generated on Mon Apr 29 19:22:49 2024 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.36 (ruby-3.3.0).
 </div>
