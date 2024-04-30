@@ -1,0 +1,37 @@
+# typed: strict
+require "sorbet-runtime"
+require "minitest/autorun"
+require_relative "../lib/code_gen/targets/wasm/type"
+require_relative "../lib/code_gen/targets/wasm/instructions/instructions"
+require_relative "../lib/code_gen/targets/wasm/instructions/instruction_set"
+require_relative "../lib/code_gen/targets/wasm/optimization/tee"
+
+class WasmOptimizationTest < Minitest::Test
+  extend T::Sig
+
+  include CodeGen::Targets::Wasm
+  include CodeGen::Targets::Wasm::Instructions
+
+  sig { void }
+  def test_tee_simple
+    original = [
+      Const.new(Type::I32, 5),
+      LocalSet.new("a"),
+      LocalGet.new("a"),
+      Const.new(Type::I32, 2),
+      LocalSet.new("b"),
+    ]
+
+    expected = [
+      Const.new(Type::I32, 5),
+      LocalTee.new("a"),
+      Const.new(Type::I32, 2),
+      LocalSet.new("b"),
+    ]
+
+    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee.run
+
+    assert original.eql?(expected)
+  end
+end
