@@ -1,0 +1,21 @@
+require:
+  - rubocop-minitest
+  - rubocop-rake
+  - rubocop-sorbet
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+Style/Encoding:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 80
+
+Metrics:
+  Enabled: false
