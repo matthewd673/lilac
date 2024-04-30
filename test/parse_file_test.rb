@@ -17,7 +17,9 @@ class ParseFileTest < Minitest::Test
                              Definition.new(Type::I32, ID.new("a"),
                                             Constant.new(Type::I32, 5)),
                            ])
-    program = Frontend::Parser.parse_file("test/il_programs/frontend/definition.txt")
+    program = Frontend::Parser.parse_file(
+      "test/il_programs/frontend/definition.txt"
+    )
 
     assert program.eql?(expected)
   end
@@ -51,7 +53,9 @@ class ParseFileTest < Minitest::Test
                                             Constant.new(Type::I32, 3)),
                              Jump.new("L0"),
                            ])
-    program = Frontend::Parser.parse_file("test/il_programs/frontend/label_and_jmp.txt")
+    program = Frontend::Parser.parse_file(
+      "test/il_programs/frontend/label_and_jmp.txt"
+    )
 
     assert program.eql?(expected)
   end
@@ -75,55 +79,114 @@ class ParseFileTest < Minitest::Test
   sig { void }
   def test_parse_binop
     expected = Program.new(stmt_list: [
-                             Definition.new(Type::I32, ID.new("a", number: 0), BinaryOp.new(
-                                                                                 BinaryOp::Operator::ADD,
-                                                                                 Constant.new(Type::I32, 12), Constant.new(Type::I32, 6)
-                                                                               )),
-                             Definition.new(Type::I32, ID.new("a", number: 1), BinaryOp.new(
-                                                                                 BinaryOp::Operator::SUB,
-                                                                                 ID.new("a", number: 0), Constant.new(Type::I32, 0)
-                                                                               )),
-                             Definition.new(Type::I32, ID.new("a", number: 2), BinaryOp.new(
-                                                                                 BinaryOp::Operator::MUL,
-                                                                                 ID.new("a", number: 1), Constant.new(Type::I32, -2)
-                                                                               )),
-                             Definition.new(Type::I32, ID.new("a", number: 3), BinaryOp.new(
-                                                                                 BinaryOp::Operator::DIV,
-                                                                                 ID.new("a", number: 2), Constant.new(Type::I32, -2)
-                                                                               )),
-
-                             Definition.new(Type::U8, ID.new("b"), BinaryOp.new(
-                                                                     BinaryOp::Operator::EQ,
-                                                                     Constant.new(Type::U8, 0), Constant.new(Type::U8, 0)
-                                                                   )),
-                             Definition.new(Type::U8, ID.new("c"), BinaryOp.new(
-                                                                     BinaryOp::Operator::NEQ,
-                                                                     Constant.new(Type::U8, 1), Constant.new(Type::U8, 0)
-                                                                   )),
-                             Definition.new(Type::U8, ID.new("d"), BinaryOp.new(
-                                                                     BinaryOp::Operator::LT,
-                                                                     Constant.new(Type::U8, 2), Constant.new(Type::U8, 4)
-                                                                   )),
-                             Definition.new(Type::U8, ID.new("e"), BinaryOp.new(
-                                                                     BinaryOp::Operator::GT,
-                                                                     Constant.new(Type::U8, 3), Constant.new(Type::U8, 1)
-                                                                   )),
-                             Definition.new(Type::U8, ID.new("f"), BinaryOp.new(
-                                                                     BinaryOp::Operator::LEQ,
-                                                                     Constant.new(Type::U8, 1), Constant.new(Type::U8, 1)
-                                                                   )),
-                             Definition.new(Type::U8, ID.new("g"), BinaryOp.new(
-                                                                     BinaryOp::Operator::GEQ,
-                                                                     Constant.new(Type::U8, 0), Constant.new(Type::U8, 1)
-                                                                   )),
-                             Definition.new(Type::U8, ID.new("h"), BinaryOp.new(
-                                                                     BinaryOp::Operator::OR,
-                                                                     Constant.new(Type::U8, 1), Constant.new(Type::U8, 0)
-                                                                   )),
-                             Definition.new(Type::U8, ID.new("i"), BinaryOp.new(
-                                                                     BinaryOp::Operator::AND,
-                                                                     Constant.new(Type::U8, 0), Constant.new(Type::U8, 1)
-                                                                   )),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("a", number: 0),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::ADD,
+                                 Constant.new(Type::I32, 12),
+                                 Constant.new(Type::I32, 6)
+                               )
+                             ),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("a", number: 1),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::SUB,
+                                 ID.new("a", number: 0),
+                                 Constant.new(Type::I32, 0)
+                               )
+                             ),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("a", number: 2),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::MUL,
+                                 ID.new("a", number: 1),
+                                 Constant.new(Type::I32, -2)
+                               )
+                             ),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("a", number: 3),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::DIV,
+                                 ID.new("a", number: 2),
+                                 Constant.new(Type::I32, -2)
+                               )
+                             ),
+                             Definition.new(
+                               Type::U8,
+                               ID.new("b"),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::EQ,
+                                 Constant.new(Type::U8, 0),
+                                 Constant.new(Type::U8, 0)
+                               )
+                             ),
+                             Definition.new(
+                               Type::U8,
+                               ID.new("c"),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::NEQ,
+                                 Constant.new(Type::U8, 1),
+                                 Constant.new(Type::U8, 0)
+                               )
+                             ),
+                             Definition.new(
+                               Type::U8,
+                               ID.new("d"),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::LT,
+                                 Constant.new(Type::U8, 2),
+                                 Constant.new(Type::U8, 4)
+                               )
+                             ),
+                             Definition.new(
+                               Type::U8,
+                               ID.new("e"),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::GT,
+                                 Constant.new(Type::U8, 3),
+                                 Constant.new(Type::U8, 1)
+                               )
+                             ),
+                             Definition.new(
+                               Type::U8,
+                               ID.new("f"),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::LEQ,
+                                 Constant.new(Type::U8, 1),
+                                 Constant.new(Type::U8, 1)
+                               )
+                             ),
+                             Definition.new(
+                               Type::U8,
+                               ID.new("g"),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::GEQ,
+                                 Constant.new(Type::U8, 0),
+                                 Constant.new(Type::U8, 1)
+                               )
+                             ),
+                             Definition.new(
+                               Type::U8,
+                               ID.new("h"),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::OR,
+                                 Constant.new(Type::U8, 1),
+                                 Constant.new(Type::U8, 0)
+                               )
+                             ),
+                             Definition.new(
+                               Type::U8,
+                               ID.new("i"),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::AND,
+                                 Constant.new(Type::U8, 0),
+                                 Constant.new(Type::U8, 1)
+                               )
+                             ),
                            ])
     program = Frontend::Parser.parse_file("test/il_programs/frontend/binop.txt")
 
@@ -133,11 +196,13 @@ class ParseFileTest < Minitest::Test
   sig { void }
   def test_parse_unop
     expected = Program.new(stmt_list: [
-                             Definition.new(Type::I16, ID.new("a"), UnaryOp.new(
-                                                                      UnaryOp::Operator::NEG, Constant.new(
-                                                                                                Type::I16, 2
-                                                                                              )
-                                                                    )),
+                             Definition.new(
+                               Type::I16, ID.new("a"),
+                               UnaryOp.new(
+                                 UnaryOp::Operator::NEG,
+                                 Constant.new(Type::I16, 2)
+                               )
+                             ),
                            ])
     program = Frontend::Parser.parse_file("test/il_programs/frontend/unop.txt")
 
@@ -147,11 +212,17 @@ class ParseFileTest < Minitest::Test
   sig { void }
   def test_parse_func
     expected = Program.new(stmt_list: [
-                             Definition.new(Type::I32, ID.new("ans"),
-                                            Call.new("multiply", [Constant.new(Type::I32, 3),
-                                                                  Constant.new(
-                                                                    Type::I32, 5
-                                                                  )])),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("ans"),
+                               Call.new(
+                                 "multiply",
+                                 [
+                                   Constant.new(Type::I32, 3),
+                                   Constant.new(Type::I32, 5),
+                                 ]
+                               )
+                             ),
                            ])
     expected.add_func(FuncDef.new("multiply",
                                   [
@@ -178,40 +249,72 @@ class ParseFileTest < Minitest::Test
   sig { void }
   def test_parse_phi
     expected = Program.new(stmt_list: [
-                             Definition.new(Type::I32, ID.new("a"),
-                                            Constant.new(Type::I32, 1)),
-                             Definition.new(Type::I32, ID.new("b"),
-                                            Constant.new(Type::I32, 2)),
-                             Definition.new(Type::I32, Register.new(0),
-                                            BinaryOp.new(BinaryOp::Operator::EQ,
-                                                         ID.new("a"),
-                                                         Constant.new(
-                                                           Type::I32, 1
-                                                         ))),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("a"),
+                               Constant.new(Type::I32, 1)
+                             ),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("b"),
+                               Constant.new(Type::I32, 2)
+                             ),
+                             Definition.new(
+                               Type::I32,
+                               Register.new(0),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::EQ,
+                                 ID.new("a"),
+                                 Constant.new(Type::I32, 1)
+                               )
+                             ),
                              JumpZero.new(Register.new(0), "L0"),
-                             Definition.new(Type::I32, Register.new(1),
-                                            BinaryOp.new(BinaryOp::Operator::MUL,
-                                                         ID.new("b"),
-                                                         Constant.new(
-                                                           Type::I32, 2
-                                                         ))),
-                             Definition.new(Type::I32, ID.new("b", number: 1),
-                                            Register.new(0)),
+                             Definition.new(
+                               Type::I32,
+                               Register.new(1),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::MUL,
+                                 ID.new("b"),
+                                 Constant.new(Type::I32, 2)
+                               )
+                             ),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("b", number: 1),
+                               Register.new(0)
+                             ),
                              Jump.new("L1"),
                              Label.new("L0"),
-                             Definition.new(Type::I32, Register.new(2),
-                                            BinaryOp.new(BinaryOp::Operator::ADD,
-                                                         ID.new("b"),
-                                                         Constant.new(
-                                                           Type::I32, 1
-                                                         ))),
-                             Definition.new(Type::I32, ID.new("b", number: 2),
-                                            Register.new(0)),
+                             Definition.new(
+                               Type::I32,
+                               Register.new(2),
+                               BinaryOp.new(
+                                 BinaryOp::Operator::ADD,
+                                 ID.new("b"),
+                                 Constant.new(Type::I32, 1)
+                               )
+                             ),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("b", number: 2),
+                               Register.new(0)
+                             ),
                              Label.new("L1"),
-                             Definition.new(Type::I32, ID.new("b", number: 3),
-                                            Phi.new([ID.new("b", number: 1), ID.new("b", number: 2)])),
-                             Definition.new(Type::I32, ID.new("c"),
-                                            ID.new("b", number: 3)),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("b", number: 3),
+                               Phi.new(
+                                 [
+                                   ID.new("b", number: 1),
+                                   ID.new("b", number: 2),
+                                 ]
+                               )
+                             ),
+                             Definition.new(
+                               Type::I32,
+                               ID.new("c"),
+                               ID.new("b", number: 3)
+                             ),
                            ])
     program = Frontend::Parser.parse_file("test/il_programs/frontend/phi.txt")
 
@@ -224,18 +327,29 @@ class ParseFileTest < Minitest::Test
                              VoidCall.new(Call.new("main", [])),
                            ])
     expected.add_func(FuncDef.new("main", [], Type::Void, [
-                                    Definition.new(Type::I32, Register.new(1), Call.new("divide", [
-                                                                                          Constant.new(
-                                                                                            Type::F64, 6.0
-                                                                                          ),
-                                                                                          Constant.new(
-                                                                                            Type::F64, 3.3
-                                                                                          ),
-                                                                                        ])),
-                                    Definition.new(Type::F64, ID.new("ans"),
-                                                   Register.new(1)),
-                                    VoidCall.new(ExternCall.new("console",
-                                                                "log", [ID.new("ans")])),
+                                    Definition.new(
+                                      Type::I32,
+                                      Register.new(1),
+                                      Call.new(
+                                        "divide",
+                                        [
+                                          Constant.new(Type::F64, 6.0),
+                                          Constant.new(Type::F64, 3.3),
+                                        ]
+                                      )
+                                    ),
+                                    Definition.new(
+                                      Type::F64,
+                                      ID.new("ans"),
+                                      Register.new(1)
+                                    ),
+                                    VoidCall.new(
+                                      ExternCall.new(
+                                        "console",
+                                        "log",
+                                        [ID.new("ans")]
+                                      )
+                                    ),
                                     Return.new(Constant.new(Type::Void, nil)),
                                   ]))
     expected.add_func(FuncDef.new("divide",
@@ -243,16 +357,23 @@ class ParseFileTest < Minitest::Test
                                    FuncParam.new(Type::F64, ID.new("b"))],
                                   Type::F64,
                                   [
-                                    Definition.new(Type::F64, Register.new(0), BinaryOp.new(
-                                                                                 BinaryOp::Operator::DIV,
-                                                                                 ID.new("a"), ID.new("b")
-                                                                               )),
+                                    Definition.new(
+                                      Type::F64,
+                                      Register.new(0),
+                                      BinaryOp.new(
+                                        BinaryOp::Operator::DIV,
+                                        ID.new("a"),
+                                        ID.new("b")
+                                      )
+                                    ),
                                     Return.new(Register.new(0)),
                                   ]))
     expected.add_extern_func(
       ExternFuncDef.new("console", "log", [Type::F64], Type::Void)
     )
-    program = Frontend::Parser.parse_file("test/il_programs/frontend/extern.txt")
+    program = Frontend::Parser.parse_file(
+      "test/il_programs/frontend/extern.txt"
+    )
 
     assert program.eql?(expected)
   end
