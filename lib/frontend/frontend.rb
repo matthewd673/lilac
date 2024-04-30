@@ -1,4 +1,6 @@
 # typed: strict
+# frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "../il"
 
@@ -113,7 +115,7 @@ module Frontend
 
     sig { returns(String) }
     def to_s
-      "#{@type}"
+      @type.to_s
     end
   end
 
@@ -124,7 +126,7 @@ module Frontend
     # much easier here
     TokenDef.new(TokenType::Arrow, /->/),
     TokenDef.new(TokenType::UnaryOp, /-@/),
-    TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<=|>=|<|>|\|\||\&\&/),
+    TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<=|>=|<|>|\|\||&&/),
     TokenDef.new(TokenType::Phi, /phi/),
     TokenDef.new(TokenType::Assignment, /=/),
     TokenDef.new(TokenType::Jump, /jmp/),
@@ -158,5 +160,5 @@ module Frontend
     TokenDef.new(TokenType::Name, /[\w!@$^&*\-+=\[\];',.?\/<>]+/),
 
     # NOTE: TokenType::NewLine and ::EOF are special and do not need a TokenDef
-  ], T::Array[TokenDef])
+  ].freeze, T::Array[TokenDef])
 end
