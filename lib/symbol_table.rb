@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "il"
 
@@ -10,6 +11,7 @@ class ILSymbol
   sig { returns(IL::ID) }
   # The ID that this symbol corresponds to.
   attr_reader :id
+
   sig { returns(IL::Type) }
   # The type of the symbol.
   attr_reader :type

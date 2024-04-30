@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "il"
 
@@ -13,7 +14,7 @@ class Visitor
   # and the optional visiting context. It can have any return type.
   Lambda = T.type_alias do
     T.proc.params(arg0: Visitor, arg1: T.untyped, arg2: T.untyped)
-      .returns(T.untyped)
+     .returns(T.untyped)
   end
 
   # A +Visitor::LambdaHash+ is a type-alias for a hash of classes ->

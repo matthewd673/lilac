@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 require "minitest/autorun"
 require_relative "../lib/code_gen/targets/wasm/type"

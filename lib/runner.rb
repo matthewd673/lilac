@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "pass"
 
@@ -8,7 +9,7 @@ class Runner
   extend T::Sig
   extend T::Generic
 
-  P = type_member {{ upper: Pass }}
+  P = type_member { { upper: Pass } }
 
   sig { returns(IL::Program) }
   # The Program that the Runner is operating on.

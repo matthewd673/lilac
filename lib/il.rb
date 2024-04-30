@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 
 # IL contains a set of classes representing the Lilac Intermediate Language.
@@ -118,6 +119,7 @@ module IL
 
     sig { returns(Type) }
     attr_reader :type
+
     sig { returns(T.untyped) }
     attr_reader :value
 
@@ -156,10 +158,12 @@ module IL
     sig { returns(String) }
     # The name of the ID.
     attr_reader :name
+
     sig { returns(Integer) }
     # The number of the ID. Multiple definitions of the same ID name must
     # have unique numbers.
     attr_reader :number
+
     sig { returns(String) }
     # The key of the ID. Includes both name and number.
     attr_reader :key
@@ -288,8 +292,10 @@ module IL
 
     sig { returns(Operator) }
     attr_reader :op
+
     sig { returns(Value) }
     attr_accessor :left
+
     sig { returns(Value) }
     attr_accessor :right
 
@@ -382,6 +388,7 @@ module IL
 
     sig { returns(Operator) }
     attr_reader :op
+
     sig { returns(Value) }
     attr_accessor :value
 
@@ -434,6 +441,7 @@ module IL
 
     sig { returns(String) }
     attr_reader :func_name
+
     sig { returns(T::Array[Value]) }
     attr_reader :args
 
@@ -474,9 +482,11 @@ module IL
     sig { returns(String) }
     attr_reader :func_source
 
-    sig do params(func_source: String,
-                 func_name: String,
-                 args: T::Array[Value]).void end
+    sig do
+      params(func_source: String,
+             func_name: String,
+             args: T::Array[Value]).void
+    end
     def initialize(func_source, func_name, args)
       @func_source = func_source
       @func_name = func_name
@@ -564,8 +574,10 @@ module IL
 
     sig { returns(Type) }
     attr_reader :type
+
     sig { returns(ID) }
     attr_accessor :id
+
     sig { returns(T.any(Expression, Value)) }
     attr_accessor :rhs
 
@@ -798,6 +810,7 @@ module IL
 
     sig { returns(Type) }
     attr_reader :type
+
     sig { returns(ID) }
     attr_reader :id
 
@@ -830,18 +843,23 @@ module IL
 
     sig { returns(String) }
     attr_reader :name
+
     sig { returns(T::Array[FuncParam]) }
     attr_reader :params
+
     sig { returns(Type) }
     attr_reader :ret_type
+
     sig { returns(T::Array[Statement]) }
     attr_reader :stmt_list
 
-    sig do params(name: String,
-                 params: T::Array[FuncParam],
-                 ret_type: Type,
-                 stmt_list: T::Array[Statement])
-          .void end
+    sig do
+      params(name: String,
+             params: T::Array[FuncParam],
+             ret_type: Type,
+             stmt_list: T::Array[Statement])
+        .void
+    end
     def initialize(name, params, ret_type, stmt_list)
       @name = name
       @params = params
@@ -884,17 +902,22 @@ module IL
 
     sig { returns(String) }
     attr_reader :source
+
     sig { returns(String) }
     attr_reader :name
+
     sig { returns(T::Array[Type]) }
     attr_reader :param_types
+
     sig { returns(Type) }
     attr_reader :ret_type
 
-    sig do params(source: String,
-                 name: String,
-                 param_types: T::Array[Type],
-                 ret_type: Type).void end
+    sig do
+      params(source: String,
+             name: String,
+             param_types: T::Array[Type],
+             ret_type: Type).void
+    end
     def initialize(source, name, param_types, ret_type)
       @source = source
       @name = name
@@ -1010,18 +1033,23 @@ module IL
 
     sig { returns(String) }
     attr_reader :name
+
     sig { returns(T::Array[FuncParam]) }
     attr_reader :params
+
     sig { returns(Type) }
     attr_reader :ret_type
+
     sig { returns(Analysis::CFG) }
     attr_reader :cfg
 
-    sig do params(name: String,
-                 params: T::Array[FuncParam],
-                 ret_type: Type,
-                 cfg: Analysis::CFG)
-          .void end
+    sig do
+      params(name: String,
+             params: T::Array[FuncParam],
+             ret_type: Type,
+             cfg: Analysis::CFG)
+        .void
+    end
     def initialize(name, params, ret_type, cfg)
       @name = name
       @params = params

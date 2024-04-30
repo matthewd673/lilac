@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "pass"
 require_relative "il"
@@ -229,8 +230,10 @@ class SSA < Pass
     end
   end
 
-  sig do params(rhs: T.any(IL::Value, IL::Expression))
-          .returns(T::Set[String]) end
+  sig do
+    params(rhs: T.any(IL::Value, IL::Expression))
+      .returns(T::Set[String])
+  end
   def get_rhs_names(rhs)
     case rhs
     when IL::Constant then Set[]
@@ -266,10 +269,12 @@ class SSA < Pass
     rename(@cfg.entry, counter, stack, dom_tree)
   end
 
-  sig do params(name: String,
-               counter: T::Hash[String, Integer],
-               stack: T::Hash[String, T::Array[Integer]])
-          .returns(IL::ID) end
+  sig do
+    params(name: String,
+           counter: T::Hash[String, Integer],
+           stack: T::Hash[String, T::Array[Integer]])
+      .returns(IL::ID)
+  end
   def new_name(name, counter, stack)
     # unsafes should never break
     i = T.unsafe(counter[name])
@@ -285,10 +290,12 @@ class SSA < Pass
     IL::ID.new(name, number: i)
   end
 
-  sig do params(block: BB,
-               counter: T::Hash[String, Integer],
-               stack: T::Hash[String, T::Array[Integer]],
-               dom_tree: DomTree).void end
+  sig do
+    params(block: BB,
+           counter: T::Hash[String, Integer],
+           stack: T::Hash[String, T::Array[Integer]],
+           dom_tree: DomTree).void
+  end
   def rename(block, counter, stack, dom_tree)
     # for each phi function in block, rewrite lhs with new_name
     block.stmt_list.each do |s|
@@ -351,9 +358,11 @@ class SSA < Pass
     end
   end
 
-  sig do params(rhs: T.any(IL::Expression, IL::Value),
-               counter: T::Hash[String, Integer],
-               stack: T::Hash[String, T::Array[Integer]]).void end
+  sig do
+    params(rhs: T.any(IL::Expression, IL::Value),
+           counter: T::Hash[String, Integer],
+           stack: T::Hash[String, T::Array[Integer]]).void
+  end
   def rewrite_rhs(rhs, counter, stack)
     case rhs
     # Constants have nothing to rewrite

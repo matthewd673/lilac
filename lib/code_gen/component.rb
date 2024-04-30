@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "code_gen"
 
@@ -7,6 +8,6 @@ require_relative "code_gen"
 # For example: a function in Wasm.
 module CodeGen
   class Component
-  # NOTE: stub
+    # NOTE: stub
   end
 end

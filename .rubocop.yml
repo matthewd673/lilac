@@ -12,8 +12,6 @@ Style/RedundantParentheses:
   Enabled: false
 Style/ParenthesesAroundCondition:
   Enabled: false
-Layout:
-  Enabled: false
 Lint:
   Enabled: false
 Metrics:
@@ -69,6 +67,9 @@ Style/Encoding:
 
 Layout/LineLength:
   Max: 80
+
+Naming/MethodParameterName:
+  Enabled: false
 
 # this breaks yard comments
 Sorbet/EmptyLineAfterSig:

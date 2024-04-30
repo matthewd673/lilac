@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "../code_gen"
 
@@ -7,6 +8,6 @@ require_relative "../code_gen"
 # machine-dependent code generator.
 module CodeGen
   module Targets
-  # NOTE: namespace stub
+    # NOTE: namespace stub
   end
 end

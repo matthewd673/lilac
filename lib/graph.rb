@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 
 # A Graph is a generic data structure representing a graph with nodes and
@@ -8,7 +9,7 @@ class Graph
   extend T::Sig
   extend T::Generic
 
-  Node = type_member {{ upper: Object }}
+  Node = type_member { { upper: Object } }
 
   # An Edge is a generic data structure representing a directed edge between
   # two nodes in a graph.
@@ -16,10 +17,11 @@ class Graph
     extend T::Sig
     extend T::Generic
 
-    Node = type_member {{ upper: Object }}
+    Node = type_member { { upper: Object } }
 
     sig { returns(Node) }
     attr_reader :from
+
     sig { returns(Node) }
     attr_reader :to
 
@@ -237,12 +239,12 @@ class Graph
     # remove this edge from "from"'s outgoing
     outgoing = @outgoing[edge.from]
     # should never be nil
-outgoing&.delete(edge)
+    outgoing&.delete(edge)
 
     # remove this edge from "to"'s incoming
     incoming = @incoming[edge.to]
     # should never be nil
-incoming&.delete(edge)
+    incoming&.delete(edge)
   end
 
   sig { params(from: Node, to: Node).returns(T.nilable(Edge[Node])) }
@@ -299,10 +301,12 @@ incoming&.delete(edge)
 
   private
 
-  sig do params(node: Node,
-               seen: T::Set[Node],
-               block: T.proc.params(arg0: Node).void)
-          .void end
+  sig do
+    params(node: Node,
+           seen: T::Set[Node],
+           block: T.proc.params(arg0: Node).void)
+      .void
+  end
   def postorder_traversal_helper(node, seen, &block)
     if seen.include?(node)
       return
@@ -311,7 +315,7 @@ incoming&.delete(edge)
     seen.add(node)
 
     each_successor(node) do |s|
-     postorder_traversal_helper(s, seen, &block)
+      postorder_traversal_helper(s, seen, &block)
     end
     yield node
   end

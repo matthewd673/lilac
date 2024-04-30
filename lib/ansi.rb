@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 
 # The ANSI module contains constants and helper functions that can be used
@@ -46,10 +47,12 @@ module ANSI
   # Must be used with +.fmt256+.
   LILAC_256 = 147
 
-  sig do params(obj: Object,
-               color: T.nilable(Integer),
-               bold: T::Boolean)
-          .returns(String) end
+  sig do
+    params(obj: Object,
+           color: T.nilable(Integer),
+           bold: T::Boolean)
+      .returns(String)
+  end
   # Format a String using ANSI codes.
   #
   # @param [T.nilable(Integer)] color The foreground color of the String.

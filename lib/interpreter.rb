@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "il"
 require_relative "visitor"
@@ -27,8 +28,8 @@ module Interpreter
     # run all validations before interpreting
     # TODO: update to work with CFG (or move all validations to tests)
     # if validate
-      # validation_runner = Validation::ValidationRunner.new(program)
-      # validation_runner.run_passes(Validation::VALIDATIONS)
+    # validation_runner = Validation::ValidationRunner.new(program)
+    # validation_runner.run_passes(Validation::VALIDATIONS)
     # end
 
     # collect all funcs in the program
@@ -57,7 +58,9 @@ module Interpreter
 
   protected
 
-  sig { params(label_hash: T::Hash[String, Analysis::BB], cfg: Analysis::CFG).void }
+  sig do
+    params(label_hash: T::Hash[String, Analysis::BB], cfg: Analysis::CFG).void
+  end
   def self.register_labels(label_hash, cfg)
     cfg.each_node do |b|
       if b.entry
@@ -66,8 +69,10 @@ module Interpreter
     end
   end
 
-  sig do params(cfg: Analysis::CFG, visitor: Visitor, context: Context)
-          .returns(T.nilable(InterpreterValue)) end
+  sig do
+    params(cfg: Analysis::CFG, visitor: Visitor, context: Context)
+      .returns(T.nilable(InterpreterValue))
+  end
   def self.interpret_cfg(cfg, visitor, context)
     while context.current != cfg.exit
       # interpret the current block
@@ -115,21 +120,19 @@ module Interpreter
     nil
   end
 
-  VISIT_VALUE = T.let(lambda  { |v, o, context|
-   raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Value)
-     
-   
-     raise("Interpretation of #{self.class} is not implemented")
-   
+  VISIT_VALUE = T.let(lambda { |v, o, context|
+    raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Value)
+
+    raise("Interpretation of #{self.class} is not implemented")
   }, Visitor::Lambda)
 
-  VISIT_CONSTANT = T.let(lambda  { |v, o, context|
+  VISIT_CONSTANT = T.let(lambda { |v, o, context|
     type = o.type
     value = o.value
     InterpreterValue.new(type, value)
   }, Visitor::Lambda)
 
-  VISIT_ID = T.let(lambda  { |v, o, context|
+  VISIT_ID = T.let(lambda { |v, o, context|
     key = o.key
 
     info = context.symbols.lookup(key)
@@ -139,13 +142,11 @@ module Interpreter
 
   VISIT_EXPRESSION = T.let(lambda  { |v, o, context|
     raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Expression)
-      
-    
-      raise("Interpretation of #{self.class} is not implemented")
-    
+
+    raise("Interpretation of #{self.class} is not implemented")
   }, Visitor::Lambda)
 
-  VISIT_BINARYOP = T.let(lambda  { |v, o, context|
+  VISIT_BINARYOP = T.let(lambda { |v, o, context|
     left = o.left
     right = o.right
     op = o.op
@@ -159,39 +160,39 @@ module Interpreter
 
     # cannot use BinaryOp.calculate since these are InterpreterValues
     result = case op
-    when IL::BinaryOp::Operator::ADD
-      left.value + right.value
-    when IL::BinaryOp::Operator::SUB
-      left.value - right.value
-    when IL::BinaryOp::Operator::MUL
-      left.value * right.value
-    when IL::BinaryOp::Operator::DIV
-      left.value / right.value
-    when IL::BinaryOp::Operator::EQ
-      left.value == right.value ? 1 : 0
-    when IL::BinaryOp::Operator::NEQ
-      left.value != right.value ? 1 : 0
-    when IL::BinaryOp::Operator::LT
-      left.value < right.value ? 1 : 0
-    when IL::BinaryOp::Operator::GT
-      left.value > right.value ? 1 : 0
-    when IL::BinaryOp::Operator::LEQ
-      left.value <= right.value ? 1 : 0
-    when IL::BinaryOp::Operator::GEQ
-      left.value >= right.value ? 1 : 0
-    when IL::BinaryOp::Operator::OR
-      left.value != 0 || right.value != 0 ? 1 : 0
-    when IL::BinaryOp::Operator::AND
-      left.value != 0 && right.value != 0 ? 1 : 0
-    else # cannot use T.absurd since o.op is untyped
-      raise("Unimplemented binary operator '#{op}'")
-    end
+             when IL::BinaryOp::Operator::ADD
+               left.value + right.value
+             when IL::BinaryOp::Operator::SUB
+               left.value - right.value
+             when IL::BinaryOp::Operator::MUL
+               left.value * right.value
+             when IL::BinaryOp::Operator::DIV
+               left.value / right.value
+             when IL::BinaryOp::Operator::EQ
+               left.value == right.value ? 1 : 0
+             when IL::BinaryOp::Operator::NEQ
+               left.value != right.value ? 1 : 0
+             when IL::BinaryOp::Operator::LT
+               left.value < right.value ? 1 : 0
+             when IL::BinaryOp::Operator::GT
+               left.value > right.value ? 1 : 0
+             when IL::BinaryOp::Operator::LEQ
+               left.value <= right.value ? 1 : 0
+             when IL::BinaryOp::Operator::GEQ
+               left.value >= right.value ? 1 : 0
+             when IL::BinaryOp::Operator::OR
+               left.value != 0 || right.value != 0 ? 1 : 0
+             when IL::BinaryOp::Operator::AND
+               left.value != 0 && right.value != 0 ? 1 : 0
+             else # cannot use T.absurd since o.op is untyped
+               raise("Unimplemented binary operator '#{op}'")
+             end
 
     # since both operands must have same type we can return either as our type
     InterpreterValue.new(left.type, result)
   }, Visitor::Lambda)
 
-  VISIT_UNARYOP = T.let(lambda  { |v, o, context|
+  VISIT_UNARYOP = T.let(lambda { |v, o, context|
     value = o.value
     op = o.op
 
@@ -199,16 +200,16 @@ module Interpreter
 
     # cannot use UnaryOp.calculate since these are InterpreterValues
     result = case op
-    when IL::UnaryOp::Operator::NEG
-      0 - value.value
-    else
-      raise("Unsupported unary operator '#{op}'")
-    end
+             when IL::UnaryOp::Operator::NEG
+               0 - value.value
+             else
+               raise("Unsupported unary operator '#{op}'")
+             end
 
     InterpreterValue.new(value.type, result)
   }, Visitor::Lambda)
 
-  VISIT_CALL = T.let(lambda  { |v, o, context|
+  VISIT_CALL = T.let(lambda { |v, o, context|
     func_name = o.func_name
     args = o.args
     func = context.funcs[func_name]
@@ -254,7 +255,7 @@ module Interpreter
     ret_value
   }, Visitor::Lambda)
 
-  VISIT_PHI = T.let(lambda  { |v, o, context|
+  VISIT_PHI = T.let(lambda { |v, o, context|
     ids = o.ids
 
     # find the id in the phi function that was last written to
@@ -284,15 +285,13 @@ module Interpreter
     InterpreterValue.new(last_written.type, last_written.value)
   }, Visitor::Lambda)
 
-  VISIT_STATEMENT = T.let(lambda  { |v, o, context|
+  VISIT_STATEMENT = T.let(lambda { |v, o, context|
     raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Statement)
-      
-    
-      raise("Interpretation of #{self.class} is not implemented")
-    
+
+    raise("Interpretation of #{self.class} is not implemented")
   }, Visitor::Lambda)
 
-  VISIT_DEFINITION = T.let(lambda  { |v, o, context|
+  VISIT_DEFINITION = T.let(lambda { |v, o, context|
     type = o.type
     id = o.id
     rhs = o.rhs
@@ -305,7 +304,7 @@ module Interpreter
     context.symbols.insert(symbol)
   }, Visitor::Lambda)
 
-  VISIT_JUMP = T.let(lambda  { |v, o, context|
+  VISIT_JUMP = T.let(lambda { |v, o, context|
     target = o.target
 
     # move instruction pointer there
@@ -313,7 +312,7 @@ module Interpreter
     context.ip = index
   }, Visitor::Lambda)
 
-  VISIT_JUMPZERO = T.let(lambda  { |v, o, context|
+  VISIT_JUMPZERO = T.let(lambda { |v, o, context|
     cond = o.cond
     target = o.target
 
@@ -324,7 +323,7 @@ module Interpreter
     cond_eval.value == 0
   }, Visitor::Lambda)
 
-  VISIT_JUMPNOTZERO = T.let(lambda  { |v, o, context|
+  VISIT_JUMPNOTZERO = T.let(lambda { |v, o, context|
     cond = o.cond
     target = o.target
 
@@ -362,6 +361,7 @@ module Interpreter
 
     sig { returns(IL::Type) }
     attr_reader :type
+
     sig { returns(T.untyped) }
     attr_reader :value
 
@@ -384,10 +384,13 @@ module Interpreter
 
     sig { returns(String) }
     attr_reader :key
+
     sig { returns(IL::Type) }
     attr_reader :type
+
     sig { returns(T.untyped) }
     attr_accessor :value
+
     sig { returns(Integer) }
     attr_accessor :write_time
 
@@ -495,14 +498,19 @@ module Interpreter
 
     sig { returns(Analysis::BB) }
     attr_accessor :current
+
     sig { returns(Integer) }
     attr_accessor :step_ct
+
     sig { returns(SymbolTable) }
     attr_reader :symbols
+
     sig { returns(T::Hash[String, IL::CFGFuncDef]) }
     attr_accessor :funcs # func name -> CFGFuncDef
+
     sig { returns(T.nilable(IL::CFGFuncDef)) }
     attr_accessor :in_func
+
     sig { returns(T::Hash[String, Analysis::BB]) }
     attr_accessor :label_blocks # label name -> BB object
 

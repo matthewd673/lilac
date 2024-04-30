@@ -1,5 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
+
 require_relative "validation"
 require_relative "id_naming"
 require_relative "ssa"
