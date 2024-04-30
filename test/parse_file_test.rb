@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require "minitest/autorun"
 require_relative "../lib/il"
@@ -14,7 +15,7 @@ class ParseFileTest < Minitest::Test
     expected = Program.new(stmt_list: [
       Definition.new(Type::I32, ID.new("a"), Constant.new(Type::I32, 5)),
     ])
-    program = Frontend::Parser::parse_file("test/il_programs/frontend/definition.txt")
+    program = Frontend::Parser.parse_file("test/il_programs/frontend/definition.txt")
 
     assert program.eql?(expected)
   end
@@ -29,7 +30,7 @@ class ParseFileTest < Minitest::Test
       Definition.new(Type::F32, ID.new("e"), Constant.new(Type::F32, 3.14)),
       Definition.new(Type::F64, ID.new("f"), Constant.new(Type::F64, -1.0)),
     ])
-    program = Frontend::Parser::parse_file("test/il_programs/frontend/types.txt")
+    program = Frontend::Parser.parse_file("test/il_programs/frontend/types.txt")
 
     assert program.eql?(expected)
   end
@@ -41,7 +42,7 @@ class ParseFileTest < Minitest::Test
       Definition.new(Type::I32, ID.new("a"), Constant.new(Type::I32, 3)),
       Jump.new("L0"),
     ])
-    program = Frontend::Parser::parse_file("test/il_programs/frontend/label_and_jmp.txt")
+    program = Frontend::Parser.parse_file("test/il_programs/frontend/label_and_jmp.txt")
 
     assert program.eql?(expected)
   end
@@ -54,7 +55,7 @@ class ParseFileTest < Minitest::Test
       JumpNotZero.new(ID.new("a"), "L0"),
       JumpZero.new(Constant.new(Type::U8, 1), "L0"),
     ])
-    program = Frontend::Parser::parse_file("test/il_programs/frontend/jz_jnz.txt")
+    program = Frontend::Parser.parse_file("test/il_programs/frontend/jz_jnz.txt")
 
     assert program.eql?(expected)
   end
@@ -112,7 +113,7 @@ class ParseFileTest < Minitest::Test
         Constant.new(Type::U8, 0), Constant.new(Type::U8, 1)
       )),
     ])
-    program = Frontend::Parser::parse_file("test/il_programs/frontend/binop.txt")
+    program = Frontend::Parser.parse_file("test/il_programs/frontend/binop.txt")
 
     assert program.eql?(expected)
   end
@@ -121,9 +122,9 @@ class ParseFileTest < Minitest::Test
   def test_parse_unop
     expected = Program.new(stmt_list: [
       Definition.new(Type::I16, ID.new("a"), UnaryOp.new(
-        UnaryOp::Operator::NEG, Constant.new(Type::I16, 2)))
+        UnaryOp::Operator::NEG, Constant.new(Type::I16, 2))),
     ])
-    program = Frontend::Parser::parse_file("test/il_programs/frontend/unop.txt")
+    program = Frontend::Parser.parse_file("test/il_programs/frontend/unop.txt")
 
     assert program.eql?(expected)
   end
@@ -133,12 +134,12 @@ class ParseFileTest < Minitest::Test
     expected = Program.new(stmt_list: [
       Definition.new(Type::I32, ID.new("ans"),
                      Call.new("multiply", [Constant.new(Type::I32, 3),
-                                           Constant.new(Type::I32, 5)]))
+                                           Constant.new(Type::I32, 5)])),
     ])
     expected.add_func(FuncDef.new("multiply",
                                   [
                                     FuncParam.new(Type::I32, ID.new("a")),
-                                    FuncParam.new(Type::I32, ID.new("b"))
+                                    FuncParam.new(Type::I32, ID.new("b")),
                                   ],
                                   Type::I32,
                                   [
@@ -152,7 +153,7 @@ class ParseFileTest < Minitest::Test
                                   ]
                                  ))
 
-    program = Frontend::Parser::parse_file("test/il_programs/frontend/func.txt")
+    program = Frontend::Parser.parse_file("test/il_programs/frontend/func.txt")
 
     assert program.eql?(expected)
   end
@@ -184,7 +185,7 @@ class ParseFileTest < Minitest::Test
                      Phi.new([ID.new("b", number: 1), ID.new("b", number: 2)])),
       Definition.new(Type::I32, ID.new("c"), ID.new("b", number: 3)),
     ])
-    program = Frontend::Parser::parse_file("test/il_programs/frontend/phi.txt")
+    program = Frontend::Parser.parse_file("test/il_programs/frontend/phi.txt")
 
     assert program.eql?(expected)
   end
@@ -211,11 +212,11 @@ class ParseFileTest < Minitest::Test
       Definition.new(Type::F64, Register.new(0), BinaryOp.new(
                                                   BinaryOp::Operator::DIV,
                                                   ID.new("a"), ID.new("b"))),
-      Return.new(Register.new(0))
+      Return.new(Register.new(0)),
     ]))
     expected.add_extern_func(
       ExternFuncDef.new("console", "log", [Type::F64], Type::Void))
-    program = Frontend::Parser::parse_file("test/il_programs/frontend/extern.txt")
+    program = Frontend::Parser.parse_file("test/il_programs/frontend/extern.txt")
 
     assert program.eql?(expected)
   end

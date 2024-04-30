@@ -1,11 +1,13 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "code_gen"
 require_relative "instruction"
 
 # A Generator is used to turn a root component of some machine-dependent code
 # into a valid string representation of that component.
-class CodeGen::Generator
+module CodeGen
+  class Generator
   extend T::Sig
   extend T::Helpers
 
@@ -20,4 +22,5 @@ class CodeGen::Generator
 
   sig { abstract.returns(String) }
   def generate; end
+  end
 end

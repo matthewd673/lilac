@@ -1,9 +1,11 @@
 # typed: strict
+# frozen_string_literal: true
 require_relative "analysis"
 require_relative "cfg"
 
 # Determine if a CFG is reducible.
-class Analysis::Reducible
+module Analysis
+  class Reducible
   extend T::Sig
   extend T::Generic
 
@@ -28,27 +30,25 @@ class Analysis::Reducible
     while applied
       applied = false
       # T1: remove all self-edges on a node
-      @cfg.each_node { |n|
-        @cfg.each_outgoing(n) { |o|
-          if o.to == n
-            @cfg.delete_edge(o)
-            applied = true
-            break
-          end
-        }
-      }
+      @cfg.each_node do |n|
+        @cfg.each_outgoing(n) do |o|
+          next unless o.to == n
+          @cfg.delete_edge(o)
+          applied = true
+          break
+        end
+      end
 
       # T2: if n has a single predecessor m, fold n into m
-      @cfg.each_node { |n|
-        if @cfg.predecessors_length(n) == 1
-          m = @cfg.each_predecessor(n) { |n| break n }
-          merge_nodes(n, T.unsafe(m))
-          applied = true
-        end
-      }
+      @cfg.each_node do |n|
+        next unless @cfg.predecessors_length(n) == 1
+        m = @cfg.each_predecessor(n) { |n| break n }
+        merge_nodes(n, T.unsafe(m))
+        applied = true
+      end
     end
 
-    return @cfg.nodes_length == 1
+    @cfg.nodes_length == 1
   end
 
   private
@@ -57,30 +57,31 @@ class Analysis::Reducible
   def merge_nodes(n, m)
     # remove edge from m -> n
     mn_edge = @cfg.find_edge(m, n)
-    if not mn_edge
+    unless mn_edge
       raise "No edge m -> n found, cannot merge"
     end
     @cfg.delete_edge(mn_edge)
 
     # many any edges originating from n originate from m
-    @cfg.each_outgoing(n) { |o|
+    @cfg.each_outgoing(n) do |o|
       new_edge = Graph::Edge.new(m, o.to)
       @cfg.delete_edge(o)
       @cfg.add_edge(new_edge)
-    }
+    end
 
     # if there are now multiple edges from m to some node, remvoe them
     seen_to = Set.new
-    @cfg.each_outgoing(m) { |o|
+    @cfg.each_outgoing(m) do |o|
       # duplicate
       if seen_to.include?(o.to)
         @cfg.delete_edge(o)
       end
 
       seen_to.add(o.to)
-    }
+    end
 
     # remove n
     @cfg.delete_node(n)
+  end
   end
 end

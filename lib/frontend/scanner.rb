@@ -1,8 +1,10 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "frontend"
 
-class Frontend::Scanner
+module Frontend
+  class Scanner
   # NOTE: Scanner is adapted from Newt's Scanner class
 
   extend T::Sig
@@ -30,23 +32,23 @@ class Frontend::Scanner
     end
 
     # return end of file once we reach it
-    if @string.length == 0
+    if @string.empty?
       return Token.new(TokenType::EOF, "$$", pos)
     end
 
     # find best possible token match from defs list
     best = T.let(nil, T.nilable(Token))
-    TOKEN_DEFS.each { |t|
+    TOKEN_DEFS.each do |t|
       # find first match
       m = t.pattern.match(@string)
 
       # skip if no match or match is not at beginning of string
-      if (not m) or (not m[0]) or m.begin(0) > 0
+      if (!m) or (!(m[0])) or m.begin(0) > 0
         next
       end
 
       # something is always better than nothing
-      if not best
+      unless best
         best = Token.new(t.type, T.unsafe(m[0]), pos)
         next
       end
@@ -55,9 +57,9 @@ class Frontend::Scanner
       if m.length > best.image.length
         best = Token.new(t.type, T.unsafe(m[0]), pos)
       end
-    }
+    end
 
-    if not best
+    unless best
       raise("Invalid symbol: '#{@string[0]}'") # TODO: nicer errors
     end
 
@@ -65,7 +67,7 @@ class Frontend::Scanner
     @string.delete_prefix!(best.image)
     @scan_row += best.image.length
 
-    return best
+    best
   end
 
   private
@@ -73,7 +75,7 @@ class Frontend::Scanner
   sig { returns(T::Boolean) }
   def strip_whitespace
     saw_nl = T.let(false, T::Boolean)
-    while true
+    loop do
       if @string.start_with?(" ")
         @string.delete_prefix!(" ")
         @scan_row += 1
@@ -89,11 +91,11 @@ class Frontend::Scanner
         @scan_row += 1 # NOTE: assume tab size = 1
       # trim annotations
       elsif @string.start_with?("\"")
-        while @string.length > 0 and (not @string[0] == "\n")
+        while !@string.empty? and (@string[0] != "\n")
           @string = T.unsafe(@string[1..])
 
           # stop if @string turns nil, which Sorbet says is possible
-          if not @string
+          unless @string
             return saw_nl
           end
         end
@@ -101,6 +103,7 @@ class Frontend::Scanner
         break
       end
     end
-    return saw_nl
+    saw_nl
+  end
   end
 end

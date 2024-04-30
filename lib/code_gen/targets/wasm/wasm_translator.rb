@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "wasm"
 require_relative "../../translator"
@@ -15,7 +16,10 @@ require_relative "relooper"
 require_relative "wasm_block"
 
 # A WasmTranslator translates Lilac IL into Wasm instructions.
-class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
+module CodeGen
+  module Targets
+  module Wasm
+  class WasmTranslator < CodeGen::Translator
   extend T::Sig
 
   include CodeGen::Targets::Wasm
@@ -37,14 +41,14 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
     @symbols.push_scope # always have scope for globals and top-level
 
     # import all extern functions
-    @program.each_extern_func { |f|
+    @program.each_extern_func do |f|
       components.push(translate_import(f))
-    }
+    end
 
     # translate all functions
-    @program.each_func { |f|
+    @program.each_func do |f|
       components.push(translate_func(f))
-    }
+    end
 
     # translate instructions for main stmt_list
     main_instructions = translate_instructions(@program.cfg)
@@ -54,9 +58,9 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
                                          main_instructions))
     components.push(Components::Start.new("__lilac_main"))
 
-    wasm_module = Components::Module.new(components)
+    Components::Module.new(components)
 
-    return wasm_module
+    
   end
 
   private
@@ -65,21 +69,21 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
   def translate_import(extern_funcdef)
     # translate param types for function signature
     param_types = []
-    extern_funcdef.param_types.each { |t|
-      param_types.push(Instructions::to_wasm_type(t))
-    }
+    extern_funcdef.param_types.each do |t|
+      param_types.push(Instructions.to_wasm_type(t))
+    end
 
     # result type for void functions in Wasm is just nil
     if extern_funcdef.ret_type != IL::Type::Void
-      result = Instructions::to_wasm_type(T.unsafe(extern_funcdef.ret_type))
+      result = Instructions.to_wasm_type(T.unsafe(extern_funcdef.ret_type))
     end
 
     # construct import object
-    import = Components::Import.new(extern_funcdef.source,
+    Components::Import.new(extern_funcdef.source,
                                     extern_funcdef.name,
                                     param_types,
                                     result)
-    return import
+    
   end
 
   sig { params(cfg_funcdef: IL::CFGFuncDef).returns(Components::Func) }
@@ -88,14 +92,14 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
 
     # create a new scope with func params
     @symbols.push_scope
-    cfg_funcdef.params.each { |p|
+    cfg_funcdef.params.each do |p|
       @symbols.insert(ILSymbol.new(p.id, p.type))
 
       # also mark this down for the function signature
-      param_type = Instructions::to_wasm_type(p.type)
+      param_type = Instructions.to_wasm_type(p.type)
       param_name = p.id.name
       params.push(Components::FuncParam.new(param_type, param_name))
-    }
+    end
 
     # translate instructions and pop the scope we used
     instructions = translate_instructions(cfg_funcdef.cfg)
@@ -104,17 +108,17 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
     # construct func with appropriate params and return type
     # if return type is void then result is simply nil
     if cfg_funcdef.ret_type != IL::Type::Void
-      result = Instructions::to_wasm_type(cfg_funcdef.ret_type)
+      result = Instructions.to_wasm_type(cfg_funcdef.ret_type)
     end
-    func = Components::Func.new(cfg_funcdef.name,
+    Components::Func.new(cfg_funcdef.name,
                                 params,
                                 result,
                                 instructions)
-    return func
+    
   end
 
-  sig { params(cfg: Analysis::CFG)
-          .returns(T::Array[Instructions::WasmInstruction]) }
+  sig do params(cfg: Analysis::CFG)
+          .returns(T::Array[Instructions::WasmInstruction]) end
   def translate_instructions(cfg)
     # run relooper on the cfg
     dom_facts = Analysis::Dominators.new(cfg).run
@@ -125,12 +129,12 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
 
     # scan forwards to build a symbol table of all locals and their types.
     # NOTE: assume that our caller has kindly pushed a new scope
-    cfg.each_node { |b|
+    cfg.each_node do |b|
       # scan each block for definitions and log them
       # a previous validation should have already ensured that there are no
       # inconsistent types, so we don't need any checks here.
-      b.stmt_list.each { |s|
-        if not s.is_a?(IL::Definition)
+      b.stmt_list.each do |s|
+        unless s.is_a?(IL::Definition)
           next
         end
 
@@ -144,34 +148,34 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
         @symbols.insert(id_symbol)
 
         # push declaration
-        type = Instructions::to_wasm_type(s.type)
+        type = Instructions.to_wasm_type(s.type)
         decl = Instructions::Local.new(type, s.id.name)
         instructions.push(decl)
-      }
-    }
+      end
+    end
 
     # translate the WasmBlocks from relooper and return it
     root = relooper.translate
     instructions.concat(translate_wasm_block(root))
 
-    return instructions
+    instructions
   end
 
-  sig { params(block: WasmBlock)
-          .returns(T::Array[Instructions::WasmInstruction])}
+  sig do params(block: WasmBlock)
+          .returns(T::Array[Instructions::WasmInstruction]) end
   def translate_wasm_block(block)
     case block
       when WasmIfBlock
         instructions = []
 
         # translate all the conditional stuff
-        block.bb.stmt_list.each { |s|
+        block.bb.stmt_list.each do |s|
           instructions.concat(@transformer.transform(s))
-        }
+        end
 
         # push the conditional and create the if
         bb_exit = T.unsafe(block.bb.exit)
-        if not bb_exit
+        unless bb_exit
           raise "Basic block did not have a exit"
         end
         instructions.push(push_value(bb_exit.cond))
@@ -185,7 +189,7 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
         instructions.push(Instructions::If.new)
 
         # no true branch = invalid WasmIfBlock
-        if not block.true_branch
+        unless block.true_branch
           raise "WasmIfBlock has no true branch"
         end
 
@@ -211,7 +215,7 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
           instructions.concat(translate_wasm_block(T.unsafe(block.next_block)))
         end
 
-        return instructions
+        instructions
       when WasmLoopBlock
         instructions = []
         block_label = alloc_block_label
@@ -221,11 +225,11 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
         # this will be placed at the beginning of the _block_ and
         # the end of the _loop_
         cond_insts = []
-        block.bb.stmt_list.each { |s|
+        block.bb.stmt_list.each do |s|
           cond_insts.concat(@transformer.transform(s))
-        }
+        end
         bb_exit = T.unsafe(block.bb.exit)
-        if not bb_exit
+        unless bb_exit
           raise "Basic block did not have a exit"
         end
         cond_insts.push(push_value(bb_exit.cond))
@@ -250,7 +254,7 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
         instructions.push(Instructions::Loop.new(loop_label))
 
         # translate the inner of the loop (not optional)
-        if not block.inner
+        unless block.inner
           raise "WasmLoopBlock has no inner"
         end
         inner = translate_wasm_block(T.unsafe(block.inner))
@@ -272,21 +276,21 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
           instructions.concat(translate_wasm_block(T.unsafe(block.next_block)))
         end
 
-        return instructions
+        instructions
       when WasmBlock
         instructions = []
 
         # translate block
-        block.bb.stmt_list.each { |s|
+        block.bb.stmt_list.each do |s|
           instructions.concat(@transformer.transform(s))
-        }
+        end
 
         # translate next block
         if block.next_block
           instructions.concat(translate_wasm_block(T.unsafe(block.next_block)))
         end
 
-        return instructions
+        instructions
     end
   end
 
@@ -309,13 +313,16 @@ class CodeGen::Targets::Wasm::WasmTranslator < CodeGen::Translator
   def alloc_block_label
     label = "__lilac_block#{@block_ct}"
     @block_ct += 1
-    return label
+    label
   end
 
   sig { returns(String) }
   def alloc_loop_label
     label = "__lilac_loop_#{@loop_ct}"
     @loop_ct += 1
-    return label
+    label
+  end
+  end
+  end
   end
 end

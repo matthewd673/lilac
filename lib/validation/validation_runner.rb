@@ -1,10 +1,12 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "validation"
 require_relative "../runner"
 
 # A ValidationRunner is a Runner for Validation passes.
-class Validation::ValidationRunner < Runner
+module Validation
+  class ValidationRunner < Runner
   extend T::Sig
   extend T::Generic
 
@@ -16,5 +18,6 @@ class Validation::ValidationRunner < Runner
   # Run a ValidationPass on the program.
   def run_pass(pass)
     pass.run(@program)
+  end
   end
 end

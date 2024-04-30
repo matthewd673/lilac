@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "analysis"
 require_relative "cfg"
@@ -7,7 +8,8 @@ require_relative "cfg_facts"
 
 include Analysis
 
-class Analysis::ReachingDefs < DFA
+module Analysis
+  class ReachingDefs < DFA
   extend T::Sig
   extend T::Generic
 
@@ -26,9 +28,9 @@ class Analysis::ReachingDefs < DFA
 
   sig { returns(CFGFacts[Domain]) }
   def run
-    @cfg.each_block { |b|
+    @cfg.each_block do |b|
       init_sets(b)
-    }
+    end
 
     super
   end
@@ -40,17 +42,17 @@ class Analysis::ReachingDefs < DFA
     # union of OUT[P] for all predecessors P of B
     u = T.let(Set[], T::Set[Domain])
 
-    @cfg.each_predecessor(block) { |p|
-      u = u | get_set(@out, p)
-    }
+    @cfg.each_predecessor(block) do |p|
+      u |= get_set(@out, p)
+    end
 
-    return u
+    u
   end
 
   sig { params(block: BB).returns(T::Set[Domain]) }
   def transfer(block)
     # union of GEN[B] and (IN[B] - KILL[B])
-    return get_set(@gen, block) |
+    get_set(@gen, block) |
       (get_set(@in, block) - get_set(@kill, block))
   end
 
@@ -63,15 +65,15 @@ class Analysis::ReachingDefs < DFA
     @kill[b] = Set[]
 
     # find all definitions in block
-    b.stmt_list.each { |s|
+    b.stmt_list.each do |s|
       # only definitions are relevant
-      if not s.is_a?(IL::Definition)
+      unless s.is_a?(IL::Definition)
         next
       end
 
       key = s.id.key
       T.unsafe(@gen[b]).add(key)
-    }
+    end
 
     # any def not in this block is killed here
     @kill[b] = @all_defs - T.unsafe(@gen[b])
@@ -81,18 +83,19 @@ class Analysis::ReachingDefs < DFA
   def compute_all_defs(cfg)
     all = Set[]
 
-    cfg.each_block { |b|
-      b.stmt_list.each { |s|
+    cfg.each_block do |b|
+      b.stmt_list.each do |s|
         # only definitions are relevant
-        if not s.is_a?(IL::Definition)
+        unless s.is_a?(IL::Definition)
           next
         end
 
         key = s.id.key
         T.unsafe(all).add(key)
-      }
-    }
+      end
+    end
 
-    return all
+    all
+  end
   end
 end

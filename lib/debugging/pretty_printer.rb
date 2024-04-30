@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "debugging"
 require_relative "../ansi"
@@ -8,7 +9,8 @@ require_relative "../analysis/bb"
 
 # A PrettyPrinter contains functions that make it easy to pretty-print various
 # internal lilac data structures, like +IL::Program+, to the terminal.
-class Debugging::PrettyPrinter
+module Debugging
+  class PrettyPrinter
   extend T::Sig
 
   # A Map representing the color palette used by PrettyPrinter.
@@ -24,7 +26,7 @@ class Debugging::PrettyPrinter
     # Additional colors
     :gutter => ANSI::GREEN_BRIGHT, # TODO: only looks good with solarized dark
     :annotation => ANSI::GREEN_BRIGHT,
-  }, T::Hash[T.untyped, Integer])
+  }.freeze, T::Hash[T.untyped, Integer])
 
   sig { void }
   # Construct a new PrettyPrinter.
@@ -40,30 +42,30 @@ class Debugging::PrettyPrinter
   def print_program(program)
     # approximate total line count for gutter length
     approx_lines = program.stmt_list.length
-    program.each_extern_func { |f|
+    program.each_extern_func do |f|
       approx_lines += 1
-    }
-    program.each_func { |f|
+    end
+    program.each_func do |f|
       approx_lines += f.stmt_list.length + 2
-    }
+    end
 
     # create context
     gutter_len = approx_lines.to_s.length
     ctx = PrettyPrinterContext.new(gutter_len, 0, 0)
 
     # print all lines
-    program.each_extern_func { |f|
-      puts(@visitor.visit(f, ctx: ctx))
+    program.each_extern_func do |f|
+      puts(@visitor.visit(f, ctx:))
       ctx.line_num += 1
-    }
-    program.each_func { |f|
-      puts(@visitor.visit(f, ctx: ctx))
+    end
+    program.each_func do |f|
+      puts(@visitor.visit(f, ctx:))
       ctx.line_num += 1
-    }
-    program.stmt_list.each { |s|
-      puts(@visitor.visit(s, ctx: ctx))
+    end
+    program.stmt_list.each do |s|
+      puts(@visitor.visit(s, ctx:))
       ctx.line_num += 1
-    }
+    end
   end
 
   sig { params(blocks: T::Array[Analysis::BB]).void }
@@ -72,12 +74,12 @@ class Debugging::PrettyPrinter
   #
   # @param [T::Array[Analysis::BB::Block]] blocks The array of blocks to print.
   def print_blocks(blocks)
-    blocks.each { |b|
+    blocks.each do |b|
       puts(ANSI.fmt("[BLOCK (len=#{b.length})]", bold: true))
-      b.stmt_list.each_with_index { |s, i|
+      b.stmt_list.each_with_index do |s, i|
         puts(@visitor.visit(s))
-      }
-    }
+      end
+    end
   end
 
   protected
@@ -85,15 +87,15 @@ class Debugging::PrettyPrinter
   # A visit context used internally by the PrettyPrinter Visitor.
   PrettyPrinterContext = Struct.new(:gutter_len, :line_num, :indent)
 
-  VISIT_TYPE = T.let(-> (v, o, c) {
+  VISIT_TYPE = T.let(lambda  { |v, o, c|
     ANSI.fmt(o.to_s, color: PALETTE[IL::Type])
   }, Visitor::Lambda)
 
-  VISIT_VALUE = T.let(-> (v, o, c) {
+  VISIT_VALUE = T.let(lambda  { |v, o, c|
     o.to_s # NOTE: stub, don't format
   }, Visitor::Lambda)
 
-  VISIT_CONSTANT = T.let(-> (v, o, c) {
+  VISIT_CONSTANT = T.let(lambda  { |v, o, c|
     if o.type.eql?(IL::Type::Void)
       ANSI.fmt("void", color: PALETTE[IL::Constant])
     else
@@ -101,50 +103,50 @@ class Debugging::PrettyPrinter
     end
   }, Visitor::Lambda)
 
-  VISIT_ID = T.let(-> (v, o, c) {
+  VISIT_ID = T.let(lambda  { |v, o, c|
     "#{ANSI.fmt(o.name, color: PALETTE[IL::ID])}##{o.number}"
   }, Visitor::Lambda)
 
-  VISIT_REGISTER = T.let(-> (v, o, c) {
-    "#{ANSI.fmt(o.name, color: PALETTE[IL::Register])}"
+  VISIT_REGISTER = T.let(lambda  { |v, o, c|
+    ANSI.fmt(o.name, color: PALETTE[IL::Register]).to_s
   }, Visitor::Lambda)
 
-  VISIT_EXPRESSION = T.let(-> (v, o, c) {
+  VISIT_EXPRESSION = T.let(lambda  { |v, o, c|
     o.to_s # NOTE: stub, don't format
   }, Visitor::Lambda)
 
-  VISIT_BINARYOP = T.let(-> (v, o, c) {
+  VISIT_BINARYOP = T.let(lambda  { |v, o, c|
     s = "#{v.visit(o.left)} "
     s += "#{ANSI.fmt(o.op, color: PALETTE[IL::BinaryOp])} "
     s += v.visit(o.right)
-    return s
+    s
   }, Visitor::Lambda)
 
-  VISIT_CALL = T.let(-> (v, o, c) {
+  VISIT_CALL = T.let(lambda  { |v, o, c|
     s = "#{ANSI.fmt("call", bold: true)} #{o.func_name}("
-    o.args.each { |a|
+    o.args.each do |a|
       s += "#{v.visit(a)}, "
-    }
+    end
     s.chomp!(", ")
     s += ")"
   }, Visitor::Lambda)
 
-  VISIT_EXTERNCALL = T.let(-> (v, o, c) {
+  VISIT_EXTERNCALL = T.let(lambda  { |v, o, c|
     s = "#{ANSI.fmt("extern call", bold: true)} #{o.func_source} #{o.func_name}("
-    o.args.each { |a|
+    o.args.each do |a|
       s += "#{v.visit(a)}, "
-    }
+    end
     s.chomp!(", ")
     s += ")"
   }, Visitor::Lambda)
 
-  VISIT_STATEMENT = T.let(-> (v, o, c) {
+  VISIT_STATEMENT = T.let(lambda  { |v, o, c|
     o.to_s # NOTE: stub, don't format
   }, Visitor::Lambda)
 
-  VISIT_DEFINITION = T.let(-> (v, o, c) {
+  VISIT_DEFINITION = T.let(lambda  { |v, o, c|
     # line number and indent
-    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
     pad = indent(c.indent)
     s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
 
@@ -155,12 +157,12 @@ class Debugging::PrettyPrinter
       s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
     end
 
-    return s
+    s
   }, Visitor::Lambda)
 
-  VISIT_LABEL = T.let(-> (v, o, c) {
+  VISIT_LABEL = T.let(lambda  { |v, o, c|
     # line number and indent
-    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
     pad = indent(c.indent)
     s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
 
@@ -171,12 +173,12 @@ class Debugging::PrettyPrinter
       s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
     end
 
-    return s
+    s
   }, Visitor::Lambda)
 
-  VISIT_JUMP = T.let(-> (v, o, c) {
+  VISIT_JUMP = T.let(lambda  { |v, o, c|
     # line number and indent
-    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
     pad = indent(c.indent)
     s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
 
@@ -188,12 +190,12 @@ class Debugging::PrettyPrinter
       s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
     end
 
-    return s
+    s
   }, Visitor::Lambda)
 
-  VISIT_JUMPZERO = T.let(-> (v, o, c) {
+  VISIT_JUMPZERO = T.let(lambda  { |v, o, c|
     # line number and indent
-    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
     pad = indent(c.indent)
     s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
 
@@ -205,12 +207,12 @@ class Debugging::PrettyPrinter
       s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
     end
 
-    return s
+    s
   }, Visitor::Lambda)
 
-  VISIT_JUMPNOTZERO = T.let(-> (v, o, c) {
+  VISIT_JUMPNOTZERO = T.let(lambda  { |v, o, c|
     # line number and indent
-    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
     pad = indent(c.indent)
     s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
 
@@ -222,12 +224,12 @@ class Debugging::PrettyPrinter
       s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
     end
 
-    return s
+    s
   }, Visitor::Lambda)
 
-  VISIT_RETURN = T.let(-> (v, o, c) {
+  VISIT_RETURN = T.let(lambda  { |v, o, c|
     # line number and indent
-    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
     pad = indent(c.indent)
     s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
 
@@ -238,12 +240,12 @@ class Debugging::PrettyPrinter
       s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
     end
 
-    return s
+    s
   }, Visitor::Lambda)
 
-  VISIT_VOIDCALL = T.let(-> (v, o, c) {
+  VISIT_VOIDCALL = T.let(lambda  { |v, o, c|
     # line number and indent
-    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
     pad = indent(c.indent)
     s = ANSI.fmt(num, color: PALETTE[:gutter]) + pad
 
@@ -254,31 +256,31 @@ class Debugging::PrettyPrinter
       s += ANSI.fmt(" \" #{o.annotation}", color: PALETTE[:annotation])
     end
 
-    return s
+    s
   }, Visitor::Lambda)
 
-  VISIT_FUNCDEF = T.let(-> (v, o, c) {
+  VISIT_FUNCDEF = T.let(lambda  { |v, o, c|
     # line number
-    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
     c.line_num += 1
     s = ANSI.fmt(num, color: PALETTE[:gutter])
 
     s += "#{ANSI.fmt("func", bold: true)} #{o.name}("
 
     # print params
-    o.params.each { |p|
+    o.params.each do |p|
       s += "#{v.visit(p.type)} #{v.visit(p.id)}, "
-    }
+    end
     s.chomp!(", ")
 
     s += ") -> #{v.visit(o.ret_type)}\n"
 
     # print body
     c.indent = 1
-    o.stmt_list.each { |stmt|
+    o.stmt_list.each do |stmt|
       s += "#{v.visit(stmt, ctx: c)}\n"
       c.line_num += 1
-    }
+    end
 
     # fix line number and indent
     c.line_num -= 1
@@ -287,27 +289,27 @@ class Debugging::PrettyPrinter
     # print end
     new_num = left_pad(c.line_num.to_s, c.gutter_len)
     s += "#{ANSI.fmt(new_num, color: PALETTE[:gutter])} "
-    s += "#{ANSI.fmt("end", bold: true)}"
+    s += ANSI.fmt("end", bold: true).to_s
 
-    return s
+    s
   }, Visitor::Lambda)
 
-  VISIT_FUNCPARAM = T.let(-> (v, o, c) {
+  VISIT_FUNCPARAM = T.let(lambda  { |v, o, c|
     "#{v.visit(o.type)} #{v.visit(o.id)}"
   }, Visitor::Lambda)
 
-  VISIT_EXTERNFUNCDEF = T.let(-> (v, o, c) {
+  VISIT_EXTERNFUNCDEF = T.let(lambda  { |v, o, c|
     # line number
-    num = left_pad(c.line_num.to_s, c.gutter_len) + " "
+    num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
     c.line_num += 1
     s = ANSI.fmt(num, color: PALETTE[:gutter])
 
     s += "#{ANSI.fmt("extern func", bold: true)} #{o.source} #{o.name}("
 
     # print param types
-    o.param_types.each { |t|
+    o.param_types.each do |t|
       s += "#{v.visit(t)}, "
-    }
+    end
     s.chomp!(", ")
 
     s += ") -> #{v.visit(o.ret_type)}\n"
@@ -315,7 +317,7 @@ class Debugging::PrettyPrinter
     # fix line number and indent
     c.line_num -= 1
     c.indent = 0
-    return s
+    s
 
   }, Visitor::Lambda)
 
@@ -338,7 +340,7 @@ class Debugging::PrettyPrinter
     IL::FuncDef => VISIT_FUNCDEF,
     IL::FuncParam => VISIT_FUNCPARAM,
     IL::ExternFuncDef => VISIT_EXTERNFUNCDEF,
-  }, Visitor::LambdaHash)
+  }.freeze, Visitor::LambdaHash)
 
   private
 
@@ -348,17 +350,18 @@ class Debugging::PrettyPrinter
       str = pad + str
     end
 
-    return str
+    str
   end
 
   sig { params(indent: Integer).returns(String) }
   def self.indent(indent)
     str = ""
 
-    for i in 1..indent
+    (1..indent).each do |i|
       str += "  "
     end
 
-    return str
+    str
+  end
   end
 end

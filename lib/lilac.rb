@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 
 # load requirements for external programs
@@ -40,17 +41,17 @@ module CLI
   sig { void }
   # Print all available optimizations.
   def self.print_optimizations
-    Optimization::OPTIMIZATIONS.each { |o|
+    Optimization::OPTIMIZATIONS.each do |o|
       puts(o.id)
-    }
+    end
   end
 
   sig { void }
   # Print all available validations.
   def self.print_validations
-    Validation::VALIDATIONS.each { |v|
+    Validation::VALIDATIONS.each do |v|
       puts(v.id)
-    }
+    end
   end
 
   sig { params(filename: T.nilable(String)).void }
@@ -59,12 +60,12 @@ module CLI
   # @param [T.nilable(String)] filename The name of the file to parse
   #   (or +nil+ which will be handled nicely).
   def self.parse(filename)
-    if not filename
+    unless filename
       puts("usage: lilac parse <filename>")
       return
     end
 
-    program = Frontend::Parser::parse_file(filename)
+    program = Frontend::Parser.parse_file(filename)
     pp = Debugging::PrettyPrinter.new
     pp.print_program(program)
   end
@@ -76,32 +77,32 @@ module CLI
   # @param [T.nilable(String)] filename The name of the file to parse
   #   (or +nil+ which will be handled nicely).
   def self.cfg(filename)
-    if not filename
+    unless filename
       puts("usage: lilac cfg <filename>")
       return
     end
 
-    program = Frontend::Parser::parse_file(filename)
+    program = Frontend::Parser.parse_file(filename)
 
     func_ct = 0
-    program.each_func { |f|
+    program.each_func do |f|
       func_ct += 1
-    }
+    end
 
     if func_ct > 0
       puts("// WARNING: #{func_ct} functions were not included in the CFG")
     end
 
-    bb = Analysis::BB::from_stmt_list(program.stmt_list)
+    bb = Analysis::BB.from_stmt_list(program.stmt_list)
     cfg = Analysis::CFG.new(bb)
-    graphviz = Debugging::GraphVisualizer::generate_graphviz(cfg)
+    graphviz = Debugging::GraphVisualizer.generate_graphviz(cfg)
     puts(graphviz)
   end
 end
 
 # if Lilac is run directly then provide a simple CLI.
 if $PROGRAM_NAME == __FILE__
-  if ARGV.length == 0 # no args case
+  if ARGV.empty? # no args case
     CLI.main
   elsif ARGV[0] == "optimizations"
     CLI.print_optimizations

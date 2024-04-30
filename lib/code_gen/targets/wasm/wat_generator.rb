@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "wasm"
 require_relative "../../generator"
@@ -9,7 +10,10 @@ require_relative "instructions/instruction_set"
 require_relative "components"
 
 # A WatGenerator generates valid Wat from Wasm instructions.
-class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
+module CodeGen
+  module Targets
+  module Wasm
+  class WatGenerator < CodeGen::Generator
   extend T::Sig
 
   include CodeGen::Targets::Wasm
@@ -28,27 +32,27 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
 
   private
 
-  VISIT_ARRAY = T.let(-> (v, o, c) {
+  VISIT_ARRAY = T.let(lambda  { |v, o, c|
     str = ""
-    o.each { |element|
+    o.each do |element|
       str += "#{v.visit(element, ctx: c)}\n"
-    }
+    end
     str.chomp!
-    return str
+    str
   }, Visitor::Lambda)
 
-  VISIT_MODULE = T.let(-> (v, o, c) {
+  VISIT_MODULE = T.let(lambda  { |v, o, c|
     "(module\n#{v.visit(o.components, ctx: "  ")}\n)"
   }, Visitor::Lambda)
 
-  VISIT_IMPORT = T.let(-> (v, o, c) {
+  VISIT_IMPORT = T.let(lambda  { |v, o, c|
     import_str = "(import \"#{o.module_name}\" \"#{o.func_name}\")"
 
     # stringify param types
     params_str = " "
-    o.param_types.each { |t|
+    o.param_types.each do |t|
       params_str += "(param #{t})"
-    }
+    end
     params_str.chomp!(" ")
 
     # stringify return type
@@ -60,12 +64,12 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     "#{c}(func $#{o.func_name} #{import_str}#{params_str}#{result_str})"
   }, Visitor::Lambda)
 
-  VISIT_FUNC = T.let(-> (v, o, c) {
+  VISIT_FUNC = T.let(lambda  { |v, o, c|
     # stringify params
     params_str = " "
-    o.params.each { |p|
+    o.params.each do |p|
       params_str += "#{v.visit(p)} "
-    }
+    end
     params_str.chomp!(" ")
 
     # stringify return type
@@ -75,21 +79,21 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     end
 
     # stringify instructions
-    instructions_str = v.visit(o.instructions, ctx: c + "  ")
+    instructions_str = v.visit(o.instructions, ctx: "#{c}  ")
     instructions_str.chomp!
 
     "#{c}(func $#{o.name}#{params_str}#{result_str}\n#{instructions_str}\n#{c})"
   }, Visitor::Lambda)
 
-  VISIT_FUNCPARAM = T.let(-> (v, o, c) {
+  VISIT_FUNCPARAM = T.let(lambda  { |v, o, c|
     "(param $#{o.name} #{o.type})"
   }, Visitor::Lambda)
 
-  VISIT_START = T.let(-> (v, o, c) {
+  VISIT_START = T.let(lambda  { |v, o, c|
     "#{c}(start $#{o.name})"
   }, Visitor::Lambda)
 
-  VISIT_INSTRUCTION = T.let(-> (v, o, c) {
+  VISIT_INSTRUCTION = T.let(lambda  { |v, o, c|
     "#{c}#{o.wat}"
   }, Visitor::Lambda)
 
@@ -101,5 +105,8 @@ class CodeGen::Targets::Wasm::WatGenerator < CodeGen::Generator
     Components::FuncParam => VISIT_FUNCPARAM,
     Components::Start => VISIT_START,
     Instruction => VISIT_INSTRUCTION,
-  }, Visitor::LambdaHash)
+  }.freeze, Visitor::LambdaHash)
+  end
+  end
+  end
 end

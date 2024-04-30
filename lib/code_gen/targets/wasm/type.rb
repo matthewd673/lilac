@@ -1,17 +1,21 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "wasm"
 
 include CodeGen::Targets::Wasm
 
-CodeGen::Targets::Wasm::IntegerType = T.type_alias {
-                                              T.any(Type::I32, Type::I64) }
+CodeGen::Targets::Wasm::IntegerType = T.type_alias do
+                                              T.any(Type::I32, Type::I64) end
 
-CodeGen::Targets::Wasm::FloatType = T.type_alias {
-                                            T.any(Type::F32, Type::F64) }
+CodeGen::Targets::Wasm::FloatType = T.type_alias do
+                                            T.any(Type::F32, Type::F64) end
 
 
-class CodeGen::Targets::Wasm::Type < T::Enum
+module CodeGen
+  module Targets
+  module Wasm
+  class Type < T::Enum
   extend T::Sig
 
   enums do
@@ -24,5 +28,8 @@ class CodeGen::Targets::Wasm::Type < T::Enum
   sig { returns(String) }
   def to_s
     serialize
+  end
+  end
+  end
   end
 end

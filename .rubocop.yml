@@ -3,6 +3,23 @@ require:
   - rubocop-rake
   - rubocop-sorbet
 
+# TODO: enable these checks over time
+Style/Documentation:
+  Enabled: false
+Style/AndOr:
+  Enabled: false
+Style/RedundantParentheses:
+  Enabled: false
+Style/ParenthesesAroundCondition:
+  Enabled: false
+Layout:
+  Enabled: false
+Lint:
+  Enabled: false
+Metrics:
+  Enabled: false
+###
+
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
@@ -11,11 +28,48 @@ Style/TrailingCommaInArrayLiteral:
   Enabled: true
   EnforcedStyleForMultiline: comma
 
+Style/TrailingCommaInHashLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/WhileUntilModifier:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: true
+  EnforcedStyle: comparison
+
+Style/RegexpLiteral:
+  Enabled: true
+  EnforcedStyle: slashes
+  AllowInnerSlashes: true
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/CombinableLoops:
+  Enabled: false
+
+Style/MultipleComparison:
+  Enabled: true
+  ComparisonsThreshold: 3
+
+Style/CommentAnnotation:
+  Enabled: false
+
+Style/TrivialAccessors:
+  Enabled: false
+
 Style/Encoding:
   Enabled: false
 
 Layout/LineLength:
   Max: 80
 
-Metrics:
+# this breaks yard comments
+Sorbet/EmptyLineAfterSig:
   Enabled: false

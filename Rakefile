@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "minitest/test_task"
 
 task :default do

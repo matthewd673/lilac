@@ -1,11 +1,13 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "code_gen"
 require_relative "../il"
 
 # The Pattern module contains wildcard definitions that can be used for
 # matching patterns in Lilac IL.
-module CodeGen::Pattern
+module CodeGen
+  module Pattern
   extend T::Sig
 
   # A wildcard for any +IL::Statement+.
@@ -73,22 +75,19 @@ module CodeGen::Pattern
   # A wildcard for any +IL::Value+.
   class ValueWildcard < IL::Value
     sig { void }
-    def initialize
-    end
+    def initialize; end
   end
 
   # A wildcard for any +IL::ID+.
   class IDWildcard < IL::ID
     sig { void }
-    def initialize
-    end
+    def initialize; end
   end
 
   # A wildcard for an +IL::Constant+ of any type and with any value.
   class ConstantWildcard < IL::Constant
     sig { void }
-    def initialize
-    end
+    def initialize; end
   end
 
   # A wildcard for any +IL::Constant+ with an integer type.
@@ -127,5 +126,6 @@ module CodeGen::Pattern
   # A wildcard for the numeric value stored in an +IL::Constant+.
   class ConstantValueWildcard
     # NOTE: stub
+  end
   end
 end

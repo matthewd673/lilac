@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "validation"
 require_relative "validation_pass"
@@ -10,7 +11,8 @@ include Validation
 # reserved characters. It is very possible for ID names with reserved
 # characters to compile fine, but it is introduces unnecessary
 # ambiguity.
-class Validation::IDNaming < ValidationPass
+module Validation
+  class IDNaming < ValidationPass
   extend T::Sig
 
   sig { override.returns(String) }
@@ -26,26 +28,26 @@ class Validation::IDNaming < ValidationPass
   sig { params(program: IL::Program).void }
   def run(program)
     # scan all funcs
-    program.each_func { |f|
+    program.each_func do |f|
       # scan params
-      f.params.each { |p|
+      f.params.each do |p|
         # skip registers, which are named automatically
         if p.id.is_a?(IL::Register) then next end
 
-        if not valid?(p.id.name)
+        unless valid?(p.id.name)
           raise("Reserved character in ID name '#{p.id.name}'")
         end
-      }
+      end
 
       # check function name
       # (this won't check Calls but you must def a func to call it so...)
-      if not valid?(f.name)
+      unless valid?(f.name)
         raise("Reserved character in FuncDef name '#{f.name}'")
       end
 
       # scan contents of function
       scan_items(f.stmt_list)
-    }
+    end
 
     # scan program
     scan_items(program.stmt_list)
@@ -55,10 +57,10 @@ class Validation::IDNaming < ValidationPass
 
   sig { params(stmt_list: T::Array[IL::Statement]).void }
   def scan_items(stmt_list)
-    stmt_list.each { |s|
+    stmt_list.each do |s|
       # only defs are relevant
       # (every id must be defined, another validation will check that)
-      if not s.is_a?(IL::Definition)
+      unless s.is_a?(IL::Definition)
         next
       end
 
@@ -67,22 +69,22 @@ class Validation::IDNaming < ValidationPass
         next
       end
 
-      if not valid?(s.id.name)
+      unless valid?(s.id.name)
         raise("Reserved character in ID name '#{s.id.name}'")
       end
-    }
+    end
   end
 
   sig { params(name: String).returns(T::Boolean) }
   def valid?(name)
-    not (name.length == 0 or name.include?("%") or name.include?("#"))
+    !(name.empty? or name.include?("%") or name.include?("#"))
   end
 
-  sig { params(node: T.any(IL::FuncDef,
+  sig do params(node: T.any(IL::FuncDef,
                            IL::Statement,
                            IL::Expression,
                            IL::Value))
-          .returns(T::Array[IL::ID]) }
+          .returns(T::Array[IL::ID]) end
   def get_ids(node)
     case node
     when IL::Definition
@@ -99,6 +101,7 @@ class Validation::IDNaming < ValidationPass
       return [node]
     end
 
-    return []
+    []
+  end
   end
 end

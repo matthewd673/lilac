@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimizations"
@@ -6,7 +7,8 @@ require_relative "optimization_pass"
 require_relative "../runner"
 
 # An OptimizationRunner is a Runner for Optimization passes.
-class Optimization::OptimizationRunner < Runner
+module Optimization
+  class OptimizationRunner < Runner
   extend T::Sig
   extend T::Generic
 
@@ -28,37 +30,37 @@ class Optimization::OptimizationRunner < Runner
     when OptimizationPass::UnitType::StatementList
       pass.run(@program.stmt_list)
     when OptimizationPass::UnitType::BasicBlock
-      bb_list = Analysis::BB::from_stmt_list(@program.stmt_list)
+      bb_list = Analysis::BB.from_stmt_list(@program.stmt_list)
 
-      bb_list.each { |b|
+      bb_list.each do |b|
         pass.run(b)
-      }
+      end
 
-      stmt_list = Analysis::BB::to_stmt_list(bb_list)
+      stmt_list = Analysis::BB.to_stmt_list(bb_list)
       @program.stmt_list.clear
       @program.stmt_list.concat(stmt_list)
     else
       raise("Unsupported unit type for #{pass.id}")
     end
-    @program.each_func { |f|
+    @program.each_func do |f|
       # run on function body
       case pass.unit_type
       when OptimizationPass::UnitType::StatementList
         pass.run(f.stmt_list)
       when OptimizationPass::UnitType::BasicBlock
-        bb_list = Analysis::BB::from_stmt_list(f.stmt_list)
+        bb_list = Analysis::BB.from_stmt_list(f.stmt_list)
 
-        bb_list.each { |b|
+        bb_list.each do |b|
           pass.run(b)
-        }
+        end
 
-        stmt_list = Analysis::BB::to_stmt_list(bb_list)
+        stmt_list = Analysis::BB.to_stmt_list(bb_list)
         f.stmt_list.clear
         f.stmt_list.concat(stmt_list)
       else
         raise("Unsupported unit type for #{pass.id}")
       end
-    }
+    end
   end
 
   sig { params(level: Integer).returns(T::Array[OptimizationPass[T.untyped]]) }
@@ -67,5 +69,6 @@ class Optimization::OptimizationRunner < Runner
   # @return [T::Array[OptimizationPass]] A list of Optimizations.
   def level_passes(level)
     OPTIMIZATIONS.select { |o| o.level == level }
+  end
   end
 end

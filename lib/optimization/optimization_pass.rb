@@ -1,10 +1,12 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "../pass"
 require_relative "../il"
 
-class Optimization::OptimizationPass < Pass
+module Optimization
+  class OptimizationPass < Pass
   extend T::Sig
   extend T::Generic
   extend T::Helpers
@@ -38,5 +40,6 @@ class Optimization::OptimizationPass < Pass
   sig { returns(String) }
   def to_s
     "#{id} (#{level}): #{description}"
+  end
   end
 end

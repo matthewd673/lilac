@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require_relative "validation"
 require_relative "id_naming"
 require_relative "ssa"
@@ -9,4 +10,4 @@ Validation::VALIDATIONS = T.let([
   IDNaming.new,
   Validation::SSA.new,
   TypeCheck.new,
-], T::Array[ValidationPass])
+].freeze, T::Array[ValidationPass])

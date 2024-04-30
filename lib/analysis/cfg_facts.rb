@@ -1,10 +1,12 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "analysis"
 
 # A CFGFacts object stores the sets of facts (e.g.: GEN and KILL) that were
 # computed by an analysis about a CFG.
-class Analysis::CFGFacts
+module Analysis
+  class CFGFacts
   extend T::Sig
   extend T::Generic
 
@@ -20,7 +22,7 @@ class Analysis::CFGFacts
   #
   # @param [CFG] cfg The CFG that the analysis was run on.
   def initialize(cfg)
-    @facts = T.let(Hash.new, T::Hash[Symbol, T::Hash[BB, T::Set[Domain]]])
+    @facts = T.let({}, T::Hash[Symbol, T::Hash[BB, T::Set[Domain]]])
     @cfg = cfg
   end
 
@@ -48,34 +50,35 @@ class Analysis::CFGFacts
   #   empty set.
   def get_fact(symbol, block)
     fact_set = @facts[symbol]
-    if not fact_set
+    unless fact_set
       return Set[]
     end
 
     block_facts = fact_set[block]
-    if not block_facts
+    unless block_facts
       return Set[]
     end
 
-    return block_facts
+    block_facts
   end
 
   sig { returns(String) }
   def to_s
     str = ""
-    @cfg.each_node { |b|
+    @cfg.each_node do |b|
       str += "#{b.id} => {\n"
-      @facts.keys.each { |k|
+      @facts.each_key do |k|
         str += "  #{k} => {"
-        get_fact(k, b).each { |o|
-          str += o.to_s + ", "
-        }
+        get_fact(k, b).each do |o|
+          str += "#{o.to_s}, "
+        end
         str.chomp!(", ")
         str += "},\n"
-      }
+      end
       str += "},\n"
-    }
+    end
     str.chomp!("\n")
-    return str
+    str
+  end
   end
 end

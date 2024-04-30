@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "il"
 
@@ -100,11 +101,11 @@ class SymbolTable
   # @return [T.nilable(ILSymbol)] The topmost symbol with the given key. If
   #   no such symbol exists in the table it will return +nil+.
   def lookup(key)
-    @scopes.reverse_each { |s|
+    @scopes.reverse_each do |s|
       symbol = s.lookup(key)
       if symbol then return symbol end
-    }
-    return nil
+    end
+    nil
   end
 
   sig { returns(T.nilable(Scope)) }

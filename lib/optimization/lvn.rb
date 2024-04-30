@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
@@ -6,7 +7,8 @@ require_relative "../analysis/bb"
 
 include Optimization
 
-class Optimization::LVN < OptimizationPass
+module Optimization
+  class LVN < OptimizationPass
   extend T::Sig
   extend T::Generic
 
@@ -39,7 +41,7 @@ class Optimization::LVN < OptimizationPass
     value_number_map = ValueNumberMap.new
     id_number_map = IDNumberMap.new
 
-    block.stmt_list.each { |s|
+    block.stmt_list.each do |s|
       # perform constant folding on conditional jump conditions
       # this is a bonus on top of LVN's core task
       if s.is_a?(IL::JumpZero) or s.is_a?(IL::JumpNotZero)
@@ -52,7 +54,7 @@ class Optimization::LVN < OptimizationPass
       end
 
       # only definitions are relevant
-      if not s.is_a?(IL::Definition)
+      unless s.is_a?(IL::Definition)
         next
       end
 
@@ -70,7 +72,7 @@ class Optimization::LVN < OptimizationPass
       # get or insert the value (existing shows if it existed before or not)
       number = value_number_map.get_number_by_value(rhs_val.hash)
       existing = true
-      if not number
+      unless number
         number = value_number_map.insert_value(rhs_val)
         existing = false
       end
@@ -81,12 +83,12 @@ class Optimization::LVN < OptimizationPass
       # constants on the rhs are always better off staying as constants
       if rhs_val.value.is_a?(IL::Constant)
         s.rhs = rhs_val.value
-        s.annotation = "#{number} (is constant)" unless not existing
+        s.annotation = "#{number} (is constant)" if existing
         next
       end
 
       # brand new values will never have their rhs replaced
-      if not existing
+      unless existing
         next
       end
 
@@ -99,36 +101,36 @@ class Optimization::LVN < OptimizationPass
       end
 
       existing_hash = value_number_map.get_value_by_number(number)
-      if existing_hash
-        s.rhs = existing_hash.value
-        s.annotation = number.to_s # TODO: temp
-        next
-      end
-    }
+      next unless existing_hash
+      s.rhs = existing_hash.value
+      s.annotation = number.to_s # TODO: temp
+      next
+    end
   end
 
   private
 
-  sig { params(rhs: T.any(IL::Expression, IL::Value),
+  sig do params(rhs: T.any(IL::Expression, IL::Value),
                value_number_map: ValueNumberMap,
                id_number_map: IDNumberMap)
-        .returns(T.any(IL::Expression, IL::Value)) }
+        .returns(T.any(IL::Expression, IL::Value)) end
   def constant_folding(rhs, value_number_map, id_number_map)
-    if rhs.is_a?(IL::ID)
+    case rhs
+    when IL::ID
       # check if the id has a value number
       id_number = id_number_map.get_number_by_id(rhs)
 
       # if it has a value number, get it and check if its a constant
-      if not id_number then return rhs end
+      unless id_number then return rhs end
       id_value = value_number_map.get_value_by_number(id_number)
 
-      if not id_value then return rhs end # will never happen
+      unless id_value then return rhs end # will never happen
 
       # if its a constant, set rhs to that constant
       if id_value.value.is_a?(IL::Constant)
         return id_value.value
       end
-    elsif rhs.is_a?(IL::BinaryOp)
+    when IL::BinaryOp
       # recurse on left and right (in case they are ids mapped to constants)
       left = constant_folding(rhs.left, value_number_map, id_number_map)
       right = constant_folding(rhs.right, value_number_map, id_number_map)
@@ -141,7 +143,7 @@ class Optimization::LVN < OptimizationPass
         constant_result = IL::Constant.new(left.type, rhs.calculate)
         return constant_result
       end
-    elsif rhs.is_a?(IL::UnaryOp)
+    when IL::UnaryOp
       # recurse on value (in case they are ids mapped to constants)
       value = constant_folding(rhs.value, value_number_map, id_number_map)
 
@@ -153,7 +155,7 @@ class Optimization::LVN < OptimizationPass
       end
     end
 
-    return rhs
+    rhs
   end
 
   class ValueNumberMap
@@ -176,7 +178,7 @@ class Optimization::LVN < OptimizationPass
       # it will be easy to find
       @value_to_index[number.to_s] = number
 
-      return number
+      number
     end
 
     sig { params(number: Integer).returns(T.nilable(ValueHash)) }
@@ -204,9 +206,8 @@ class Optimization::LVN < OptimizationPass
       old_number = @id_to_number[id.key]
       if old_number
         old_id_list = @number_to_ids[old_number]
-        if old_id_list # will always be true, check for sorbet's sake
-          old_id_list.delete(id)
-        end
+        # will always be true, check for sorbet's sake
+old_id_list&.delete(id)
       end
 
       @id_to_number[id.key] = number
@@ -228,11 +229,11 @@ class Optimization::LVN < OptimizationPass
     def get_id_by_number(number)
       id_list = @number_to_ids[number]
 
-      if not id_list
+      unless id_list
         return nil
       end
 
-      return id_list[0]
+      id_list[0]
     end
   end
 
@@ -245,11 +246,11 @@ class Optimization::LVN < OptimizationPass
     sig { returns(String) }
     attr_reader :hash
 
-    sig { params(value: HashType,
+    sig do params(value: HashType,
                  value_number_map: ValueNumberMap,
                  id_number_map: IDNumberMap
                 ).void
-    }
+    end
     def initialize(value, value_number_map, id_number_map)
       @value = value
 
@@ -261,29 +262,28 @@ class Optimization::LVN < OptimizationPass
 
     private
 
-    HashType = T.type_alias { T.any(ValueNumber,
+    HashType = T.type_alias do T.any(ValueNumber,
                                     IL::Value,
-                                    IL::Expression) }
+                                    IL::Expression) end
 
     sig { params(value: HashType).returns(String) }
     def compute_hash(value)
-      if value.is_a?(ValueNumber)
-        "#{value.number}"
-      elsif value.is_a?(IL::Constant)
+      case value
+      when ValueNumber
+        value.number.to_s
+      when IL::Constant
         "#{value.type}:#{value.value}"
-      elsif value.is_a?(IL::ID)
+      when IL::ID
         # lookup value number for id
         # (if id is defined in another block it may not exist)
         number = @id_number_map.get_number_by_id(value)
-        if not number
-          number = -1 # TODO: is this the proper way to handle this case?
-        end
-        return "#{number}"
-      elsif value.is_a?(IL::BinaryOp)
+        number ||= -1
+        number.to_s
+      when IL::BinaryOp
         left_hash = compute_hash(value.left)
         right_hash = compute_hash(value.right)
         "(#{value.op} #{left_hash} #{right_hash})"
-      elsif value.is_a?(IL::UnaryOp)
+      when IL::UnaryOp
         "(#{value.op} #{compute_hash(value.value)})"
       else
         raise("Unsupported value type in hash function: #{value.class}")
@@ -306,5 +306,6 @@ class Optimization::LVN < OptimizationPass
     def to_s
       "##{@number}"
     end
+  end
   end
 end

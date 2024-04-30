@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
@@ -18,4 +19,4 @@ Optimization::OPTIMIZATIONS = T.let([
   RemoveUnusedLabels.new,
   RemoveUselessJumps.new,
   SimplifyRedundantBinops.new,
-], T::Array[Optimization::OptimizationPass[T.untyped]])
+].freeze, T::Array[Optimization::OptimizationPass[T.untyped]])

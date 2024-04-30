@@ -1,10 +1,14 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "../wasm"
 require_relative "instructions"
 require_relative "../../../../il"
 
-module CodeGen::Targets::Wasm::Instructions
+module CodeGen
+  module Targets
+  module Wasm
+  module Instructions
   extend T::Sig
   # NUMERIC INSTRUCTIONS
   # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Numeric
@@ -489,11 +493,11 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Local
+      if other.class != Local
         return false
       end
 
-      return (@type.eql?(other.type) and @variable.eql?(other.variable))
+      (@type.eql?(other.type) and @variable.eql?(other.variable))
     end
   end
 
@@ -648,11 +652,11 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Call
+      if other.class != Call
         return false
       end
 
-      return @func_name.eql?(other.func_name)
+      @func_name.eql?(other.func_name)
     end
   end
 
@@ -673,7 +677,7 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      return other.class == End
+      other.class == End
     end
   end
 
@@ -702,7 +706,7 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      return other.class == If
+      other.class == If
     end
   end
 
@@ -724,7 +728,7 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      return other.class == Else
+      other.class == Else
     end
   end
 
@@ -761,8 +765,11 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      return other.class == Return
+      other.class == Return
     end
+  end
+  end
+  end
   end
 end
 

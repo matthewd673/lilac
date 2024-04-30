@@ -1,9 +1,11 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "code_gen"
 require_relative "../il"
 
-class CodeGen::Translator
+module CodeGen
+  class Translator
   extend T::Sig
   extend T::Helpers
 
@@ -19,4 +21,5 @@ class CodeGen::Translator
 
   sig { abstract.returns(Component) }
   def translate; end
+  end
 end

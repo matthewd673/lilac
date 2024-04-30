@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "analysis"
 require_relative "bb"
@@ -8,7 +9,8 @@ require_relative "dfa"
 require_relative "cfg_facts"
 
 # Compute the dominance frontiers for a CFG.
-class Analysis::DomFrontiers
+module Analysis
+  class DomFrontiers
   extend T::Sig
 
   include Analysis
@@ -23,10 +25,10 @@ class Analysis::DomFrontiers
     @cfg = cfg
     @dom_tree = dom_tree
 
-    @df = T.let(Hash.new, T::Hash[BB, T::Set[BB]])
-    @cfg.each_node { |b|
+    @df = T.let({}, T::Hash[BB, T::Set[BB]])
+    @cfg.each_node do |b|
       @df[b] = Set[]
-    }
+    end
   end
 
   sig { returns(CFGFacts[BB]) }
@@ -38,13 +40,13 @@ class Analysis::DomFrontiers
   def run
     # DF algorithm
     # for each predecessor of each join node...
-    @cfg.each_node { |j|
+    @cfg.each_node do |j|
       # skip nodes that aren't join nodes
-      if not @cfg.predecessors_length(j) > 1
+      if @cfg.predecessors_length(j) <= 1
         next
       end
 
-      @cfg.each_predecessor(j) { |p|
+      @cfg.each_predecessor(j) do |p|
         # walk up the dom tree from p until we find a node that dominates j
         runner = T.let(p, T.nilable(BB))
 
@@ -53,12 +55,13 @@ class Analysis::DomFrontiers
           @df[runner] = T.unsafe(@df[runner]) | [j] # add j to runner's DF
           runner = @dom_tree.idom(runner) # continue moving up dom tree
         end
-      }
-    }
+      end
+    end
 
     # build output
     facts = CFGFacts.new(@cfg)
     facts.add_fact_hash(:df, @df)
-    return facts
+    facts
+  end
   end
 end

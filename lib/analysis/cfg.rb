@@ -1,11 +1,13 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "../graph"
 require_relative "analysis"
 require_relative "bb"
 
 # A CFG is a type of +Graph+ used to represent control flow graphs.
-class Analysis::CFG < Graph
+module Analysis
+  class CFG < Graph
   extend T::Sig
   extend T::Generic
 
@@ -38,7 +40,7 @@ class Analysis::CFG < Graph
   def initialize(block_list)
     super()
 
-    @label_map = T.let(Hash.new, T::Hash[String, BB])
+    @label_map = T.let({}, T::Hash[String, BB])
     @entry = T.let(BB.new(ENTRY, stmt_list: []), BB)
     @exit = T.let(BB.new(EXIT, stmt_list: []), BB)
 
@@ -57,9 +59,9 @@ class Analysis::CFG < Graph
   # @param [BB] node The basic block to add.
   def add_node(node)
     @nodes.push(node)
-    if node.entry and node.entry.is_a?(IL::Label)
+    return unless node.entry&.is_a?(IL::Label)
       @label_map[T.unsafe(node.entry).name] = node
-    end
+    
   end
 
   sig { returns(Integer) }
@@ -68,10 +70,10 @@ class Analysis::CFG < Graph
   # @return [Integer] The maximum block ID.
   def max_block_id
     max = -1 # also = to ENTRY so be careful
-    each_block { |b|
+    each_block do |b|
       if b.id > max then max = b.id end
-    }
-    return max
+    end
+    max
   end
 
   private
@@ -85,19 +87,19 @@ class Analysis::CFG < Graph
     @outgoing.clear
 
     # add all blocks to the graph nodes
-    block_list.each { |b|
+    block_list.each do |b|
       add_node(b)
-    }
+    end
 
     # connect blocks into graph nodes
-    block_list.each { |b|
+    block_list.each do |b|
       # create edge for block exit (some IL::Jump)
       if b.exit
         jump = T.unsafe(b.exit) # to placate Sorbet below
 
         # find block that jump is targeting
         successor = @label_map[jump.target]
-        if not successor # this is unlikely but I think possible
+        unless successor # this is unlikely but I think possible
           raise("CFG attempted to build edge to label that doesn't exist: \"#{jump.target}\"")
         end
 
@@ -108,7 +110,7 @@ class Analysis::CFG < Graph
         add_edge(Edge.new(b, successor))
 
         # if jump is NOT conditional then stop after creating this edge
-        if jump.class == IL::Jump
+        if jump.instance_of?(IL::Jump)
           next
         end
       end
@@ -122,18 +124,17 @@ class Analysis::CFG < Graph
         @exit.true_branch = false
         add_edge(Edge.new(b, @exit))
       end
-    }
+    end
 
     # create edge from entry to first block
     first_block = @nodes[0]
-    if not first_block
-      first_block = @exit
-    end
+    first_block ||= @exit
     first_block.true_branch = false
     add_edge(Edge.new(entry, first_block))
 
     # add entry and exit block nodes to graph
     @nodes.insert(0, @entry)
     @nodes.push(@exit)
+  end
   end
 end

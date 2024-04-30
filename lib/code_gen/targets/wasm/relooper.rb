@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "wasm"
 require_relative "wasm_block"
@@ -15,7 +16,10 @@ require_relative "../../../analysis/reducible"
 #     control flow to structured control flow (functional pearl). Proc.
 #     ACM Program. Lang. 6, ICFP, Article 90 (August 2022), 22 pages.
 #     https://doi.org/10.1145/3547621
-class CodeGen::Targets::Wasm::Relooper
+module CodeGen
+  module Targets
+  module Wasm
+  class Relooper
   extend T::Sig
 
   include CodeGen::Targets::Wasm
@@ -31,7 +35,7 @@ class CodeGen::Targets::Wasm::Relooper
 
     reducible = Analysis::Reducible.new(cfg).run
     # TODO: convert to reducible if it isn't already
-    if not reducible
+    unless reducible
       raise "CFG is not reducible"
     end
 
@@ -53,7 +57,7 @@ class CodeGen::Targets::Wasm::Relooper
     classify_nodes
 
     # translate everything starting at entry
-    return do_tree(@cfg.entry)
+    do_tree(@cfg.entry)
   end
 
   private
@@ -68,16 +72,16 @@ class CodeGen::Targets::Wasm::Relooper
 
   sig { void }
   def classify_nodes
-    @cfg.each_node { |b|
+    @cfg.each_node do |b|
       b_props = Set.new
 
       # "a node that has two or more forward inedges is a merge node" (join)
       forward_inedges = 0
-      @cfg.each_incoming(b) { |e|
+      @cfg.each_incoming(b) do |e|
         if forward_edge?(e)
           forward_inedges += 1
         end
-      }
+      end
 
       if forward_inedges >= 2 # is a join node
         b_props.add(BlockProperty::Join)
@@ -92,19 +96,19 @@ class CodeGen::Targets::Wasm::Relooper
       # "a node that has a back inedge is a loop header, and its translation
       #   is wrapped in a loop form"
       has_back_inedge = T.let(false, T::Boolean)
-      @cfg.each_incoming(b) { |e|
+      @cfg.each_incoming(b) do |e|
         if back_edge?(e)
           has_back_inedge = true
           break
         end
-      }
+      end
 
       if has_back_inedge
         b_props.add(BlockProperty::Loop)
       end
 
       @props[b] = b_props
-    }
+    end
   end
 
   sig { params(edge: Graph::Edge[Analysis::BB]).returns(T::Boolean) }
@@ -112,11 +116,11 @@ class CodeGen::Targets::Wasm::Relooper
     from = @cfg_rpo[edge.from]
     to = @cfg_rpo[edge.to]
 
-    if not from or not to
+    if !from or !to
       raise "Invalid edge from #{edge.from} to #{edge.to}"
     end
 
-    return from < to
+    from < to
   end
 
   sig { params(edge: Graph::Edge[Analysis::BB]).returns(T::Boolean) }
@@ -124,12 +128,12 @@ class CodeGen::Targets::Wasm::Relooper
     from = @cfg_rpo[edge.from]
     to = @cfg_rpo[edge.to]
 
-    if not from or not to
+    if !from or !to
       raise "Invalid edge from #{from} to #{to}"
     end
 
     # self-loops are back edges
-    return from >= to
+    from >= to
   end
 
   sig { params(node: Analysis::BB).returns(WasmBlock) }
@@ -141,18 +145,17 @@ class CodeGen::Targets::Wasm::Relooper
     children.sort_by { |c| T.unsafe(@cfg_rpo[c]) }
 
     # create a new wasm block for this node
-    wasm_block = T.let(nil, T.nilable(WasmBlock))
-    if T.unsafe(@props[node]).include?(BlockProperty::Loop)
-      wasm_block = WasmLoopBlock.new(node)
+    wasm_block = if T.unsafe(@props[node]).include?(BlockProperty::Loop)
+      WasmLoopBlock.new(node)
     elsif T.unsafe(@props[node]).include?(BlockProperty::If)
-      wasm_block = WasmIfBlock.new(node)
+      WasmIfBlock.new(node)
     else
-      wasm_block = WasmBlock.new(node)
+      WasmBlock.new(node)
     end
 
     last_block = wasm_block # used to chain children in next_block
 
-    children.each { |c|
+    children.each do |c|
       translation = do_tree(c)
 
       # place child in a conditional wasm block
@@ -179,16 +182,16 @@ class CodeGen::Targets::Wasm::Relooper
         # then place child in WasmLoopBlock.inner
         # otherwise, the child is the next_block of the loop
         is_inner = T.let(false, T::Boolean)
-        @dom_tree.dom_by(c) { |d|
-          @cfg.each_outgoing(d) { |o|
+        @dom_tree.dom_by(c) do |d|
+          @cfg.each_outgoing(d) do |o|
             if o.to == node and back_edge?(o)
               is_inner = true
               break
             end
-          }
+          end
 
           if is_inner then break end
-        }
+        end
 
         if is_inner
           wasm_block.inner = translation
@@ -201,19 +204,19 @@ class CodeGen::Targets::Wasm::Relooper
         last_block.next_block = translation
         last_block = translation
       end
-    }
+    end
 
-    return wasm_block
+    wasm_block
   end
 
   # TODO: move these within the debugger namespace
   sig { params(block: T.nilable(WasmBlock), depth: Integer).void }
   def print_wasm_block(block, depth)
     tab = ""
-    for _ in 0..depth
+    (0..depth).each do |_|
       tab += "  "
     end
-    if not block
+    unless block
       puts("#{tab}  next_block: nil")
       return
     end
@@ -246,5 +249,8 @@ class CodeGen::Targets::Wasm::Relooper
 
       print_wasm_block(block.next_block, depth)
     end
+  end
+  end
+  end
   end
 end

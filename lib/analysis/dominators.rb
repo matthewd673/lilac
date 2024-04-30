@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "analysis"
 require_relative "bb"
@@ -9,7 +10,8 @@ require_relative "cfg_facts"
 # The Dominators analysis is a DFA that computes the set of dominators for
 # each basic block in the CFG. The output of this can be used to compute
 # a dominator tree (and, therefore, perform dominance frontiers analysis).
-class Analysis::Dominators < Analysis::DFA
+module Analysis
+  class Dominators < Analysis::DFA
   extend T::Sig
   extend T::Generic
 
@@ -23,9 +25,9 @@ class Analysis::Dominators < Analysis::DFA
   def initialize(cfg)
     # gather all blocks
     @all_blocks = T.let(Set[], T::Set[Domain])
-    cfg.each_node { |b|
+    cfg.each_node do |b|
       @all_blocks.add(b)
-    }
+    end
 
     super(Direction::Forwards,
           Set[cfg.entry], # boundary
@@ -39,9 +41,9 @@ class Analysis::Dominators < Analysis::DFA
   # @return [CFGFacts[Domain]] A +CFGFacts+ containing information about
   #   each block's dominators (which are stored in +:out+).
   def run
-    @cfg.each_node { |b|
+    @cfg.each_node do |b|
       init_sets(b)
-    }
+    end
 
     super
   end
@@ -54,23 +56,23 @@ class Analysis::Dominators < Analysis::DFA
     i = @all_blocks
     preds = 0
 
-    @cfg.each_predecessor(block) { |p|
+    @cfg.each_predecessor(block) do |p|
       preds += 1
-      i = i & get_set(@out, p)
-    }
+      i &= get_set(@out, p)
+    end
 
     # no predecessors = empty set
     if preds == 0
       i = Set[]
     end
 
-    return i
+    i
   end
 
   sig { params(block: BB).returns(T::Set[Domain]) }
   def transfer(block)
     # union of IN[B] and GEN[B]
-    return get_set(@in, block) | get_set(@gen, block)
+    get_set(@in, block) | get_set(@gen, block)
   end
 
   private
@@ -80,5 +82,6 @@ class Analysis::Dominators < Analysis::DFA
     # initialize gen and kill sets
     @gen[block] = Set[block]
     @kill[block] = Set[]
+  end
   end
 end

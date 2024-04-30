@@ -1,10 +1,15 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "../../../../pass"
 require_relative "../instructions/instructions"
 
-class CodeGen::Targets::Wasm::Optimization::Tee < Pass
+module CodeGen
+  module Targets
+  module Wasm
+  module Optimization
+  class Tee < Pass
   extend T::Sig
 
   include CodeGen::Targets::Wasm
@@ -33,12 +38,12 @@ class CodeGen::Targets::Wasm::Optimization::Tee < Pass
       # errors so I'm leaving it in
       inst = T.let(@instructions[i], T.nilable(Instructions::WasmInstruction))
 
-      if not inst # should never happen
+      unless inst # should never happen
         break
       end
 
       # skip first instruction
-      if not last
+      unless last
         last = inst
         i += 1
         next
@@ -63,5 +68,9 @@ class CodeGen::Targets::Wasm::Optimization::Tee < Pass
 
       i += 1
     end
+  end
+  end
+  end
+  end
   end
 end

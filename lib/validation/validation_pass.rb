@@ -1,10 +1,12 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "validation"
 require_relative "../pass"
 require_relative "../il"
 
-class Validation::ValidationPass < Pass
+module Validation
+  class ValidationPass < Pass
   extend T::Sig
   extend T::Helpers
 
@@ -18,5 +20,6 @@ class Validation::ValidationPass < Pass
   sig { returns(String) }
   def to_s
     "#{id}: #{description}"
+  end
   end
 end

@@ -1,11 +1,13 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
 
 include Optimization
 
-class Optimization::CondenseLabels < OptimizationPass
+module Optimization
+  class CondenseLabels < OptimizationPass
   extend T::Sig
   extend T::Generic
 
@@ -40,7 +42,7 @@ class Optimization::CondenseLabels < OptimizationPass
 
     deletion = []
 
-    stmt_list.each_with_index { |s, i|
+    stmt_list.each_with_index do |s, i|
       # identify adjacent labels
       last = T.unsafe(stmt_list[i - 1]) # NOTE: workaround for sorbet 7006
       if s.is_a?(IL::Label) and last and last.is_a?(IL::Label)
@@ -56,11 +58,11 @@ class Optimization::CondenseLabels < OptimizationPass
           jump_map[s.target] = [s]
         end
       end
-    }
+    end
 
-    label_adj_map.keys.reverse_each { |c|
+    label_adj_map.keys.reverse_each do |c|
       # redirect all jumps pointing at the adj label to its predecessor
-      jump_map[c.name].each { |j|
+      jump_map[c.name].each do |j|
         j.target = label_adj_map[c].name
 
         # copy jumps in map to reflect their new target
@@ -72,12 +74,13 @@ class Optimization::CondenseLabels < OptimizationPass
         else
           jump_map[j.target] = [j]
         end
-      }
-    }
+      end
+    end
 
     # delete all marked stmts
-    deletion.each { |s|
+    deletion.each do |s|
       stmt_list.delete(s)
-    }
+    end
+  end
   end
 end

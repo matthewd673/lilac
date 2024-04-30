@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "wasm"
 require_relative "../../il_transformer"
@@ -8,7 +9,10 @@ require_relative "instructions/instructions"
 
 # A WasmILTransformer transforms a sequence of Lilac IL statements into Wasm
 # instructions.
-class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
+module CodeGen
+  module Targets
+  module Wasm
+  class WasmILTransformer < CodeGen::ILTransformer
   extend T::Sig
 
   include CodeGen
@@ -43,15 +47,15 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
   def get_il_type(rhs)
     case rhs
     when IL::BinaryOp
-      return get_il_type(rhs.left) # left and right should always match
+      get_il_type(rhs.left) # left and right should always match
     when IL::UnaryOp
-      return get_il_type(rhs.value)
+      get_il_type(rhs.value)
     when IL::ID
       symbol = @symbol_table.lookup(rhs.key)
-      if not symbol
+      unless symbol
         raise "Symbol #{rhs} not in symbol table"
       end
-      return symbol.type
+      symbol.type
     when IL::Constant then rhs.type
     else
       raise "Unable to determine type of #{rhs}"
@@ -65,7 +69,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
   #   perform type lookup on.
   # @return [Wasm::Type] The Wasm type of the expression or value.
   def get_type(rhs)
-    Instructions::to_wasm_type(get_il_type(rhs))
+    Instructions.to_wasm_type(get_il_type(rhs))
   end
 
   private
@@ -74,7 +78,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     # STATEMENT RULES
     # definition
     Pattern::DefinitionWildcard.new(Pattern::RhsWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         instructions = []
 
         # recurse on rhs then push local set
@@ -85,7 +89,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
       },
     # void call
     IL::VoidCall.new(Pattern::CallWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         t.transform(o.call) # easy, since this stmt just wraps the call expr
       },
     # EXPRESSION RULES
@@ -94,7 +98,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::ADD,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         instructions = []
 
         # translate left, right, and then push op
@@ -109,7 +113,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::SUB,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         instructions = []
 
         # translate left, right, and then push op
@@ -124,7 +128,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::MUL,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         instructions = []
 
         # translate left, right, and then push op
@@ -139,7 +143,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::DIV,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         left = t.transform(o.left)
         right = t.transform(o.right)
 
@@ -148,13 +152,13 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
         # choose between div_s, div_u, and div
         div = nil
         if il_type.signed?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           div = Instructions::DivideSigned.new(type)
         elsif il_type.unsigned?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           div = Instructions::DivideUnsigned.new(type)
         elsif il_type.float?
-          type = Instructions::to_float_type(il_type)
+          type = Instructions.to_float_type(il_type)
           div = Instructions::Divide.new(type)
         end
 
@@ -170,12 +174,12 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
                      Pattern::IntegerConstantWildcard.new(0),
                      Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         right = t.transform(o.right)
 
         # lookup type based on constant
         il_type = t.get_il_type(o.left)
-        type = Instructions::to_integer_type(il_type)
+        type = Instructions.to_integer_type(il_type)
 
         instructions = []
         instructions.concat(right)
@@ -186,12 +190,12 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
                      Pattern::ValueWildcard.new,
                      Pattern::IntegerConstantWildcard.new(0)) =>
-      -> (t, o) {
+      lambda  { |t, o|
         left = t.transform(o.left)
 
         # lookup type based on constant
         il_type = t.get_il_type(o.right)
-        type = Instructions::to_integer_type(il_type)
+        type = Instructions.to_integer_type(il_type)
 
         instructions = []
         instructions.concat(left)
@@ -203,7 +207,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::EQ,
               Pattern::ValueWildcard.new,
               Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         left = t.transform(o.left)
         right = t.transform(o.right)
 
@@ -215,7 +219,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::NEQ,
               Pattern::ValueWildcard.new,
               Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         left = t.transform(o.left)
         right = t.transform(o.right)
 
@@ -227,7 +231,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::GT,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         left = t.transform(o.left)
         right = t.transform(o.right)
 
@@ -236,13 +240,13 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
         # choose between gt_s, gt_u, and gt
         gt = nil
         if il_type.signed?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           gt = Instructions::GreaterThanSigned.new(type)
         elsif il_type.unsigned?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           gt = Instructions::GreaterThanUnsigned.new(type)
         elsif il_type.float?
-          type = Instructions::to_float_type(il_type)
+          type = Instructions.to_float_type(il_type)
           gt = Instructions::GreaterThan.new(type)
         end
 
@@ -252,7 +256,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::LT,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         left = t.transform(o.left)
         right = t.transform(o.right)
 
@@ -261,13 +265,13 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
         # choose between lt_s, lt_u, and lt
         lt = nil
         if il_type.signed?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           lt = Instructions::LessThanSigned.new(type)
         elsif il_type.unsigned?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           lt = Instructions::LessThanUnsigned.new(type)
         elsif il_type.float?
-          type = Instructions::to_float_type(il_type)
+          type = Instructions.to_float_type(il_type)
           lt = Instructions::LessThan.new(type)
         end
 
@@ -282,7 +286,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::GEQ,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         left = t.transform(o.left)
         right = t.transform(o.right)
 
@@ -291,13 +295,13 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
         # choose between ge_s, ge_u, and ge
         ge = nil
         if il_type.signed?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           ge = Instructions::GreaterOrEqualSigned.new(type)
         elsif il_type.unsigned?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           ge = Instructions::GreaterOrEqualUnsigned.new(type)
         elsif il_type.float?
-          type = Instructions::to_float_type(il_type)
+          type = Instructions.to_float_type(il_type)
           ge = Instructions::GreaterOrEqual.new(type)
         end
 
@@ -307,7 +311,7 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
     IL::BinaryOp.new(IL::BinaryOp::Operator::LEQ,
                      Pattern::ValueWildcard.new,
                      Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         left = t.transform(o.left)
         right = t.transform(o.right)
 
@@ -316,13 +320,13 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
         # choose between le_s, le_u, and le
         le = nil
         if il_type.signed?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           le = Instructions::LessOrEqualSigned.new(type)
         elsif il_type.unsigned?
-          type = Instructions::to_integer_type(il_type)
+          type = Instructions.to_integer_type(il_type)
           le = Instructions::LessOrEqualUnsigned.new(type)
         elsif il_type.float?
-          type = Instructions::to_float_type(il_type)
+          type = Instructions.to_float_type(il_type)
           le = Instructions::LessOrEqual.new(type)
         end
 
@@ -330,19 +334,19 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
       },
     # CALL RULES
     Pattern::CallWildcard.new =>
-      -> (t, o) {
+      lambda  { |t, o|
         instructions = []
 
         # push all arguments
-        o.args.each { |a|
+        o.args.each do |a|
           instructions.concat(t.transform(a))
-        }
+        end
 
         instructions.push(Instructions::Call.new(o.func_name))
         instructions
       },
     IL::Return.new(Pattern::ValueWildcard.new) =>
-      -> (t, o) {
+      lambda  { |t, o|
         value = t.transform(o.value)
 
         instructions = []
@@ -353,19 +357,22 @@ class CodeGen::Targets::Wasm::WasmILTransformer < CodeGen::ILTransformer
       },
     # VALUE RULES
     Pattern::IDWildcard.new =>
-      -> (t, o) {
+      lambda  { |t, o|
         [Instructions::LocalGet.new(o.name)]
       },
     Pattern::ConstantWildcard.new =>
-      -> (t, o) {
+      lambda  { |t, o|
         # produce nothing for void constants
         # these are only used by return statements
         if o.type == IL::Type::Void
           return []
         end
 
-        type = Instructions::to_wasm_type(o.type)
+        type = Instructions.to_wasm_type(o.type)
         [Instructions::Const.new(type, o.value)]
       },
-  }, T::Hash[IL::ILObject, Transform])
+  }.freeze, T::Hash[IL::ILObject, Transform])
+  end
+  end
+  end
 end

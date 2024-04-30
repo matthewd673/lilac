@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "code_gen"
 require_relative "instruction"
@@ -8,20 +9,21 @@ require_relative "../il"
 # An ILTransformer mechanically transforms Lilac IL code into some
 # machine-dependent code representation based on a set of pattern-matching
 # rules.
-class CodeGen::ILTransformer
+module CodeGen
+  class ILTransformer
   extend T::Sig
 
   include CodeGen
   include CodeGen::Pattern
 
-  Transform = T.type_alias {
+  Transform = T.type_alias do
     T.proc.params(arg0: CodeGen::ILTransformer, arg1: IL::ILObject)
       .returns(T::Array[CodeGen::Instruction])
-  }
+  end
 
   sig { void }
   def initialize
-    @rules = T.let(Hash.new, T::Hash[IL::ILObject, Transform])
+    @rules = T.let({}, T::Hash[IL::ILObject, Transform])
   end
 
   sig { params(block: T.proc.params(arg0: IL::ILObject).void).void }
@@ -33,20 +35,20 @@ class CodeGen::ILTransformer
   def transform(object)
     # find all rules that could apply to this object
     rule = find_rule_for_object(object)
-    if not rule
+    unless rule
       raise("No rules found for object #{object}")
     end
 
     # apply the rule to the object
-    return apply_transform(rule, object, self)
+    apply_transform(rule, object, self)
   end
 
   private
 
-  sig { params(transform: Transform,
+  sig do params(transform: Transform,
                object: IL::ILObject,
                transformer: CodeGen::ILTransformer)
-          .returns(T::Array[Instruction]) }
+          .returns(T::Array[Instruction]) end
   def apply_transform(transform, object, transformer)
     transform.call(transformer, object)
   end
@@ -54,12 +56,12 @@ class CodeGen::ILTransformer
   sig { params(object: IL::ILObject).returns(T.nilable(Transform)) }
   def find_rule_for_object(object)
     rule = T.let(nil, T.nilable(Transform))
-    each_rule { |r|
+    each_rule do |r|
       if matches?(r, object)
         rule = @rules[r]
         break
       end
-    }
+    end
     rule
   end
 
@@ -77,13 +79,13 @@ class CodeGen::ILTransformer
       return (object.is_a?(IL::Expression) or object.is_a?(IL::Value))
     # Expression wildcards
     when Pattern::BinaryOpWildcard
-      if not object.is_a?(IL::BinaryOp)
+      unless object.is_a?(IL::BinaryOp)
         false
       end
       object = T.cast(object, IL::BinaryOp)
       matches?(rule.left, object.left) and matches?(rule.right, object.right)
     when Pattern::UnaryOpWildcard
-      if not object.is_a?(IL::UnaryOp)
+      unless object.is_a?(IL::UnaryOp)
         false
       end
       object = T.cast(object, IL::UnaryOp)
@@ -154,13 +156,14 @@ class CodeGen::ILTransformer
     raise("Unsupported pattern match between \"#{rule}\" and \"#{object}\"")
   end
 
-  sig { params(rule: T.any(Pattern::ConstantValueWildcard, T.untyped),
+  sig do params(rule: T.any(Pattern::ConstantValueWildcard, T.untyped),
                value: T.untyped)
-          .returns(T::Boolean) }
+          .returns(T::Boolean) end
   def constant_value_matches?(rule, value)
     case rule
-      when Pattern::ConstantValueWildcard then return true
-      else return rule == value
+      when Pattern::ConstantValueWildcard then true
+      else rule == value
     end
+  end
   end
 end

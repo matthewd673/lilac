@@ -1,11 +1,13 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
 
 include Optimization
 
-class Optimization::ConstCondJumps < OptimizationPass
+module Optimization
+  class ConstCondJumps < OptimizationPass
   extend T::Sig
   extend T::Generic
 
@@ -37,24 +39,25 @@ class Optimization::ConstCondJumps < OptimizationPass
 
     replacement = []
 
-    stmt_list.each_with_index { |s, i|
+    stmt_list.each_with_index do |s, i|
       # precompute jz
       if s.is_a?(IL::JumpZero) and s.cond.is_a?(IL::Constant)
         cond = T.cast(s.cond, IL::Constant)
         if cond.value == 0
-          replacement.push({:index => i, :stmt => IL::Jump.new(s.target)})
+          replacement.push({index: i, stmt: IL::Jump.new(s.target)})
         end
       # precompute jnz
       elsif s.is_a?(IL::JumpNotZero) and s.cond.is_a?(IL::Constant)
         cond = T.cast(s.cond, IL::Constant)
         if cond.value != 0
-          replacement.push(:index => i, :stmt => IL::Jump.new(s.target))
+          replacement.push(index: i, stmt: IL::Jump.new(s.target))
         end
       end
-    }
+    end
 
-    replacement.each { |r|
+    replacement.each do |r|
       stmt_list[r[:index]] = r[:stmt]
-    }
+    end
+  end
   end
 end

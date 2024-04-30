@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "frontend"
 require_relative "scanner"
@@ -7,7 +8,8 @@ require_relative "../il"
 # A Parser can parse human-readable IL source code in +IL::Program+ objects.
 # It provides minimal error reporting as IL source code is not designed to
 # be handwritten (though it certainly can be).
-class Frontend::Parser
+module Frontend
+  class Parser
   # NOTE: Parser is adapted from Newt's Parser class
   extend T::Sig
 
@@ -25,7 +27,7 @@ class Frontend::Parser
     fp.close
 
     parser = Parser.new(source)
-    return parser.parse
+    parser.parse
   end
 
   sig { params(string: String).void }
@@ -44,32 +46,34 @@ class Frontend::Parser
   # @return [IL::Program] The program represented by the IL source code string.
   def parse
     @next_token = @scanner.scan_next
-    return parse_program
+    parse_program
   end
 
   private
 
   sig { params(types: TokenType).returns(T::Boolean) }
   def see?(*types)
-    types.each { |t|
+    types.each do |t|
       if @next_token.type == t
         return true
       end
-    }
+    end
 
-    return false
+    false
   end
 
   sig { params(types: TokenType).returns(Token) }
   def eat(*types)
     # try to eat any of the possible types
-    types.each { |t|
-      if @next_token.type == t
-        eaten = @next_token
-        @next_token = @scanner.scan_next
-        return eaten
+    types.each do |t|
+      unless @next_token.type == t
+        next
       end
-    }
+
+      eaten = @next_token
+      @next_token = @scanner.scan_next
+      return eaten
+    end
 
     raise("Syntax error at #{@next_token.position}: saw #{@next_token.type}, expected #{types}") # TODO: nice errors
   end
@@ -79,7 +83,7 @@ class Frontend::Parser
     program = IL::Program.new
 
     # parse top level items (which include statements and other components)
-    while not see?(TokenType::EOF)
+    until see?(TokenType::EOF)
       if see?(TokenType::NewLine, TokenType::Type, TokenType::Label,
               TokenType::Jump, TokenType::JumpZero, TokenType::JumpNotZero,
               TokenType::Return, TokenType::VoidConst)
@@ -95,7 +99,7 @@ class Frontend::Parser
 
     eat(TokenType::EOF)
 
-    return program
+    program
   end
 
   sig { returns(T::Array[IL::Statement]) }
@@ -103,11 +107,11 @@ class Frontend::Parser
     stmt_list = []
 
     # parse stmts until we reach the end
-    while not see?(TokenType::EOF, TokenType::End, TokenType::Func)
+    until see?(TokenType::EOF, TokenType::End, TokenType::Func)
       stmt_list.concat(parse_stmt)
     end
 
-    return stmt_list
+    stmt_list
   end
 
   sig { returns(T::Array[IL::Statement]) }
@@ -187,7 +191,7 @@ class Frontend::Parser
       val_l = parse_value
 
       # if see a binary op, parse that
-      if see?(TokenType::BinaryOp)
+      return val_l unless see?(TokenType::BinaryOp)
         binop_tok = eat(TokenType::BinaryOp)
         val_r = parse_value
 
@@ -195,9 +199,9 @@ class Frontend::Parser
 
         return binop
       # if don't see a binary op, this must just be a constant
-      else
-        return val_l
-      end
+      
+        
+      
     # unary op
     elsif see?(TokenType::UnaryOp)
       unop_tok = eat(TokenType::UnaryOp)
@@ -306,7 +310,7 @@ class Frontend::Parser
 
     eat(TokenType::End)
 
-    return IL::FuncDef.new(name, func_params, ret_type, stmt_list)
+    IL::FuncDef.new(name, func_params, ret_type, stmt_list)
   end
 
   sig { returns(IL::ExternFuncDef) }
@@ -329,7 +333,7 @@ class Frontend::Parser
     ret_type = type_from_string(ret_type_str)
     eat(TokenType::NewLine)
 
-    return IL::ExternFuncDef.new(source, name, func_param_types, ret_type)
+    IL::ExternFuncDef.new(source, name, func_param_types, ret_type)
   end
 
   sig { params(param_list: T::Array[IL::FuncParam]).void }
@@ -348,10 +352,10 @@ class Frontend::Parser
     param_list.push(IL::FuncParam.new(type, id))
 
     # if we see a comma then we have to recurse
-    if see?(TokenType::Comma)
+    return unless see?(TokenType::Comma)
       eat(TokenType::Comma)
       parse_func_params(param_list)
-    end
+    
   end
 
   sig { params(param_type_list: T::Array[IL::Type]).void }
@@ -367,10 +371,10 @@ class Frontend::Parser
     param_type_list.push(type)
 
     # if we see a comma then we have to recurse
-    if see?(TokenType::Comma)
+    return unless see?(TokenType::Comma)
       eat(TokenType::Comma)
       parse_extern_func_param_types(param_type_list)
-    end
+    
   end
 
   sig { params(arg_list: T::Array[IL::Value]).void }
@@ -384,10 +388,10 @@ class Frontend::Parser
     arg_list.push(value)
 
     # if we see a comma then we have to recurse
-    if see?(TokenType::Comma)
+    return unless see?(TokenType::Comma)
       eat(TokenType::Comma)
       parse_call_args(arg_list)
-    end
+    
   end
 
   sig { params(id_list: T::Array[IL::ID]).void }
@@ -399,17 +403,17 @@ class Frontend::Parser
       id = register_from_string(eat(TokenType::Register).image)
     end
 
-    if not id
+    unless id
       raise("Unexpected token when parsing ID list: #{@next_token}")
     end
 
     id_list.push(id)
 
     # parse rest of list
-    if see?(TokenType::Comma)
+    return unless see?(TokenType::Comma)
       eat(TokenType::Comma)
       parse_id_list(id_list)
-    end
+    
   end
 
   sig { params(string: String).returns(IL::Type) }
@@ -430,7 +434,7 @@ class Frontend::Parser
   sig { params(string: String).returns(IL::ID) }
   def id_from_string(string)
     split = string.split("#")
-    if (not split[0]) or (not split[1]) or split.length > 2
+    if (!(split[0])) or (!(split[1])) or split.length > 2
       raise("Invalid ID string \"#{string}\"")
     end
 
@@ -440,20 +444,20 @@ class Frontend::Parser
     id = IL::ID.new(name)
     id.number = number
 
-    return id
+    id
   end
 
   sig { params(string: String).returns(IL::Register) }
   def register_from_string(string)
     number = T.unsafe(string[1..]).to_i
-    return IL::Register.new(number)
+    IL::Register.new(number)
   end
 
   sig { params(string: String).returns(IL::Constant) }
   def constant_from_string(string)
     # find type in constant string
     type_str = string.match(/[uif][0-9]{1,2}/)
-    if not type_str
+    unless type_str
       raise("No type tag in constant: \"#{string}\"")
     end
     type = type_from_string(T.unsafe(type_str[0]))
@@ -463,11 +467,11 @@ class Frontend::Parser
       numeric = string.to_f
     end
 
-    return IL::Constant.new(type, numeric)
+    IL::Constant.new(type, numeric)
   end
 
-  sig { params(token: Token, left: IL::Value, right: IL::Value)
-          .returns(IL::BinaryOp) }
+  sig do params(token: Token, left: IL::Value, right: IL::Value)
+          .returns(IL::BinaryOp) end
   def binop_from_token(token, left, right)
     op = case token.image
     when "+" then IL::BinaryOp::Operator::ADD
@@ -486,7 +490,7 @@ class Frontend::Parser
       raise("Invalid BinaryOp token image #{token.image}")
     end
 
-    return IL::BinaryOp.new(op, left, right)
+    IL::BinaryOp.new(op, left, right)
   end
 
   sig { params(token: Token, value: IL::Value).returns(IL::UnaryOp) }
@@ -497,6 +501,7 @@ class Frontend::Parser
       raise("Invalid UnaryOp token image #{token.image}")
     end
 
-    return IL::UnaryOp.new(op, value)
+    IL::UnaryOp.new(op, value)
+  end
   end
 end

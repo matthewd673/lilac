@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "debugging"
 require_relative "../graph"
@@ -6,7 +7,8 @@ require_relative "../analysis/bb"
 
 # The GraphVisualizer module provides functions to visualize Graph objects.
 # It also includes special features to enhance CFG visualizations.
-module Debugging::GraphVisualizer
+module Debugging
+  module GraphVisualizer
   extend T::Sig
 
   sig { params(graph: Graph[T.untyped]).returns(String) }
@@ -19,7 +21,7 @@ module Debugging::GraphVisualizer
     str += "digraph {\n"
 
     # define blocks
-    graph.each_node { |n|
+    graph.each_node do |n|
       name = n.to_s
       label = name
       shape = "box"
@@ -38,24 +40,23 @@ module Debugging::GraphVisualizer
       end
 
       str += "#{name} [label=#{label} shape=#{shape}]\n"
-    }
+    end
 
     # define edges
-    graph.each_edge { |e|
+    graph.each_edge do |e|
       from_name = e.from.id
       to_name = e.to.id
 
       color = "black"
       # special case for CFGs: highlight true conditional branch edges
-      if e.to.is_a?(Analysis::BB)
-        if e.to.true_branch
-          color = "blue"
-        end
+      if e.to.is_a?(Analysis::BB) && e.to.true_branch
+        color = "blue"
       end
 
       str += "#{from_name} -> #{to_name} [constraint=false color=#{color}]\n"
-    }
+    end
 
     str += "}"
+  end
   end
 end

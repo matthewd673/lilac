@@ -1,11 +1,13 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "analysis"
 require_relative "cfg"
 require_relative "cfg_facts"
 
 # A DFA is a generic framework for a data-flow analysis.
-class Analysis::DFA
+module Analysis
+  class DFA
   extend T::Sig
   extend T::Generic
 
@@ -21,10 +23,10 @@ class Analysis::DFA
     end
   end
 
-  sig { params(direction: Direction,
+  sig do params(direction: Direction,
                boundary: T::Set[Domain],
                init: T::Set[Domain],
-               cfg: CFG).void }
+               cfg: CFG).void end
   # Construct a new DFA. Should only be called by subclasses of DFA which
   # represent a specific analysis. These subclasses should then expose a much
   # simpler constructor.
@@ -42,10 +44,10 @@ class Analysis::DFA
     @init = init
     @cfg = cfg
 
-    @out = T.let(Hash.new, T::Hash[BB, T::Set[Domain]])
-    @in = T.let(Hash.new, T::Hash[BB, T::Set[Domain]])
-    @gen = T.let(Hash.new, T::Hash[BB, T::Set[Domain]])
-    @kill = T.let(Hash.new, T::Hash[BB, T::Set[Domain]])
+    @out = T.let({}, T::Hash[BB, T::Set[Domain]])
+    @in = T.let({}, T::Hash[BB, T::Set[Domain]])
+    @gen = T.let({}, T::Hash[BB, T::Set[Domain]])
+    @kill = T.let({}, T::Hash[BB, T::Set[Domain]])
   end
 
   sig { returns(CFGFacts[Domain]) }
@@ -66,7 +68,7 @@ class Analysis::DFA
     facts.add_fact_hash(:gen, @gen)
     facts.add_fact_hash(:kill, @kill)
 
-    return facts
+    facts
   end
 
   protected
@@ -90,16 +92,14 @@ class Analysis::DFA
     raise("Meet function is unimplemented")
   end
 
-  sig { params(hash: T::Hash[BB, T::Set[Domain]], block: BB)
-          .returns(T::Set[Domain]) }
+  sig do params(hash: T::Hash[BB, T::Set[Domain]], block: BB)
+          .returns(T::Set[Domain]) end
   def get_set(hash, block)
     set_b = hash[block]
 
-    if not set_b
-      set_b = Set[]
-    end
+    set_b ||= Set[]
 
-    return set_b
+    set_b
   end
 
   private
@@ -108,17 +108,17 @@ class Analysis::DFA
   def run_forwards
     # initialize all nodes
     @out[@cfg.entry] = @boundary
-    @cfg.each_block { |b|
+    @cfg.each_block do |b|
       if b == @cfg.entry then next end
 
       @out[b] = @init
-    }
+    end
 
     # iterate
     changed = T.let(true, T::Boolean)
     while changed
       changed = false
-      @cfg.each_block { |b|
+      @cfg.each_block do |b|
         if b == @cfg.entry then next end
 
         old_out = T.unsafe(@out[b])
@@ -129,7 +129,7 @@ class Analysis::DFA
         if old_out.length != new_out.length
           changed = true
         end
-      }
+      end
     end
   end
 
@@ -143,17 +143,17 @@ class Analysis::DFA
   def run_backwards
     # initialize all nodes
     @in[@cfg.exit] = @boundary
-    @cfg.each_block { |b|
+    @cfg.each_block do |b|
       if b == @cfg.exit then next end
 
       @in[b] = @init
-    }
+    end
 
     # iterate
     changed = T.let(true, T::Boolean)
     while changed
       changed = false
-      @cfg.each_block { |b|
+      @cfg.each_block do |b|
         if b == @cfg.exit then next end
 
         old_in = T.unsafe(@in[b])
@@ -164,7 +164,7 @@ class Analysis::DFA
         if old_in.length != new_in.length
           changed = true
         end
-      }
+      end
     end
   end
 
@@ -172,5 +172,6 @@ class Analysis::DFA
   def step_backwards(block)
     @out[block] = meet(block)
     @in[block] = transfer(block)
+  end
   end
 end

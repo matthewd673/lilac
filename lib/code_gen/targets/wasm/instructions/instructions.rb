@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "../wasm"
 require_relative "../../../instruction"
@@ -6,7 +7,10 @@ require_relative "../../../instruction"
 # The Wasm::Instructions module contains definitions for classes of
 # instructions in Wasm as well as the actual instructions defined in the
 # Wasm spec.
-module CodeGen::Targets::Wasm::Instructions
+module CodeGen
+  module Targets
+  module Wasm
+  module Instructions
   extend T::Sig
 
   include CodeGen
@@ -101,13 +105,13 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == self.class
+      if other.class != self.class
         return false
       end
 
       other = T.cast(other, TypedInstruction)
 
-      return @type.eql?(other.type)
+      @type.eql?(other.type)
     end
   end
 
@@ -130,13 +134,13 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == self.class
+      if other.class != self.class
         return false
       end
 
       other = T.cast(other, IntegerInstruction)
 
-      return @type.eql?(other.type)
+      @type.eql?(other.type)
     end
   end
 
@@ -160,13 +164,13 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == self.class
+      if other.class != self.class
         return false
       end
 
       other = T.cast(other, FloatInstruction)
 
-      return @type.eql?(other.type)
+      @type.eql?(other.type)
     end
   end
 
@@ -188,13 +192,13 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == self.class
+      if other.class != self.class
         return false
       end
 
       other = T.cast(other, VariableInstruction)
 
-      return @variable.eql?(other.variable)
+      @variable.eql?(other.variable)
     end
   end
 
@@ -215,13 +219,16 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == self.class
+      if other.class != self.class
         return false
       end
 
       other = T.cast(other, LabelInstruction)
 
-      return @label.eql?(other.label)
+      @label.eql?(other.label)
     end
+  end
+  end
+  end
   end
 end

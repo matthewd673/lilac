@@ -1,11 +1,13 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
 
 include Optimization
 
-class Optimization::RemoveUselessJumps < OptimizationPass
+module Optimization
+  class RemoveUselessJumps < OptimizationPass
   extend T::Sig
   extend T::Generic
 
@@ -37,17 +39,18 @@ class Optimization::RemoveUselessJumps < OptimizationPass
 
     deletion = []
 
-    stmt_list.each { |s|
+    stmt_list.each do |s|
       # identify labels directly below a jump that points to them
       last = T.unsafe(stmt_list[-1]) # NOTE: workaround for sorbet 7006
       if s.is_a?(IL::Label) and last and last.is_a?(IL::Jump) and
-         last.target.eql?(s.name) and not last.class.method_defined?(:cond)
+         last.target.eql?(s.name) and !last.class.method_defined?(:cond)
         deletion.push(last)
       end
-    }
+    end
 
-    deletion.each { |d|
+    deletion.each do |d|
       stmt_list.delete(d)
-    }
+    end
+  end
   end
 end

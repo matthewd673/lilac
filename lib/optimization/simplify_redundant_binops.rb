@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
@@ -6,7 +7,8 @@ require_relative "../il"
 
 include Optimization
 
-class Optimization::SimplifyRedundantBinops < OptimizationPass
+module Optimization
+  class SimplifyRedundantBinops < OptimizationPass
   extend T::Sig
   extend T::Generic
 
@@ -37,20 +39,20 @@ class Optimization::SimplifyRedundantBinops < OptimizationPass
     stmt_list = unit # alias
 
     # find all binops (which can only occur in Definitions)
-    stmt_list.each { |s|
-      if (not s.is_a?(IL::Definition)) or (not s.rhs.is_a?(IL::BinaryOp))
+    stmt_list.each do |s|
+      if (!s.is_a?(IL::Definition)) or (!s.rhs.is_a?(IL::BinaryOp))
           next
       end
 
       new = simplify_binop(T.cast(s.rhs, IL::BinaryOp))
       # if simplify_binop returned nil, there is no way to simplify so skip
-      if not new
+      unless new
         next
       end
 
       # else, replace the binop with the new value
       s.rhs = new
-    }
+    end
   end
 
   private
@@ -105,7 +107,7 @@ class Optimization::SimplifyRedundantBinops < OptimizationPass
       end
     end
 
-    return nil
+    nil
   end
 
     sig { params(value: IL::Value, const: T.untyped, neg: T::Boolean).returns(T::Boolean) }
@@ -117,8 +119,9 @@ class Optimization::SimplifyRedundantBinops < OptimizationPass
       if neg
         return !ans
       end
-      return ans
+      ans
     else false
     end
+  end
   end
 end

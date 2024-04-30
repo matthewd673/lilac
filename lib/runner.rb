@@ -1,4 +1,5 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "pass"
 
@@ -31,7 +32,7 @@ class Runner
   # Run a list of passes on the Program.
   # @param [T::Array[Pass]] pass_list The list of Passes to run.
   def run_passes(pass_list)
-    for p in pass_list
+    pass_list.each do |p|
       run_pass(p)
     end
   end

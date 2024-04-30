@@ -1,11 +1,13 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "analysis"
 require_relative "cfg"
 require_relative "../il"
 
 # A BB is a data structure representing a basic block.
-class Analysis::BB
+module Analysis
+  class BB
   extend T::Sig
 
   sig { returns(Integer) }
@@ -29,11 +31,11 @@ class Analysis::BB
   # conditional jump.
   attr_accessor :true_branch
 
-  sig { params(id: Integer,
+  sig do params(id: Integer,
                entry: T.nilable(IL::Label),
                exit: T.nilable(IL::Jump),
                stmt_list: T::Array[IL::Statement],
-               true_branch: T::Boolean).void }
+               true_branch: T::Boolean).void end
   def initialize(id, entry: nil, exit: nil, stmt_list: [], true_branch: false)
     @id = id
     @entry = entry
@@ -82,53 +84,53 @@ class Analysis::BB
       str += ")"
     end
 
-    return str
+    str
   end
 
   sig { params(other: Analysis::BB).returns(T::Boolean) }
   # Returns true if two BBs are equal. BBs are considered equal if they have
   # the same ID.
   def eql?(other)
-    return (id == other.id)
+    (id == other.id)
   end
 
-  sig { params(stmt_list: T::Array[IL::Statement])
-          .returns(T::Array[Analysis::BB]) }
+  sig do params(stmt_list: T::Array[IL::Statement])
+          .returns(T::Array[Analysis::BB]) end
   # Create a list of basic blocks for the given statement list.
   # @param [T::Array[IL::Statement]] stmt_list The statement list to
   #   create blocks from.
   # @return [T::Array[Analysis::BB]] A list of basic blocks in
   #   the statement list.
   def self.from_stmt_list(stmt_list)
-    return create_blocks(stmt_list)
+    create_blocks(stmt_list)
   end
 
-  sig { params(bb_list: T::Array[Analysis::BB])
-          .returns(T::Array[IL::Statement]) }
+  sig do params(bb_list: T::Array[Analysis::BB])
+          .returns(T::Array[IL::Statement]) end
   def self.to_stmt_list(bb_list)
     stmt_list = []
-    bb_list.each { |b|
-      b.stmt_list.each { |s|
+    bb_list.each do |b|
+      b.stmt_list.each do |s|
         stmt_list.push(s)
-      }
-    }
-    return stmt_list
+      end
+    end
+    stmt_list
   end
 
   private
 
-  sig { params(stmt_list: T::Array[IL::Statement])
-          .returns(T::Array[Analysis::BB]) }
+  sig do params(stmt_list: T::Array[IL::Statement])
+          .returns(T::Array[Analysis::BB]) end
   def self.create_blocks(stmt_list)
     blocks = []
     block_stmts = []
     current_entry = T.let(nil, T.nilable(IL::Label))
 
-    stmt_list.each { |s|
+    stmt_list.each do |s|
       # mark beginning of a block
       if s.is_a?(IL::Label)
         # push previous block onto list (exit is nil)
-        if not (block_stmts.empty? and !current_entry)
+        unless (block_stmts.empty? and !current_entry)
           blocks.push(Analysis::BB.new(blocks.length,
                                        entry: current_entry,
                                        stmt_list: block_stmts))
@@ -139,28 +141,28 @@ class Analysis::BB
 
       # don't push labels or jumps
       # they belong in @entry or @exit
-      if not (s.is_a?(IL::Label) or s.is_a?(IL::Jump))
+      unless (s.is_a?(IL::Label) or s.is_a?(IL::Jump))
         block_stmts.push(s)
       end
 
       # mark end of a block
-      if s.is_a?(IL::Jump)
-        blocks.push(Analysis::BB.new(blocks.length,
-                                     entry: current_entry,
-                                     exit: s,
-                                     stmt_list: block_stmts))
-        block_stmts = []
-        current_entry = nil
-      end
-    }
+      next unless s.is_a?(IL::Jump)
+      blocks.push(Analysis::BB.new(blocks.length,
+                                   entry: current_entry,
+                                   exit: s,
+                                   stmt_list: block_stmts))
+      block_stmts = []
+      current_entry = nil
+    end
 
     # scoop up stragglers
-    if not block_stmts.empty?
+    unless block_stmts.empty?
       blocks.push(Analysis::BB.new(blocks.length,
                                    entry: current_entry,
                                    stmt_list: block_stmts))
     end
 
-    return blocks
+    blocks
+  end
   end
 end

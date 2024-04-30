@@ -1,9 +1,13 @@
 # typed: strict
+# frozen_string_literal: true
 require "sorbet-runtime"
 require_relative "../../component"
 
 # The Wasm::Components module contains Wasm component definitions.
-module CodeGen::Targets::Wasm::Components
+module CodeGen
+  module Targets
+  module Wasm
+  module Components
   # A generic Wasm component.
   class WasmComponent < CodeGen::Component
     # NOTE: stub
@@ -50,10 +54,10 @@ module CodeGen::Targets::Wasm::Components
     sig { returns(T::Array[WasmInstruction]) }
     attr_reader :instructions
 
-    sig { params(name: String,
+    sig do params(name: String,
                  params: T::Array[FuncParam],
                  result: T.nilable(Type),
-                 instructions: T::Array[WasmInstruction]).void }
+                 instructions: T::Array[WasmInstruction]).void end
     def initialize(name, params, result, instructions)
       @name = name
       @params = params
@@ -95,15 +99,18 @@ module CodeGen::Targets::Wasm::Components
     sig { returns(T.nilable(Type)) }
     attr_reader :result
 
-    sig { params(module_name: String,
+    sig do params(module_name: String,
                  func_name: String,
                  param_types: T::Array[Type],
-                 result: T.nilable(Type)).void }
+                 result: T.nilable(Type)).void end
     def initialize(module_name, func_name, param_types, result)
       @module_name = module_name
       @func_name = func_name
       @param_types = param_types
       @result = result
     end
+  end
+  end
+  end
   end
 end
