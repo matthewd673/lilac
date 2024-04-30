@@ -77,6 +77,9 @@ module CodeGen::Targets::Wasm::Instructions
 
     sig { abstract.returns(String) }
     def wat; end
+
+    sig { abstract.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other); end
   end
 
   # A Wasm instruction with a type (e.g.: +add+).
@@ -95,6 +98,17 @@ module CodeGen::Targets::Wasm::Instructions
     def initialize(type)
       @type = type
     end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == self.class
+        return false
+      end
+
+      other = T.cast(other, TypedInstruction)
+
+      return @type.eql?(other.type)
+    end
   end
 
   # A Wasm instruction that requires an integer type argument (e.g.: +div_s+).
@@ -112,6 +126,17 @@ module CodeGen::Targets::Wasm::Instructions
     sig { params(type: T.any(Type::I32, Type::I64)).void }
     def initialize(type)
       @type = type
+    end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == self.class
+        return false
+      end
+
+      other = T.cast(other, IntegerInstruction)
+
+      return @type.eql?(other.type)
     end
   end
 
@@ -132,6 +157,17 @@ module CodeGen::Targets::Wasm::Instructions
     def initialize(type)
       @type = type
     end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == self.class
+        return false
+      end
+
+      other = T.cast(other, FloatInstruction)
+
+      return @type.eql?(other.type)
+    end
   end
 
   # A Wasm instruction that requires a variable name argument
@@ -149,6 +185,17 @@ module CodeGen::Targets::Wasm::Instructions
     def initialize(variable)
       @variable = variable
     end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == self.class
+        return false
+      end
+
+      other = T.cast(other, VariableInstruction)
+
+      return @variable.eql?(other.variable)
+    end
   end
 
   # A Wasm instruction that requires a label name (e.g.: +loop+).
@@ -164,6 +211,17 @@ module CodeGen::Targets::Wasm::Instructions
     sig { params(label: String).void }
     def initialize(label)
       @label = label
+    end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == self.class
+        return false
+      end
+
+      other = T.cast(other, LabelInstruction)
+
+      return @label.eql?(other.label)
     end
   end
 end
