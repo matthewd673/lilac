@@ -22,8 +22,8 @@ module CodeGen
         sig { params(symbol_table: SymbolTable).void }
         # Construct a new WasmILTransformer.
         #
-        # @param [SymbolTable] symbol_table The symbol table for the statement list
-        #   being transformed. Used for variable type lookups, etc.
+        # @param [SymbolTable] symbol_table The symbol table for the statement
+        #   list being transformed. Used for variable type lookups, etc.
         def initialize(symbol_table)
           super()
           @symbol_table = symbol_table
@@ -33,7 +33,8 @@ module CodeGen
         sig do
           params(object: IL::ILObject).returns(T::Array[CodeGen::Instruction])
         end
-        # For internal use. Translate an ILObject into a sequence of Instructions.
+        # For internal use. Translate an ILObject into a sequence of
+        # Instructions.
         #
         # @param [IL::ILObject] object The ILObject to transform.
         # @return [T::Array[CodeGen::Instruction]] A sequence of instructions.
@@ -44,8 +45,8 @@ module CodeGen
         sig { params(rhs: T.any(IL::Expression, IL::Value)).returns(IL::Type) }
         # For internal use. Get the IL::Type of an expression or value.
         #
-        # @param [T.any(IL::Expression, IL::Value)] rhs The expression or value to
-        #   perform type lookup on.
+        # @param [T.any(IL::Expression, IL::Value)] rhs The expression or value
+        #   to perform type lookup on.
         # @return [IL::Type] The type of the expression or value.
         def get_il_type(rhs)
           case rhs
@@ -69,8 +70,8 @@ module CodeGen
         sig { params(rhs: T.any(IL::Expression, IL::Value)).returns(Type) }
         # For internal use. Get the Wasm::Type of an expression or value.
         #
-        # @param [T.any(IL::Expression, IL::Value)] rhs The expression or value to
-        #   perform type lookup on.
+        # @param [T.any(IL::Expression, IL::Value)] rhs The expression or value
+        #   to perform type lookup on.
         # @return [Wasm::Type] The Wasm type of the expression or value.
         def get_type(rhs)
           Instructions.to_wasm_type(get_il_type(rhs))
@@ -94,7 +95,8 @@ module CodeGen
           # void call
           IL::VoidCall.new(Pattern::CallWildcard.new) =>
             lambda { |t, o|
-              t.transform(o.call) # easy, since this stmt just wraps the call expr
+              # easy, since this statement just wraps the call expr
+              t.transform(o.call)
             },
           # EXPRESSION RULES
           # binary ops
@@ -217,7 +219,12 @@ module CodeGen
 
               type = t.get_type(o.left)
 
-              [left, right, Instructions::Equal.new(type)]
+              instructions = []
+              instructions.concat(left)
+              instructions.concat(right)
+              instructions.push(Instructions::Equal.new(type))
+
+              instructions
             },
           # not equal
           IL::BinaryOp.new(IL::BinaryOp::Operator::NEQ,
@@ -229,7 +236,12 @@ module CodeGen
 
               type = t.get_type(o.left)
 
-              [left, right, Instructions::NotEqual.new(type)]
+              instructions = []
+              instructions.concat(left)
+              instructions.concat(right)
+              instructions.push(Instructions::NotEqual.new(type))
+
+              instructions
             },
           # greater than
           IL::BinaryOp.new(IL::BinaryOp::Operator::GT,
@@ -254,7 +266,12 @@ module CodeGen
                 gt = Instructions::GreaterThan.new(type)
               end
 
-              [left, right, gt]
+              instructions = []
+              instructions.concat(left)
+              instructions.concat(right)
+              instructions.push(gt)
+
+              instructions
             },
           # less than
           IL::BinaryOp.new(IL::BinaryOp::Operator::LT,
@@ -309,7 +326,12 @@ module CodeGen
                 ge = Instructions::GreaterOrEqual.new(type)
               end
 
-              [left, right, ge]
+              instructions = []
+              instructions.concat(left)
+              instructions.concat(right)
+              instructions.push(ge)
+
+              instructions
             },
           # less than equal
           IL::BinaryOp.new(IL::BinaryOp::Operator::LEQ,
@@ -334,7 +356,12 @@ module CodeGen
                 le = Instructions::LessOrEqual.new(type)
               end
 
-              [left, right, le]
+              instructions = []
+              instructions.concat(left)
+              instructions.concat(right)
+              instructions.push(le)
+
+              instructions
             },
           # CALL RULES
           Pattern::CallWildcard.new =>
@@ -347,6 +374,7 @@ module CodeGen
               end
 
               instructions.push(Instructions::Call.new(o.func_name))
+
               instructions
             },
           IL::Return.new(Pattern::ValueWildcard.new) =>
