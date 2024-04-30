@@ -34,4 +34,52 @@ class WasmOptimizationTest < Minitest::Test
 
     assert original.eql?(expected)
   end
+
+  sig { void }
+  def test_tee_diff_names
+    original = [
+      Const.new(Type::I32, 5),
+      LocalSet.new("a"),
+      LocalGet.new("b"),
+      Const.new(Type::I32, 2),
+      LocalSet.new("c"),
+    ]
+
+    expected = [
+      Const.new(Type::I32, 5),
+      LocalSet.new("a"),
+      LocalGet.new("b"),
+      Const.new(Type::I32, 2),
+      LocalSet.new("c"),
+    ]
+
+    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee.run
+
+    assert original.eql?(expected)
+  end
+
+  sig { void }
+  def test_tee_not_consecutive
+    original = [
+      Const.new(Type::I32, 5),
+      LocalSet.new("a"),
+      Const.new(Type::I32, 2),
+      LocalGet.new("a"),
+      Subtract.new(Type::I32),
+    ]
+
+    expected = [
+      Const.new(Type::I32, 5),
+      LocalSet.new("a"),
+      Const.new(Type::I32, 2),
+      LocalGet.new("a"),
+      Subtract.new(Type::I32),
+    ]
+
+    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee.run
+
+    assert original.eql?(expected)
+  end
 end
