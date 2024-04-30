@@ -486,6 +486,15 @@ module CodeGen::Targets::Wasm::Instructions
     def wat
       "(local $#{@variable} #{@type.to_s})"
     end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Local
+        return false
+      end
+
+      return (@type.eql?(other.type) and @variable.eql?(other.variable))
+    end
   end
 
   # Represents the +local.get+ instruction.
@@ -636,6 +645,15 @@ module CodeGen::Targets::Wasm::Instructions
     def wat
       "call $#{@func_name}"
     end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      if not other.class == Call
+        return false
+      end
+
+      return @func_name.eql?(other.func_name)
+    end
   end
 
   # Represents the +end+ instruction.
@@ -651,6 +669,11 @@ module CodeGen::Targets::Wasm::Instructions
     sig { override.returns(String) }
     def wat
       "end"
+    end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      return other.class == End
     end
   end
 
@@ -676,6 +699,11 @@ module CodeGen::Targets::Wasm::Instructions
     def wat
       "if"
     end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      return other.class == If
+    end
   end
 
   # Represents the +else+ instruction.
@@ -692,6 +720,11 @@ module CodeGen::Targets::Wasm::Instructions
     sig { override.returns(String) }
     def wat
       "else"
+    end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      return other.class == Else
     end
   end
 
@@ -724,6 +757,11 @@ module CodeGen::Targets::Wasm::Instructions
     sig { override.returns(String) }
     def wat
       "return"
+    end
+
+    sig { override.params(other: T.untyped).returns(T::Boolean) }
+    def eql?(other)
+      return other.class == Return
     end
   end
 end
