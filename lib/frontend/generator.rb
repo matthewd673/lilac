@@ -6,9 +6,9 @@ require_relative "frontend"
 require_relative "../il"
 require_relative "../visitor"
 
-# A Generator generates human-readable IL source code for programs. The
-# output of a Generator can be parsed by a +Parser+ without any modification.
 module Frontend
+  # A Generator generates human-readable IL source code for programs. The
+  # output of a Generator can be parsed by a +Parser+ without any modification.
   class Generator
     extend T::Sig
 

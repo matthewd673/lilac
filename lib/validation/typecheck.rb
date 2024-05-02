@@ -7,11 +7,9 @@ require_relative "validation_pass"
 require_relative "../il"
 require_relative "../symbol_table"
 
-include Validation
-
-# The type-check validation ensures that there are no definitions or
-# expressions with mismatched types in the program.
 module Validation
+  # The type-check validation ensures that there are no definitions or
+  # expressions with mismatched types in the program.
   class TypeCheck < ValidationPass
     extend T::Sig
 

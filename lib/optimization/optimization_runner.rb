@@ -7,8 +7,8 @@ require_relative "optimizations"
 require_relative "optimization_pass"
 require_relative "../runner"
 
-# An OptimizationRunner is a Runner for Optimization passes.
 module Optimization
+  # An OptimizationRunner is a Runner for Optimization passes.
   class OptimizationRunner < Runner
     extend T::Sig
     extend T::Generic

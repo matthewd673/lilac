@@ -6,10 +6,8 @@ require_relative "validation"
 require_relative "validation_pass"
 require_relative "../il"
 
-include Validation
-
-# The SSA validation ensures that the program is in valid SSA form.
 module Validation
+  # The SSA validation ensures that the program is in valid SSA form.
   class SSA < ValidationPass
     extend T::Sig
 

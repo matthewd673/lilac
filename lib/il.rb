@@ -319,7 +319,7 @@ module IL
     sig { returns(T.untyped) }
     def calculate
       # calculations can only be performed on constants
-      if !@left.is_a?(Constant) or !@right.is_a?(Constant)
+      if !@left.is_a?(Constant) || !@right.is_a?(Constant)
         return nil
       end
 

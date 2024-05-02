@@ -92,7 +92,7 @@ module Interpreter
       # once we've reached the end of the current block we must either:
       # jump (perhaps conditionally) or move to the block's (single) successor
       # block exits with a conditional jump
-      if context.current.exit and context.current.exit.class != IL::Jump
+      if context.current.exit && context.current.exit.class != IL::Jump
         jump = context.current.exit
         # evaluate conditional and then jump
         cond_result = visitor.visit(jump, ctx: context)
@@ -121,9 +121,11 @@ module Interpreter
   end
 
   VISIT_VALUE = T.let(lambda { |v, o, context|
-    raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Value)
+    if instance_of?(IL::Value)
+      raise "#{self.class} is a stub and should not be constructed"
+    end
 
-    raise("Interpretation of #{self.class} is not implemented")
+    raise "Interpretation of #{self.class} is not implemented"
   }, Visitor::Lambda)
 
   VISIT_CONSTANT = T.let(lambda { |v, o, context|
@@ -140,10 +142,12 @@ module Interpreter
     InterpreterValue.new(info.type, info.value)
   }, Visitor::Lambda)
 
-  VISIT_EXPRESSION = T.let(lambda  { |v, o, context|
-    raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Expression)
+  VISIT_EXPRESSION = T.let(lambda { |v, o, context|
+    if instance_of?(IL::Expression)
+      raise "#{self.class} is a stub and should not be constructed"
+    end
 
-    raise("Interpretation of #{self.class} is not implemented")
+    raise "Interpretation of #{self.class} is not implemented"
   }, Visitor::Lambda)
 
   VISIT_BINARYOP = T.let(lambda { |v, o, context|
@@ -279,16 +283,18 @@ module Interpreter
     end
 
     unless last_written
-      raise("Failed to lookup value for phi function")
+      raise "Failed to lookup value for phi function"
     end
 
     InterpreterValue.new(last_written.type, last_written.value)
   }, Visitor::Lambda)
 
   VISIT_STATEMENT = T.let(lambda { |v, o, context|
-    raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Statement)
+    if instance_of?(IL::Statement)
+      raise "#{self.class} is a stub and should not be constructed"
+    end
 
-    raise("Interpretation of #{self.class} is not implemented")
+    raise "Interpretation of #{self.class} is not implemented"
   }, Visitor::Lambda)
 
   VISIT_DEFINITION = T.let(lambda { |v, o, context|
@@ -314,7 +320,6 @@ module Interpreter
 
   VISIT_JUMPZERO = T.let(lambda { |v, o, context|
     cond = o.cond
-    target = o.target
 
     # evaluate conditional
     cond_eval = v.visit(cond, ctx: context)
@@ -325,7 +330,6 @@ module Interpreter
 
   VISIT_JUMPNOTZERO = T.let(lambda { |v, o, context|
     cond = o.cond
-    target = o.target
 
     # evaluate conditional
     cond_eval = v.visit(cond, ctx: context)
@@ -408,7 +412,7 @@ module Interpreter
     end
   end
 
-  # NOTE: Adapted from symbol_table.rb
+  # A scope contains symbols. NOTE: Adapted from symbol_table.rb
   class Scope
     extend T::Sig
 
@@ -427,8 +431,8 @@ module Interpreter
       symbol = @symbols[key]
 
       # FIXME: patch for weird SSA Register renaming
-      #        REMOVE once SSA renaming is fixed!
-      if (!symbol) and (!key.include?("#"))
+      #        REMOVE once to_ssa renaming is fixed!
+      if !symbol && !key.include?("#")
         symbol = @symbols["#{key}#0"]
       end
 
@@ -446,6 +450,7 @@ module Interpreter
     end
   end
 
+  # A symbol table stores symbol information.
   # NOTE: Adapted from symbol_table.rb
   class SymbolTable
     extend T::Sig

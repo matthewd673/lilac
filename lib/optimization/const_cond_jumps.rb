@@ -5,9 +5,9 @@ require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
 
-include Optimization
-
 module Optimization
+  # The ConstCondJumps optimization turns conditional jumps with a constant
+  # conditional value into unconditional jumps.
   class ConstCondJumps < OptimizationPass
     extend T::Sig
     extend T::Generic
@@ -42,13 +42,13 @@ module Optimization
 
       stmt_list.each_with_index do |s, i|
         # precompute jz
-        if s.is_a?(IL::JumpZero) and s.cond.is_a?(IL::Constant)
+        if s.is_a?(IL::JumpZero) && s.cond.is_a?(IL::Constant)
           cond = T.cast(s.cond, IL::Constant)
           if cond.value == 0
             replacement.push({ index: i, stmt: IL::Jump.new(s.target) })
           end
         # precompute jnz
-        elsif s.is_a?(IL::JumpNotZero) and s.cond.is_a?(IL::Constant)
+        elsif s.is_a?(IL::JumpNotZero) && s.cond.is_a?(IL::Constant)
           cond = T.cast(s.cond, IL::Constant)
           if cond.value != 0
             replacement.push(index: i, stmt: IL::Jump.new(s.target))

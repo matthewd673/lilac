@@ -7,6 +7,7 @@ require_relative "../pass"
 require_relative "../il"
 
 module Validation
+  # A ValidationPass is a Pass that performs a validation.
   class ValidationPass < Pass
     extend T::Sig
     extend T::Helpers

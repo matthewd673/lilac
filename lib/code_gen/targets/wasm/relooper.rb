@@ -9,17 +9,17 @@ require_relative "../../../analysis/cfg"
 require_relative "../../../analysis/dom_tree"
 require_relative "../../../analysis/reducible"
 
-# The Relooper class converts a CFGProgram with aribrary gotos into a
-# structured control flow form. It is not based on the relooper algorithm
-# presented in the original Emscripten paper but rather on the algorithm
-# described in the "Beyond Relooper" paper:
-#   Norman Ramsey. 2022. Beyond Relooper: recursive translation of unstructured
-#     control flow to structured control flow (functional pearl). Proc.
-#     ACM Program. Lang. 6, ICFP, Article 90 (August 2022), 22 pages.
-#     https://doi.org/10.1145/3547621
 module CodeGen
   module Targets
     module Wasm
+      # The Relooper class converts a CFGProgram with aribrary gotos into a
+      # structured control flow form. It is not based on the relooper algorithm
+      # presented in the original Emscripten paper but rather on the algorithm
+      # described in the "Beyond Relooper" paper:
+      #   Norman Ramsey. 2022. Beyond Relooper: recursive translation of
+      #     unstructured control flow to structured control flow
+      #     (functional pearl). Proc. ACM Program. Lang. 6, ICFP, Article 90
+      #     (August 2022), 22 pages. https://doi.org/10.1145/3547621
       class Relooper
         extend T::Sig
 
@@ -29,7 +29,8 @@ module CodeGen
         # Initialize a new Relooper.
         #
         # @param [Analysis::CFG] cfg The CFG to run the Relooper algorithm on.
-        # @param [Analysis::DomTree] dom_tree The dominance tree for the given CFG.
+        # @param [Analysis::DomTree] dom_tree The dominance tree for the given
+        #   CFG.
         def initialize(cfg, dom_tree)
           @cfg = cfg
           @dom_tree = dom_tree
@@ -63,11 +64,13 @@ module CodeGen
 
         private
 
+        # A BlockProperty is a structured control flow property that a basic
+        # block can have.
         class BlockProperty < T::Enum
           enums do
             If = new
             Join = new
-            Loop = new
+            Loop = new # LoopHeader
           end
         end
 
@@ -76,7 +79,8 @@ module CodeGen
           @cfg.each_node do |b|
             b_props = Set.new
 
-            # "a node that has two or more forward inedges is a merge node" (join)
+            # "a node that has two or more forward inedges is a merge node"
+            # (join)
             forward_inedges = 0
             @cfg.each_incoming(b) do |e|
               if forward_edge?(e)
@@ -94,8 +98,8 @@ module CodeGen
               b_props.add(BlockProperty::If)
             end
 
-            # "a node that has a back inedge is a loop header, and its translation
-            #   is wrapped in a loop form"
+            # "a node that has a back inedge is a loop header, and its
+            # translation is wrapped in a loop form"
             has_back_inedge = T.let(false, T::Boolean)
             @cfg.each_incoming(b) do |e|
               if back_edge?(e)
@@ -117,7 +121,7 @@ module CodeGen
           from = @cfg_rpo[edge.from]
           to = @cfg_rpo[edge.to]
 
-          if !from or !to
+          if !from || !to
             raise "Invalid edge from #{edge.from} to #{edge.to}"
           end
 
@@ -129,7 +133,7 @@ module CodeGen
           from = @cfg_rpo[edge.from]
           to = @cfg_rpo[edge.to]
 
-          if !from or !to
+          if !from || !to
             raise "Invalid edge from #{from} to #{to}"
           end
 
@@ -138,7 +142,8 @@ module CodeGen
         end
 
         sig { params(node: Analysis::BB).returns(WasmBlock) }
-        # Recursively translate all nodes immediately dominated by the given node.
+        # Recursively translate all nodes immediately dominated by the given
+        # node.
         def do_tree(node)
           # children are sorted by rpo numbering
           children = []
@@ -161,23 +166,24 @@ module CodeGen
 
             # place child in a conditional wasm block
             # join
-            # TODO: what if a node dominates multiple join nodes? see page 6 (90:6)
-            if wasm_block.is_a?(WasmIfBlock) and
+            # TODO: what if a node dominates multiple join nodes? see page 6
+            # (90:6)
+            if wasm_block.is_a?(WasmIfBlock) &&
                T.unsafe(@props[c]).include?(BlockProperty::Join)
 
               last_block.next_block = translation
               last_block = translation
             # true
-            elsif wasm_block.is_a?(WasmIfBlock) and c.true_branch
+            elsif wasm_block.is_a?(WasmIfBlock) && c.true_branch
               wasm_block.true_branch = translation
             # false
-            elsif wasm_block.is_a?(WasmIfBlock) and !c.true_branch
+            elsif wasm_block.is_a?(WasmIfBlock) && !c.true_branch
               wasm_block.false_branch = translation
 
             # place child in a loop header wasm block
             elsif wasm_block.is_a?(WasmLoopBlock)
-              # NOTE: this is not derived from the original paper and may produce
-              # incorrect behavior
+              # NOTE: this is not derived from the original paper and may
+              # produce incorrect behavior
 
               # if child dominates a node that has a backedge to node
               # then place child in WasmLoopBlock.inner
@@ -185,7 +191,7 @@ module CodeGen
               is_inner = T.let(false, T::Boolean)
               @dom_tree.dom_by(c) do |d|
                 @cfg.each_outgoing(d) do |o|
-                  if o.to == node and back_edge?(o)
+                  if o.to == node && back_edge?(o)
                     is_inner = true
                     break
                   end

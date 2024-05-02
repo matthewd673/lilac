@@ -8,9 +8,9 @@ require_relative "../il"
 require_relative "../visitor"
 require_relative "../analysis/bb"
 
-# A PrettyPrinter contains functions that make it easy to pretty-print various
-# internal lilac data structures, like +IL::Program+, to the terminal.
 module Debugging
+  # A PrettyPrinter contains functions that make it easy to pretty-print various
+  # internal lilac data structures, like +IL::Program+, to the terminal.
   class PrettyPrinter
     extend T::Sig
 

@@ -9,8 +9,8 @@ require_relative "dom_tree"
 require_relative "dfa"
 require_relative "cfg_facts"
 
-# Compute the dominance frontiers for a CFG.
 module Analysis
+  # Compute the dominance frontiers for a CFG.
   class DomFrontiers
     extend T::Sig
 
@@ -52,7 +52,7 @@ module Analysis
           runner = T.let(p, T.nilable(BB))
 
           # NOTE: original algorithm does not enforce runner != nil
-          while runner and runner != @dom_tree.idom(j)
+          while runner && runner != @dom_tree.idom(j)
             @df[runner] = T.unsafe(@df[runner]) | [j] # add j to runner's DF
             runner = @dom_tree.idom(runner) # continue moving up dom tree
           end

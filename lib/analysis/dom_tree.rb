@@ -8,6 +8,7 @@ require_relative "bb"
 require_relative "cfg_facts"
 
 module Analysis
+  # A DomTree is a graph that represent's a CFG's dominator tree.
   class DomTree < Graph
     extend T::Sig
     extend T::Generic
@@ -106,8 +107,7 @@ module Analysis
 
       cfg_facts.get_fact(:out, block).each do |d|
         dom_dist = find_dom_dist(cfg_facts.cfg, block, d, 0)
-        if dom_dist > 0 and
-           (idom_dist == -1 or dom_dist < idom_dist)
+        if dom_dist > 0 && (idom_dist == -1 || dom_dist < idom_dist)
           idom = d
         end
       end

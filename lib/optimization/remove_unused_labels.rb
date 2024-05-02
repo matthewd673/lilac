@@ -6,9 +6,9 @@ require_relative "optimization"
 require_relative "optimization_pass"
 require_relative "../il"
 
-include Optimization
-
 module Optimization
+  # The RemoveUnusedLabels optimization removes labels that are never targeted
+  # by a jump.
   class RemoveUnusedLabels < OptimizationPass
     extend T::Sig
     extend T::Generic

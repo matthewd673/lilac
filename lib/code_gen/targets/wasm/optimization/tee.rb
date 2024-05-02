@@ -10,6 +10,8 @@ module CodeGen
   module Targets
     module Wasm
       module Optimization
+        # The Tee optimization combines consecutive set and get instructions
+        # into a single tee instruction.
         class Tee < Pass
           extend T::Sig
 

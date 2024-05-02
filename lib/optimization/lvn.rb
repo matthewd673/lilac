@@ -6,9 +6,8 @@ require_relative "optimization"
 require_relative "optimization_pass"
 require_relative "../analysis/bb"
 
-include Optimization
-
 module Optimization
+  # The LVN optimization performs local value numbering.
   class LVN < OptimizationPass
     extend T::Sig
     extend T::Generic
@@ -45,7 +44,7 @@ module Optimization
       block.stmt_list.each do |s|
         # perform constant folding on conditional jump conditions
         # this is a bonus on top of LVN's core task
-        if s.is_a?(IL::JumpZero) or s.is_a?(IL::JumpNotZero)
+        if s.is_a?(IL::JumpZero) || s.is_a?(IL::JumpNotZero)
           cond = constant_folding(s.cond, value_number_map, id_number_map)
           # swap out cond only if the new result is a constant
           if cond.is_a?(IL::Constant)
@@ -141,7 +140,7 @@ module Optimization
         right = constant_folding(rhs.right, value_number_map, id_number_map)
 
         # only calculate if both sides are constants
-        if left.is_a?(IL::Constant) and right.is_a?(IL::Constant)
+        if left.is_a?(IL::Constant) && right.is_a?(IL::Constant)
           rhs.left = left
           rhs.right = right
           # TODO: below calculation ignores type mismatch
@@ -163,6 +162,8 @@ module Optimization
       rhs
     end
 
+    # The ValueNumberMap class stores mappings of values and their local
+    # numbers.
     class ValueNumberMap
       extend T::Sig
 
@@ -197,6 +198,7 @@ module Optimization
       end
     end
 
+    # The IDNumberMap class stores mappings of IDs and their local numbers.
     class IDNumberMap
       extend T::Sig
 
@@ -242,6 +244,8 @@ module Optimization
       end
     end
 
+    # The ValueHash class creates hash values for values that can be used
+    # to index them.
     class ValueHash
       extend T::Sig
 
@@ -298,6 +302,8 @@ module Optimization
       end
     end
 
+    # A ValueNumber is a special +IL::Value+ that represents a local value
+    # number.
     class ValueNumber < IL::Value
       extend T::Sig
 

@@ -5,9 +5,9 @@ require "sorbet-runtime"
 require_relative "frontend"
 
 module Frontend
+  # A Scanner tokenizes an input string. NOTE: Scanner is adapted from Newt's
+  # Scanner class.
   class Scanner
-    # NOTE: Scanner is adapted from Newt's Scanner class
-
     extend T::Sig
 
     include Frontend
@@ -44,7 +44,7 @@ module Frontend
         m = t.pattern.match(@string)
 
         # skip if no match or match is not at beginning of string
-        if (!m) or (!(m[0])) or m.begin(0) > 0
+        if !m || !m[0] || m.begin(0) > 0
           next
         end
 
@@ -92,7 +92,7 @@ module Frontend
           @scan_row += 1 # NOTE: assume tab size = 1
         # trim annotations
         elsif @string.start_with?("\"")
-          while !@string.empty? and (@string[0] != "\n")
+          while !@string.empty? && @string[0] != "\n"
             @string = T.unsafe(@string[1..])
 
             # stop if @string turns nil, which Sorbet says is possible

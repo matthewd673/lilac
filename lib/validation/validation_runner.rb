@@ -5,8 +5,8 @@ require "sorbet-runtime"
 require_relative "validation"
 require_relative "../runner"
 
-# A ValidationRunner is a Runner for Validation passes.
 module Validation
+  # A ValidationRunner is a Runner for Validation passes.
   class ValidationRunner < Runner
     extend T::Sig
     extend T::Generic

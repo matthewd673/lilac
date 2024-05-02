@@ -6,8 +6,8 @@ require_relative "analysis"
 require_relative "cfg"
 require_relative "../il"
 
-# A BB is a data structure representing a basic block.
 module Analysis
+  # A BB is a data structure representing a basic block.
   class BB
     extend T::Sig
 
@@ -75,7 +75,7 @@ module Analysis
 
       str = "BB##{id_str}"
 
-      if @entry or @exit
+      if @entry || @exit
         str += " ("
         if @entry
           str += "entry=#{@entry.class} '#{@entry.name}', "
@@ -139,7 +139,7 @@ module Analysis
         # mark beginning of a block
         if s.is_a?(IL::Label)
           # push previous block onto list (exit is nil)
-          unless (block_stmts.empty? and !current_entry)
+          unless block_stmts.empty? && !current_entry
             blocks.push(Analysis::BB.new(blocks.length,
                                          entry: current_entry,
                                          stmt_list: block_stmts))
@@ -150,7 +150,7 @@ module Analysis
 
         # don't push labels or jumps
         # they belong in @entry or @exit
-        unless (s.is_a?(IL::Label) or s.is_a?(IL::Jump))
+        unless s.is_a?(IL::Label) || s.is_a?(IL::Jump)
           block_stmts.push(s)
         end
 

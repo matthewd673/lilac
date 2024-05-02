@@ -6,9 +6,9 @@ require_relative "optimization"
 require_relative "optimization_pass"
 require_relative "../il"
 
-include Optimization
-
 module Optimization
+  # SimplifyRedundantBinops is an optimization that removes binary ops that
+  # have no effect, like multiplying a variable by +1+.
   class SimplifyRedundantBinops < OptimizationPass
     extend T::Sig
     extend T::Generic
@@ -41,7 +41,7 @@ module Optimization
 
       # find all binops (which can only occur in Definitions)
       stmt_list.each do |s|
-        if (!s.is_a?(IL::Definition)) or (!s.rhs.is_a?(IL::BinaryOp))
+        if !s.is_a?(IL::Definition) || !s.rhs.is_a?(IL::BinaryOp)
           next
         end
 

@@ -6,12 +6,12 @@ require_relative "frontend"
 require_relative "scanner"
 require_relative "../il"
 
-# A Parser can parse human-readable IL source code in +IL::Program+ objects.
-# It provides minimal error reporting as IL source code is not designed to
-# be handwritten (though it certainly can be).
 module Frontend
+  # A Parser can parse human-readable IL source code in +IL::Program+ objects.
+  # It provides minimal error reporting as IL source code is not designed to
+  # be handwritten (though it certainly can be). NOTE: Parser is adapted from
+  # Newt's Parser class.
   class Parser
-    # NOTE: Parser is adapted from Newt's Parser class
     extend T::Sig
 
     include Frontend
@@ -32,7 +32,8 @@ module Frontend
     end
 
     sig { params(string: String).void }
-    # Construct a new Parser which will parse IL source code from the given string.
+    # Construct a new Parser which will parse IL source code from the given
+    # string.
     #
     # @param [String] string The string of IL source code while will be parsed.
     def initialize(string)
@@ -44,7 +45,8 @@ module Frontend
     sig { returns(IL::Program) }
     # Parse the IL source code in the Parser's string.
     #
-    # @return [IL::Program] The program represented by the IL source code string.
+    # @return [IL::Program] The program represented by the IL source code
+    # string.
     def parse
       @next_token = @scanner.scan_next
       parse_program
@@ -76,7 +78,8 @@ module Frontend
         return eaten
       end
 
-      raise("Syntax error at #{@next_token.position}: saw #{@next_token.type}, expected #{types}") # TODO: nice errors
+      raise "Syntax error at #{@next_token.position}: "\
+        "saw #{@next_token.type}, expected #{types}" # TODO: nice errors
     end
 
     sig { returns(IL::Program) }
@@ -434,8 +437,8 @@ module Frontend
     sig { params(string: String).returns(IL::ID) }
     def id_from_string(string)
       split = string.split("#")
-      if (!(split[0])) or (!(split[1])) or split.length > 2
-        raise("Invalid ID string \"#{string}\"")
+      if !split[0] || !split[1] || split.length > 2
+        raise "Invalid ID string \"#{string}\""
       end
 
       name = T.unsafe(split[0])
@@ -458,13 +461,13 @@ module Frontend
       # find type in constant string
       type_str = string.match(/[uif][0-9]{1,2}/)
       unless type_str
-        raise("No type tag in constant: \"#{string}\"")
+        raise "No type tag in constant: \"#{string}\""
       end
 
       type = type_from_string(T.unsafe(type_str[0]))
 
       numeric = string.to_i
-      if type == IL::Type::F32 or type == IL::Type::F64
+      if type == IL::Type::F32 || type == IL::Type::F64
         numeric = string.to_f
       end
 

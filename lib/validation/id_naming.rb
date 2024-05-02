@@ -6,13 +6,11 @@ require_relative "validation"
 require_relative "validation_pass"
 require_relative "../il"
 
-include Validation
-
-# The ID Naming validation ensures that ID names do not include
-# reserved characters. It is very possible for ID names with reserved
-# characters to compile fine, but it is introduces unnecessary
-# ambiguity.
 module Validation
+  # The ID Naming validation ensures that ID names do not include
+  # reserved characters. It is very possible for ID names with reserved
+  # characters to compile fine, but it is introduces unnecessary
+  # ambiguity.
   class IDNaming < ValidationPass
     extend T::Sig
 
