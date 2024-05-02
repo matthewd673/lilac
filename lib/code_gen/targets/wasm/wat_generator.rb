@@ -67,7 +67,7 @@ module CodeGen
 
         VISIT_FUNC = T.let(lambda { |v, o, c|
           # stringify params
-          params_str = " "
+          params_str = " ".dup # shouldn't be frozen
           o.params.each do |p|
             params_str += "#{v.visit(p)} "
           end
