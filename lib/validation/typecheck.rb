@@ -14,30 +14,35 @@ module Validation
     extend T::Sig
 
     sig { override.returns(String) }
-    def id
+    def self.id
       "typecheck"
     end
 
     sig { override.returns(String) }
-    def description
+    def self.description
       "Detect type mismatches in definitions and expressions"
     end
 
     sig { params(program: IL::Program).void }
-    def run(program)
+    def initialize(program)
+      @program = program
+    end
+
+    sig { override.void }
+    def run!
       symbols = SymbolTable.new
       funcs = {} # name -> return type
 
       # store function return types
-      program.each_func do |f|
+      @program.each_func do |f|
         funcs[f.name] = f.ret_type
       end
 
       # scan on all items
       symbols.push_scope
-      scan_items(program.stmt_list, symbols, funcs)
+      scan_items(@program.stmt_list, symbols, funcs)
       # ...and scan on all functions
-      program.each_func do |f|
+      @program.each_func do |f|
         scan_items(f.stmt_list, symbols, funcs)
       end
       symbols.pop_scope

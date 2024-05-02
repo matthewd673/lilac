@@ -12,25 +12,30 @@ module Validation
     extend T::Sig
 
     sig { override.returns(String) }
-    def id
+    def self.id
       "ssa"
     end
 
     sig { override.returns(String) }
-    def description
+    def self.description
       "Ensure the program is in valid SSA form"
     end
 
     sig { params(program: IL::Program).void }
-    def run(program)
+    def initialize(program)
+      @program = program
+    end
+
+    sig { override.void }
+    def run!
       symbols = SymbolTable.new
       symbols.push_scope # top level scope
 
       # scan top level of program
-      scan_stmt_list(program.stmt_list, symbols)
+      scan_stmt_list(@program.stmt_list, symbols)
 
       # scan all funcs
-      program.each_func do |f|
+      @program.each_func do |f|
         # create a new scope (NOTE: assumes ssa doesn't hold between funcs)
         symbols.push_scope
 

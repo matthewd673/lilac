@@ -15,19 +15,24 @@ module Validation
     extend T::Sig
 
     sig { override.returns(String) }
-    def id
+    def self.id
       "id_naming"
     end
 
     sig { override.returns(String) }
-    def description
+    def self.description
       "Ensure that ID names do not include reserved characters"
     end
 
     sig { params(program: IL::Program).void }
-    def run(program)
+    def initialize(program)
+      @program = program
+    end
+
+    sig { override.void }
+    def run!
       # scan all funcs
-      program.each_func do |f|
+      @program.each_func do |f|
         # scan params
         f.params.each do |p|
           # skip registers, which are named automatically
@@ -49,7 +54,7 @@ module Validation
       end
 
       # scan program
-      scan_items(program.stmt_list)
+      scan_items(@program.stmt_list)
     end
 
     private

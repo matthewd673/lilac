@@ -18,7 +18,8 @@ module Validation
     sig { params(pass: P).void }
     # Run a ValidationPass on the program.
     def run_pass(pass)
-      pass.run(@program)
+      instance = T.unsafe(pass).new(@program)
+      instance.run!
     end
   end
 end
