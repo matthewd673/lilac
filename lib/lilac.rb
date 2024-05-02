@@ -11,7 +11,7 @@ require_relative "debugging/pretty_printer"
 require_relative "debugging/graph_visualizer"
 require_relative "analysis/bb"
 require_relative "analysis/cfg"
-require_relative "ssa"
+require_relative "to_ssa"
 require_relative "interpreter"
 require_relative "frontend/generator"
 require_relative "code_gen/targets/wasm/wasm_translator"
@@ -36,7 +36,8 @@ module CLI
     puts("  optimizations: list all optimizations")
     puts("  validations: list all validations")
     puts("  parse <filename>: parse and pretty print an IL text file")
-    puts("  cfg <filename>: parse an IL text file, compute a CFG, and output a Graphviz graph for it")
+    puts("  cfg <filename>: parse an IL text file, compute a CFG, "\
+         "and output a Graphviz graph for it")
   end
 
   sig { void }

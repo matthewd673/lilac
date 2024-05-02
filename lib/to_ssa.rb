@@ -13,21 +13,21 @@ require_relative "analysis/dominators"
 require_relative "analysis/dom_tree"
 require_relative "analysis/dom_frontiers"
 
-# The SSA pass transforms a CFG into SSA form by optimally  inserting phi
+# The ToSSA pass transforms a CFG into SSA form by optimally inserting phi
 # functions at join nodes and renaming IDs with unique subscripts.
-class SSA < Pass
+class ToSSA < Pass
   extend T::Sig
 
   include Analysis
 
   sig { override.returns(String) }
   def id
-    "ssa"
+    "to_ssa"
   end
 
   sig { override.returns(String) }
   def description
-    "Transform a CFG into SSA form"
+    "Transform a CFG into SSA form in place"
   end
 
   sig { params(cfg: CFG).void }
@@ -97,7 +97,7 @@ class SSA < Pass
     critical_edges = []
 
     @cfg.each_edge do |e|
-      if @cfg.predecessors_length(e.to) > 1 and
+      if @cfg.predecessors_length(e.to) > 1 &&
          @cfg.successors_length(e.from) > 1
         critical_edges.push(e)
       end
@@ -156,7 +156,7 @@ class SSA < Pass
       # since phi functions must appear all at the beginning of the block,
       # as soon as we see a statement that doesn't match this we can stop
       # the check
-      if (!s.is_a?(IL::Definition)) or (!s.rhs.is_a?(IL::Phi))
+      if !s.is_a?(IL::Definition) || !s.rhs.is_a?(IL::Phi)
         break
       end
 
@@ -299,7 +299,7 @@ class SSA < Pass
   def rename(block, counter, stack, dom_tree)
     # for each phi function in block, rewrite lhs with new_name
     block.stmt_list.each do |s|
-      if (!s.is_a?(IL::Definition)) or (!s.rhs.is_a?(IL::Phi))
+      if !s.is_a?(IL::Definition) || !s.rhs.is_a?(IL::Phi)
         break
       end
 
@@ -310,7 +310,7 @@ class SSA < Pass
     # for each definition in block
     block.stmt_list.each do |s|
       # skip past Phi definitions since those were handled above
-      if (!s.is_a?(IL::Definition)) or s.rhs.is_a?(IL::Phi)
+      if !s.is_a?(IL::Definition) || s.rhs.is_a?(IL::Phi)
         next
       end
 
