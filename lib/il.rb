@@ -1,4 +1,6 @@
 # typed: strict
+# frozen_string_literal: true
+
 require "sorbet-runtime"
 
 # IL contains a set of classes representing the Lilac Intermediate Language.
@@ -117,6 +119,7 @@ module IL
 
     sig { returns(Type) }
     attr_reader :type
+
     sig { returns(T.untyped) }
     attr_reader :value
 
@@ -132,12 +135,12 @@ module IL
 
     sig { override.returns(String) }
     def to_s
-      "#{@value}"
+      @value.to_s
     end
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Constant
+      if other.class != Constant
         return false
       end
 
@@ -155,10 +158,12 @@ module IL
     sig { returns(String) }
     # The name of the ID.
     attr_reader :name
+
     sig { returns(Integer) }
     # The number of the ID. Multiple definitions of the same ID name must
     # have unique numbers.
     attr_reader :number
+
     sig { returns(String) }
     # The key of the ID. Includes both name and number.
     attr_reader :key
@@ -189,7 +194,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == ID
+      if other.class != ID
         return false
       end
 
@@ -229,7 +234,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Register
+      if other.class != Register
         return false
       end
 
@@ -281,14 +286,16 @@ module IL
 
       sig { returns(String) }
       def to_s
-        self.serialize
+        serialize
       end
     end
 
     sig { returns(Operator) }
     attr_reader :op
+
     sig { returns(Value) }
     attr_accessor :left
+
     sig { returns(Value) }
     attr_accessor :right
 
@@ -312,7 +319,7 @@ module IL
     sig { returns(T.untyped) }
     def calculate
       # calculations can only be performed on constants
-      if not @left.is_a?(Constant) or not @right.is_a?(Constant)
+      if !@left.is_a?(Constant) or !@right.is_a?(Constant)
         return nil
       end
 
@@ -329,28 +336,28 @@ module IL
       when Operator::DIV
         left.value / right.value
       when Operator::EQ
-        if left.value == right.value then 1 else 0 end
+        left.value == right.value ? 1 : 0
       when Operator::NEQ
-        if left.value != right.value then 1 else 0 end
+        left.value != right.value ? 1 : 0
       when Operator::LT
-        if left.value < right.value then 1 else 0 end
+        left.value < right.value ? 1 : 0
       when Operator::GT
-        if left.value > right.value then 1 else 0 end
+        left.value > right.value ? 1 : 0
       when Operator::LEQ
-        if left.value <= right.value then 1 else 0 end
+        left.value <= right.value ? 1 : 0
       when Operator::GEQ
-        if left.value >= right.value then 1 else 0 end
+        left.value >= right.value ? 1 : 0
       when Operator::OR
-        if left.value != 0 || right.value != 0 then 1 else 0 end
+        left.value != 0 || right.value != 0 ? 1 : 0
       when Operator::AND
-        if left.value != 0 && right.value != 0 then 1 else 0 end
+        left.value != 0 && right.value != 0 ? 1 : 0
       else T.absurd(self)
       end
     end
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == BinaryOp
+      if other.class != BinaryOp
         return false
       end
 
@@ -375,12 +382,13 @@ module IL
 
       sig { returns(String) }
       def to_s
-        self.serialize
+        serialize
       end
     end
 
     sig { returns(Operator) }
     attr_reader :op
+
     sig { returns(Value) }
     attr_accessor :value
 
@@ -402,7 +410,7 @@ module IL
     sig { returns(T.untyped) }
     def calculate
       # calculations can only be performed on constants
-      if not @value.is_a?(Constant)
+      unless @value.is_a?(Constant)
         return nil
       end
 
@@ -417,7 +425,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == UnaryOp
+      if other.class != UnaryOp
         return false
       end
 
@@ -433,6 +441,7 @@ module IL
 
     sig { returns(String) }
     attr_reader :func_name
+
     sig { returns(T::Array[Value]) }
     attr_reader :args
 
@@ -445,17 +454,17 @@ module IL
     sig { override.returns(String) }
     def to_s
       arg_str = ""
-      @args.each { |a|
+      @args.each do |a|
         arg_str += "#{a}, "
-      }
+      end
       arg_str.chomp!(", ")
 
-      return "call #{@func_name}(#{arg_str})"
+      "call #{@func_name}(#{arg_str})"
     end
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Call
+      if other.class != Call
         return false
       end
 
@@ -473,9 +482,11 @@ module IL
     sig { returns(String) }
     attr_reader :func_source
 
-    sig { params(func_source: String,
-                 func_name: String,
-                 args: T::Array[Value]).void }
+    sig do
+      params(func_source: String,
+             func_name: String,
+             args: T::Array[Value]).void
+    end
     def initialize(func_source, func_name, args)
       @func_source = func_source
       @func_name = func_name
@@ -485,17 +496,17 @@ module IL
     sig { override.returns(String) }
     def to_s
       arg_str = ""
-      @args.each { |a|
+      @args.each do |a|
         arg_str += "#{a}, "
-      }
+      end
       arg_str.chomp!(", ")
 
-      return "extern_call #{@func_source}.#{@func_name}(#{arg_str})"
+      "extern_call #{@func_source}.#{@func_name}(#{arg_str})"
     end
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == ExternCall
+      if other.class != ExternCall
         return false
       end
 
@@ -520,9 +531,9 @@ module IL
     sig { override.returns(String) }
     def to_s
       ids_str = ""
-      @ids.each { |id|
+      @ids.each do |id|
         ids_str += "#{id.to_s}, "
-      }
+      end
       ids_str.chomp!(", ")
 
       "phi (#{ids_str})"
@@ -530,7 +541,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Phi
+      if other.class != Phi
         return false
       end
 
@@ -563,8 +574,10 @@ module IL
 
     sig { returns(Type) }
     attr_reader :type
+
     sig { returns(ID) }
     attr_accessor :id
+
     sig { returns(T.any(Expression, Value)) }
     attr_accessor :rhs
 
@@ -588,7 +601,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Definition
+      if other.class != Definition
         return false
       end
 
@@ -620,7 +633,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Label
+      if other.class != Label
         return false
       end
 
@@ -652,7 +665,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Jump
+      if other.class != Jump
         return false
       end
 
@@ -687,7 +700,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == JumpZero
+      if other.class != JumpZero
         return false
       end
 
@@ -722,7 +735,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == JumpNotZero
+      if other.class != JumpNotZero
         return false
       end
 
@@ -751,7 +764,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Return
+      if other.class != Return
         return false
       end
 
@@ -781,7 +794,7 @@ module IL
 
     sig { override.params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == VoidCall
+      if other.class != VoidCall
         return false
       end
 
@@ -797,6 +810,7 @@ module IL
 
     sig { returns(Type) }
     attr_reader :type
+
     sig { returns(ID) }
     attr_reader :id
 
@@ -813,7 +827,7 @@ module IL
 
     sig { params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == FuncParam
+      if other.class != FuncParam
         return false
       end
 
@@ -829,18 +843,23 @@ module IL
 
     sig { returns(String) }
     attr_reader :name
+
     sig { returns(T::Array[FuncParam]) }
     attr_reader :params
+
     sig { returns(Type) }
     attr_reader :ret_type
+
     sig { returns(T::Array[Statement]) }
     attr_reader :stmt_list
 
-    sig { params(name: String,
-                 params: T::Array[FuncParam],
-                 ret_type: Type,
-                 stmt_list: T::Array[Statement])
-          .void }
+    sig do
+      params(name: String,
+             params: T::Array[FuncParam],
+             ret_type: Type,
+             stmt_list: T::Array[Statement])
+        .void
+    end
     def initialize(name, params, ret_type, stmt_list)
       @name = name
       @params = params
@@ -851,22 +870,22 @@ module IL
     sig { returns(String) }
     def to_s
       param_str = ""
-      @params.each { |p|
+      @params.each do |p|
         param_str += "#{p}, "
-      }
+      end
       param_str.chomp!(", ")
 
       stmt_str = ""
-      @stmt_list.each { |s|
+      @stmt_list.each do |s|
         stmt_str += "#{s}\n"
-      }
+      end
 
-      return "func #{@name}(#{param_str}) -> #{@ret_type}:\n#{stmt_str}\nend"
+      "func #{@name}(#{param_str}) -> #{@ret_type}:\n#{stmt_str}\nend"
     end
 
     sig { params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == FuncDef
+      if other.class != FuncDef
         return false
       end
 
@@ -883,17 +902,22 @@ module IL
 
     sig { returns(String) }
     attr_reader :source
+
     sig { returns(String) }
     attr_reader :name
+
     sig { returns(T::Array[Type]) }
     attr_reader :param_types
+
     sig { returns(Type) }
     attr_reader :ret_type
 
-    sig { params(source: String,
-                 name: String,
-                 param_types: T::Array[Type],
-                 ret_type: Type).void }
+    sig do
+      params(source: String,
+             name: String,
+             param_types: T::Array[Type],
+             ret_type: Type).void
+    end
     def initialize(source, name, param_types, ret_type)
       @source = source
       @name = name
@@ -908,7 +932,7 @@ module IL
 
     sig { params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == ExternFuncDef
+      if other.class != ExternFuncDef
         return false
       end
 
@@ -942,9 +966,9 @@ module IL
 
     sig { params(block: T.proc.params(arg0: FuncDef).void).void }
     def each_func(&block)
-      @func_map.keys.each { |k|
+      @func_map.each_key do |k|
         yield T.unsafe(@func_map[k])
-      }
+      end
     end
 
     sig { params(name: String).returns(T.nilable(FuncDef)) }
@@ -959,9 +983,9 @@ module IL
 
     sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
     def each_extern_func(&block)
-      @extern_func_map.keys.each { |k|
+      @extern_func_map.each_key do |k|
         yield T.unsafe(@extern_func_map[k])
-      }
+      end
     end
 
     sig { params(key: String).returns(T.nilable(ExternFuncDef)) }
@@ -972,15 +996,15 @@ module IL
     sig { returns(String) }
     def to_s
       str = ""
-      @stmt_list.each { |i|
-        str += i.to_s + "\n"
-      }
-      return str
+      @stmt_list.each do |i|
+        str += "#{i.to_s}\n"
+      end
+      str
     end
 
     sig { params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if not other.class == Program
+      if other.class != Program
         return false
       end
 
@@ -1009,18 +1033,23 @@ module IL
 
     sig { returns(String) }
     attr_reader :name
+
     sig { returns(T::Array[FuncParam]) }
     attr_reader :params
+
     sig { returns(Type) }
     attr_reader :ret_type
+
     sig { returns(Analysis::CFG) }
     attr_reader :cfg
 
-    sig { params(name: String,
-                 params: T::Array[FuncParam],
-                 ret_type: Type,
-                 cfg: Analysis::CFG)
-          .void }
+    sig do
+      params(name: String,
+             params: T::Array[FuncParam],
+             ret_type: Type,
+             cfg: Analysis::CFG)
+        .void
+    end
     def initialize(name, params, ret_type, cfg)
       @name = name
       @params = params
@@ -1053,20 +1082,20 @@ module IL
       cfg_program = CFGProgram.new(main_cfg)
 
       # convert all functions to cfg and add them
-      program.each_func { |f|
+      program.each_func do |f|
         func_bb = Analysis::BB.from_stmt_list(f.stmt_list)
         func_cfg = Analysis::CFG.new(func_bb)
         cfg_funcdef = CFGFuncDef.new(f.name, f.params, f.ret_type, func_cfg)
 
         cfg_program.add_func(cfg_funcdef)
-      }
+      end
 
       # add all extern functions (which have no body so don't need conversion)
-      program.each_extern_func { |f|
+      program.each_extern_func do |f|
         cfg_program.add_extern_func(f)
-      }
+      end
 
-      return cfg_program
+      cfg_program
     end
 
     sig { params(cfg_funcdef: CFGFuncDef).void }
@@ -1076,9 +1105,9 @@ module IL
 
     sig { params(block: T.proc.params(arg0: CFGFuncDef).void).void }
     def each_func(&block)
-      @func_map.keys.each { |k|
+      @func_map.each_key do |k|
         yield T.unsafe(@func_map[k])
-      }
+      end
     end
 
     sig { params(name: String).returns(T.nilable(CFGFuncDef)) }
@@ -1093,9 +1122,9 @@ module IL
 
     sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
     def each_extern_func(&block)
-      @extern_func_map.keys.each { |k|
+      @extern_func_map.each_key do |k|
         yield T.unsafe(@extern_func_map[k])
-      }
+      end
     end
 
     sig { params(key: String).returns(T.nilable(ExternFuncDef)) }

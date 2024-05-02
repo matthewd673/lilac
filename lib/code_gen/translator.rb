@@ -1,22 +1,26 @@
 # typed: strict
+# frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "code_gen"
 require_relative "../il"
 
-class CodeGen::Translator
-  extend T::Sig
-  extend T::Helpers
+module CodeGen
+  class Translator
+    extend T::Sig
+    extend T::Helpers
 
-  abstract!
+    abstract!
 
-  include CodeGen
+    include CodeGen
 
-  sig { params(transformer: ILTransformer, cfg_program: IL::CFGProgram).void }
-  def initialize(transformer, cfg_program)
-    @transformer = transformer
-    @program = cfg_program
+    sig { params(transformer: ILTransformer, cfg_program: IL::CFGProgram).void }
+    def initialize(transformer, cfg_program)
+      @transformer = transformer
+      @program = cfg_program
+    end
+
+    sig { abstract.returns(Component) }
+    def translate; end
   end
-
-  sig { abstract.returns(Component) }
-  def translate; end
 end

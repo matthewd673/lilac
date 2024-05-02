@@ -1,4 +1,6 @@
 # typed: strict
+# frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
@@ -6,119 +8,125 @@ require_relative "../il"
 
 include Optimization
 
-class Optimization::SimplifyRedundantBinops < OptimizationPass
-  extend T::Sig
-  extend T::Generic
+module Optimization
+  class SimplifyRedundantBinops < OptimizationPass
+    extend T::Sig
+    extend T::Generic
 
-  Unit = type_member { { fixed: T::Array[IL::Statement] } }
+    Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
-  sig { override.returns(String) }
-  def id
-    "simplify_redundant_binops"
-  end
+    sig { override.returns(String) }
+    def id
+      "simplify_redundant_binops"
+    end
 
-  sig { override.returns(String) }
-  def description
-    "Simplify binary operators that have no effect (i.e.: x + 0)"
-  end
+    sig { override.returns(String) }
+    def description
+      "Simplify binary operators that have no effect (i.e.: x + 0)"
+    end
 
-  sig { override.returns(Integer) }
-  def level
-    0
-  end
+    sig { override.returns(Integer) }
+    def level
+      0
+    end
 
-  sig { override.returns(UnitType) }
-  def unit_type
-    UnitType::StatementList
-  end
+    sig { override.returns(UnitType) }
+    def unit_type
+      UnitType::StatementList
+    end
 
-  sig { params(unit: Unit).void }
-  def run(unit)
-    stmt_list = unit # alias
+    sig { params(unit: Unit).void }
+    def run(unit)
+      stmt_list = unit # alias
 
-    # find all binops (which can only occur in Definitions)
-    stmt_list.each { |s|
-      if (not s.is_a?(IL::Definition)) or (not s.rhs.is_a?(IL::BinaryOp))
+      # find all binops (which can only occur in Definitions)
+      stmt_list.each do |s|
+        if (!s.is_a?(IL::Definition)) or (!s.rhs.is_a?(IL::BinaryOp))
           next
-      end
+        end
 
-      new = simplify_binop(T.cast(s.rhs, IL::BinaryOp))
-      # if simplify_binop returned nil, there is no way to simplify so skip
-      if not new
-        next
-      end
+        new = simplify_binop(T.cast(s.rhs, IL::BinaryOp))
+        # if simplify_binop returned nil, there is no way to simplify so skip
+        unless new
+          next
+        end
 
-      # else, replace the binop with the new value
-      s.rhs = new
-    }
-  end
-
-  private
-
-  sig { params(binop: IL::BinaryOp).returns(T.nilable(IL::Value)) }
-  def simplify_binop(binop)
-    case binop.op
-    when IL::BinaryOp::Operator::ADD
-      # check for adding 0
-      if const?(binop.left, 0)
-        return binop.right
-      elsif const?(binop.right, 0)
-        return binop.left
-      end
-    when IL::BinaryOp::Operator::SUB
-      # check for subtracting 0
-      if const?(binop.right, 0) # not associative
-        return binop.left
-      end
-    when IL::BinaryOp::Operator::MUL
-      # check for mul by 1
-      if const?(binop.left, 1)
-        return binop.right
-      elsif const?(binop.right, 1)
-        return binop.left
-      end
-
-      # check for mul by 0
-      if const?(binop.left, 0)
-        return binop.left # return the zero
-      elsif const?(binop.right, 0)
-        return binop.right # same idea
-      end
-    when IL::BinaryOp::Operator::DIV
-      # check for div by 1
-      if const?(binop.right, 1) # not associative
-        return binop.left
-      end
-    when IL::BinaryOp::Operator::OR
-      # check for or with something non-zero (which is always true)
-      if const?(binop.left, 0, neg: true)
-        return binop.left # return the non-zero
-      elsif const?(binop.right, 0, neg: true)
-        return binop.right # return the non-zero
-      end
-    when IL::BinaryOp::Operator::AND
-      # check for and with something zero (which is always false)
-      if const?(binop.left, 0)
-        return binop.left # return the zero because thats what it evals to
-      elsif const?(binop.right, 0)
-        return binop.right # same idea
+        # else, replace the binop with the new value
+        s.rhs = new
       end
     end
 
-    return nil
-  end
+    private
 
-    sig { params(value: IL::Value, const: T.untyped, neg: T::Boolean).returns(T::Boolean) }
-  def const?(value, const, neg: false)
-    case value
-    # NOTE: the below should work for any numeric type
-    when IL::Constant
-      ans = value.value == const
-      if neg
-        return !ans
+    sig { params(binop: IL::BinaryOp).returns(T.nilable(IL::Value)) }
+    def simplify_binop(binop)
+      case binop.op
+      when IL::BinaryOp::Operator::ADD
+        # check for adding 0
+        if const?(binop.left, 0)
+          return binop.right
+        elsif const?(binop.right, 0)
+          return binop.left
+        end
+      when IL::BinaryOp::Operator::SUB
+        # check for subtracting 0
+        if const?(binop.right, 0) # not associative
+          return binop.left
+        end
+      when IL::BinaryOp::Operator::MUL
+        # check for mul by 1
+        if const?(binop.left, 1)
+          return binop.right
+        elsif const?(binop.right, 1)
+          return binop.left
+        end
+
+        # check for mul by 0
+        if const?(binop.left, 0)
+          return binop.left # return the zero
+        elsif const?(binop.right, 0)
+          return binop.right # same idea
+        end
+      when IL::BinaryOp::Operator::DIV
+        # check for div by 1
+        if const?(binop.right, 1) # not associative
+          return binop.left
+        end
+      when IL::BinaryOp::Operator::OR
+        # check for or with something non-zero (which is always true)
+        if const?(binop.left, 0, neg: true)
+          return binop.left # return the non-zero
+        elsif const?(binop.right, 0, neg: true)
+          return binop.right # return the non-zero
+        end
+      when IL::BinaryOp::Operator::AND
+        # check for and with something zero (which is always false)
+        if const?(binop.left, 0)
+          return binop.left # return the zero because thats what it evals to
+        elsif const?(binop.right, 0)
+          return binop.right # same idea
+        end
       end
-      return ans
-    else false
+
+      nil
+    end
+
+    sig do
+      params(value: IL::Value, const: T.untyped,
+             neg: T::Boolean).returns(T::Boolean)
+    end
+    def const?(value, const, neg: false)
+      case value
+      # NOTE: the below should work for any numeric type
+      when IL::Constant
+        ans = value.value == const
+        if neg
+          return !ans
+        end
+
+        ans
+      else false
+      end
     end
   end
 end
