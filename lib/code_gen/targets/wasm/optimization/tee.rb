@@ -18,12 +18,12 @@ module CodeGen
           include CodeGen::Targets::Wasm
 
           sig { override.returns(String) }
-          def id
+          def self.id
             "tee"
           end
 
           sig { override.returns(String) }
-          def description
+          def self.description
             "Combine set and get instructions into a single tee instruction"
           end
 
@@ -34,8 +34,8 @@ module CodeGen
             @instructions = instructions
           end
 
-          sig { void }
-          def run
+          sig { override.void }
+          def run!
             last = T.let(nil, T.nilable(Instructions::WasmInstruction))
             i = 0
             while i < @instructions.length
