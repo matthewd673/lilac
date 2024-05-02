@@ -32,7 +32,7 @@ class WasmOptimizationTest < Minitest::Test
     ]
 
     tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
-    tee.run
+    tee.run!
 
     assert original.eql?(expected)
   end
@@ -57,7 +57,7 @@ class WasmOptimizationTest < Minitest::Test
     ]
 
     tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
-    tee.run
+    tee.run!
 
     assert original.eql?(expected)
   end
@@ -154,7 +154,7 @@ class WasmOptimizationTest < Minitest::Test
     ]
 
     tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
-    tee.run
+    tee.run!
 
     assert original.eql?(expected)
   end
@@ -178,7 +178,7 @@ class WasmOptimizationTest < Minitest::Test
     ]
 
     tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
-    tee.run
+    tee.run!
 
     assert original.eql?(expected)
   end
@@ -202,7 +202,7 @@ class WasmOptimizationTest < Minitest::Test
     ]
 
     tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
-    tee.run
+    tee.run!
 
     assert original.eql?(expected)
   end

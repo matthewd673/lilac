@@ -13,12 +13,15 @@ class Pass
   abstract!
 
   sig { abstract.returns(String) }
-  def id; end
+  def self.id; end
   sig { abstract.returns(String) }
-  def description; end
+  def self.description; end
+
+  sig { abstract.void }
+  def run!; end
 
   sig { returns(String) }
   def to_s
-    "#{id}: #{description}"
+    "#{self.class.id}: #{self.class.description}"
   end
 end

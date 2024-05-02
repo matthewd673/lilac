@@ -15,37 +15,40 @@ module Optimization
     Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
     sig { override.returns(String) }
-    def id
+    def self.id
       "condense_labels"
     end
 
     sig { override.returns(String) }
-    def description
+    def self.description
       "Condense adjacent labels"
     end
 
     sig { override.returns(Integer) }
-    def level
+    def self.level
       0
     end
 
     sig { override.returns(UnitType) }
-    def unit_type
+    def self.unit_type
       UnitType::StatementList
     end
 
-    sig { params(unit: Unit).void }
-    def run(unit)
-      stmt_list = unit # alias
+    sig { params(stmt_list: Unit).void }
+    def initialize(stmt_list)
+      @stmt_list = stmt_list
+    end
 
+    sig { override.void }
+    def run!
       jump_map = {} # target name -> IL::Goto
       label_adj_map = {} # IL::Label -> the IL::Label immediately above it
 
       deletion = []
 
-      stmt_list.each_with_index do |s, i|
+      @stmt_list.each_with_index do |s, i|
         # identify adjacent labels
-        last = T.unsafe(stmt_list[i - 1]) # NOTE: workaround for sorbet 7006
+        last = T.unsafe(@stmt_list[i - 1]) # NOTE: workaround for sorbet 7006
         if s.is_a?(IL::Label) && last && last.is_a?(IL::Label)
           label_adj_map[s] = last
           deletion.push(s) # remove adjacent labels
@@ -80,7 +83,7 @@ module Optimization
 
       # delete all marked stmts
       deletion.each do |s|
-        stmt_list.delete(s)
+        @stmt_list.delete(s)
       end
     end
   end

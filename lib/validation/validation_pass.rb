@@ -14,14 +14,9 @@ module Validation
 
     abstract!
 
-    sig { params(program: IL::Program).void }
-    def run(program)
-      raise "run is unimplemented for #{id}"
-    end
-
     sig { returns(String) }
     def to_s
-      "#{id}: #{description}"
+      "#{self.class.id}: #{self.class.description}"
     end
   end
 end

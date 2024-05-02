@@ -21,12 +21,12 @@ class ToSSA < Pass
   include Analysis
 
   sig { override.returns(String) }
-  def id
+  def self.id
     "to_ssa"
   end
 
   sig { override.returns(String) }
-  def description
+  def self.description
     "Transform a CFG into SSA form in place"
   end
 
@@ -45,9 +45,9 @@ class ToSSA < Pass
     @df_facts = T.let(CFGFacts.new(cfg), CFGFacts[BB])
   end
 
-  sig { void }
+  sig { override.void }
   # Run the SSA transformation on the CFG. It will be modified in place.
-  def run
+  def run!
     # find and split all critical edges
     critical_edges = find_critical_edges
     critical_edges.each do |e|

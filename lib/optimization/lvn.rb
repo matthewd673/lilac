@@ -15,33 +15,36 @@ module Optimization
     Unit = type_member { { fixed: Analysis::BB } }
 
     sig { override.returns(String) }
-    def id
+    def self.id
       "lvn"
     end
 
     sig { override.returns(String) }
-    def description
+    def self.description
       "Local value numbering"
     end
 
     sig { override.returns(Integer) }
-    def level
+    def self.level
       1
     end
 
     sig { override.returns(UnitType) }
-    def unit_type
+    def self.unit_type
       UnitType::BasicBlock
     end
 
-    sig { params(unit: Unit).void }
-    def run(unit)
-      block = unit # alias
+    sig { params(block: Unit).void }
+    def initialize(block)
+      @block = block
+    end
 
+    sig { override.void }
+    def run!
       value_number_map = ValueNumberMap.new
       id_number_map = IDNumberMap.new
 
-      block.stmt_list.each do |s|
+      @block.stmt_list.each do |s|
         # perform constant folding on conditional jump conditions
         # this is a bonus on top of LVN's core task
         if s.is_a?(IL::JumpZero) || s.is_a?(IL::JumpNotZero)

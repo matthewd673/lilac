@@ -22,50 +22,57 @@ module Optimization
     # @param [Pass] pass The Pass to run.
     def run_pass(pass)
       # UnitType::None is a placeholder used by the parent class
-      if pass.unit_type == OptimizationPass::UnitType::None
-        raise("No unit type for optimization pass #{pass.id}")
+      if pass.class.unit_type == OptimizationPass::UnitType::None
+        raise "No unit type for optimization pass #{pass.class.id}"
       end
 
       # run on main program statements
-      case pass.unit_type
+      case pass.class.unit_type
       when OptimizationPass::UnitType::StatementList
-        pass.run(@program.stmt_list)
+        instance = T.unsafe(pass).new(@program.stmt_list)
+        instance.run!
       when OptimizationPass::UnitType::BasicBlock
         bb_list = Analysis::BB.from_stmt_list(@program.stmt_list)
 
+        instance = T.let(nil, T.nilable(OptimizationPass[T.untyped]))
         bb_list.each do |b|
-          pass.run(b)
+          instance = T.unsafe(pass).new(b)
+          instance.run!
         end
 
         stmt_list = Analysis::BB.to_stmt_list(bb_list)
         @program.stmt_list.clear
         @program.stmt_list.concat(stmt_list)
       else
-        raise("Unsupported unit type for #{pass.id}")
+        raise "Unsupported unit type for #{pass.class.id}"
       end
       @program.each_func do |f|
         # run on function body
-        case pass.unit_type
+        case pass.class.unit_type
         when OptimizationPass::UnitType::StatementList
-          pass.run(f.stmt_list)
+          instance = T.unsafe(pass).new(f.stmt_list)
+          instance.run!
         when OptimizationPass::UnitType::BasicBlock
           bb_list = Analysis::BB.from_stmt_list(f.stmt_list)
 
+          instance = T.let(nil, T.nilable(OptimizationPass[T.untyped]))
           bb_list.each do |b|
-            pass.run(b)
+            instance = T.unsafe(pass).new(b)
+            instance.run!
           end
 
           stmt_list = Analysis::BB.to_stmt_list(bb_list)
           f.stmt_list.clear
           f.stmt_list.concat(stmt_list)
         else
-          raise("Unsupported unit type for #{pass.id}")
+          raise "Unsupported unit type for #{pass.class.id}"
         end
       end
     end
 
     sig do
-      params(level: Integer).returns(T::Array[OptimizationPass[T.untyped]])
+      params(level: Integer)
+        .returns(T::Array[T.class_of(OptimizationPass)])
     end
     # Get all of the Optimizations at a given optimization level.
     # @param [Integer] level The level to select at.
