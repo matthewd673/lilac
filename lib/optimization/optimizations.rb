@@ -14,10 +14,10 @@ require_relative "simplify_redundant_binops"
 
 # A definitive list of all optimizations available in Lilac.
 Optimization::OPTIMIZATIONS = T.let([
-  CondenseLabels.new,
-  LVN.new,
-  ConstCondJumps.new,
-  RemoveUnusedLabels.new,
-  RemoveUselessJumps.new,
-  SimplifyRedundantBinops.new,
+  Optimization::CondenseLabels.new,
+  Optimization::LVN.new,
+  Optimization::ConstCondJumps.new,
+  Optimization::RemoveUnusedLabels.new,
+  Optimization::RemoveUselessJumps.new,
+  Optimization::SimplifyRedundantBinops.new,
 ].freeze, T::Array[Optimization::OptimizationPass[T.untyped]])
