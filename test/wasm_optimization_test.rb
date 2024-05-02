@@ -15,7 +15,7 @@ class WasmOptimizationTest < Minitest::Test
   include CodeGen::Targets::Wasm::Instructions
 
   sig { void }
-  def test_tee_simple
+  def test_tee_valid_one
     original = [
       Const.new(Type::I32, 5),
       LocalSet.new("a"),
@@ -29,6 +29,128 @@ class WasmOptimizationTest < Minitest::Test
       LocalTee.new("a"),
       Const.new(Type::I32, 2),
       LocalSet.new("b"),
+    ]
+
+    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee.run
+
+    assert original.eql?(expected)
+  end
+
+  sig { void }
+  def test_tee_valid_two
+    original = [
+      LocalGet.new("a"),
+      Const.new(Type::I32, 0),
+      GreaterThanSigned.new(Type::I32),
+      LocalSet.new("0"),
+      LocalGet.new("0"),
+      EqualZero.new(Type::I32),
+    ]
+
+    expected = [
+      LocalGet.new("a"),
+      Const.new(Type::I32, 0),
+      GreaterThanSigned.new(Type::I32),
+      LocalTee.new("0"),
+      EqualZero.new(Type::I32),
+    ]
+
+    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee.run
+
+    assert original.eql?(expected)
+  end
+
+  sig { void }
+  def test_tee_valid_three
+    original = [
+      Local.new(Type::I32, "a"),
+      Local.new(Type::I32, "b"),
+      Local.new(Type::I32, "0"),
+      Local.new(Type::I32, "1"),
+      Local.new(Type::I32, "2"),
+      Local.new(Type::I32, "c"),
+      Const.new(Type::I32, 5),
+      LocalSet.new("a"),
+      Const.new(Type::I32, 1),
+      LocalSet.new("b"),
+      Block.new("block_0"),
+      LocalGet.new("a"),
+      Const.new(Type::I32, 0),
+      GreaterThanSigned.new(Type::I32),
+      LocalSet.new("0"),
+      LocalGet.new("0"),
+      EqualZero.new(Type::I32),
+      BranchIf.new("block_0"),
+      Loop.new("loop_0"),
+      LocalGet.new("b"),
+      Const.new(Type::I32, 2),
+      Multiply.new(Type::I32),
+      LocalSet.new("1"),
+      LocalGet.new("1"),
+      LocalSet.new("b"),
+      LocalGet.new("a"),
+      Const.new(Type::I32, 1),
+      Subtract.new(Type::I32),
+      LocalSet.new("2"),
+      LocalGet.new("2"),
+      LocalSet.new("a"),
+      LocalGet.new("a"),
+      Const.new(Type::I32, 0),
+      GreaterThanSigned.new(Type::I32),
+      LocalSet.new("0"),
+      LocalGet.new("0"),
+      EqualZero.new(Type::I32),
+      BranchIf.new("block_0"),
+      Branch.new("loop_0"),
+      End.new,
+      End.new,
+      LocalGet.new("b"),
+      LocalSet.new("c"),
+      Return.new,
+    ]
+
+    expected = [
+      Local.new(Type::I32, "a"),
+      Local.new(Type::I32, "b"),
+      Local.new(Type::I32, "0"),
+      Local.new(Type::I32, "1"),
+      Local.new(Type::I32, "2"),
+      Local.new(Type::I32, "c"),
+      Const.new(Type::I32, 5),
+      LocalSet.new("a"),
+      Const.new(Type::I32, 1),
+      LocalSet.new("b"),
+      Block.new("block_0"),
+      LocalGet.new("a"),
+      Const.new(Type::I32, 0),
+      GreaterThanSigned.new(Type::I32),
+      LocalTee.new("0"),
+      EqualZero.new(Type::I32),
+      BranchIf.new("block_0"),
+      Loop.new("loop_0"),
+      LocalGet.new("b"),
+      Const.new(Type::I32, 2),
+      Multiply.new(Type::I32),
+      LocalTee.new("1"),
+      LocalSet.new("b"),
+      LocalGet.new("a"),
+      Const.new(Type::I32, 1),
+      Subtract.new(Type::I32),
+      LocalTee.new("2"),
+      LocalTee.new("a"),
+      Const.new(Type::I32, 0),
+      GreaterThanSigned.new(Type::I32),
+      LocalTee.new("0"),
+      EqualZero.new(Type::I32),
+      BranchIf.new("block_0"),
+      Branch.new("loop_0"),
+      End.new,
+      End.new,
+      LocalGet.new("b"),
+      LocalSet.new("c"),
+      Return.new,
     ]
 
     tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
