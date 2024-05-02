@@ -16,31 +16,34 @@ module Optimization
     Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
     sig { override.returns(String) }
-    def id
+    def self.id
       "simplify_redundant_binops"
     end
 
     sig { override.returns(String) }
-    def description
+    def self.description
       "Simplify binary operators that have no effect (i.e.: x + 0)"
     end
 
     sig { override.returns(Integer) }
-    def level
+    def self.level
       0
     end
 
     sig { override.returns(UnitType) }
-    def unit_type
+    def self.unit_type
       UnitType::StatementList
     end
 
-    sig { params(unit: Unit).void }
-    def run(unit)
-      stmt_list = unit # alias
+    sig { params(stmt_list: Unit).void }
+    def initialize(stmt_list)
+      @stmt_list = stmt_list
+    end
 
+    sig { override.void }
+    def run!
       # find all binops (which can only occur in Definitions)
-      stmt_list.each do |s|
+      @stmt_list.each do |s|
         if !s.is_a?(IL::Definition) || !s.rhs.is_a?(IL::BinaryOp)
           next
         end

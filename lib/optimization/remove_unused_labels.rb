@@ -16,32 +16,35 @@ module Optimization
     Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
     sig { override.returns(String) }
-    def id
+    def self.id
       "remove_unused_labels"
     end
 
     sig { override.returns(String) }
-    def description
+    def self.description
       "Remove labels that are never targeted"
     end
 
     sig { override.returns(Integer) }
-    def level
+    def self.level
       0
     end
 
     sig { override.returns(UnitType) }
-    def unit_type
+    def self.unit_type
       UnitType::StatementList
     end
 
-    sig { params(unit: Unit).void }
-    def run(unit)
-      stmt_list = unit # alias
+    sig { params(stmt_list: Unit).void }
+    def initialize(stmt_list)
+      @stmt_list = stmt_list
+    end
 
+    sig { override.void }
+    def run!
       # find all labels that are jumped to
       jumped_labels = []
-      stmt_list.each do |s|
+      @stmt_list.each do |s|
         unless s.is_a?(IL::Jump) then next end
 
         if jumped_labels.include?(s.target) then next end
@@ -51,7 +54,7 @@ module Optimization
 
       # delete all labels that aren't jumped to
       deletion = []
-      stmt_list.each do |s|
+      @stmt_list.each do |s|
         # only labels are relevant
         unless s.is_a?(IL::Label)
           next
@@ -64,7 +67,7 @@ module Optimization
       end
 
       deletion.each do |d|
-        stmt_list.delete(d)
+        @stmt_list.delete(d)
       end
     end
   end
