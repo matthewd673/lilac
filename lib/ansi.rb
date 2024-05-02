@@ -1,4 +1,6 @@
 # typed: strict
+# frozen_string_literal: true
+
 require "sorbet-runtime"
 
 # The ANSI module contains constants and helper functions that can be used
@@ -45,10 +47,12 @@ module ANSI
   # Must be used with +.fmt256+.
   LILAC_256 = 147
 
-  sig { params(obj: Object,
-               color: T.nilable(Integer),
-               bold: T::Boolean)
-          .returns(String) }
+  sig do
+    params(obj: Object,
+           color: T.nilable(Integer),
+           bold: T::Boolean)
+      .returns(String)
+  end
   # Format a String using ANSI codes.
   #
   # @param [T.nilable(Integer)] color The foreground color of the String.
@@ -58,10 +62,8 @@ module ANSI
   #
   # @return [String] The formatted String which can be printed as normal.
   def self.fmt(obj, color: nil, bold: false)
-    if not color
-      color = ANSI::DEFAULT
-    end
-    "\e[#{color}m#{"\e[1m" unless not bold}#{obj.to_s}\e[0m"
+    color ||= ANSI::DEFAULT
+    "\e[#{color}m#{"\e[1m" if bold}#{obj.to_s}\e[0m"
   end
 
   sig { params(obj: Object, color: Integer, bold: T::Boolean).returns(String) }
@@ -70,6 +72,6 @@ module ANSI
   # @param [Integer] color The number of the color in the xterm-256 color table.
   # @param [T::Boolean] bold Determines if the String is bold or not.
   def self.fmt256(obj, color, bold: false)
-    "\e[38;5;#{color}m#{"\e[1m" unless not bold}#{obj.to_s}\e[0m"
+    "\e[38;5;#{color}m#{"\e[1m" if bold}#{obj.to_s}\e[0m"
   end
 end

@@ -1,4 +1,6 @@
 # typed: strict
+# frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "pass"
 
@@ -7,7 +9,7 @@ class Runner
   extend T::Sig
   extend T::Generic
 
-  P = type_member {{ upper: Pass }}
+  P = type_member { { upper: Pass } }
 
   sig { returns(IL::Program) }
   # The Program that the Runner is operating on.
@@ -31,7 +33,7 @@ class Runner
   # Run a list of passes on the Program.
   # @param [T::Array[Pass]] pass_list The list of Passes to run.
   def run_passes(pass_list)
-    for p in pass_list
+    pass_list.each do |p|
       run_pass(p)
     end
   end

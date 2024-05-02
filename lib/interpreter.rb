@@ -1,4 +1,6 @@
 # typed: strict
+# frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "il"
 require_relative "visitor"
@@ -26,22 +28,22 @@ module Interpreter
     # run all validations before interpreting
     # TODO: update to work with CFG (or move all validations to tests)
     # if validate
-      # validation_runner = Validation::ValidationRunner.new(program)
-      # validation_runner.run_passes(Validation::VALIDATIONS)
+    # validation_runner = Validation::ValidationRunner.new(program)
+    # validation_runner.run_passes(Validation::VALIDATIONS)
     # end
 
     # collect all funcs in the program
     context.funcs = {}
-    program.each_func { |f|
+    program.each_func do |f|
       context.funcs[f.name] = f
-    }
+    end
 
     # collect all labels in program -- including within functions
     context.label_blocks = {}
     register_labels(context.label_blocks, program.cfg)
-    program.each_func { |f|
+    program.each_func do |f|
       register_labels(context.label_blocks, f.cfg)
-    }
+    end
 
     # begin interpretation
     interpret_cfg(program.cfg, visitor, context)
@@ -56,21 +58,25 @@ module Interpreter
 
   protected
 
-  sig { params(label_hash: T::Hash[String, Analysis::BB], cfg: Analysis::CFG).void }
+  sig do
+    params(label_hash: T::Hash[String, Analysis::BB], cfg: Analysis::CFG).void
+  end
   def self.register_labels(label_hash, cfg)
-    cfg.each_node { |b|
+    cfg.each_node do |b|
       if b.entry
         label_hash[T.unsafe(b.entry).name] = b
       end
-    }
+    end
   end
 
-  sig { params(cfg: Analysis::CFG, visitor: Visitor, context: Context)
-          .returns(T.nilable(InterpreterValue)) }
+  sig do
+    params(cfg: Analysis::CFG, visitor: Visitor, context: Context)
+      .returns(T.nilable(InterpreterValue))
+  end
   def self.interpret_cfg(cfg, visitor, context)
     while context.current != cfg.exit
       # interpret the current block
-      context.current.stmt_list.each { |s|
+      context.current.stmt_list.each do |s|
         # special handling for return
         if s.is_a?(IL::Return)
           ret_result = visitor.visit(s.value, ctx: context)
@@ -81,7 +87,7 @@ module Interpreter
         # visit a statement normally
         visitor.visit(s, ctx: context)
         context.step_ct += 1
-      }
+      end
 
       # once we've reached the end of the current block we must either:
       # jump (perhaps conditionally) or move to the block's (single) successor
@@ -92,59 +98,55 @@ module Interpreter
         cond_result = visitor.visit(jump, ctx: context)
         context.step_ct += 1
         # take appropriate branch
-        cfg.each_outgoing(context.current) { |o|
-          if not o.to.true_branch == cond_result
+        cfg.each_outgoing(context.current) do |o|
+          if o.to.true_branch != cond_result
             next
           end
 
           context.current = o.to
           break
-        }
+        end
       # block either exits with a jmp or has no @exit
       else
-        cfg.each_successor(context.current) { |s|
+        cfg.each_successor(context.current) do |s|
           context.current = s
           break # just take the first successor (there should only be one)
-        }
+        end
       end
     end
 
     # no return statement hit
     # should only happen at top level in valid IL
-    return nil
+    nil
   end
 
-  VISIT_VALUE = T.let(-> (v, o, context) {
-   if self.class == IL::Value
-     raise("#{self.class} is a stub and should not be constructed")
-   else
-     raise("Interpretation of #{self.class} is not implemented")
-   end
+  VISIT_VALUE = T.let(lambda { |v, o, context|
+    raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Value)
+
+    raise("Interpretation of #{self.class} is not implemented")
   }, Visitor::Lambda)
 
-  VISIT_CONSTANT = T.let(-> (v, o, context) {
+  VISIT_CONSTANT = T.let(lambda { |v, o, context|
     type = o.type
     value = o.value
-    return InterpreterValue.new(type, value)
+    InterpreterValue.new(type, value)
   }, Visitor::Lambda)
 
-  VISIT_ID = T.let(-> (v, o, context) {
+  VISIT_ID = T.let(lambda { |v, o, context|
     key = o.key
 
     info = context.symbols.lookup(key)
 
-    return InterpreterValue.new(info.type, info.value)
+    InterpreterValue.new(info.type, info.value)
   }, Visitor::Lambda)
 
-  VISIT_EXPRESSION = T.let(-> (v, o, context) {
-    if self.class == IL::Expression
-      raise("#{self.class} is a stub and should not be constructed")
-    else
-      raise("Interpretation of #{self.class} is not implemented")
-    end
+  VISIT_EXPRESSION = T.let(lambda  { |v, o, context|
+    raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Expression)
+
+    raise("Interpretation of #{self.class} is not implemented")
   }, Visitor::Lambda)
 
-  VISIT_BINARYOP = T.let(-> (v, o, context) {
+  VISIT_BINARYOP = T.let(lambda { |v, o, context|
     left = o.left
     right = o.right
     op = o.op
@@ -152,45 +154,45 @@ module Interpreter
     left = v.visit(left, ctx: context)
     right = v.visit(right, ctx: context)
 
-    if not left.type.eql?(right.type)
+    unless left.type.eql?(right.type)
       raise("Mismatched types '#{left.type}' and '#{right.type}'")
     end
 
     # cannot use BinaryOp.calculate since these are InterpreterValues
     result = case op
-    when IL::BinaryOp::Operator::ADD
-      left.value + right.value
-    when IL::BinaryOp::Operator::SUB
-      left.value - right.value
-    when IL::BinaryOp::Operator::MUL
-      left.value * right.value
-    when IL::BinaryOp::Operator::DIV
-      left.value / right.value
-    when IL::BinaryOp::Operator::EQ
-      if left.value == right.value then 1 else 0 end
-    when IL::BinaryOp::Operator::NEQ
-      if left.value != right.value then 1 else 0 end
-    when IL::BinaryOp::Operator::LT
-      if left.value < right.value then 1 else 0 end
-    when IL::BinaryOp::Operator::GT
-      if left.value > right.value then 1 else 0 end
-    when IL::BinaryOp::Operator::LEQ
-      if left.value <= right.value then 1 else 0 end
-    when IL::BinaryOp::Operator::GEQ
-      if left.value >= right.value then 1 else 0 end
-    when IL::BinaryOp::Operator::OR
-      if left.value != 0 || right.value != 0 then 1 else 0 end
-    when IL::BinaryOp::Operator::AND
-      if left.value != 0 && right.value != 0 then 1 else 0 end
-    else # cannot use T.absurd since o.op is untyped
-      raise("Unimplemented binary operator '#{op}'")
-    end
+             when IL::BinaryOp::Operator::ADD
+               left.value + right.value
+             when IL::BinaryOp::Operator::SUB
+               left.value - right.value
+             when IL::BinaryOp::Operator::MUL
+               left.value * right.value
+             when IL::BinaryOp::Operator::DIV
+               left.value / right.value
+             when IL::BinaryOp::Operator::EQ
+               left.value == right.value ? 1 : 0
+             when IL::BinaryOp::Operator::NEQ
+               left.value != right.value ? 1 : 0
+             when IL::BinaryOp::Operator::LT
+               left.value < right.value ? 1 : 0
+             when IL::BinaryOp::Operator::GT
+               left.value > right.value ? 1 : 0
+             when IL::BinaryOp::Operator::LEQ
+               left.value <= right.value ? 1 : 0
+             when IL::BinaryOp::Operator::GEQ
+               left.value >= right.value ? 1 : 0
+             when IL::BinaryOp::Operator::OR
+               left.value != 0 || right.value != 0 ? 1 : 0
+             when IL::BinaryOp::Operator::AND
+               left.value != 0 && right.value != 0 ? 1 : 0
+             else # cannot use T.absurd since o.op is untyped
+               raise("Unimplemented binary operator '#{op}'")
+             end
 
     # since both operands must have same type we can return either as our type
-    return InterpreterValue.new(left.type, result)
+    InterpreterValue.new(left.type, result)
   }, Visitor::Lambda)
 
-  VISIT_UNARYOP = T.let(-> (v, o, context) {
+  VISIT_UNARYOP = T.let(lambda { |v, o, context|
     value = o.value
     op = o.op
 
@@ -198,16 +200,16 @@ module Interpreter
 
     # cannot use UnaryOp.calculate since these are InterpreterValues
     result = case op
-    when IL::UnaryOp::Operator::NEG
-      0 - value.value
-    else
-      raise("Unsupported unary operator '#{op}'")
-    end
+             when IL::UnaryOp::Operator::NEG
+               0 - value.value
+             else
+               raise("Unsupported unary operator '#{op}'")
+             end
 
-    return InterpreterValue.new(value.type, result)
+    InterpreterValue.new(value.type, result)
   }, Visitor::Lambda)
 
-  VISIT_CALL = T.let(-> (v, o, context) {
+  VISIT_CALL = T.let(lambda { |v, o, context|
     func_name = o.func_name
     args = o.args
     func = context.funcs[func_name]
@@ -215,9 +217,9 @@ module Interpreter
 
     # fill in param values with call args
     arg_vals = []
-    args.each { |a|
+    args.each do |a|
       arg_vals.push(v.visit(a, ctx: context).value)
-    }
+    end
 
     # temporarily leave current func scope
     this_func_scope = nil
@@ -233,11 +235,11 @@ module Interpreter
 
     # fill in params with args (that were computed in this_func_scope)
     arg_index = 0
-    func.params.each { |p|
+    func.params.each do |p|
       arg_symbol = SymbolInfo.new(p.id.key, p.type, arg_vals[arg_index])
       context.symbols.insert(arg_symbol)
       arg_index += 1
-    }
+    end
 
     # interpret body of function
     ret_value = interpret_cfg(cfg, v, context)
@@ -250,23 +252,23 @@ module Interpreter
     context.current = this_current
 
     # return value from inside function
-    return ret_value
+    ret_value
   }, Visitor::Lambda)
 
-  VISIT_PHI = T.let(-> (v, o, context) {
+  VISIT_PHI = T.let(lambda { |v, o, context|
     ids = o.ids
 
     # find the id in the phi function that was last written to
     last_written = T.let(nil, T.nilable(SymbolInfo))
-    ids.each { |id|
+    ids.each do |id|
       id_info = context.symbols.lookup(id.key)
 
       # can happen if other branch has never been hit so far
-      if not id_info
+      unless id_info
         next
       end
 
-      if not last_written
+      unless last_written
         last_written = id_info
         next
       end
@@ -274,24 +276,22 @@ module Interpreter
       if id_info.write_time > last_written.write_time
         last_written = id_info
       end
-    }
+    end
 
-    if not last_written
+    unless last_written
       raise("Failed to lookup value for phi function")
     end
 
-    return InterpreterValue.new(last_written.type, last_written.value)
+    InterpreterValue.new(last_written.type, last_written.value)
   }, Visitor::Lambda)
 
-  VISIT_STATEMENT = T.let(-> (v, o, context) {
-    if self.class == IL::Statement
-      raise("#{self.class} is a stub and should not be constructed")
-    else
-      raise("Interpretation of #{self.class} is not implemented")
-    end
+  VISIT_STATEMENT = T.let(lambda { |v, o, context|
+    raise("#{self.class} is a stub and should not be constructed") if instance_of?(IL::Statement)
+
+    raise("Interpretation of #{self.class} is not implemented")
   }, Visitor::Lambda)
 
-  VISIT_DEFINITION = T.let(-> (v, o, context) {
+  VISIT_DEFINITION = T.let(lambda { |v, o, context|
     type = o.type
     id = o.id
     rhs = o.rhs
@@ -304,7 +304,7 @@ module Interpreter
     context.symbols.insert(symbol)
   }, Visitor::Lambda)
 
-  VISIT_JUMP = T.let(-> (v, o, context) {
+  VISIT_JUMP = T.let(lambda { |v, o, context|
     target = o.target
 
     # move instruction pointer there
@@ -312,7 +312,7 @@ module Interpreter
     context.ip = index
   }, Visitor::Lambda)
 
-  VISIT_JUMPZERO = T.let(-> (v, o, context) {
+  VISIT_JUMPZERO = T.let(lambda { |v, o, context|
     cond = o.cond
     target = o.target
 
@@ -320,10 +320,10 @@ module Interpreter
     cond_eval = v.visit(cond, ctx: context)
 
     # return true if jump should execute
-    return cond_eval.value == 0
+    cond_eval.value == 0
   }, Visitor::Lambda)
 
-  VISIT_JUMPNOTZERO = T.let(-> (v, o, context) {
+  VISIT_JUMPNOTZERO = T.let(lambda { |v, o, context|
     cond = o.cond
     target = o.target
 
@@ -331,7 +331,7 @@ module Interpreter
     cond_eval = v.visit(cond, ctx: context)
 
     # return true if jump should execute
-    return cond_eval.value != 0
+    cond_eval.value != 0
   }, Visitor::Lambda)
 
   VISIT_LAMBDAS = T.let({
@@ -349,7 +349,7 @@ module Interpreter
     IL::JumpZero => VISIT_JUMPZERO,
     IL::JumpNotZero => VISIT_JUMPNOTZERO,
     # NOTE: IL::Return is handled manually as a special case
-  }, Visitor::LambdaHash)
+  }.freeze, Visitor::LambdaHash)
 
   private
 
@@ -361,6 +361,7 @@ module Interpreter
 
     sig { returns(IL::Type) }
     attr_reader :type
+
     sig { returns(T.untyped) }
     attr_reader :value
 
@@ -383,10 +384,13 @@ module Interpreter
 
     sig { returns(String) }
     attr_reader :key
+
     sig { returns(IL::Type) }
     attr_reader :type
+
     sig { returns(T.untyped) }
     attr_accessor :value
+
     sig { returns(Integer) }
     attr_accessor :write_time
 
@@ -424,21 +428,21 @@ module Interpreter
 
       # FIXME: patch for weird SSA Register renaming
       #        REMOVE once SSA renaming is fixed!
-      if (not symbol) and (not key.include?("#"))
-        symbol = @symbols[key + "#0"]
+      if (!symbol) and (!key.include?("#"))
+        symbol = @symbols["#{key}#0"]
       end
 
-      return symbol
+      symbol
     end
 
     sig { returns(String) }
     def to_s
       s = ""
-      @symbols.keys.each { |k|
+      @symbols.each_key do |k|
         s += "#{@symbols[k]}\n"
-      }
+      end
       s.chomp!("\n")
-      return s
+      s
     end
   end
 
@@ -468,21 +472,21 @@ module Interpreter
 
     sig { params(key: String).returns(T.nilable(SymbolInfo)) }
     def lookup(key)
-      @scopes.reverse_each { |s|
+      @scopes.reverse_each do |s|
         symbol = s.lookup(key)
         if symbol then return symbol end
-      }
-      return nil
+      end
+      nil
     end
 
     sig { returns(String) }
     def to_s
       s = ""
-      @scopes.each { |scope|
+      @scopes.each do |scope|
         s += "scope:\n"
         s += scope.to_s
-      }
-      return s
+      end
+      s
     end
   end
 
@@ -494,14 +498,19 @@ module Interpreter
 
     sig { returns(Analysis::BB) }
     attr_accessor :current
+
     sig { returns(Integer) }
     attr_accessor :step_ct
+
     sig { returns(SymbolTable) }
     attr_reader :symbols
+
     sig { returns(T::Hash[String, IL::CFGFuncDef]) }
     attr_accessor :funcs # func name -> CFGFuncDef
+
     sig { returns(T.nilable(IL::CFGFuncDef)) }
     attr_accessor :in_func
+
     sig { returns(T::Hash[String, Analysis::BB]) }
     attr_accessor :label_blocks # label name -> BB object
 
@@ -511,9 +520,9 @@ module Interpreter
       @step_ct = T.let(0, Integer)
       @symbols = T.let(SymbolTable.new, SymbolTable)
       @symbols.push_scope(Scope.new) # symbol table always has top-level scope
-      @funcs = T.let(Hash.new, T::Hash[String, IL::CFGFuncDef])
+      @funcs = T.let({}, T::Hash[String, IL::CFGFuncDef])
       @in_func = T.let(nil, T.nilable(IL::CFGFuncDef))
-      @label_blocks = T.let(Hash.new, T::Hash[String, Analysis::BB])
+      @label_blocks = T.let({}, T::Hash[String, Analysis::BB])
     end
   end
 end

@@ -1,4 +1,6 @@
 # typed: strict
+# frozen_string_literal: true
+
 require "sorbet-runtime"
 require_relative "il"
 
@@ -9,6 +11,7 @@ class ILSymbol
   sig { returns(IL::ID) }
   # The ID that this symbol corresponds to.
   attr_reader :id
+
   sig { returns(IL::Type) }
   # The type of the symbol.
   attr_reader :type
@@ -100,11 +103,11 @@ class SymbolTable
   # @return [T.nilable(ILSymbol)] The topmost symbol with the given key. If
   #   no such symbol exists in the table it will return +nil+.
   def lookup(key)
-    @scopes.reverse_each { |s|
+    @scopes.reverse_each do |s|
       symbol = s.lookup(key)
       if symbol then return symbol end
-    }
-    return nil
+    end
+    nil
   end
 
   sig { returns(T.nilable(Scope)) }

@@ -1,4 +1,6 @@
 # typed: strict
+# frozen_string_literal: true
+
 require "sorbet-runtime"
 
 # A Graph is a generic data structure representing a graph with nodes and
@@ -7,7 +9,7 @@ class Graph
   extend T::Sig
   extend T::Generic
 
-  Node = type_member {{ upper: Object }}
+  Node = type_member { { upper: Object } }
 
   # An Edge is a generic data structure representing a directed edge between
   # two nodes in a graph.
@@ -15,10 +17,11 @@ class Graph
     extend T::Sig
     extend T::Generic
 
-    Node = type_member {{ upper: Object }}
+    Node = type_member { { upper: Object } }
 
     sig { returns(Node) }
     attr_reader :from
+
     sig { returns(Node) }
     attr_reader :to
 
@@ -38,7 +41,7 @@ class Graph
         return false
       end
 
-      return (to.eql?(other.to) and from.eql?(other.from))
+      (to.eql?(other.to) and from.eql?(other.from))
     end
 
     sig { returns(String) }
@@ -53,8 +56,8 @@ class Graph
     @nodes = T.let([], T::Array[Node])
     @edges = T.let([], T::Array[Edge[Node]])
 
-    @incoming = T.let(Hash.new, T::Hash[Node, T::Set[Edge[Node]]])
-    @outgoing = T.let(Hash.new, T::Hash[Node, T::Set[Edge[Node]]])
+    @incoming = T.let({}, T::Hash[Node, T::Set[Edge[Node]]])
+    @outgoing = T.let({}, T::Hash[Node, T::Set[Edge[Node]]])
   end
 
   sig { params(block: T.proc.params(arg0: Node).void).void }
@@ -86,7 +89,7 @@ class Graph
   # @param [Node] node The node to iterate for.
   def each_incoming(node, &block)
     incoming = @incoming[node]
-    if not incoming
+    if !incoming
       []
     else
       incoming.each(&block)
@@ -100,7 +103,7 @@ class Graph
   # @param [Node] node The node to iterate for.
   def each_outgoing(node, &block)
     outgoing = @outgoing[node]
-    if not outgoing
+    if !outgoing
       []
     else
       outgoing.each(&block)
@@ -110,7 +113,7 @@ class Graph
   sig { params(node: Node).returns(Integer) }
   def incoming_length(node)
     incoming = @incoming[node]
-    if not incoming
+    if !incoming
       0
     else
       incoming.length
@@ -120,7 +123,7 @@ class Graph
   sig { params(node: Node).returns(Integer) }
   def outgoing_length(node)
     outgoing = @outgoing[node]
-    if not outgoing
+    if !outgoing
       0
     else
       outgoing.length
@@ -132,9 +135,9 @@ class Graph
   #
   # @param [Node] node The node to iterate for.
   def each_predecessor(node, &block)
-    each_incoming(node) { |e|
+    each_incoming(node) do |e|
       yield e.from
-    }
+    end
   end
 
   sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
@@ -142,9 +145,9 @@ class Graph
   #
   # @param [Node] node The node to iterate for.
   def each_successor(node, &block)
-    each_outgoing(node) { |e|
+    each_outgoing(node) do |e|
       yield e.to
-    }
+    end
   end
 
   sig { params(node: Node).returns(Integer) }
@@ -155,7 +158,7 @@ class Graph
   #   not in the graph this will be +0+.
   def predecessors_length(node)
     incoming = @incoming[node]
-    if not incoming
+    if !incoming
       0
     else
       incoming.length
@@ -170,7 +173,7 @@ class Graph
   #   not in the graph this will be +0+.
   def successors_length(node)
     outgoing = @outgoing[node]
-    if not outgoing
+    if !outgoing
       0
     else
       outgoing.length
@@ -193,13 +196,13 @@ class Graph
   def delete_node(node)
     @nodes.delete(node)
 
-    each_outgoing(node) { |o|
+    each_outgoing(node) do |o|
       delete_edge(o)
-    }
+    end
 
-    each_incoming(node) { |i|
+    each_incoming(node) do |i|
       delete_edge(i)
-    }
+    end
   end
 
   sig { params(edge: Edge[Node]).void }
@@ -212,13 +215,13 @@ class Graph
     @edges.push(edge)
 
     # add this edge to "from"'s outgoing
-    if not @outgoing[edge.from]
+    unless (@outgoing[edge.from])
       @outgoing[edge.from] = Set[]
     end
     T.unsafe(@outgoing[edge.from]).add(edge)
 
     # add this edge to "to"'s incoming
-    if not @incoming[edge.to]
+    unless (@incoming[edge.to])
       @incoming[edge.to] = Set[]
     end
     T.unsafe(@incoming[edge.to]).add(edge)
@@ -235,24 +238,22 @@ class Graph
 
     # remove this edge from "from"'s outgoing
     outgoing = @outgoing[edge.from]
-    if outgoing # should never be nil
-      outgoing.delete(edge)
-    end
+    # should never be nil
+    outgoing&.delete(edge)
 
     # remove this edge from "to"'s incoming
     incoming = @incoming[edge.to]
-    if incoming # should never be nil
-      incoming.delete(edge)
-    end
+    # should never be nil
+    incoming&.delete(edge)
   end
 
   sig { params(from: Node, to: Node).returns(T.nilable(Edge[Node])) }
   def find_edge(from, to)
-    each_outgoing(from) { |o|
+    each_outgoing(from) do |o|
       if o.to == to
         return o
       end
-    }
+    end
 
     nil
   end
@@ -266,44 +267,46 @@ class Graph
   def postorder_numbering(node)
     numbering = {}
     i = 0
-    postorder_traversal(node) { |n|
+    postorder_traversal(node) do |n|
       numbering[n] = i
       i += 1
-    }
-    return numbering
+    end
+    numbering
   end
 
   sig { params(node: Node).returns(T::Hash[Analysis::BB, Integer]) }
   def reverse_postorder_numbering(node)
     numbering = {}
     i = @nodes.length - 1
-    postorder_traversal(node) { |n|
+    postorder_traversal(node) do |n|
       numbering[n] = i
       i -= 1
-    }
-    return numbering
+    end
+    numbering
   end
 
   sig { returns(Graph[Node]) }
   def clone
     new_graph = Graph.new
 
-    @nodes.each { |n|
+    @nodes.each do |n|
       new_graph.add_node(n)
-    }
-    @edges.each { |e|
+    end
+    @edges.each do |e|
       new_graph.add_edge(e)
-    }
+    end
 
-    return new_graph
+    new_graph
   end
 
   private
 
-  sig { params(node: Node,
-               seen: T::Set[Node],
-               block: T.proc.params(arg0: Node).void)
-          .void }
+  sig do
+    params(node: Node,
+           seen: T::Set[Node],
+           block: T.proc.params(arg0: Node).void)
+      .void
+  end
   def postorder_traversal_helper(node, seen, &block)
     if seen.include?(node)
       return
@@ -311,9 +314,9 @@ class Graph
 
     seen.add(node)
 
-    each_successor(node) { |s|
-     postorder_traversal_helper(s, seen, &block)
-    }
+    each_successor(node) do |s|
+      postorder_traversal_helper(s, seen, &block)
+    end
     yield node
   end
 end
