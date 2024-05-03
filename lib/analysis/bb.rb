@@ -3,7 +3,6 @@
 
 require "sorbet-runtime"
 require_relative "analysis"
-require_relative "cfg"
 require_relative "../il"
 
 module Analysis
@@ -67,9 +66,9 @@ module Analysis
     # @return [String] A String representation of the block.
     def to_s
       id_str = id.to_s
-      if id == Analysis::CFG::ENTRY
+      if id == -1 # hardcoded and ugly
         id_str = "ENTRY"
-      elsif id == Analysis::CFG::EXIT
+      elsif id == -2 # hardcoded and ugly
         id_str = "EXIT"
       end
 
@@ -166,7 +165,7 @@ module Analysis
       end
 
       # scoop up stragglers
-      unless block_stmts.empty?
+      if !block_stmts.empty? || current_entry
         blocks.push(Analysis::BB.new(blocks.length,
                                      entry: current_entry,
                                      stmt_list: block_stmts))
