@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
+require "securerandom"
 require_relative "analysis"
 require_relative "../il"
 
@@ -10,7 +11,7 @@ module Analysis
   class BB
     extend T::Sig
 
-    sig { returns(Integer) }
+    sig { returns(String) }
     # The unique ID of the block.
     attr_reader :id
 
@@ -32,7 +33,7 @@ module Analysis
     attr_accessor :true_branch
 
     sig do
-      params(id: Integer,
+      params(id: String,
              entry: T.nilable(IL::Label),
              exit: T.nilable(IL::Jump),
              stmt_list: T::Array[IL::Statement],
@@ -139,7 +140,7 @@ module Analysis
         if s.is_a?(IL::Label)
           # push previous block onto list (exit is nil)
           unless block_stmts.empty? && !current_entry
-            blocks.push(Analysis::BB.new(blocks.length,
+            blocks.push(Analysis::BB.new(SecureRandom.uuid,
                                          entry: current_entry,
                                          stmt_list: block_stmts))
             block_stmts = []
@@ -156,7 +157,7 @@ module Analysis
         # mark end of a block
         next unless s.is_a?(IL::Jump)
 
-        blocks.push(Analysis::BB.new(blocks.length,
+        blocks.push(Analysis::BB.new(SecureRandom.uuid,
                                      entry: current_entry,
                                      exit: s,
                                      stmt_list: block_stmts))
@@ -166,7 +167,7 @@ module Analysis
 
       # scoop up stragglers
       if !block_stmts.empty? || current_entry
-        blocks.push(Analysis::BB.new(blocks.length,
+        blocks.push(Analysis::BB.new(SecureRandom.uuid,
                                      entry: current_entry,
                                      stmt_list: block_stmts))
       end

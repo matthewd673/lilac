@@ -11,6 +11,27 @@ module IL
   # "visited". For example, +IL::Value+ is in but +IL::Type+ is out.
   ILObject = T.type_alias { T.any(Value, Expression, Statement) }
 
+  # SignedIntegerType is a type-alias for any signed integer type in the IL.
+  SignedIntegerType = T.type_alias do
+    T.any(Type::I8, Type::I16, Type::I32, Type::I64)
+  end
+
+  # UnsignedIntegerType is a type-alias for any unsigned integer type in the IL.
+  UnsignedIntegerType = T.type_alias do
+    T.any(Type::U8, Type::I16, Type::I32, Type::I64)
+  end
+
+  # IntegerType is a type-alias for any signed or unsigned integer type
+  # in the IL.
+  IntegerType = T.type_alias do
+    T.any(SignedIntegerType, UnsignedIntegerType)
+  end
+
+  # FloatType is a type-alias for any floating point type in the IL.
+  FloatType = T.type_alias do
+    T.any(Type::F32, Type::F64)
+  end
+
   # A Type is an enum of all the possible primitive data types in the IL.
   class Type < T::Enum
     extend T::Sig
@@ -20,6 +41,14 @@ module IL
       Void = new
       # An unsigned 8-bit integer.
       U8 = new
+      # An unsigned 16-bit integer.
+      U16 = new
+      # An unsigned 32-bit integer.
+      U32 = new
+      # An unsigned 64-bit integer.
+      U64 = new
+      # A signed 8-bit integer.
+      I8 = new
       # A signed 16-bit integer.
       I16 = new
       # A signed 32-bit integer.
@@ -37,6 +66,10 @@ module IL
       case self
       when Void then "void"
       when U8 then "u8"
+      when U16 then "u16"
+      when U32 then "u32"
+      when U64 then "u64"
+      when I8 then "i8"
       when I16 then "i16"
       when I32 then "i32"
       when I64 then "i64"

@@ -6,8 +6,8 @@ require_relative "../graph"
 require_relative "analysis"
 require_relative "bb"
 
-# A CFG is a type of +Graph+ used to represent control flow graphs.
 module Analysis
+  # A CFG is a type of +Graph+ that represents control flow graphs.
   class CFG < Graph
     extend T::Sig
     extend T::Generic
@@ -16,10 +16,10 @@ module Analysis
 
     Node = type_member { { fixed: BB } }
 
-    # The number used by the ENTRY block in any CFG.
-    ENTRY = -1
-    # The number used by the EXIT block in any CFG.
-    EXIT = -2
+    # The ID used by the ENTRY block in any CFG.
+    ENTRY = "ENTRY"
+    # The ID used by the EXIT block in any CFG.
+    EXIT = "EXIT"
 
     sig { returns(BB) }
     # The ENTRY block in this CFG.
@@ -36,8 +36,8 @@ module Analysis
     sig { params(block_list: T::Array[BB]).void }
     # Construct a new CFG from a list of basic blocks.
     #
-    # @param [T::Array[BB]] block_list The list of basic blocks which will be the
-    #   nodes of this CFG.
+    # @param [T::Array[BB]] block_list The list of basic blocks which will be
+    #   the nodes of this CFG.
     def initialize(block_list)
       super()
 
@@ -65,18 +65,6 @@ module Analysis
       @label_map[T.unsafe(node.entry).name] = node
     end
 
-    sig { returns(Integer) }
-    # Find the maximum block ID in the graph. Requires an O(n) search.
-    #
-    # @return [Integer] The maximum block ID.
-    def max_block_id
-      max = -1 # also = to ENTRY so be careful
-      each_block do |b|
-        if b.id > max then max = b.id end
-      end
-      max
-    end
-
     private
 
     sig { params(block_list: T::Array[BB]).void }
@@ -93,7 +81,7 @@ module Analysis
       end
 
       # connect blocks into graph nodes
-      block_list.each do |b|
+      block_list.each_with_index do |b, i|
         # create edge for block exit (some IL::Jump)
         if b.exit
           jump = T.unsafe(b.exit) # to placate Sorbet below
@@ -101,12 +89,13 @@ module Analysis
           # find block that jump is targeting
           successor = @label_map[jump.target]
           unless successor # this is unlikely but I think possible
-            raise("CFG attempted to build edge to label that doesn't exist: \"#{jump.target}\"")
+            raise "CFG attempted to build edge to label that doesn't exist: "\
+                  "\"#{jump.target}\""
           end
 
           # create an edge to the target block
-          # if jump IS conditional then the edge must be (and we can easily check
-          # if a jump is conditional based on its class)
+          # if jump IS conditional then the edge must be (and we can easily
+          # check if a jump is conditional based on its class)
           successor.true_branch = jump.class != IL::Jump
           add_edge(Edge.new(b, successor))
 
@@ -117,7 +106,7 @@ module Analysis
         end
 
         # create edge to next block
-        following = block_list[b.id + 1]
+        following = block_list[i + 1]
         if following
           following.true_branch = false
           add_edge(Edge.new(b, following))
