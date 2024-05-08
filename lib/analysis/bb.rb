@@ -17,11 +17,11 @@ module Analysis
 
     sig { returns(T.nilable(IL::Label)) }
     # The Label that marks the entry of the block (if one exists)
-    attr_reader :entry
+    attr_accessor :entry
 
     sig { returns(T.nilable(IL::Jump)) }
     # The Jump that marks the exit of the block (if one exists)
-    attr_reader :exit
+    attr_accessor :exit
 
     sig { returns(T::Array[IL::Statement]) }
     # The Statements in the block.
