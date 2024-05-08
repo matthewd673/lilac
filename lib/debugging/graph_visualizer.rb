@@ -41,7 +41,7 @@ module Debugging
           end
         end
 
-        str += "#{name} [label=#{label} shape=#{shape}]\n"
+        str += "\"#{name}\" [label=\"#{label}\" shape=#{shape}]\n"
       end
 
       # define edges
@@ -55,7 +55,7 @@ module Debugging
           color = "blue"
         end
 
-        str += "#{from_name} -> #{to_name} [constraint=false color=#{color}]\n"
+        str += "\"#{from_name}\" -> \"#{to_name}\" [constraint=false color=#{color}]\n"
       end
 
       str += "}"
