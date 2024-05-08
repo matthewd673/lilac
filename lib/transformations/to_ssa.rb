@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
+require "securerandom"
 require_relative "../pass"
 require_relative "../il"
 require_relative "../graph"
@@ -80,8 +81,7 @@ module Transformations
       @cfg.delete_edge(edge)
 
       # create new block in the middle
-      new_id = @cfg.max_block_id + 1
-      new_block = BB.new(new_id, stmt_list: [])
+      new_block = BB.new(SecureRandom.uuid, stmt_list: [])
       @cfg.add_node(new_block)
 
       # if old "to" was a true_branch, move that status to "new_block"
