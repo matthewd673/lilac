@@ -6,14 +6,15 @@ require_relative "debugging"
 require_relative "../graph"
 require_relative "../analysis/bb"
 
-# The GraphVisualizer module provides functions to visualize Graph objects.
-# It also includes special features to enhance CFG visualizations.
 module Debugging
+  # The GraphVisualizer module provides functions to visualize Graph objects.
+  # It also includes special features to enhance CFG visualizations.
   module GraphVisualizer
     extend T::Sig
 
     sig { params(graph: Graph[T.untyped]).returns(String) }
-    # Generate a String representation of the graph in the Graphviz DOT language.
+    # Generate a String representation of the graph in the Graphviz DOT
+    # language.
     #
     # @param [Graph] graph The graph to visualize.
     # @return [String] A String containing DOT code.
