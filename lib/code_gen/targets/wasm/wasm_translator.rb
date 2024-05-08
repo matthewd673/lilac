@@ -16,10 +16,10 @@ require_relative "../../../analysis/dom_tree"
 require_relative "relooper"
 require_relative "wasm_block"
 
-# A WasmTranslator translates Lilac IL into Wasm instructions.
 module CodeGen
   module Targets
     module Wasm
+      # A WasmTranslator translates Lilac IL into Wasm instructions.
       class WasmTranslator < CodeGen::Translator
         extend T::Sig
 
@@ -28,7 +28,7 @@ module CodeGen
         sig { params(cfg_program: IL::CFGProgram).void }
         def initialize(cfg_program)
           @symbols = T.let(SymbolTable.new, SymbolTable)
-          wasm_translator = CodeGen::Targets::Wasm::WasmILTransformer.new(@symbols)
+          wasm_translator = WasmILTransformer.new(@symbols)
 
           @loop_ct = T.let(0, Integer)
           @block_ct = T.let(0, Integer)
@@ -74,9 +74,8 @@ module CodeGen
             param_types.push(Instructions.to_wasm_type(t))
           end
 
-          # result type for void functions in Wasm is just nil
           if extern_funcdef.ret_type != IL::Type::Void
-            result = Instructions.to_wasm_type(T.unsafe(extern_funcdef.ret_type))
+            result = Instructions.to_wasm_type(extern_funcdef.ret_type)
           end
 
           # construct import object
@@ -132,8 +131,8 @@ module CodeGen
           # NOTE: assume that our caller has kindly pushed a new scope
           cfg.each_node do |b|
             # scan each block for definitions and log them
-            # a previous validation should have already ensured that there are no
-            # inconsistent types, so we don't need any checks here.
+            # a previous validation should have already ensured that there are
+            # no inconsistent types, so we don't need any checks here.
             b.stmt_list.each do |s|
               unless s.is_a?(IL::Definition)
                 next
@@ -187,8 +186,18 @@ module CodeGen
             if bb_exit.is_a?(IL::JumpZero)
               cond_il_type = T.cast(@transformer, WasmILTransformer)
                               .get_il_type(bb_exit.cond)
-              cond_type = Instructions.to_integer_type(cond_il_type)
-              instructions.push(Instructions::EqualZero.new(cond_type))
+
+              # handle integer or non-integer IL type
+              if cond_il_type.integer?
+                cond_type = Instructions.to_integer_type(cond_il_type)
+                instructions.push(Instructions::EqualZero.new(cond_type))
+              elsif cond_il_type.float?
+                cond_type = Instructions.to_float_type(cond_il_type)
+                instructions.push(Instructions::Const.new(cond_type, 0.0))
+                instructions.push(Instructions::Equal.new(cond_type))
+              else # NOTE: I think this never happens
+                raise "Unexpected conditional IL type"
+              end
             end
             instructions.push(Instructions::If.new)
 
@@ -207,7 +216,8 @@ module CodeGen
               instructions.push(Instructions::Else.new)
 
               # translate false branch
-              if_false_branch = translate_wasm_block(T.unsafe(block.false_branch))
+              block_false_branch = T.unsafe(block.false_branch)
+              if_false_branch = translate_wasm_block(block_false_branch)
               instructions.concat(if_false_branch)
             end
 
@@ -216,7 +226,8 @@ module CodeGen
 
             # translate the following blocks
             if block.next_block
-              instructions.concat(translate_wasm_block(T.unsafe(block.next_block)))
+              block_next_block = T.unsafe(block.next_block)
+              instructions.concat(translate_wasm_block(block_next_block))
             end
 
             instructions
@@ -238,12 +249,21 @@ module CodeGen
             end
 
             cond_insts.push(push_value(bb_exit.cond))
-            # TODO: handle jz with non-int cond value
-            if bb_exit.is_a?(IL::JumpZero)
+            if bb_exit.is_a?(IL::JumpZero) # TODO: handle JumpNotZero?
               cond_il_type = T.cast(@transformer, WasmILTransformer)
                               .get_il_type(bb_exit.cond)
-              cond_type = Instructions.to_integer_type(cond_il_type)
-              cond_insts.push(Instructions::EqualZero.new(cond_type))
+
+              # handle integer or non-integer IL type
+              if cond_il_type.integer?
+                cond_type = Instructions.to_integer_type(cond_il_type)
+                cond_insts.push(Instructions::EqualZero.new(cond_type))
+              elsif cond_il_type.float?
+                cond_type = Instructions.to_float_type(cond_il_type)
+                cond_insts.push(Instructions::Const.new(cond_type, 0.0))
+                cond_insts.push(Instructions::Equal.new(cond_type))
+              else # NOTE: I think this never happens
+                raise "Unexpected conditional IL type"
+              end
             end
 
             # create the outer block
@@ -279,7 +299,8 @@ module CodeGen
 
             # translate the following blocks
             if block.next_block
-              instructions.concat(translate_wasm_block(T.unsafe(block.next_block)))
+              block_next_block = T.unsafe(block.next_block)
+              instructions.concat(translate_wasm_block(block_next_block))
             end
 
             instructions
@@ -293,7 +314,8 @@ module CodeGen
 
             # translate next block
             if block.next_block
-              instructions.concat(translate_wasm_block(T.unsafe(block.next_block)))
+              block_next_block = T.unsafe(block.next_block)
+              instructions.concat(translate_wasm_block(block_next_block))
             end
 
             instructions
