@@ -11,8 +11,8 @@ require_relative "../lib/code_gen/targets/wasm/optimization/tee"
 class WasmOptimizationTest < Minitest::Test
   extend T::Sig
 
-  include CodeGen::Targets::Wasm
-  include CodeGen::Targets::Wasm::Instructions
+  include Lilac::CodeGen::Targets::Wasm
+  include Lilac::CodeGen::Targets::Wasm::Instructions
 
   sig { void }
   def test_tee_valid_one
@@ -31,7 +31,7 @@ class WasmOptimizationTest < Minitest::Test
       LocalSet.new("b"),
     ]
 
-    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee = Lilac::CodeGen::Targets::Wasm::Optimization::Tee.new(original)
     tee.run!
 
     assert original.eql?(expected)
@@ -56,7 +56,7 @@ class WasmOptimizationTest < Minitest::Test
       EqualZero.new(Type::I32),
     ]
 
-    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee = Lilac::CodeGen::Targets::Wasm::Optimization::Tee.new(original)
     tee.run!
 
     assert original.eql?(expected)
@@ -153,7 +153,7 @@ class WasmOptimizationTest < Minitest::Test
       Return.new,
     ]
 
-    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee = Lilac::CodeGen::Targets::Wasm::Optimization::Tee.new(original)
     tee.run!
 
     assert original.eql?(expected)
@@ -177,7 +177,7 @@ class WasmOptimizationTest < Minitest::Test
       LocalSet.new("c"),
     ]
 
-    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee = Lilac::CodeGen::Targets::Wasm::Optimization::Tee.new(original)
     tee.run!
 
     assert original.eql?(expected)
@@ -201,7 +201,7 @@ class WasmOptimizationTest < Minitest::Test
       Subtract.new(Type::I32),
     ]
 
-    tee = CodeGen::Targets::Wasm::Optimization::Tee.new(original)
+    tee = Lilac::CodeGen::Targets::Wasm::Optimization::Tee.new(original)
     tee.run!
 
     assert original.eql?(expected)

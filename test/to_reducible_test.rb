@@ -13,9 +13,9 @@ require_relative "../lib/debugging/graph_visualizer"
 class ToReducibleTest < Minitest::Test
   extend T::Sig
 
-  include IL
-  include Analysis
-  include Transformations
+  include Lilac::IL
+  include Lilac::Analysis
+  include Lilac::Transformations
 
   sig { void }
   def test_already_reducible

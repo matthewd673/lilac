@@ -11,8 +11,8 @@ require_relative "../lib/analysis/reducible"
 class ReducibleTest < Minitest::Test
   extend T::Sig
 
-  include IL
-  include Analysis
+  include Lilac::IL
+  include Lilac::Analysis
 
   sig { void }
   def test_reducible_one
