@@ -4,11 +4,13 @@
 require "sorbet-runtime"
 require_relative "../targets"
 
-# The Wasm module contains tools for generating Wasm from Lilac IL.
-module CodeGen
-  module Targets
-    module Wasm
-      # NOTE: namespace stub
+module Lilac
+  module CodeGen
+    module Targets
+      # The Wasm module contains tools for generating Wasm from Lilac IL.
+      module Wasm
+        # NOTE: namespace stub
+      end
     end
   end
 end

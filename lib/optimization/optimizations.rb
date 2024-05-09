@@ -12,12 +12,16 @@ require_relative "remove_unused_labels"
 require_relative "remove_useless_jumps"
 require_relative "simplify_redundant_binops"
 
-# A definitive list of all optimizations available in Lilac.
-Optimization::OPTIMIZATIONS = T.let([
-  Optimization::CondenseLabels,
-  Optimization::LVN,
-  Optimization::ConstCondJumps,
-  Optimization::RemoveUnusedLabels,
-  Optimization::RemoveUselessJumps,
-  Optimization::SimplifyRedundantBinops,
-].freeze, T::Array[T.class_of(Optimization::OptimizationPass)])
+module Lilac
+  module Optimization
+    # A definitive list of all optimizations available in Lilac.
+    OPTIMIZATIONS = T.let([
+      CondenseLabels,
+      LVN,
+      ConstCondJumps,
+      RemoveUnusedLabels,
+      RemoveUselessJumps,
+      SimplifyRedundantBinops,
+    ].freeze, T::Array[T.class_of(OptimizationPass)])
+  end
+end
