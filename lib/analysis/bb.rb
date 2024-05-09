@@ -94,7 +94,11 @@ module Analysis
     # Returns true if two BBs are equal. BBs are considered equal if they have
     # the same ID.
     def eql?(other)
-      (id == other.id)
+      unless other.class == BB
+        return false
+      end
+
+      id.eql?(other.id)
     end
 
     sig do

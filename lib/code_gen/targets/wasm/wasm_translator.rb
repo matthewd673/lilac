@@ -11,8 +11,6 @@ require_relative "wasm_il_transformer"
 require_relative "instructions/instructions"
 require_relative "instructions/instruction_set"
 require_relative "components"
-require_relative "../../../analysis/dominators"
-require_relative "../../../analysis/dom_tree"
 require_relative "relooper"
 require_relative "wasm_block"
 
@@ -121,9 +119,7 @@ module CodeGen
         end
         def translate_instructions(cfg)
           # run relooper on the cfg
-          dom_facts = Analysis::Dominators.new(cfg).run
-          dom_tree = Analysis::DomTree.new(dom_facts)
-          relooper = Relooper.new(cfg, dom_tree)
+          relooper = Relooper.new(cfg)
 
           instructions = []
 

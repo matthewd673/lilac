@@ -6,8 +6,10 @@ require_relative "wasm"
 require_relative "wasm_block"
 require_relative "../../../analysis/bb"
 require_relative "../../../analysis/cfg"
+require_relative "../../../analysis/dominators"
 require_relative "../../../analysis/dom_tree"
 require_relative "../../../analysis/reducible"
+require_relative "../../../transformations/to_reducible"
 
 module CodeGen
   module Targets
@@ -25,28 +27,22 @@ module CodeGen
 
         include CodeGen::Targets::Wasm
 
-        sig { params(cfg: Analysis::CFG, dom_tree: Analysis::DomTree).void }
+        sig { params(cfg: Analysis::CFG).void }
         # Initialize a new Relooper.
         #
         # @param [Analysis::CFG] cfg The CFG to run the Relooper algorithm on.
-        # @param [Analysis::DomTree] dom_tree The dominance tree for the given
-        #   CFG.
-        def initialize(cfg, dom_tree)
+        def initialize(cfg)
           @cfg = cfg
-          @dom_tree = dom_tree
-
-          reducible = Analysis::Reducible.new(cfg).run
-          # TODO: convert to reducible if it isn't already
-          unless reducible
-            raise "CFG is not reducible"
-          end
 
           # to be filled in later
+          @dom_tree = T.let( # particularly ugly but just an empty dom tree
+            Analysis::DomTree.new(
+              Analysis::CFGFacts.new(Analysis::CFG.new([]))
+            ),
+            Analysis::DomTree
+          )
+          @cfg_rpo = T.let({}, T::Hash[Analysis::BB, Integer])
           @props = T.let({}, T::Hash[Analysis::BB, T::Set[BlockProperty]])
-
-          # compute RPO
-          @cfg_rpo = T.let(@cfg.reverse_postorder_numbering(@cfg.entry),
-                           T::Hash[Analysis::BB, Integer])
         end
 
         sig { returns(WasmBlock) }
@@ -55,6 +51,27 @@ module CodeGen
         #
         # @return [WasmBlock] The root structured control flow block.
         def translate
+          puts Debugging::GraphVisualizer.generate_graphviz(@cfg)
+
+          # convert to reducible if necessary
+          reducible = Analysis::Reducible.new(@cfg).run
+          unless reducible
+            to_reducible = Transformations::ToReducible.new(@cfg)
+            to_reducible.run!
+          end
+
+          puts Debugging::GraphVisualizer.generate_graphviz(@cfg)
+
+          # compute dom tree
+          dominators = Analysis::Dominators.new(@cfg)
+          @dom_tree = Analysis::DomTree.new(dominators.run)
+
+          # compute RPO
+          @cfg_rpo = @cfg.reverse_postorder_numbering(@cfg.entry)
+          @cfg_rpo.each_key do |k|
+            puts "#{k} => #{@cfg_rpo[k]}"
+          end
+
           # classify each node in the CFG
           classify_nodes
 
@@ -121,8 +138,12 @@ module CodeGen
           from = @cfg_rpo[edge.from]
           to = @cfg_rpo[edge.to]
 
-          if !from || !to
-            raise "Invalid edge from #{edge.from} to #{edge.to}"
+          if !from
+            raise "Invalid edge from #{edge.from} to #{edge.to}: "\
+                  "#{edge.from} does not exist in graph RPO"
+          elsif !to
+            raise "Invalid edge from #{edge.from} to #{edge.to}: "\
+                  "#{edge.to} does not exist in graph RPO"
           end
 
           from < to
