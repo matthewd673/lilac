@@ -37,11 +37,11 @@ class Graph
 
     sig { params(other: T.untyped).returns(T::Boolean) }
     def eql?(other)
-      if other.class != Edge
+      if other.class != self.class
         return false
       end
 
-      (to.eql?(other.to) and from.eql?(other.from))
+      to.eql?(other.to) && from.eql?(other.from)
     end
 
     sig { returns(String) }
@@ -218,13 +218,13 @@ class Graph
     unless (@outgoing[edge.from])
       @outgoing[edge.from] = Set[]
     end
-    T.unsafe(@outgoing[edge.from]).add(edge)
+    @outgoing[edge.from]&.add(edge)
 
     # add this edge to "to"'s incoming
     unless (@incoming[edge.to])
       @incoming[edge.to] = Set[]
     end
-    T.unsafe(@incoming[edge.to]).add(edge)
+    @incoming[edge.to]&.add(edge)
   end
 
   sig { params(edge: Edge[Node]).void }
@@ -317,6 +317,7 @@ class Graph
     each_successor(node) do |s|
       postorder_traversal_helper(s, seen, &block)
     end
+
     yield node
   end
 end
