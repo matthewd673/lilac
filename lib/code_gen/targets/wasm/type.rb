@@ -4,18 +4,13 @@
 require "sorbet-runtime"
 require_relative "wasm"
 
-CodeGen::Targets::Wasm::IntegerType = T.type_alias do
-  T.any(Type::I32, Type::I64)
-end
-
-CodeGen::Targets::Wasm::FloatType = T.type_alias do
-  T.any(Type::F32, Type::F64)
-end
-
 module Lilac
   module CodeGen
     module Targets
       module Wasm
+        IntegerType = T.type_alias { T.any(Type::I32, Type::I64) }
+        FloatType = T.type_alias { T.any(Type::F32, Type::F64) }
+
         class Type < T::Enum
           extend T::Sig
 
