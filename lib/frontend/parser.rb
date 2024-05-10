@@ -3,6 +3,7 @@
 
 require "sorbet-runtime"
 require_relative "scanner"
+require_relative "frontend"
 require_relative "../il"
 
 module Lilac
@@ -14,7 +15,7 @@ module Lilac
     class Parser
       extend T::Sig
 
-      include Frontend
+      include Lilac::Frontend
 
       sig { params(filename: String).returns(IL::Program) }
       # Load a file and parse its contents into a program. This also handles the

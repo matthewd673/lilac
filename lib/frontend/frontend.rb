@@ -7,8 +7,6 @@ require_relative "../il"
 module Lilac
   # The Frontend module contains tools for parsing IL from text files.
   module Frontend
-    extend T::Sig
-
     # TokenType is an enum of all the tokens in the grammar.
     class TokenType < T::Enum
       extend T::Sig
@@ -123,9 +121,9 @@ module Lilac
     TOKEN_DEFS = T.let([
       # keywords
       TokenDef.new(TokenType::Type, /u8|i16|i32|i64|f32|f64/),
+      TokenDef.new(TokenType::Arrow, /->/),
       # NOTE: -@ isn't really standard anywhere else but it will make things
       # much easier here
-      TokenDef.new(TokenType::Arrow, /->/),
       TokenDef.new(TokenType::UnaryOp, /-@/),
       TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<=|>=|<|>|\|\||&&/),
       TokenDef.new(TokenType::Phi, /phi/),
