@@ -1,9 +1,11 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "sorbet"
+require "sorbet-runtime"
 
-# The Transformations module contains transformations for IL Programs.
-module Transformations
-  # NOTE: namespace stub
+module Lilac
+  # The Transformations module contains transformations for IL Programs.
+  module Transformations
+    # NOTE: namespace stub
+  end
 end
