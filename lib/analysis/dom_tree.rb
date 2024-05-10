@@ -3,7 +3,6 @@
 
 require "sorbet-runtime"
 require_relative "../graph"
-require_relative "analysis"
 require_relative "bb"
 require_relative "cfg_facts"
 

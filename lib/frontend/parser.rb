@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
-require_relative "frontend"
 require_relative "scanner"
 require_relative "../il"
 

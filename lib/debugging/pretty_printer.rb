@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
-require_relative "debugging"
 require_relative "../ansi"
 require_relative "../il"
 require_relative "../visitor"

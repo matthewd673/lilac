@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
-require_relative "code_gen"
 require_relative "../il"
 
 module Lilac
@@ -31,7 +30,8 @@ module Lilac
 
       # A wildcard for any +IL::Expression+ and any +IL::Value+.
       # NOTE: while this class inherits from +IL::Expression+ the internal
-      # matching implementation will also accept an  +IL::Value+ as a valid match.
+      # matching implementation will also accept an  +IL::Value+ as a valid
+      # match.
       class RhsWildcard < IL::Expression
         # TODO: stub
       end

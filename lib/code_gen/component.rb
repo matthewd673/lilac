@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
-require_relative "code_gen"
 
 module Lilac
   module CodeGen

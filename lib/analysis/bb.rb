@@ -3,7 +3,6 @@
 
 require "sorbet-runtime"
 require "securerandom"
-require_relative "analysis"
 require_relative "../il"
 
 module Lilac

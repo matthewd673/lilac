@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
-require_relative "../wasm"
 require_relative "instructions"
 require_relative "../../../../il"
 

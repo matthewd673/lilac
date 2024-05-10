@@ -2,9 +2,7 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
-require_relative "optimization"
 require_relative "optimization_pass"
-
 require_relative "condense_labels"
 require_relative "lvn"
 require_relative "const_cond_jumps"

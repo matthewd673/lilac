@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
-require_relative "analysis"
 require_relative "cfg"
 require_relative "dfa"
 require_relative "cfg_facts"

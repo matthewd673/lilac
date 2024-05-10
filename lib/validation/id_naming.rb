@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
-require_relative "validation"
 require_relative "validation_pass"
 require_relative "../il"
 
