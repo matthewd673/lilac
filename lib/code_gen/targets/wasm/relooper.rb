@@ -51,8 +51,6 @@ module Lilac
           #
           # @return [WasmBlock] The root structured control flow block.
           def translate
-            puts Debugging::GraphVisualizer.generate_graphviz(@cfg)
-
             # convert to reducible if necessary
             reducible = Analysis::Reducible.new(@cfg).run
             unless reducible
@@ -60,17 +58,12 @@ module Lilac
               to_reducible.run!
             end
 
-            puts Debugging::GraphVisualizer.generate_graphviz(@cfg)
-
             # compute dom tree
             dominators = Analysis::Dominators.new(@cfg)
             @dom_tree = Analysis::DomTree.new(dominators.run)
 
             # compute RPO
             @cfg_rpo = @cfg.reverse_postorder_numbering(@cfg.entry)
-            @cfg_rpo.each_key do |k|
-              puts "#{k} => #{@cfg_rpo[k]}"
-            end
 
             # classify each node in the CFG
             classify_nodes
