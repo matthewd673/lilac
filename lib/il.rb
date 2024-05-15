@@ -4,7 +4,7 @@
 require "sorbet-runtime"
 
 module Lilac
-  # IL contains a set of classes representing the Lilac Intermediate Language.
+  # IL contains the classes representing the Lilac Intermediate Language.
   module IL
     extend T::Sig
 
@@ -146,6 +146,9 @@ module Lilac
 
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
+
+      sig { abstract.returns(Value) }
+      def clone; end
     end
 
     # A Constant is a constant value of a given type.
@@ -182,6 +185,11 @@ module Lilac
         other = T.cast(other, Constant)
 
         type.eql?(other.type) and value.eql?(other.value)
+      end
+
+      sig { override.returns(Constant) }
+      def clone
+        Constant.new(@type, @value)
       end
     end
 
@@ -238,6 +246,11 @@ module Lilac
         name.eql?(other.name) and number.eql?(other.number)
       end
 
+      sig { override.returns(ID) }
+      def clone
+        ID.new(@name, number: @number)
+      end
+
       private
 
       sig { returns(String) }
@@ -277,6 +290,11 @@ module Lilac
 
         number.eql?(other.number)
       end
+
+      sig { override.returns(Register) }
+      def clone
+        Register.new(@number)
+      end
     end
 
     # An Expression is any in-built function in the IL such as common
@@ -292,6 +310,9 @@ module Lilac
 
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
+
+      sig { abstract.returns(Expression) }
+      def clone; end
     end
 
     # A BinaryOp is an Expression which computes a value from two operands.
@@ -351,6 +372,22 @@ module Lilac
         "#{@left} #{@op} #{@right}"
       end
 
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != BinaryOp
+          return false
+        end
+
+        other = T.cast(other, BinaryOp)
+
+        op.eql?(other.op) and left.eql?(other.left) and right.eql?(other.right)
+      end
+
+      sig { override.returns(BinaryOp) }
+      def clone
+        BinaryOp.new(@op, @left, @right)
+      end
+
       sig { returns(T.untyped) }
       def calculate
         # calculations can only be performed on constants
@@ -388,17 +425,6 @@ module Lilac
           left.value != 0 && right.value != 0 ? 1 : 0
         else T.absurd(self)
         end
-      end
-
-      sig { override.params(other: T.untyped).returns(T::Boolean) }
-      def eql?(other)
-        if other.class != BinaryOp
-          return false
-        end
-
-        other = T.cast(other, BinaryOp)
-
-        op.eql?(other.op) and left.eql?(other.left) and right.eql?(other.right)
       end
     end
 
@@ -442,6 +468,22 @@ module Lilac
         "#{@op}#{@value}"
       end
 
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != UnaryOp
+          return false
+        end
+
+        other = T.cast(other, UnaryOp)
+
+        op.eql?(other.op) and value.eql?(other.value)
+      end
+
+      sig { override.returns(UnaryOp) }
+      def clone
+        UnaryOp.new(@op, @value)
+      end
+
       sig { returns(T.untyped) }
       def calculate
         # calculations can only be performed on constants
@@ -456,17 +498,6 @@ module Lilac
           0 - value.value
         else T.absurd(self)
         end
-      end
-
-      sig { override.params(other: T.untyped).returns(T::Boolean) }
-      def eql?(other)
-        if other.class != UnaryOp
-          return false
-        end
-
-        other = T.cast(other, UnaryOp)
-
-        op.eql?(other.op) and value.eql?(other.value)
       end
     end
 
@@ -506,6 +537,11 @@ module Lilac
         other = T.cast(other, Call)
 
         func_name.eql?(other.func_name) and args.eql?(other.args)
+      end
+
+      sig { override.returns(Call) }
+      def clone
+        Call.new(@func_name, @args)
       end
     end
 
@@ -550,6 +586,11 @@ module Lilac
         func_source.eql?(other.func_source) and
           func_name.eql?(other.func_name) and args.eql?(other.args)
       end
+
+      sig { override.returns(ExternCall) }
+      def clone
+        ExternCall.new(@func_source, @func_name, @args)
+      end
     end
 
     # A Phi function is an Expression that combines multiple possible SSA
@@ -584,6 +625,11 @@ module Lilac
 
         ids.eql?(other.ids)
       end
+
+      sig { override.returns(Phi) }
+      def clone
+        Phi.new(@ids)
+      end
     end
 
     # A Statement is a single instruction or "line of code" in the IL.
@@ -601,6 +647,9 @@ module Lilac
 
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
+
+      sig { abstract.returns(Statement) }
+      def clone; end
     end
 
     # A Definition is a Statement that defines an ID with a type and value.
@@ -644,6 +693,11 @@ module Lilac
 
         type.eql?(other.type) and id.eql?(other.id) and rhs.eql?(other.rhs)
       end
+
+      sig { override.returns(Definition) }
+      def clone
+        Definition.new(@type, @id, @rhs)
+      end
     end
 
     # A Label is a Statement that does nothing but can be jumped to by a Jump.
@@ -676,6 +730,11 @@ module Lilac
 
         name.eql?(other.name)
       end
+
+      sig { override.returns(Label) }
+      def clone
+        Label.new(@name)
+      end
     end
 
     # A Jump is a Statement that will jump to the target Label unconditionally.
@@ -707,6 +766,11 @@ module Lilac
         other = T.cast(other, Jump)
 
         target.eql?(other.target)
+      end
+
+      sig { override.returns(Jump) }
+      def clone
+        Jump.new(@target)
       end
     end
 
@@ -743,6 +807,11 @@ module Lilac
 
         cond.eql?(other.cond) and target.eql?(other.target)
       end
+
+      sig { override.returns(JumpZero) }
+      def clone
+        JumpZero.new(@cond, @target)
+      end
     end
 
     # A JumpNotZero is a Jump that will jump to the target Label only when its
@@ -778,6 +847,11 @@ module Lilac
 
         cond.eql?(other.cond) and target.eql?(other.target)
       end
+
+      sig { override.returns(JumpNotZero) }
+      def clone
+        JumpNotZero.new(@cond, @target)
+      end
     end
 
     # A Return statement is used to return a value from within a FuncDef.
@@ -806,6 +880,11 @@ module Lilac
         other = T.cast(other, Return)
 
         value.eql?(other.value)
+      end
+
+      sig { override.returns(Return) }
+      def clone
+        Return.new(@value)
       end
     end
 
@@ -836,6 +915,11 @@ module Lilac
         other = T.cast(other, VoidCall)
 
         call.eql?(other.call)
+      end
+
+      sig { override.returns(VoidCall) }
+      def clone
+        VoidCall.new(@call)
       end
     end
 
@@ -869,6 +953,11 @@ module Lilac
         other = T.cast(other, FuncParam)
 
         type.eql?(other.type) and id.eql?(other.id)
+      end
+
+      sig { returns(FuncParam) }
+      def clone
+        FuncParam.new(@type, @id)
       end
     end
 
@@ -929,6 +1018,11 @@ module Lilac
         name.eql?(other.name) and params.eql?(other.params) and
           ret_type.eql?(other.ret_type) and stmt_list.eql?(other.stmt_list)
       end
+
+      sig { returns(FuncDef) }
+      def clone
+        FuncDef.new(@name, @params, @ret_type, @stmt_list)
+      end
     end
 
     # An ExternFuncDef is a description of a function described elsewhere.
@@ -976,6 +1070,11 @@ module Lilac
         source.eql?(other.source) and name.eql?(other.name) and
           # TODO: if ret_type comparison goes last then this is nilable. Why?
           ret_type.eql?(other.ret_type) and param_types.eql?(other.param_types)
+      end
+
+      sig { returns(ExternFuncDef) }
+      def clone
+        ExternFuncDef.new(@source, @name, @param_types, @ret_type)
       end
     end
 
@@ -1049,6 +1148,19 @@ module Lilac
           extern_func_map.eql?(other.extern_func_map)
       end
 
+      sig { returns(Program) }
+      def clone
+        new_program = Program.new(stmt_list: @stmt_list)
+        each_func do |f|
+          new_program.add_func(f)
+        end
+        each_extern_func do |f|
+          new_program.add_extern_func(f)
+        end
+
+        new_program
+      end
+
       protected
 
       sig { returns(T::Hash[String, FuncDef]) }
@@ -1091,6 +1203,12 @@ module Lilac
         @ret_type = ret_type
         @cfg = cfg
       end
+
+      # TODO: implement to_s
+
+      # TODO: implement eql?
+
+      # TODO: implement clone
     end
 
     # A CFGProgram is a Program whose instructions are stored in CFGs.
@@ -1170,6 +1288,8 @@ module Lilac
       # TODO: implement to_s
 
       # TODO: implement eql?
+
+      # TODO: implement clone
 
       protected
 
