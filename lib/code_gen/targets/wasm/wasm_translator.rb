@@ -137,7 +137,7 @@ module Lilac
                 end
 
                 # avoid redefining params
-                if @symbols.lookup(s.id.key)
+                if @symbols.lookup(s.id)
                   next
                 end
 

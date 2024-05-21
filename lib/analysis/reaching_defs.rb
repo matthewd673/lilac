@@ -66,12 +66,9 @@ module Lilac
         # find all definitions in block
         b.stmt_list.each do |s|
           # only definitions are relevant
-          unless s.is_a?(IL::Definition)
-            next
-          end
+          next unless s.is_a?(IL::Definition)
 
-          key = s.id.key
-          T.unsafe(@gen[b]).add(key)
+          T.unsafe(@gen[b]).add(s.id)
         end
 
         # any def not in this block is killed here
@@ -85,12 +82,9 @@ module Lilac
         cfg.each_block do |b|
           b.stmt_list.each do |s|
             # only definitions are relevant
-            unless s.is_a?(IL::Definition)
-              next
-            end
+            next unless s.is_a?(IL::Definition)
 
-            key = s.id.key
-            T.unsafe(all).add(key)
+            T.unsafe(all).add(s.id)
           end
         end
 

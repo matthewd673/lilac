@@ -57,7 +57,7 @@ module Lilac
             when IL::UnaryOp
               get_il_type(rhs.value)
             when IL::ID
-              symbol = @symbol_table.lookup(rhs.key)
+              symbol = @symbol_table.lookup(rhs)
               unless symbol
                 raise "Symbol #{rhs} not in symbol table"
               end

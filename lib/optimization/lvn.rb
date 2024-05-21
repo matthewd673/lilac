@@ -207,20 +207,20 @@ module Lilac
 
         sig { void }
         def initialize
-          @id_to_number = T.let({}, T::Hash[String, Integer]) # id.key -> number
+          @id_to_number = T.let({}, T::Hash[IL::ID, Integer])
           @number_to_ids = T.let({}, T::Hash[Integer, T::Array[IL::ID]])
         end
 
         sig { params(id: IL::ID, number: Integer).void }
         def assign_id(id, number)
-          old_number = @id_to_number[id.key]
+          old_number = @id_to_number[id]
           if old_number
             old_id_list = @number_to_ids[old_number]
             # will always be true, check for sorbet's sake
             old_id_list&.delete(id)
           end
 
-          @id_to_number[id.key] = number
+          @id_to_number[id] = number
 
           id_list = @number_to_ids[number]
           if id_list
@@ -232,7 +232,7 @@ module Lilac
 
         sig { params(id: IL::ID).returns(T.nilable(Integer)) }
         def get_number_by_id(id)
-          @id_to_number[id.key]
+          @id_to_number[id]
         end
 
         sig { params(number: Integer).returns(T.nilable(IL::ID)) }

@@ -70,9 +70,9 @@ module Lilac
           when IL::Constant
             rhs_type = T.cast(i.rhs, IL::Constant).type
           when IL::ID
-            rhs_symbol = symbols.lookup(T.cast(i.rhs, IL::ID).key)
+            rhs_symbol = symbols.lookup(T.cast(i.rhs, IL::ID))
             unless rhs_symbol
-              raise("Symbol not found: #{T.cast(i.rhs, IL::ID).key}")
+              raise("Symbol not found: #{T.cast(i.rhs, IL::ID)}")
             end
 
             rhs_type = rhs_symbol.type
@@ -87,9 +87,9 @@ module Lilac
             raise("Expression has nil type: '#{i.rhs}'")
           end
 
-          id_symbol = symbols.lookup(i.id.key)
+          id_symbol = symbols.lookup(i.id)
           unless id_symbol
-            raise("Symbol not found: #{i.id.key}")
+            raise("Symbol not found: #{i.id}")
           end
           if id_symbol.type != rhs_type
             raise("Type mismatch in statement: '#{i}'")
@@ -110,9 +110,9 @@ module Lilac
             ltype = lconst.type
           elsif expr.left.is_a?(IL::ID)
             lid = T.cast(expr.left, IL::ID)
-            lsymbol = symbols.lookup(lid.key)
+            lsymbol = symbols.lookup(lid)
             unless lsymbol
-              raise("Symbol not found: #{lid.key}")
+              raise("Symbol not found: #{lid}")
             end
 
             ltype = lsymbol.type
@@ -126,9 +126,9 @@ module Lilac
             rtype = rconst.type
           elsif expr.right.is_a?(IL::ID)
             rid = T.cast(expr.right, IL::ID)
-            rsymbol = symbols.lookup(rid.key)
+            rsymbol = symbols.lookup(rid)
             unless rsymbol
-              raise("Symbol not found: #{rid.key}")
+              raise("Symbol not found: #{rid}")
             end
 
             rtype = rsymbol.type
@@ -147,9 +147,9 @@ module Lilac
             vtype = vconst.type
           elsif expr.value.is_a?(IL::ID)
             vid = T.cast(expr.value, IL::ID)
-            vsymbol = symbols.lookup(vid.key)
+            vsymbol = symbols.lookup(vid)
             unless vsymbol
-              raise("Symbol not found: #{vid.key}")
+              raise("Symbol not found: #{vid}")
             end
 
             vtype = vsymbol.type

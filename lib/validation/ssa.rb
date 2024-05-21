@@ -41,8 +41,8 @@ module Lilac
 
           # scan and register params
           f.params.each do |p|
-            if symbols.lookup(p.id.key)
-              raise("Multiple definitions of ID '#{p.id.key}'")
+            if symbols.lookup(p.id)
+              raise "Multiple definitions of ID '#{p.id}'"
             end
 
             symbols.insert(ILSymbol.new(p.id, p.type))
@@ -66,8 +66,8 @@ module Lilac
             next
           end
 
-          if symbols.lookup(s.id.key)
-            raise("Multiple definitions of ID '#{s.id.key}'")
+          if symbols.lookup(s.id)
+            raise("Multiple definitions of ID '#{s.id}'")
           end
 
           symbols.insert(ILSymbol.new(s.id, s.type))

@@ -29,14 +29,14 @@ module Lilac
   end
 
   # A Scope is a set of symbols that are present within a local scope (such as
-  # a +IL::FuncDef+) in a program.
+  # an +IL::FuncDef+) in a program.
   class Scope
     extend T::Sig
 
     sig { void }
     # Construct a new Scope.
     def initialize
-      @symbols = T.let({}, T::Hash[String, ILSymbol])
+      @symbols = T.let({}, T::Hash[IL::ID, ILSymbol])
     end
 
     sig { params(symbol: ILSymbol).void }
@@ -45,17 +45,17 @@ module Lilac
     #
     # @param [ILSymbol] symbol The symbol to insert.
     def insert(symbol)
-      @symbols[symbol.id.key] = symbol
+      @symbols[symbol.id] = symbol
     end
 
-    sig { params(key: String).returns(T.nilable(ILSymbol)) }
+    sig { params(id: IL::ID).returns(T.nilable(ILSymbol)) }
     # Find the symbol with a given key in this scope.
     #
-    # @param [String] key The key of the symbol to search for.
+    # @param [String] id The ID of the symbol to search for.
     # @return [T.nilable(ILSymbol)] The symbol with the given key. If the symbol
     #   does not exist in this scope it will return +nil+.
-    def lookup(key)
-      @symbols[key]
+    def lookup(id)
+      @symbols[id]
     end
 
     sig { params(block: T.proc.params(arg0: ILSymbol).void).void }
@@ -96,16 +96,16 @@ module Lilac
       T.unsafe(@scopes[-1]).insert(symbol)
     end
 
-    sig { params(key: String).returns(T.nilable(ILSymbol)) }
+    sig { params(id: IL::ID).returns(T.nilable(ILSymbol)) }
     # Search for a symbol in the entire scope stack. If multiple copies of the
     # symbol are present, the one in the topmost scope will be returned.
     #
-    # @param [String] key The key of the symbol to search for.
+    # @param [String] id The ID of the symbol to search for.
     # @return [T.nilable(ILSymbol)] The topmost symbol with the given key. If
     #   no such symbol exists in the table it will return +nil+.
-    def lookup(key)
+    def lookup(id)
       @scopes.reverse_each do |s|
-        symbol = s.lookup(key)
+        symbol = s.lookup(id)
         if symbol then return symbol end
       end
       nil
