@@ -205,37 +205,17 @@ module Lilac
       # The name of the ID.
       attr_reader :name
 
-      sig { returns(Integer) }
-      # The number of the ID. Multiple definitions of the same ID name must
-      # have unique numbers.
-      attr_reader :number
-
-      sig { returns(String) }
-      # The key of the ID. Includes both name and number.
-      attr_reader :key
-
-      sig { params(name: String, number: Integer).void }
+      sig { params(name: String).void }
       # Construct a new ID.
       #
       # @param [String] name The name of the ID.
-      # @param [Integer] number The number of the ID. Usually optional when
-      #   constructing a Program that has not yet been converted to SSA.
-      def initialize(name, number: 0)
+      def initialize(name)
         @name = name
-        @number = number
-
-        @key = T.let(compute_key, String)
-      end
-
-      sig { params(value: Integer).void }
-      def number=(value)
-        @number = value
-        @key = compute_key # key must be recomputed whenever number changes
       end
 
       sig { override.returns(String) }
       def to_s
-        @key
+        @name
       end
 
       sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -246,19 +226,12 @@ module Lilac
 
         other = T.cast(other, ID)
 
-        name.eql?(other.name) and number.eql?(other.number)
+        name.eql?(other.name)
       end
 
       sig { override.returns(ID) }
       def clone
-        ID.new(@name, number: @number)
-      end
-
-      private
-
-      sig { returns(String) }
-      def compute_key
-        "#{@name}##{@number}"
+        ID.new(@name)
       end
     end
 
@@ -268,6 +241,9 @@ module Lilac
     class Register < ID
       extend T::Sig
 
+      sig { returns(Integer) }
+      attr_reader :number
+
       sig { params(number: Integer).void }
       # Construct a new Register.
       #
@@ -275,7 +251,6 @@ module Lilac
       def initialize(number)
         @number = number
         @name = "%#{number}"
-        @key = @name
       end
 
       sig { override.returns(String) }

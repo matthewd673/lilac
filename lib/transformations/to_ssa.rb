@@ -76,6 +76,36 @@ module Lilac
 
       private
 
+      # An SSAID is an ID with a name and a number.
+      class SSAID < IL::ID
+        extend T::Sig
+
+        sig { returns(Integer) }
+        attr_reader :number
+
+        sig { params(name: String, number: Integer).void }
+        def initialize(name, number)
+          @name = name
+          @number = number
+        end
+
+        sig { override.returns(String) }
+        def to_s
+          "#{@name}##{@number}"
+        end
+
+        sig { override.params(other: T.untyped).returns(T::Boolean) }
+        def eql?(other)
+          if other.class != SSAID
+            return false
+          end
+
+          other = T.cast(other, SSAID)
+
+          name.eql?(other.name) && number.eql?(other.number)
+        end
+      end
+
       sig { params(edge: Graph::Edge[BB]).void }
       def split_edge(edge)
         # delete old edge
@@ -289,7 +319,7 @@ module Lilac
         counter[name] = i + 1
         T.unsafe(stack[name]).push(i)
 
-        IL::ID.new(name, number: i)
+        SSAID.new(name, i)
       end
 
       sig do
@@ -317,7 +347,34 @@ module Lilac
           end
 
           # rewrite rhs expression using stack
-          rewrite_rhs(s.rhs, counter, stack)
+          case s.rhs
+          when IL::ID
+            s.rhs = rewrite_id(T.cast(s.rhs, IL::ID), counter, stack)
+          when IL::BinaryOp
+            rhs = T.cast(s.rhs, IL::BinaryOp)
+            if rhs.left.is_a?(IL::ID)
+              rhs.left = rewrite_id(T.cast(rhs.left, IL::ID),
+                                    counter,
+                                    stack)
+            end
+            if rhs.right.is_a?(IL::ID)
+              rhs.right = rewrite_id(T.cast(rhs.right, IL::ID),
+                                     counter,
+                                     stack)
+            end
+          when IL::UnaryOp
+            rhs = T.cast(s.rhs, IL::UnaryOp)
+            if rhs.value.is_a?(IL::ID)
+              rhs.value = rewrite_id(T.cast(rhs.value, IL::ID),
+                                     counter,
+                                     stack)
+            end
+          when IL::Call
+            rhs = T.cast(s.rhs, IL::Call)
+            rhs.args.map do |a|
+              a.is_a?(IL::ID) ? rewrite_id(a, counter, stack) : a
+            end
+          end
 
           # rewrite lhs of definition with new_name
           s.id = new_name(s.id.name, counter, stack)
@@ -340,7 +397,7 @@ module Lilac
               next
             end
 
-            phi.ids.push(IL::ID.new(name, number:))
+            phi.ids.push(SSAID.new(name, number))
           end
         end
 
@@ -361,34 +418,13 @@ module Lilac
       end
 
       sig do
-        params(rhs: T.any(IL::Expression, IL::Value),
+        params(id: IL::ID,
                counter: T::Hash[String, Integer],
-               stack: T::Hash[String, T::Array[Integer]]).void
+               stack: T::Hash[String, T::Array[Integer]])
+          .returns(SSAID)
       end
-      def rewrite_rhs(rhs, counter, stack)
-        case rhs
-        # Constants have nothing to rewrite
-        when IL::Constant then nil
-        # Phis will be handled somewhere else
-        when IL::Phi then nil
-        when IL::ID
-          # rewrite id with top of stack[name]
-          rhs.number = T.unsafe(T.unsafe(stack[rhs.name])[-1])
-        when IL::BinaryOp
-          # recurse on operands
-          rewrite_rhs(rhs.left, counter, stack)
-          rewrite_rhs(rhs.right, counter, stack)
-        when IL::UnaryOp
-          # recurse on operand
-          rewrite_rhs(rhs.value, counter, stack)
-        when IL::Call
-          # recurse on all args
-          rhs.args.each do |a|
-            rewrite_rhs(a, counter, stack)
-          end
-        else
-          raise("Attempted to rewrite unrecognized rhs: #{rhs.class}")
-        end
+      def rewrite_id(id, counter, stack)
+        SSAID.new(id.name, T.unsafe(T.unsafe(stack[id.name])[-1]))
       end
     end
   end
