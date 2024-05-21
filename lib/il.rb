@@ -176,7 +176,7 @@ module Lilac
 
       sig { override.returns(String) }
       def to_s
-        @value.to_s
+        @type == Type::Void ? "void" : @value.to_s
       end
 
       sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -497,7 +497,7 @@ module Lilac
 
       sig { override.returns(String) }
       def to_s
-        arg_str = ""
+        arg_str = "".dup
         @args.each do |a|
           arg_str += "#{a}, "
         end
