@@ -22,12 +22,12 @@ module Lilac
       # @param [Pass] pass The Pass to run.
       def run_pass(pass)
         # UnitType::None is a placeholder used by the parent class
-        if pass.class.unit_type == OptimizationPass::UnitType::None
-          raise "No unit type for optimization pass #{pass.class.id}"
+        if pass.unit_type == OptimizationPass::UnitType::None
+          raise "No unit type for optimization pass #{pass.id}"
         end
 
         # run on main program statements
-        case pass.class.unit_type
+        case pass.unit_type
         when OptimizationPass::UnitType::StatementList
           instance = T.unsafe(pass).new(@program.stmt_list)
           instance.run!
@@ -44,11 +44,11 @@ module Lilac
           @program.stmt_list.clear
           @program.stmt_list.concat(stmt_list)
         else
-          raise "Unsupported unit type for #{pass.class.id}"
+          raise "Unsupported unit type for #{pass.id}"
         end
         @program.each_func do |f|
           # run on function body
-          case pass.class.unit_type
+          case pass.unit_type
           when OptimizationPass::UnitType::StatementList
             instance = T.unsafe(pass).new(f.stmt_list)
             instance.run!
@@ -65,7 +65,7 @@ module Lilac
             f.stmt_list.clear
             f.stmt_list.concat(stmt_list)
           else
-            raise "Unsupported unit type for #{pass.class.id}"
+            raise "Unsupported unit type for #{pass.id}"
           end
         end
       end

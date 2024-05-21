@@ -38,6 +38,16 @@ module Lilac
       sig { abstract.returns(UnitType) }
       def self.unit_type; end
 
+      sig { returns(Integer) }
+      def level
+        self.class.level
+      end
+
+      sig { returns(UnitType) }
+      def unit_type
+        self.class.unit_type
+      end
+
       sig { returns(String) }
       def to_s
         "#{self.class.id} (#{self.class.level}): #{self.class.description}"

@@ -18,6 +18,16 @@ module Lilac
     sig { abstract.returns(String) }
     def self.description; end
 
+    sig { returns(String) }
+    def id
+      self.class.id
+    end
+
+    sig { returns(String) }
+    def description
+      self.class.id
+    end
+
     sig { abstract.void }
     def run!; end
 
