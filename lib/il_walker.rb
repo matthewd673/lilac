@@ -44,6 +44,8 @@ module Lilac
         il.params.each { |p| walk(p) }
         il.stmt_list.each { |s| walk(s) }
       when IL::Program
+        il.each_extern_func { |f| walk(f) }
+        il.each_func { |f| walk(f) }
         il.stmt_list.each { |s| walk(s) }
       end
     end
