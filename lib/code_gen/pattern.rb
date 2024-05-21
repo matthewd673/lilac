@@ -33,7 +33,7 @@ module Lilac
       # matching implementation will also accept an  +IL::Value+ as a valid
       # match.
       class RhsWildcard < IL::Expression
-        # TODO: stub
+        # NOTE: stub
       end
 
       # A wildcard for any +IL::Expression+.
