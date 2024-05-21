@@ -19,7 +19,6 @@ module Lilac
         IntConst = new("IntConst")
         FloatConst = new("FloatConst")
         VoidConst = new("VoidConst")
-        ID = new("ID")
         Register = new("Register")
         BinaryOp = new("BinaryOp")
         UnaryOp = new("UnaryOp")
@@ -146,17 +145,12 @@ module Lilac
       TokenDef.new(TokenType::IntConst, /-?[0-9]+(i8|i16|i32|i64)/),
       TokenDef.new(TokenType::FloatConst,
                    /-?(([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+))(f32|f64)/),
-      # NOTE: pretty much anything goes for ID names, this is just a
-      # reasonably-broad subset of what the internal IL checks will actually
-      # allow
-      TokenDef.new(TokenType::ID, /[\w!@$^&*\-+=\[\];',.?\/<>]+#[0-9]+/),
       TokenDef.new(TokenType::Register, /%[0-9]+/),
       # NOTE: again, actual permitted label names are very broad in the IL
       # (broader than ID names, in fact)
-      TokenDef.new(TokenType::Label, /[\w!@$^&*\-+=\[\];',.?\/<>]+:/),
-      # NOTE: parentheses are absent here to make parsing easier (but of course
-      # that isn't actually enforced in the IL)
-      TokenDef.new(TokenType::Name, /[\w!@$^&*\-+=\[\];',.?\/<>]+/),
+      TokenDef.new(TokenType::Label, /[\w!@$^&\[\];'.?<>]+:/),
+      # NOTE: anything goes for ID and Func names, this is just a nice subset
+      TokenDef.new(TokenType::Name, /[\w!@$^&\[\];'.?<>]+/),
 
       # NOTE: TokenType::NewLine and ::EOF are special and don't need a TokenDef
     ].freeze, T::Array[TokenDef])

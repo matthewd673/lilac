@@ -131,8 +131,8 @@ module Lilac
           type_str = eat(TokenType::Type).image
           type = type_from_string(type_str)
 
-          if see?(TokenType::ID)
-            id_str = eat(TokenType::ID).image
+          if see?(TokenType::Name)
+            id_str = eat(TokenType::Name).image
             id = id_from_string(id_str)
           elsif see?(TokenType::Register)
             register_str = eat(TokenType::Register).image
@@ -196,7 +196,7 @@ module Lilac
           TokenType::UIntConst,
           TokenType::IntConst,
           TokenType::FloatConst,
-          TokenType::ID,
+          TokenType::Name,
           TokenType::Register
         )
           val_l = parse_value
@@ -290,8 +290,8 @@ module Lilac
           eat(TokenType::VoidConst)
           return IL::Constant.new(IL::Type::Void, nil)
         # id
-        elsif see?(TokenType::ID)
-          id_str = eat(TokenType::ID).image
+        elsif see?(TokenType::Name)
+          id_str = eat(TokenType::Name).image
           return id_from_string(id_str)
         # register
         elsif see?(TokenType::Register)
@@ -360,7 +360,7 @@ module Lilac
         type_str = eat(TokenType::Type).image
         type = type_from_string(type_str)
 
-        id_str = eat(TokenType::ID).image
+        id_str = eat(TokenType::Name).image
         id = id_from_string(id_str)
 
         param_list.push(IL::FuncParam.new(type, id))
@@ -411,8 +411,8 @@ module Lilac
       sig { params(id_list: T::Array[IL::ID]).void }
       def parse_id_list(id_list)
         id = nil
-        if see?(TokenType::ID)
-          id = id_from_string(eat(TokenType::ID).image)
+        if see?(TokenType::Name)
+          id = id_from_string(eat(TokenType::Name).image)
         elsif see?(TokenType::Register)
           id = register_from_string(eat(TokenType::Register).image)
         end
@@ -451,19 +451,7 @@ module Lilac
 
       sig { params(string: String).returns(IL::ID) }
       def id_from_string(string)
-        split = string.split("#")
-        if !split[0] || !split[1] || split.length > 2
-          raise "Invalid ID string \"#{string}\""
-        end
-
-        name = T.unsafe(split[0])
-        number = T.unsafe(split[1]).to_i
-
-        id = IL::ID.new(name)
-
-        id.number = number
-
-        id
+        IL::ID.new(string)
       end
 
       sig { params(string: String).returns(IL::Register) }
