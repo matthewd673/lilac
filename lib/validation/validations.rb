@@ -9,7 +9,6 @@ module Lilac
   module Validation
     # A definitive list of all validations available in Lilac.
     VALIDATIONS = T.let([
-      IDNaming,
       SSA,
       TypeCheck,
     ].freeze, T::Array[T.class_of(ValidationPass)])
