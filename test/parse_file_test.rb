@@ -29,15 +29,23 @@ class ParseFileTest < Minitest::Test
     expected = Program.new(stmt_list: [
                              Definition.new(Type::U8, ID.new("a"),
                                             Constant.new(Type::U8, 8)),
-                             Definition.new(Type::I16, ID.new("b"),
+                             Definition.new(Type::U16, ID.new("b"),
+                                            Constant.new(Type::U16, 9)),
+                             Definition.new(Type::U32, ID.new("c"),
+                                            Constant.new(Type::U32, 10)),
+                             Definition.new(Type::U64, ID.new("d"),
+                                            Constant.new(Type::U64, 11)),
+                             Definition.new(Type::I8, ID.new("e"),
+                                            Constant.new(Type::I8, -2)),
+                             Definition.new(Type::I16, ID.new("f"),
                                             Constant.new(Type::I16, -3)),
-                             Definition.new(Type::I32, ID.new("c"),
+                             Definition.new(Type::I32, ID.new("g"),
                                             Constant.new(Type::I32, 5)),
-                             Definition.new(Type::I64, ID.new("d"),
+                             Definition.new(Type::I64, ID.new("h"),
                                             Constant.new(Type::I64, 9999)),
-                             Definition.new(Type::F32, ID.new("e"),
+                             Definition.new(Type::F32, ID.new("i"),
                                             Constant.new(Type::F32, 3.14)),
-                             Definition.new(Type::F64, ID.new("f"),
+                             Definition.new(Type::F64, ID.new("j"),
                                             Constant.new(Type::F64, -1.0)),
                            ])
     program = Lilac::Frontend::Parser.parse_file(
@@ -83,7 +91,7 @@ class ParseFileTest < Minitest::Test
     expected = Program.new(stmt_list: [
                              Definition.new(
                                Type::I32,
-                               ID.new("a", number: 0),
+                               ID.new("a"),
                                BinaryOp.new(
                                  BinaryOp::Operator::ADD,
                                  Constant.new(Type::I32, 12),
@@ -92,28 +100,28 @@ class ParseFileTest < Minitest::Test
                              ),
                              Definition.new(
                                Type::I32,
-                               ID.new("a", number: 1),
+                               ID.new("a"),
                                BinaryOp.new(
                                  BinaryOp::Operator::SUB,
-                                 ID.new("a", number: 0),
+                                 ID.new("a"),
                                  Constant.new(Type::I32, 0)
                                )
                              ),
                              Definition.new(
                                Type::I32,
-                               ID.new("a", number: 2),
+                               ID.new("a"),
                                BinaryOp.new(
                                  BinaryOp::Operator::MUL,
-                                 ID.new("a", number: 1),
+                                 ID.new("a"),
                                  Constant.new(Type::I32, -2)
                                )
                              ),
                              Definition.new(
                                Type::I32,
-                               ID.new("a", number: 3),
+                               ID.new("a"),
                                BinaryOp.new(
                                  BinaryOp::Operator::DIV,
-                                 ID.new("a", number: 2),
+                                 ID.new("a"),
                                  Constant.new(Type::I32, -2)
                                )
                              ),
@@ -288,7 +296,7 @@ class ParseFileTest < Minitest::Test
                              ),
                              Definition.new(
                                Type::I32,
-                               ID.new("b", number: 1),
+                               ID.new("b"),
                                Register.new(0)
                              ),
                              Jump.new("L1"),
@@ -304,24 +312,24 @@ class ParseFileTest < Minitest::Test
                              ),
                              Definition.new(
                                Type::I32,
-                               ID.new("b", number: 2),
+                               ID.new("b"),
                                Register.new(0)
                              ),
                              Label.new("L1"),
                              Definition.new(
                                Type::I32,
-                               ID.new("b", number: 3),
+                               ID.new("b"),
                                Phi.new(
                                  [
-                                   ID.new("b", number: 1),
-                                   ID.new("b", number: 2),
+                                   ID.new("b"),
+                                   ID.new("b"),
                                  ]
                                )
                              ),
                              Definition.new(
                                Type::I32,
                                ID.new("c"),
-                               ID.new("b", number: 3)
+                               ID.new("b"),
                              ),
                            ])
     program = Lilac::Frontend::Parser.parse_file(

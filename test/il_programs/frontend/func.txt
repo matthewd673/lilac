@@ -1,6 +1,6 @@
-func multiply(i32 a#0, i32 b#0) -> i32
-  i32 %0 = a#0 * b#0
+func multiply(i32 a, i32 b) -> i32
+  i32 %0 = a * b
   ret %0
 end
 
-i32 ans#0 = call multiply(3i32, 5i32)
+i32 ans = call multiply(3i32, 5i32)
