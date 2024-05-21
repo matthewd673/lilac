@@ -9,8 +9,11 @@ module Lilac
     extend T::Sig
 
     # ILObject is a type-alias for any object in the IL that can be
-    # "visited". For example, +IL::Value+ is in but +IL::Type+ is out.
-    ILObject = T.type_alias { T.any(Value, Expression, Statement) }
+    # "visited". For example, an +IL::Value+ or an +IL::FuncDef+.
+    ILObject = T.type_alias do
+      T.any(Value, Expression, Statement, FuncParam,
+            FuncDef, ExternFuncDef, Program)
+    end
 
     # SignedIntegerType is a type-alias for any signed integer type in the IL.
     SignedIntegerType = T.type_alias do
@@ -156,10 +159,10 @@ module Lilac
       extend T::Sig
 
       sig { returns(Type) }
-      attr_reader :type
+      attr_accessor :type
 
       sig { returns(T.untyped) }
-      attr_reader :value
+      attr_accessor :value
 
       sig { params(type: Type, value: T.untyped).void }
       # Construct a new Constant.
@@ -657,7 +660,7 @@ module Lilac
       extend T::Sig
 
       sig { returns(Type) }
-      attr_reader :type
+      attr_accessor :type
 
       sig { returns(ID) }
       attr_accessor :id
@@ -928,7 +931,7 @@ module Lilac
       extend T::Sig
 
       sig { returns(Type) }
-      attr_reader :type
+      attr_accessor :type
 
       sig { returns(ID) }
       attr_reader :id
@@ -972,7 +975,7 @@ module Lilac
       attr_reader :params
 
       sig { returns(Type) }
-      attr_reader :ret_type
+      attr_accessor :ret_type
 
       sig { returns(T::Array[Statement]) }
       attr_reader :stmt_list
@@ -1039,7 +1042,7 @@ module Lilac
       attr_reader :param_types
 
       sig { returns(Type) }
-      attr_reader :ret_type
+      attr_accessor :ret_type
 
       sig do
         params(source: String,
