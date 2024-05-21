@@ -120,7 +120,7 @@ module Lilac
 
     TOKEN_DEFS = T.let([
       # keywords
-      TokenDef.new(TokenType::Type, /u8|i16|i32|i64|f32|f64/),
+      TokenDef.new(TokenType::Type, /u8|u16|u32|u64|i8|i16|i32|i64|f32|f64/),
       TokenDef.new(TokenType::Arrow, /->/),
       # NOTE: -@ isn't really standard anywhere else but it will make things
       # much easier here
@@ -142,8 +142,8 @@ module Lilac
 
       # other
       TokenDef.new(TokenType::VoidConst, /void/),
-      TokenDef.new(TokenType::UIntConst, /[0-9]+u8/),
-      TokenDef.new(TokenType::IntConst, /-?[0-9]+(i16|i32|i64)/),
+      TokenDef.new(TokenType::UIntConst, /[0-9]+(u8|u16|u32|u64)/),
+      TokenDef.new(TokenType::IntConst, /-?[0-9]+(i8|i16|i32|i64)/),
       TokenDef.new(TokenType::FloatConst,
                    /-?(([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+))(f32|f64)/),
       # NOTE: pretty much anything goes for ID names, this is just a

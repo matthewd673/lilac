@@ -435,6 +435,10 @@ module Lilac
         case string
         when "void" then return IL::Type::Void
         when "u8" then return IL::Type::U8
+        when "u16" then return IL::Type::U16
+        when "u32" then return IL::Type::U32
+        when "u64" then return IL::Type::U64
+        when "i8" then return IL::Type::I8
         when "i16" then return IL::Type::I16
         when "i32" then return IL::Type::I32
         when "i64" then return IL::Type::I64
@@ -456,6 +460,7 @@ module Lilac
         number = T.unsafe(split[1]).to_i
 
         id = IL::ID.new(name)
+
         id.number = number
 
         id
