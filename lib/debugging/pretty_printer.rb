@@ -102,16 +102,15 @@ module Lilac
           end
         },
         IL::ID => lambda { |v, o, c|
-          "#{ANSI.fmt(o.name, color: PALETTE[IL::ID])}##{o.number}"
+          ANSI.fmt(o.name, color: PALETTE[IL::ID])
         },
         IL::Register => lambda { |v, o, c|
-          ANSI.fmt(o.name, color: PALETTE[IL::Register]).to_s
+          ANSI.fmt(o.name, color: PALETTE[IL::Register])
         },
         IL::BinaryOp => lambda { |v, o, c|
-          s = "#{v.visit(o.left)} "
-          s += "#{ANSI.fmt(o.op, color: PALETTE[IL::BinaryOp])} "
-          s += v.visit(o.right)
-          s
+          "#{v.visit(o.left)} "\
+          "#{ANSI.fmt(o.op, color: PALETTE[IL::BinaryOp])} "\
+          "#{v.visit(o.right)}"
         },
         IL::Call => lambda { |v, o, c|
           s = "#{ANSI.fmt("call", bold: true)} #{o.func_name}("
@@ -129,6 +128,8 @@ module Lilac
           end
           s.chomp!(", ")
           s += ")"
+
+          s
         },
         IL::Definition => lambda { |v, o, c|
           # line number and indent
