@@ -1,7 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "id_naming"
 require_relative "ssa"
 require_relative "typecheck"
 
