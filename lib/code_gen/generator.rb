@@ -17,11 +17,17 @@ module Lilac
       include CodeGen
 
       sig { params(root_component: Component).void }
+      # Construct a new Generator.
+      #
+      # @param [Component] root_component The Component to generate code for.
       def initialize(root_component)
         @root_component = root_component
       end
 
       sig { abstract.returns(String) }
+      # Generate code for the Generator's Component.
+      #
+      # @return [String] A source code string.
       def generate; end
     end
   end
