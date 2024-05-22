@@ -29,42 +29,31 @@ module Lilac
 
         # run on main program statements
         case pass.unit_type
-        when OptimizationPass::UnitType::StatementList
-          instance = T.unsafe(pass).new(@program.stmt_list)
-          instance.run!
         when OptimizationPass::UnitType::BasicBlock
-          bb_list = Analysis::BB.from_stmt_list(@program.stmt_list)
-
-          instance = T.let(nil, T.nilable(OptimizationPass[T.untyped]))
-          bb_list.each do |b|
+          instance = T.let(nil, T.nilable(OptimizationPass))
+          @program.cfg.each_node do |b|
             instance = T.unsafe(pass).new(b)
             instance.run!
           end
-
-          stmt_list = Analysis::BB.to_stmt_list(bb_list)
-          @program.stmt_list.clear
-          @program.stmt_list.concat(stmt_list)
+        when OptimizationPass::UnitType::CFG
+          instance = T.unsafe(pass).new(@program.cfg)
+          instance.run!
         else
           raise "Unsupported unit type for #{pass.id}"
         end
+
         @program.each_func do |f|
           # run on function body
           case pass.unit_type
-          when OptimizationPass::UnitType::StatementList
-            instance = T.unsafe(pass).new(f.stmt_list)
-            instance.run!
           when OptimizationPass::UnitType::BasicBlock
-            bb_list = Analysis::BB.from_stmt_list(f.stmt_list)
-
-            instance = T.let(nil, T.nilable(OptimizationPass[T.untyped]))
-            bb_list.each do |b|
+            instance = T.let(nil, T.nilable(OptimizationPass))
+            f.cfg.each_node do |b|
               instance = T.unsafe(pass).new(b)
               instance.run!
             end
-
-            stmt_list = Analysis::BB.to_stmt_list(bb_list)
-            f.stmt_list.clear
-            f.stmt_list.concat(stmt_list)
+          when OptimizationPass::UnitType::CFG
+            instance = T.unsafe(pass).new(f.cfg)
+            instance.run!
           else
             raise "Unsupported unit type for #{pass.id}"
           end

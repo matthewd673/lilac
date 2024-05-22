@@ -10,24 +10,26 @@ module Lilac
     # An OptimizationPass is a Pass that runs an optimization.
     class OptimizationPass < Pass
       extend T::Sig
-      extend T::Generic
       extend T::Helpers
 
       abstract!
 
-      Unit = type_member { { upper: Object } }
-
-      # A UnitType describes the type of object that an Optimization is
-      # working on. For example, if an Optimization runs on an object of type
+      # A UnitType describes the type of object that an Optimization works on.
+      # For example, if an Optimization runs on an object of type
       # +T::Array[IL::Statement]+, its UnitType would be
       # +UnitType::StatementList+.
       class UnitType < T::Enum
         extend T::Sig
 
         enums do
+          # Should never be used.
           None = new
-          StatementList = new
+          # A basic block.
           BasicBlock = new
+          # A CFG.
+          CFG = new
+          # An array of machine-dependent instructions. Only to be used for
+          #   machine-dependent optimizations.
           InstructionList = new
         end
       end

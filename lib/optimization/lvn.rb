@@ -10,9 +10,6 @@ module Lilac
     # The LVN optimization performs local value numbering.
     class LVN < OptimizationPass
       extend T::Sig
-      extend T::Generic
-
-      Unit = type_member { { fixed: Analysis::BB } }
 
       sig { override.returns(String) }
       def self.id
@@ -34,7 +31,7 @@ module Lilac
         UnitType::BasicBlock
       end
 
-      sig { params(block: Unit).void }
+      sig { params(block: Analysis::BB).void }
       def initialize(block)
         @block = block
       end

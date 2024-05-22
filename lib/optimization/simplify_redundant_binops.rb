@@ -11,9 +11,6 @@ module Lilac
     # have no effect, like multiplying a variable by +1+.
     class SimplifyRedundantBinops < OptimizationPass
       extend T::Sig
-      extend T::Generic
-
-      Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
       sig { override.returns(String) }
       def self.id
@@ -32,18 +29,18 @@ module Lilac
 
       sig { override.returns(UnitType) }
       def self.unit_type
-        UnitType::StatementList
+        UnitType::BasicBlock
       end
 
-      sig { params(stmt_list: Unit).void }
-      def initialize(stmt_list)
-        @stmt_list = stmt_list
+      sig { params(block: Analysis::BB).void }
+      def initialize(block)
+        @block = block
       end
 
       sig { override.void }
       def run!
         # find all binops (which can only occur in Definitions)
-        @stmt_list.each do |s|
+        @block.stmt_list.each do |s|
           if !s.is_a?(IL::Definition) || !s.rhs.is_a?(IL::BinaryOp)
             next
           end
