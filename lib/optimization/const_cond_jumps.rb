@@ -10,9 +10,6 @@ module Lilac
     # conditional value into unconditional jumps.
     class ConstCondJumps < OptimizationPass
       extend T::Sig
-      extend T::Generic
-
-      Unit = type_member { { fixed: T::Array[IL::Statement] } }
 
       sig { override.returns(String) }
       def self.id
@@ -31,36 +28,32 @@ module Lilac
 
       sig { override.returns(UnitType) }
       def self.unit_type
-        UnitType::StatementList
+        UnitType::BasicBlock
       end
 
-      sig { params(stmt_list: Unit).void }
-      def initialize(stmt_list)
-        @stmt_list = stmt_list
+      sig { params(block: Analysis::BB).void }
+      def initialize(block)
+        @block = block
       end
 
       sig { override.void }
       def run!
-        replacement = []
-
-        @stmt_list.each_with_index do |s, i|
-          # precompute jz
-          if s.is_a?(IL::JumpZero) && s.cond.is_a?(IL::Constant)
-            cond = T.cast(s.cond, IL::Constant)
-            if cond.value == 0
-              replacement.push({ index: i, stmt: IL::Jump.new(s.target) })
-            end
-          # precompute jnz
-          elsif s.is_a?(IL::JumpNotZero) && s.cond.is_a?(IL::Constant)
-            cond = T.cast(s.cond, IL::Constant)
-            if cond.value != 0
-              replacement.push(index: i, stmt: IL::Jump.new(s.target))
-            end
+        # precompute jz
+        if @block.exit&.is_a?(IL::JumpZero) &&
+           T.cast(@block.exit, IL::JumpZero).cond.is_a?(IL::Constant)
+          cond = T.cast(T.cast(@block.exit, IL::JumpZero).cond, IL::Constant)
+          target = T.cast(@block.exit&.target, String)
+          if cond.value == 0
+            @block.exit = IL::Jump.new(target)
           end
-        end
-
-        replacement.each do |r|
-          @stmt_list[r[:index]] = r[:stmt]
+        # precompute jnz
+        elsif @block.exit&.is_a?(IL::JumpNotZero) &&
+              T.cast(@block.exit, IL::JumpNotZero).cond.is_a?(IL::Constant)
+          cond = T.cast(T.cast(@block.exit, IL::JumpNotZero).cond, IL::Constant)
+          target = T.cast(@block.exit&.target, String)
+          if cond.value != 0
+            @block.exit == IL::Jump.new(target)
+          end
         end
       end
     end
