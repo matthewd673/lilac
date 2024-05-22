@@ -74,11 +74,17 @@ module Lilac
     end
 
     sig { returns(Integer) }
+    # Get the number of nodes in the graph.
+    #
+    # @return [Integer] The number of nodes in the graph.
     def nodes_length
       @nodes.length
     end
 
     sig { returns(Integer) }
+    # Get the number of edges in the graph.
+    #
+    # @return [Integer] The number of edges in the graph.
     def edges_length
       @edges.length
     end
@@ -112,6 +118,9 @@ module Lilac
     end
 
     sig { params(node: Node).returns(Integer) }
+    # The number of incoming edges for a given node.
+    #
+    # @param [Node] node The node in question.
     def incoming_length(node)
       incoming = @incoming[node]
       if !incoming
@@ -122,6 +131,9 @@ module Lilac
     end
 
     sig { params(node: Node).returns(Integer) }
+    # The number of outgoing edges for a given node.
+    #
+    # @param [Node] node The node in question.
     def outgoing_length(node)
       outgoing = @outgoing[node]
       if !outgoing
@@ -179,6 +191,26 @@ module Lilac
       else
         outgoing.length
       end
+    end
+
+    sig { params(node: Node).returns(T.nilable(Node)) }
+    # Get the first predecessor of a node.
+    #
+    # @param [Node] node The node to find for.
+    # @return [T.nilable(Node)] The first predecessor of the given node or nil
+    #   if there is none.
+    def first_predecessor(node)
+      @incoming[node]&.first&.from
+    end
+
+    sig { params(node: Node).returns(T.nilable(Node)) }
+    # Get the first successor of a node.
+    #
+    # @param [Node] node The node to find for.
+    # @return [T.nilable(Node)] The first successor of the given node or nil
+    #   if there is none.
+    def first_successor(node)
+      @outgoing[node]&.first&.to
     end
 
     sig { params(node: Node).void }
@@ -249,6 +281,12 @@ module Lilac
     end
 
     sig { params(from: Node, to: Node).returns(T.nilable(Edge[Node])) }
+    # Find an Edge in the graph between the two nodes.
+    #
+    # @param [Node] from The origin of the edge.
+    # @param [Node] to The destination of the edge.
+    # @return [T.nilable[Edge[Node]]] The Edge object connecting these two
+    #   nodes in the graph, or nil if no such edge exists in the graph.
     def find_edge(from, to)
       each_outgoing(from) do |o|
         if o.to == to
