@@ -10,14 +10,15 @@ module Lilac
     extend T::Sig
     extend T::Generic
 
+    U = type_member { { upper: T.any(IL::Program, IL::CFGProgram) } }
     P = type_member { { upper: Pass } }
 
-    sig { returns(IL::Program) }
+    sig { returns(U) }
     # The Program that the Runner is operating on.
-    # @return [IL::Program] The Program.
+    # @return [U] The Program.
     attr_reader :program
 
-    sig { params(program: IL::Program).void }
+    sig { params(program: U).void }
     # Construct a new Runner.
     def initialize(program)
       @program = program

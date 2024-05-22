@@ -15,7 +15,8 @@ module Lilac
 
       include Optimization
 
-      P = type_member { { fixed: OptimizationPass[T.untyped] } }
+      U = type_member { { fixed: IL::CFGProgram } }
+      P = type_member { { fixed: OptimizationPass } }
 
       sig { params(pass: P).void }
       # Run an OptimizationPass on every statement list in the Program.

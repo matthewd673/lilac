@@ -13,6 +13,7 @@ module Lilac
 
       include Validation
 
+      U = type_member { { fixed: IL::Program } }
       P = type_member { { fixed: ValidationPass } }
 
       sig { params(pass: P).void }
