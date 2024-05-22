@@ -33,5 +33,31 @@ end
 
 class CFGDeserializer
   extend T::Sig
-  # TODO
+
+  include Lilac
+
+  sig { params(string: String).void }
+  def initialize(string)
+    @string = string
+  end
+
+  sig { returns(Analysis::CFG) }
+  def deserialize
+    obj = YAML.load(@string)
+
+    cfg = Analysis::CFG.new
+
+    node_refs = {}
+
+    obj["nodes"].each do |n|
+      node_refs[n] = Analysis::BB.new(n)
+      cfg.add_node(node_refs[n])
+    end
+
+    obj["edges"].each do |e|
+      cfg.add_edge(Graph::Edge.new(node_refs[e["from"]], node_refs[e["to"]]))
+    end
+
+    cfg
+  end
 end
