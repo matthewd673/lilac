@@ -5,19 +5,19 @@ require "sorbet-runtime"
 require_relative "optimization"
 require_relative "optimization_pass"
 
-require_relative "condense_labels"
 require_relative "lvn"
 require_relative "const_cond_jumps"
-require_relative "remove_unused_labels"
-require_relative "remove_useless_jumps"
 require_relative "simplify_redundant_binops"
+require_relative "merge_blocks"
 
-# A definitive list of all optimizations available in Lilac.
-Optimization::OPTIMIZATIONS = T.let([
-  Optimization::CondenseLabels,
-  Optimization::LVN,
-  Optimization::ConstCondJumps,
-  Optimization::RemoveUnusedLabels,
-  Optimization::RemoveUselessJumps,
-  Optimization::SimplifyRedundantBinops,
-].freeze, T::Array[T.class_of(Optimization::OptimizationPass)])
+module Lilac
+  module Optimization
+    # A definitive list of all optimizations available in Lilac.
+    OPTIMIZATIONS = T.let([
+      LVN,
+      ConstCondJumps,
+      SimplifyRedundantBinops,
+      MergeBlocks,
+    ].freeze, T::Array[T.class_of(OptimizationPass)])
+  end
+end
