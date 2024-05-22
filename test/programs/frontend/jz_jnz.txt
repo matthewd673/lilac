@@ -1,4 +1,4 @@
 L0:
-i32 a#0 = 5i32
-jnz a#0 L0
+i32 a = 5i32
+jnz a L0
 jz 1u8 L0

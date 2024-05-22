@@ -3,7 +3,9 @@
 
 require "sorbet-runtime"
 
-# The Validation module is a namespace for lilac validations.
-module Validation
-  # namespace stub
+module Lilac
+  # The Validation module is a namespace for lilac validations.
+  module Validation
+    # namespace stub
+  end
 end
