@@ -35,6 +35,7 @@ class ToCFGTest < Minitest::Test
   private
 
   sig { params(cfg: CFG).void }
+  # Validate that the CFG has a valid ENTRY and EXIT node.
   def validate_entry_exit(cfg)
     entry_ct = 0
     exit_ct = 0
@@ -53,6 +54,7 @@ class ToCFGTest < Minitest::Test
   end
 
   sig { params(cfg: CFG).void }
+  # Validate that there exists a path from ENTRY to EXIT in the CFG.
   def validate_path_to_exit(cfg)
     seen_exit = T.let(false, T::Boolean)
 
@@ -66,6 +68,7 @@ class ToCFGTest < Minitest::Test
   end
 
   sig { params(cfg: CFG).void }
+  # Validate that the CFG has valid edges.
   def validate_edges(cfg)
     cfg.each_node do |n|
       assert n == cfg.entry || cfg.predecessors_length(n) > 0
