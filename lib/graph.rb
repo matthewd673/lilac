@@ -305,11 +305,31 @@ module Lilac
     sig { params(node: Node).returns(T::Hash[Analysis::BB, Integer]) }
     def postorder_numbering(node)
       numbering = {}
+
       i = 0
       postorder_traversal(node) do |n|
         numbering[n] = i
         i += 1
       end
+
+      numbering
+    end
+
+    sig { params(node: Node, block: T.proc.params(arg0: Node).void).void }
+    def preorder_traversal(node, &block)
+      preorder_traversal_helper(node, Set.new, &block)
+    end
+
+    sig { params(node: Node).returns(T::Hash[Analysis::BB, Integer]) }
+    def preorder_numbering(node)
+      numbering = {}
+
+      i = 0
+      preorder_traversal(node) do |n|
+        numbering[n] = i
+        i += 1
+      end
+
       numbering
     end
 
@@ -347,9 +367,7 @@ module Lilac
         .void
     end
     def postorder_traversal_helper(node, seen, &block)
-      if seen.include?(node)
-        return
-      end
+      return if seen.include?(node)
 
       seen.add(node)
 
@@ -358,6 +376,24 @@ module Lilac
       end
 
       yield node
+    end
+
+    sig do
+      params(node: Node,
+             seen: T::Set[Node],
+             block: T.proc.params(arg0: Node).void)
+        .void
+    end
+    def preorder_traversal_helper(node, seen, &block)
+      return if seen.include?(node)
+
+      seen.add(node)
+
+      yield node
+
+      each_successor(node) do |s|
+        preorder_traversal_helper(s, seen, &block)
+      end
     end
   end
 end
