@@ -229,6 +229,11 @@ module Lilac
         name.eql?(other.name)
       end
 
+      sig { returns(Integer) }
+      def hash
+        @name.hash
+      end
+
       sig { override.returns(ID) }
       def clone
         ID.new(@name)
@@ -267,6 +272,11 @@ module Lilac
         other = T.cast(other, Register)
 
         number.eql?(other.number)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        @number.hash
       end
 
       sig { override.returns(Register) }
