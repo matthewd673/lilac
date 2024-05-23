@@ -44,16 +44,22 @@ class CFGDeserializer
   sig { returns(Analysis::CFG) }
   def deserialize
     obj = YAML.load(@string)
-
     cfg = Analysis::CFG.new
 
-    node_refs = {}
+    node_refs = {
+      "ENTRY" => cfg.entry,
+      "EXIT" => cfg.exit,
+    }
 
+    # create all nodes (except ENTRY and EXIT)
     obj["nodes"].each do |n|
+      next if n == Analysis::CFG::ENTRY || n == Analysis::CFG::EXIT
+
       node_refs[n] = Analysis::BB.new(n)
       cfg.add_node(node_refs[n])
     end
 
+    # construct all edges
     obj["edges"].each do |e|
       cfg.add_edge(Graph::Edge.new(node_refs[e["from"]], node_refs[e["to"]]))
     end
