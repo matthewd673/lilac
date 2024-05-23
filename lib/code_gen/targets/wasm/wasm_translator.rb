@@ -191,7 +191,9 @@ module Lilac
                   instructions.push(Instructions::EqualZero.new(cond_type))
                 elsif cond_il_type.float?
                   cond_type = Instructions.to_float_type(cond_il_type)
-                  instructions.push(Instructions::Const.new(cond_type, 0.0))
+                  instructions.push(
+                    Instructions::ConstFloat.new(cond_type, "0.0")
+                  )
                   instructions.push(Instructions::Equal.new(cond_type))
                 else # NOTE: I think this never happens
                   raise "Unexpected conditional IL type"
@@ -257,7 +259,9 @@ module Lilac
                   cond_insts.push(Instructions::EqualZero.new(cond_type))
                 elsif cond_il_type.float?
                   cond_type = Instructions.to_float_type(cond_il_type)
-                  cond_insts.push(Instructions::Const.new(cond_type, 0.0))
+                  cond_insts.push(
+                    Instructions::ConstFloat.new(cond_type, "0.0")
+                  )
                   cond_insts.push(Instructions::Equal.new(cond_type))
                 else # NOTE: I think this never happens
                   raise "Unexpected conditional IL type"
@@ -326,8 +330,19 @@ module Lilac
           def push_value(value)
             case value
             when IL::Constant
-              Instructions::Const.new(Instructions.to_wasm_type(value.type),
-                                      value.value)
+              if value.type.integer?
+                Instructions::ConstInteger.new(
+                  Instructions.to_integer_type(value.type),
+                  value.value
+                )
+              elsif value.type.float?
+                Instructions::ConstFloat.new(
+                  Instructions.to_float_type(value.type),
+                  value.value
+                )
+              end
+
+              raise "IL::Constant is neither integer nor float"
             when IL::ID
               Instructions::LocalGet.new(value.name)
             when IL::Value # cannot happen, IL::Value is abstract

@@ -16,15 +16,17 @@ module Lilac
 
           # CONSTANTS
 
-          # Represents the +const+ instructions.
-          # Declare a constant number.
-          class Const < TypedInstruction
+          # Represents the +i32.const+ and +i64.const+ instructions.
+          # Declare a constant integer number.
+          class ConstInteger < IntegerInstruction
             include CodeGen::Targets::Wasm
 
-            sig { returns(T.untyped) }
+            sig { returns(String) }
             attr_reader :value
 
-            sig { params(type: Type, value: T.untyped).void }
+            sig do
+              params(type: T.any(Type::I32, Type::I64), value: String).void
+            end
             def initialize(type, value)
               super(type)
 
@@ -36,6 +38,35 @@ module Lilac
               case @type
               when Type::I32 then 0x41
               when Type::I64 then 0x42
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type.to_s}.const #{@value}"
+            end
+          end
+
+          # Represents the +f32.const+ and +f64.const+ instructions.
+          # Declare a constant integer number.
+          class ConstFloat < FloatInstruction
+            include CodeGen::Targets::Wasm
+
+            sig { returns(String) }
+            attr_reader :value
+
+            sig do
+              params(type: T.any(Type::F32, Type::F64), value: String).void
+            end
+            def initialize(type, value)
+              super(type)
+
+              @value = value
+            end
+
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
               when Type::F32 then 0x43
               when Type::F64 then 0x44
               end

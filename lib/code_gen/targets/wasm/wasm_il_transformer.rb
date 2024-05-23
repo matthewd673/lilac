@@ -394,7 +394,8 @@ module Lilac
               lambda { |t, o|
                 [Instructions::LocalGet.new(o.name)]
               },
-            Pattern::ConstantWildcard.new =>
+            Pattern::IntegerConstantWildcard
+                .new(Pattern::ConstantValueWildcard) =>
               lambda { |t, o|
                 # produce nothing for void constants
                 # these are only used by return statements
@@ -402,8 +403,20 @@ module Lilac
                   return []
                 end
 
-                type = Instructions.to_wasm_type(o.type)
-                [Instructions::Const.new(type, o.value)]
+                type = Instructions.to_integer_type(o.type)
+                [Instructions::ConstInteger.new(type, o.value)]
+              },
+            Pattern::FloatConstantWildcard
+                .new(Pattern::ConstantValueWildcard) =>
+              lambda { |t, o|
+                # produce nothing for void constants
+                # these are only used by return statements
+                if o.type == IL::Type::Void
+                  return []
+                end
+
+                type = Instructions.to_float_type(o.type)
+                [Instructions::ConstFloat.new(type, o.value)]
               },
           }.freeze, T::Hash[IL::ILObject, Transform])
         end
