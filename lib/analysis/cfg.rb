@@ -40,6 +40,8 @@ module Lilac
         # create an entry and an exit with an edge connecting them
         @entry = T.let(BB.new(ENTRY, stmt_list: []), BB)
         @exit = T.let(BB.new(EXIT, stmt_list: []), BB)
+        @nodes.push(@entry)
+        @nodes.push(@exit)
         # NOTE: ENTRY and EXIT are not connected by default
 
         return unless blocks
@@ -66,16 +68,21 @@ module Lilac
       # in the graph and handles ENTRY and EXIT properly.
       def clone
         new_cfg = CFG.new
-        new_cfg.each_node { |n| new_cfg.delete_node(n) }
 
-        node_refs = {}
+        node_refs = {
+          "ENTRY" => new_cfg.entry,
+          "EXIT" => new_cfg.exit,
+        }
         @nodes.each do |n|
+          # don't copy old entry and exit, new CFG has its own
+          next if n == @entry || n == @exit
+
           node_refs[n.id] = n.clone
           new_cfg.add_node(node_refs[n.id])
         end
 
         @edges.each do |e|
-          new_cfg.add_edge(Edge.new(node_refs[e.from], node_refs[e.to]))
+          new_cfg.add_edge(Edge.new(node_refs[e.from.id], node_refs[e.to.id]))
         end
 
         new_cfg
