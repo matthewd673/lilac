@@ -1207,7 +1207,7 @@ module Lilac
       def self.from_program(program)
         # convert main program stmt list to bb and cfg
         main_bb = Analysis::BB.from_stmt_list(program.stmt_list)
-        main_cfg = Analysis::CFG.new(main_bb)
+        main_cfg = Analysis::CFG.new(blocks: main_bb)
 
         # create CFGProgram from main
         cfg_program = CFGProgram.new(main_cfg)
@@ -1215,7 +1215,7 @@ module Lilac
         # convert all functions to cfg and add them
         program.each_func do |f|
           func_bb = Analysis::BB.from_stmt_list(f.stmt_list)
-          func_cfg = Analysis::CFG.new(func_bb)
+          func_cfg = Analysis::CFG.new(blocks: func_bb)
           cfg_funcdef = CFGFuncDef.new(f.name, f.params, f.ret_type, func_cfg)
 
           cfg_program.add_func(cfg_funcdef)

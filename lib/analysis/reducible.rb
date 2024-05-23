@@ -17,8 +17,7 @@ module Lilac
       #
       # @param [CFG] cfg The CFG to run the analysis on.
       def initialize(cfg)
-        # not important that it stays a CFG class
-        @cfg = T.let(cfg.clone, Graph[BB])
+        @cfg = T.let(cfg.clone, CFG)
       end
 
       sig { returns(T::Boolean) }

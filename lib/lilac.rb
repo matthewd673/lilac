@@ -96,8 +96,8 @@ module Lilac
         puts("// WARNING: #{func_ct} functions were not included in the CFG")
       end
 
-      bb = Analysis::BB.from_stmt_list(program.stmt_list)
-      cfg = Analysis::CFG.new(bb)
+      blocks = Analysis::BB.from_stmt_list(program.stmt_list)
+      cfg = Analysis::CFG.new(blocks:)
       graphviz = Debugging::GraphVisualizer.generate_graphviz(cfg)
       puts(graphviz)
     end

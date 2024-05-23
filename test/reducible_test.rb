@@ -24,7 +24,7 @@ class ReducibleTest < Minitest::Test
       ])
 
     blocks = BB.from_stmt_list(program.stmt_list)
-    cfg = CFG.new(blocks)
+    cfg = CFG.new(blocks:)
 
     assert Reducible.new(cfg).run
   end
@@ -41,7 +41,7 @@ class ReducibleTest < Minitest::Test
       ])
 
     blocks = BB.from_stmt_list(program.stmt_list)
-    cfg = CFG.new(blocks)
+    cfg = CFG.new(blocks:)
 
     refute Reducible.new(cfg).run
   end
@@ -59,7 +59,7 @@ class ReducibleTest < Minitest::Test
       ])
 
     blocks = BB.from_stmt_list(program.stmt_list)
-    cfg = CFG.new(blocks)
+    cfg = CFG.new(blocks:)
 
     refute Reducible.new(cfg).run
   end

@@ -13,7 +13,7 @@ module Lilac
 
       sig { returns(String) }
       # The unique ID of the block.
-      attr_reader :id
+      attr_accessor :id
 
       sig { returns(T.nilable(IL::Label)) }
       # The Label that marks the entry of the block (if one exists)
@@ -94,7 +94,7 @@ module Lilac
         str
       end
 
-      sig { params(other: Analysis::BB).returns(T::Boolean) }
+      sig { params(other: T.untyped).returns(T::Boolean) }
       # Returns true if two BBs are equal. BBs are considered equal if they have
       # the same ID.
       def eql?(other)
@@ -103,6 +103,20 @@ module Lilac
         end
 
         id.eql?(other.id)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        id.hash
+      end
+
+      sig { returns(BB) }
+      def clone
+        BB.new(@id,
+               entry: @entry&.clone,
+               exit: @exit&.clone,
+               stmt_list: @stmt_list.clone,
+               true_branch: @true_branch)
       end
 
       sig do

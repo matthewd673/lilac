@@ -18,7 +18,7 @@ class ParseFileTest < Minitest::Test
                                             Constant.new(Type::I32, 5)),
                            ])
     program = Lilac::Frontend::Parser.parse_file(
-      "test/il_programs/frontend/definition.txt"
+      "test/programs/frontend/definition.txt"
     )
 
     assert program.eql?(expected)
@@ -49,7 +49,7 @@ class ParseFileTest < Minitest::Test
                                             Constant.new(Type::F64, -1.0)),
                            ])
     program = Lilac::Frontend::Parser.parse_file(
-      "test/il_programs/frontend/types.txt"
+      "test/programs/frontend/types.txt"
     )
 
     assert program.eql?(expected)
@@ -64,7 +64,7 @@ class ParseFileTest < Minitest::Test
                              Jump.new("L0"),
                            ])
     program = Lilac::Frontend::Parser.parse_file(
-      "test/il_programs/frontend/label_and_jmp.txt"
+      "test/programs/frontend/label_and_jmp.txt"
     )
 
     assert program.eql?(expected)
@@ -80,7 +80,7 @@ class ParseFileTest < Minitest::Test
                              JumpZero.new(Constant.new(Type::U8, 1), "L0"),
                            ])
     program = Lilac::Frontend::Parser.parse_file(
-      "test/il_programs/frontend/jz_jnz.txt"
+      "test/programs/frontend/jz_jnz.txt"
     )
 
     assert program.eql?(expected)
@@ -199,7 +199,7 @@ class ParseFileTest < Minitest::Test
                              ),
                            ])
     program = Lilac::Frontend::Parser.parse_file(
-      "test/il_programs/frontend/binop.txt"
+      "test/programs/frontend/binop.txt"
     )
 
     assert program.eql?(expected)
@@ -217,7 +217,7 @@ class ParseFileTest < Minitest::Test
                              ),
                            ])
     program = Lilac::Frontend::Parser.parse_file(
-      "test/il_programs/frontend/unop.txt"
+      "test/programs/frontend/unop.txt"
     )
 
     assert program.eql?(expected)
@@ -256,7 +256,7 @@ class ParseFileTest < Minitest::Test
                                   ]))
 
     program = Lilac::Frontend::Parser.parse_file(
-      "test/il_programs/frontend/func.txt"
+      "test/programs/frontend/func.txt"
     )
 
     assert program.eql?(expected)
@@ -329,11 +329,11 @@ class ParseFileTest < Minitest::Test
                              Definition.new(
                                Type::I32,
                                ID.new("c"),
-                               ID.new("b"),
+                               ID.new("b")
                              ),
                            ])
     program = Lilac::Frontend::Parser.parse_file(
-      "test/il_programs/frontend/phi.txt"
+      "test/programs/frontend/phi.txt"
     )
 
     assert program.eql?(expected)
@@ -390,7 +390,7 @@ class ParseFileTest < Minitest::Test
       ExternFuncDef.new("console", "log", [Type::F64], Type::Void)
     )
     program = Lilac::Frontend::Parser.parse_file(
-      "test/il_programs/frontend/extern.txt"
+      "test/programs/frontend/extern.txt"
     )
 
     assert program.eql?(expected)
