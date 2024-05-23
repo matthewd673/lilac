@@ -94,7 +94,7 @@ module Lilac
         str
       end
 
-      sig { params(other: Analysis::BB).returns(T::Boolean) }
+      sig { params(other: T.untyped).returns(T::Boolean) }
       # Returns true if two BBs are equal. BBs are considered equal if they have
       # the same ID.
       def eql?(other)
@@ -105,9 +105,14 @@ module Lilac
         id.eql?(other.id)
       end
 
+      sig { returns(Integer) }
+      def hash
+        id.hash
+      end
+
       sig { returns(BB) }
       def clone
-        BB.new(id,
+        BB.new(@id,
                entry: @entry&.clone,
                exit: @exit&.clone,
                stmt_list: @stmt_list.clone,
