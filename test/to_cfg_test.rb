@@ -4,6 +4,7 @@
 require "sorbet-runtime"
 require "minitest/autorun"
 require_relative "helpers/cfg_serializer"
+require_relative "helpers/cfg_equality"
 require_relative "../lib/frontend/parser"
 require_relative "../lib/analysis/bb"
 require_relative "../lib/analysis/cfg"
@@ -15,16 +16,19 @@ class ToCFGTest < Minitest::Test
   include Lilac::Analysis
 
   sig { void }
-  def test_cfg_programs
+  def test_programs_to_cfg
     PROGRAMS.each do |p|
-      program = Frontend::Parser.parse_file(p)
+      program_filename = "test/programs/cfg/#{p}.txt"
+      expected_filename = "test/programs/cfg/expected/#{p}.yaml"
 
-      blocks = BB.from_stmt_list(program.stmt_list)
-      cfg = CFG.new(blocks:)
+      cfg = load_program_cfg(program_filename)
+      expected = load_expected_cfg(expected_filename)
 
       validate_entry_exit(cfg)
       validate_path_to_exit(cfg)
       validate_edges(cfg)
+
+      assert CFGEquality.eql?(cfg, expected)
     end
   end
 
@@ -69,10 +73,26 @@ class ToCFGTest < Minitest::Test
     end
   end
 
-  PROGRAMS = T.let([
-    "test/programs/cfg/one_block.txt",
-    "test/programs/cfg/branch.txt",
-    "test/programs/cfg/loop.txt",
-  ].freeze, T::Array[String])
+  sig { params(il_file: String).returns(CFG) }
+  def load_program_cfg(il_file)
+    program = Frontend::Parser.parse_file(il_file)
+
+    # compute cfg for program
+    blocks = BB.from_stmt_list(program.stmt_list)
+    CFG.new(blocks:)
+  end
+
+  sig { params(yaml_file: String).returns(CFG) }
+  def load_expected_cfg(yaml_file)
+    # load expected cfg
+    expected_fp = File.open(yaml_file)
+    expected = CFGDeserializer.new(expected_fp.read).deserialize
+    expected_fp.close
+
+    expected
+  end
+
+  PROGRAMS = T.let(%w[one_block branch loop].freeze,
+                   T::Array[String])
   private_constant :PROGRAMS
 end
