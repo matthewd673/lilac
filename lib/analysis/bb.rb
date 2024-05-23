@@ -13,7 +13,7 @@ module Lilac
 
       sig { returns(String) }
       # The unique ID of the block.
-      attr_reader :id
+      attr_accessor :id
 
       sig { returns(T.nilable(IL::Label)) }
       # The Label that marks the entry of the block (if one exists)
@@ -103,6 +103,15 @@ module Lilac
         end
 
         id.eql?(other.id)
+      end
+
+      sig { returns(BB) }
+      def clone
+        BB.new(id,
+               entry: @entry&.clone,
+               exit: @exit&.clone,
+               stmt_list: @stmt_list.clone,
+               true_branch: @true_branch)
       end
 
       sig do

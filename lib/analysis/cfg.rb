@@ -61,6 +61,26 @@ module Lilac
         @nodes.push(node)
       end
 
+      sig { returns(CFG) }
+      # NOTE: adapted from Graph.clone, except it also clones the nodes
+      # in the graph and handles ENTRY and EXIT properly.
+      def clone
+        new_cfg = CFG.new
+        new_cfg.each_node { |n| new_cfg.delete_node(n) }
+
+        node_refs = {}
+        @nodes.each do |n|
+          node_refs[n.id] = n.clone
+          new_cfg.add_node(node_refs[n.id])
+        end
+
+        @edges.each do |e|
+          new_cfg.add_edge(Edge.new(node_refs[e.from], node_refs[e.to]))
+        end
+
+        new_cfg
+      end
+
       private
 
       sig { params(blocks: T::Array[BB]).void }
