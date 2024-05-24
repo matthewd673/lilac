@@ -53,8 +53,8 @@ module Lilac
             sig { returns(T::Array[FuncParam]) }
             attr_reader :params
 
-            sig { returns(T.nilable(Type)) }
-            attr_reader :result
+            sig { returns(T::Array[Type]) }
+            attr_reader :results
 
             sig { returns(T::Array[WasmInstruction]) }
             attr_reader :instructions
@@ -62,13 +62,13 @@ module Lilac
             sig do
               params(name: String,
                      params: T::Array[FuncParam],
-                     result: T.nilable(Type),
+                     results: T::Array[Type],
                      instructions: T::Array[WasmInstruction]).void
             end
-            def initialize(name, params, result, instructions)
+            def initialize(name, params, results, instructions)
               @name = name
               @params = params
-              @result = result
+              @results = results
               @instructions = instructions
             end
           end

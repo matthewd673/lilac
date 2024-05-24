@@ -79,6 +79,7 @@ module Lilac
             # Then, once we're done, we can write the correct section size
             # to the main @writer and then concat the section writer's bytes.
             sw = HexWriter.new
+            # num functions
             sw.write_all(LEB128.encode_unsigned(functions.length))
 
             # write all function signatures
@@ -87,21 +88,18 @@ module Lilac
               sw.write(FUNC)
               sw.write_all(LEB128.encode_unsigned(f.params.length))
 
+              # param length and params
+              sw.write_all(LEB128.encode_unsigned(f.params.length))
               f.params.each do |p|
                 sw.write(T.unsafe(TYPE_MAP[p.type]))
               end
 
-              # NOTE: Lilac is only capable of generating functions with
-              # 0 or 1 results.
-              if f.result
-                sw.write_all(LEB128.encode_unsigned(1))
-                sw.write(T.unsafe(TYPE_MAP[T.unsafe(f.result)]))
-              else
-                sw.write_all(LEB128.encode_unsigned(0))
+              # result length and results
+              sw.write_all(LEB128.encode_unsigned(f.results.length))
+              f.results.each do |r|
+                sw.write(T.unsafe(TYPE_MAP[r]))
               end
             end
-
-            # TODO: write imports as functions
 
             # finish by writing section size and then section bytes
             @writer.write_all(LEB128.encode_unsigned(sw.length))

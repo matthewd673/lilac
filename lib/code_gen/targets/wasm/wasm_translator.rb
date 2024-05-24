@@ -53,7 +53,7 @@ module Lilac
             main_instructions = translate_instructions(@program.cfg)
             components.push(Components::Func.new("__lilac_main",
                                                  [], # no params
-                                                 nil, # no return type
+                                                 [], # no results
                                                  main_instructions))
             components.push(Components::Start.new("__lilac_main"))
 
@@ -105,12 +105,13 @@ module Lilac
 
             # construct func with appropriate params and return type
             # if return type is void then result is simply nil
+            results = []
             if cfg_funcdef.ret_type != IL::Type::Void
-              result = Instructions.to_wasm_type(cfg_funcdef.ret_type)
+              results.push(Instructions.to_wasm_type(cfg_funcdef.ret_type))
             end
             Components::Func.new(cfg_funcdef.name,
                                  params,
-                                 result,
+                                 results,
                                  instructions)
           end
 
