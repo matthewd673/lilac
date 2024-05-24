@@ -13,16 +13,29 @@ module Lilac
           extend T::Sig
 
           sig { void }
+          # Construct a new HexWriter.
           def initialize
             @bytes = T.let([], T::Array[Integer])
           end
 
           sig { params(bytes: Integer).void }
+          # Write an arbitrary number of bytes to the HexWriter string.
+          #
+          # @param [Integer] bytes The bytes to write.
           def write(*bytes)
             @bytes.concat(bytes)
           end
 
+          sig { params(bytes: T::Array[Integer]).void }
+          # Write an array of bytes to the HexWriter string.
+          #
+          # @param [T::Array[Integer]] bytes The bytes to write.
+          def write_all(bytes)
+            @bytes.concat(bytes)
+          end
+
           sig { returns(String) }
+          # Get a string of the bytes that have been written so far.
           def to_s
             @bytes.pack("C*")
           end
