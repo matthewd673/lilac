@@ -50,10 +50,12 @@ module Lilac
             end
 
             # translate instructions for main stmt_list
+            main_locals = find_locals(@program.cfg)
             main_instructions = translate_instructions(@program.cfg)
             components.push(Components::Func.new("__lilac_main",
                                                  [], # no params
                                                  [], # no results
+                                                 main_locals,
                                                  main_instructions))
             components.push(Components::Start.new("__lilac_main"))
 
@@ -73,15 +75,16 @@ module Lilac
               param_types.push(Instructions.to_wasm_type(t))
             end
 
+            results = []
             if extern_funcdef.ret_type != IL::Type::Void
-              result = Instructions.to_wasm_type(extern_funcdef.ret_type)
+              results.push(Instructions.to_wasm_type(extern_funcdef.ret_type))
             end
 
             # construct import object
             Components::Import.new(extern_funcdef.source,
                                    extern_funcdef.name,
                                    param_types,
-                                   result)
+                                   results)
           end
 
           sig { params(cfg_funcdef: IL::CFGFuncDef).returns(Components::Func) }
@@ -96,8 +99,11 @@ module Lilac
               # also mark this down for the function signature
               param_type = Instructions.to_wasm_type(p.type)
               param_name = p.id.name
-              params.push(Components::FuncParam.new(param_type, param_name))
+              params.push(Components::Local.new(param_type, param_name))
             end
+
+            # find all locals in the function
+            locals = find_locals(cfg_funcdef.cfg)
 
             # translate instructions and pop the scope we used
             instructions = translate_instructions(cfg_funcdef.cfg)
@@ -112,18 +118,16 @@ module Lilac
             Components::Func.new(cfg_funcdef.name,
                                  params,
                                  results,
+                                 locals,
                                  instructions)
           end
 
           sig do
             params(cfg: Analysis::CFG)
-              .returns(T::Array[Instructions::WasmInstruction])
+              .returns(T::Hash[Type, T::Array[Components::Local]])
           end
-          def translate_instructions(cfg)
-            # run relooper on the cfg
-            relooper = Relooper.new(cfg)
-
-            instructions = []
+          def find_locals(cfg)
+            locals = {}
 
             # scan forwards to build a symbol table of all locals and their
             #   types.
@@ -148,12 +152,29 @@ module Lilac
 
                 # push declaration
                 type = Instructions.to_wasm_type(s.type)
-                decl = Instructions::Local.new(type, s.id.name)
-                instructions.push(decl)
+                new_local = Components::Local.new(type, s.id.name)
+                if locals[type]
+                  locals[type].push(new_local)
+                else
+                  locals[type] = [new_local]
+                end
               end
             end
 
-            # translate the WasmBlocks from relooper and return it
+            locals
+          end
+
+          sig do
+            params(cfg: Analysis::CFG)
+              .returns(T::Array[Instructions::WasmInstruction])
+          end
+          def translate_instructions(cfg)
+            # create a relooper instance for the cfg
+            relooper = Relooper.new(cfg)
+
+            instructions = []
+
+            # run relooper, translate the WasmBlocks, and then return that
             root = relooper.translate
             instructions.concat(translate_wasm_block(root))
 

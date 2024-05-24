@@ -69,7 +69,7 @@ module Lilac
             # stringify params
             params_str = " ".dup # shouldn't be frozen
             o.params.each do |p|
-              params_str += "#{v.visit(p)} "
+              params_str += "(param $#{o.name} #{o.type})"
             end
             params_str.chomp!(" ")
 
@@ -79,16 +79,20 @@ module Lilac
               result_str = " (result #{o.result})"
             end
 
+            # stringify locals
+            locals_str = v.visit(o.locals, ctx: "#{c}  ")
+            locals_str.chomp!
+
             # stringify instructions
             instructions_str = v.visit(o.instructions, ctx: "#{c}  ")
             instructions_str.chomp!
 
             "#{c}(func $#{o.name}#{params_str}#{result_str}\n"\
-            "#{instructions_str}\n#{c})"
+            "#{locals_str}#{instructions_str}\n#{c})"
           }, Visitor::Lambda)
 
-          VISIT_FUNCPARAM = T.let(lambda { |v, o, c|
-            "(param $#{o.name} #{o.type})"
+          VISIT_LOCAL = T.let(lambda { |v, o, c|
+            "(local %#{o.name} #{o.type})"
           }, Visitor::Lambda)
 
           VISIT_START = T.let(lambda { |v, o, c|
@@ -104,7 +108,7 @@ module Lilac
             Components::Module => VISIT_MODULE,
             Components::Import => VISIT_IMPORT,
             Components::Func => VISIT_FUNC,
-            Components::FuncParam => VISIT_FUNCPARAM,
+            Components::Local => VISIT_LOCAL,
             Components::Start => VISIT_START,
             Instruction => VISIT_INSTRUCTION,
           }.freeze, Visitor::LambdaHash)
@@ -113,7 +117,7 @@ module Lilac
           private_constant :VISIT_MODULE
           private_constant :VISIT_IMPORT
           private_constant :VISIT_FUNC
-          private_constant :VISIT_FUNCPARAM
+          private_constant :VISIT_LOCAL
           private_constant :VISIT_START
           private_constant :VISIT_INSTRUCTION
           private_constant :VISIT_LAMBDAS

@@ -6,12 +6,14 @@ require "minitest/autorun"
 require_relative "../lib/code_gen/targets/wasm/type"
 require_relative "../lib/code_gen/targets/wasm/instructions/instructions"
 require_relative "../lib/code_gen/targets/wasm/instructions/instruction_set"
+require_relative "../lib/code_gen/targets/wasm/components"
 require_relative "../lib/code_gen/targets/wasm/optimization/tee"
 
 class WasmOptimizationTest < Minitest::Test
   extend T::Sig
 
   include Lilac::CodeGen::Targets::Wasm
+  include Lilac::CodeGen::Targets::Wasm::Components
   include Lilac::CodeGen::Targets::Wasm::Instructions
 
   sig { void }
@@ -65,12 +67,12 @@ class WasmOptimizationTest < Minitest::Test
   sig { void }
   def test_tee_valid_three
     original = [
-      Local.new(Type::I32, "a"),
-      Local.new(Type::I32, "b"),
-      Local.new(Type::I32, "0"),
-      Local.new(Type::I32, "1"),
-      Local.new(Type::I32, "2"),
-      Local.new(Type::I32, "c"),
+      # Local.new(Type::I32, "a"),
+      # Local.new(Type::I32, "b"),
+      # Local.new(Type::I32, "0"),
+      # Local.new(Type::I32, "1"),
+      # Local.new(Type::I32, "2"),
+      # Local.new(Type::I32, "c"),
       ConstInteger.new(Type::I32, "5"),
       LocalSet.new("a"),
       ConstInteger.new(Type::I32, "1"),
@@ -112,12 +114,12 @@ class WasmOptimizationTest < Minitest::Test
     ]
 
     expected = [
-      Local.new(Type::I32, "a"),
-      Local.new(Type::I32, "b"),
-      Local.new(Type::I32, "0"),
-      Local.new(Type::I32, "1"),
-      Local.new(Type::I32, "2"),
-      Local.new(Type::I32, "c"),
+      # Local.new(Type::I32, "a"),
+      # Local.new(Type::I32, "b"),
+      # Local.new(Type::I32, "0"),
+      # Local.new(Type::I32, "1"),
+      # Local.new(Type::I32, "2"),
+      # Local.new(Type::I32, "c"),
       ConstInteger.new(Type::I32, "5"),
       LocalSet.new("a"),
       ConstInteger.new(Type::I32, "1"),

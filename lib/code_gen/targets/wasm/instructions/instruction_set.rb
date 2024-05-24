@@ -494,45 +494,6 @@ module Lilac
           # VARIABLE INSTRUCTIONS
           # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Variables
 
-          # Represents the +local+ instruction.
-          # Declare a local variable.
-          class Local < WasmInstruction
-            extend T::Sig
-
-            include CodeGen::Targets::Wasm
-
-            sig { returns(Type) }
-            attr_reader :type
-
-            sig { returns(String) }
-            attr_reader :variable
-
-            sig { params(type: Type, variable: String).void }
-            def initialize(type, variable)
-              @type = type
-              @variable = variable
-            end
-
-            sig { override.returns(Integer) }
-            def opcode
-              raise("FIXME: no opcode") # FIXME
-            end
-
-            sig { override.returns(String) }
-            def wat
-              "(local $#{@variable} #{@type.to_s})"
-            end
-
-            sig { override.params(other: T.untyped).returns(T::Boolean) }
-            def eql?(other)
-              if other.class != Local
-                return false
-              end
-
-              (@type.eql?(other.type) and @variable.eql?(other.variable))
-            end
-          end
-
           # Represents the +local.get+ instruction.
           # Load the value of a local variable onto the stack.
           class LocalGet < VariableInstruction
