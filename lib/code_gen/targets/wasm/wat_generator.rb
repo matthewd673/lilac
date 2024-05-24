@@ -108,6 +108,15 @@ module Lilac
             Components::Start => VISIT_START,
             Instruction => VISIT_INSTRUCTION,
           }.freeze, Visitor::LambdaHash)
+
+          private_constant :VISIT_ARRAY
+          private_constant :VISIT_MODULE
+          private_constant :VISIT_IMPORT
+          private_constant :VISIT_FUNC
+          private_constant :VISIT_FUNCPARAM
+          private_constant :VISIT_START
+          private_constant :VISIT_INSTRUCTION
+          private_constant :VISIT_LAMBDAS
         end
       end
     end
