@@ -9,6 +9,9 @@ module Lilac
   module CodeGen
     module Targets
       module Wasm
+        # The Instructions module defines base classes that describe broad
+        # groups of Wasm instructions. It also aims to contain the entire Wasm
+        # instruction set.
         module Instructions
           extend T::Sig
           # NUMERIC INSTRUCTIONS
@@ -136,7 +139,8 @@ module Lilac
           end
 
           # Represents the +gt_s+ instructions.
-          # Check if a number is greater than another number (signed integers only).
+          # Check if a number is greater than another number
+          # (signed integers only).
           class GreaterThanSigned < IntegerInstruction
             sig { override.returns(Integer) }
             def opcode
@@ -153,7 +157,8 @@ module Lilac
           end
 
           # Represents the +gt_u+ instructions.
-          # Check if a number is greater than another number (unsigned integers only).
+          # Check if a number is greater than another number
+          # (unsigned integers only).
           class GreaterThanUnsigned < IntegerInstruction
             sig { override.returns(Integer) }
             def opcode
@@ -170,7 +175,8 @@ module Lilac
           end
 
           # Represents the +gt+ instructions.
-          # Check if a number is greater than another number (floating point only).
+          # Check if a number is greater than another number
+          # (floating point only).
           class GreaterThan < FloatInstruction
             sig { override.returns(Integer) }
             def opcode
@@ -187,7 +193,8 @@ module Lilac
           end
 
           # Represents the +lt_s+ instructions.
-          # Check if a number is less than another number (signed integers only).
+          # Check if a number is less than another number
+          # (signed integers only).
           class LessThanSigned < IntegerInstruction
             sig { override.returns(Integer) }
             def opcode
@@ -204,7 +211,8 @@ module Lilac
           end
 
           # Represents the +lt_u+ instructions.
-          # Check if a number is less than another number (unsigned integers only).
+          # Check if a number is less than another number
+          # (unsigned integers only).
           class LessThanUnsigned < IntegerInstruction
             sig { override.returns(Integer) }
             def opcode
@@ -256,8 +264,8 @@ module Lilac
           end
 
           # Represents the +ge_u+ instructions.
-          # Check if a number is greater than or equal to another number (unsigned
-          # integers only).
+          # Check if a number is greater than or equal to another number
+          # (unsigned integers only).
           class GreaterOrEqualUnsigned < IntegerInstruction
             sig { override.returns(Integer) }
             def opcode
@@ -274,8 +282,8 @@ module Lilac
           end
 
           # Represents the +ge+ instructions.
-          # Check if a number is greater than or equal to another number (floating
-          # point only).
+          # Check if a number is greater than or equal to another number
+          # (floating point only).
           class GreaterOrEqual < FloatInstruction
             sig { override.returns(Integer) }
             def opcode
@@ -456,8 +464,8 @@ module Lilac
           end
 
           # Represents the +rem_s+ instructions.
-          # Calculate the remainder left over when one integer is divided by another
-          # integer (signed integers only).
+          # Calculate the remainder left over when one integer is divided by
+          # another integer (signed integers only).
           class RemainderSigned < IntegerInstruction
             sig { override.returns(Integer) }
             def opcode
@@ -474,8 +482,8 @@ module Lilac
           end
 
           # Represents the +rem_u+ instructions.
-          # Calculate the remainder left over when one integer is divided by another
-          # integer (unsigned integers only).
+          # Calculate the remainder left over when one integer is divided by
+          # another integer (unsigned integers only).
           class RemainderUnsigned < IntegerInstruction
             sig { override.returns(Integer) }
             def opcode
@@ -535,9 +543,6 @@ module Lilac
               "local.tee $#{@variable}"
             end
           end
-
-          # NOTE: similar to +local+, MDN describes a +global+ instruction that does
-          # not exist in the Wasm Index of Instructions.
 
           # Represents the +global.get+ instruction.
           # Load the value of a global variable onto the stack.
@@ -704,8 +709,8 @@ module Lilac
           end
 
           # Represents the +else+ instruction.
-          # Can be used with the +if+ instruction to execute a statement if the last
-          # item on the stack is false.
+          # Can be used with the +if+ instruction to execute a statement if the
+          # last item on the stack is false.
           class Else < WasmInstruction
             extend T::Sig
 
@@ -759,6 +764,27 @@ module Lilac
             sig { override.params(other: T.untyped).returns(T::Boolean) }
             def eql?(other)
               other.class == Return
+            end
+          end
+
+          # Represents +0x40+, the type of an empty block.
+          # https://webassembly.github.io/spec/core/binary/instructions.html#control-instructions
+          class EmptyType < WasmInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              0x40
+            end
+
+            sig { override.returns(String) }
+            def wat
+              ""
+            end
+
+            sig { override.params(other: T.untyped).returns(T::Boolean) }
+            def eql?(other)
+              other.class == EmptyType
             end
           end
         end

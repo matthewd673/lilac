@@ -232,6 +232,11 @@ module Lilac
               if_true_branch = translate_wasm_block(T.unsafe(block.true_branch))
               instructions.concat(if_true_branch)
 
+              # fill in EmptyType if true branch is empty
+              if if_true_branch.empty?
+                instructions.push(Instructions::EmptyType.new)
+              end
+
               # false branch is optional
               if block.false_branch
                 # create the else
@@ -241,6 +246,11 @@ module Lilac
                 block_false_branch = T.unsafe(block.false_branch)
                 if_false_branch = translate_wasm_block(block_false_branch)
                 instructions.concat(if_false_branch)
+
+                # fill in EmptyType if false branch is empty
+                if if_false_branch.empty?
+                  instructions.push(Instructions::EmptyType.new)
+                end
               end
 
               # end the if else statement
