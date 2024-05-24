@@ -379,8 +379,18 @@ module Lilac
 
                 instructions
               },
+            IL::Return.new(
+              IL::Constant.new(IL::Type::Void,
+                               Pattern::ConstantValueWildcard.new)
+            ) =>
+              lambda { |t, o|
+                instructions = []
+                instructions.push(Instructions::Return.new)
+
+                instructions
+              },
             IL::Return.new(Pattern::ValueWildcard.new) =>
-              lambda  { |t, o|
+              lambda { |t, o|
                 value = t.transform(o.value)
 
                 instructions = []
@@ -394,8 +404,9 @@ module Lilac
               lambda { |t, o|
                 [Instructions::LocalGet.new(o.name)]
               },
-            Pattern::IntegerConstantWildcard
-                .new(Pattern::ConstantValueWildcard) =>
+            Pattern::IntegerConstantWildcard.new(
+              Pattern::ConstantValueWildcard.new
+            ) =>
               lambda { |t, o|
                 # produce nothing for void constants
                 # these are only used by return statements
@@ -404,10 +415,11 @@ module Lilac
                 end
 
                 type = Instructions.to_integer_type(o.type)
-                [Instructions::ConstInteger.new(type, o.value)]
+                [Instructions::ConstInteger.new(type, o.value.to_s)]
               },
-            Pattern::FloatConstantWildcard
-                .new(Pattern::ConstantValueWildcard) =>
+            Pattern::FloatConstantWildcard.new(
+              Pattern::ConstantValueWildcard.new
+            ) =>
               lambda { |t, o|
                 # produce nothing for void constants
                 # these are only used by return statements
@@ -416,7 +428,7 @@ module Lilac
                 end
 
                 type = Instructions.to_float_type(o.type)
-                [Instructions::ConstFloat.new(type, o.value)]
+                [Instructions::ConstFloat.new(type, o.value.to_s)]
               },
           }.freeze, T::Hash[IL::ILObject, Transform])
         end
