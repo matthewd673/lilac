@@ -36,6 +36,22 @@ module Lilac
             @bytes.concat(bytes)
           end
 
+          sig { params(string: String).void }
+          # Write a String to the HexWriter string.
+          #
+          # @param [String] string The string to write.
+          def write_str(string)
+            @bytes.concat(string.bytes)
+          end
+
+          sig { params(string: String).void }
+          # Encode a String in UTF-8 then write it to the HexWriter string.
+          #
+          # @param [String] string The string to write.
+          def write_utf_8(string)
+            @bytes.concat(string.encode("utf-8").bytes)
+          end
+
           sig { params(block: T.proc.params(arg0: Integer).void).void }
           def each(&block)
             @bytes.each(&block)
