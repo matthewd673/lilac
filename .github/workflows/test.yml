@@ -30,6 +30,7 @@ jobs:
       with:
         repo: WebAssembly/wabt
         platform: ubuntu
+        arch: "-" # workaround because wabt release files don't contain an architecture
         cache: enable
     - uses: actions/checkout@v3
     - name: Set up Ruby
