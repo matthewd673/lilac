@@ -1,0 +1,21 @@
+---
+nodes:
+- ENTRY
+- BB_1
+- BB_2
+- BB_3
+- BB_4
+- EXIT
+edges:
+- from: ENTRY
+  to: BB_1
+- from: BB_1
+  to: BB_2
+- from: BB_1
+  to: BB_3
+- from: BB_2
+  to: BB_4
+- from: BB_3
+  to: BB_4
+- from: BB_4
+  to: EXIT

@@ -33,19 +33,20 @@ module Lilac
       # @return [BB::Block] The EXIT block object in this CFG.
       attr_reader :exit
 
-      sig { params(block_list: T::Array[BB]).void }
-      # Construct a new CFG from a list of basic blocks.
-      #
-      # @param [T::Array[BB]] block_list The list of basic blocks which will be
-      #   the nodes of this CFG.
-      def initialize(block_list)
+      sig { params(blocks: T.nilable(T::Array[BB])).void }
+      def initialize(blocks: nil)
         super()
 
-        @label_map = T.let({}, T::Hash[String, BB])
+        # create an entry and an exit with an edge connecting them
         @entry = T.let(BB.new(ENTRY, stmt_list: []), BB)
         @exit = T.let(BB.new(EXIT, stmt_list: []), BB)
+        @nodes.push(@entry)
+        @nodes.push(@exit)
+        # NOTE: ENTRY and EXIT are not connected by default
 
-        compute_graph(block_list)
+        return unless blocks
+
+        compute_graph(blocks)
       end
 
       sig { params(block: T.proc.params(arg0: BB).void).void }
@@ -60,34 +61,65 @@ module Lilac
       # @param [BB] node The basic block to add.
       def add_node(node)
         @nodes.push(node)
-        return unless node.entry&.is_a?(IL::Label)
+      end
 
-        @label_map[T.unsafe(node.entry).name] = node
+      sig { returns(CFG) }
+      # NOTE: adapted from Graph.clone, except it also clones the nodes
+      # in the graph and handles ENTRY and EXIT properly.
+      def clone
+        new_cfg = CFG.new
+
+        node_refs = {
+          "ENTRY" => new_cfg.entry,
+          "EXIT" => new_cfg.exit,
+        }
+        @nodes.each do |n|
+          # don't copy old entry and exit, new CFG has its own
+          next if n == @entry || n == @exit
+
+          node_refs[n.id] = n.clone
+          new_cfg.add_node(node_refs[n.id])
+        end
+
+        @edges.each do |e|
+          new_cfg.add_edge(Edge.new(node_refs[e.from.id], node_refs[e.to.id]))
+        end
+
+        new_cfg
       end
 
       private
 
-      sig { params(block_list: T::Array[BB]).void }
-      def compute_graph(block_list)
+      sig { params(blocks: T::Array[BB]).void }
+      def compute_graph(blocks)
         # just in case this gets run more than once
         @nodes.clear
         @edges.clear
         @incoming.clear
         @outgoing.clear
 
+        @entry = BB.new(ENTRY, stmt_list: [])
+        @exit = BB.new(EXIT, stmt_list: [])
+
+        label_map = {}
+
         # add all blocks to the graph nodes
-        block_list.each do |b|
+        blocks.each do |b|
           add_node(b)
+
+          if b.entry
+            label_map[T.unsafe(b.entry).name] = b
+          end
         end
 
         # connect blocks into graph nodes
-        block_list.each_with_index do |b, i|
+        blocks.each_with_index do |b, i|
           # create edge for block exit (some IL::Jump)
           if b.exit
             jump = T.unsafe(b.exit) # to placate Sorbet below
 
             # find block that jump is targeting
-            successor = @label_map[jump.target]
+            successor = label_map[jump.target]
             unless successor # this is unlikely but I think possible
               raise "CFG attempted to build edge to label that doesn't exist: "\
                     "\"#{jump.target}\""
@@ -106,7 +138,7 @@ module Lilac
           end
 
           # create edge to next block
-          following = block_list[i + 1]
+          following = blocks[i + 1]
           if following
             following.true_branch = false
             add_edge(Edge.new(b, following))
@@ -120,7 +152,7 @@ module Lilac
         first_block = @nodes[0]
         first_block ||= @exit
         first_block.true_branch = false
-        add_edge(Edge.new(entry, first_block))
+        add_edge(Edge.new(@entry, first_block))
 
         # add entry and exit block nodes to graph
         @nodes.insert(0, @entry)

@@ -37,7 +37,7 @@ module Lilac
             # to be filled in later
             @dom_tree = T.let( # particularly ugly but just an empty dom tree
               Analysis::DomTree.new(
-                Analysis::CFGFacts.new(Analysis::CFG.new([]))
+                Analysis::CFGFacts.new(Analysis::CFG.new)
               ),
               Analysis::DomTree
             )

@@ -1,0 +1,12 @@
+---
+nodes:
+- ENTRY
+- BB_1
+- EXIT
+edges:
+- from: ENTRY
+  to: BB_1
+- from: BB_1
+  to: BB_1
+- from: BB_1
+  to: EXIT
