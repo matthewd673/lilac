@@ -12,13 +12,13 @@ class LEB128Test < Minitest::Test
 
   sig { void }
   def test_unsigned_624485
-    bytes = LEB128.encode_unsigned_int(624_485)
+    bytes = LEB128.encode_unsigned(624_485)
     assert_bytes(bytes, [0xe5, 0x8e, 0x26]) # LSB to MSB
   end
 
   sig { void }
   def test_signed_n123456
-    bytes = LEB128.encode_signed_int(-123_456)
+    bytes = LEB128.encode_signed(-123_456)
     assert_bytes(bytes, [0xc0, 0xbb, 0x78]) # LSB to MSB
   end
 

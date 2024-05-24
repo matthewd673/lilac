@@ -18,7 +18,7 @@ module Lilac
           # @param [Integer] int The unsigned integer to encode.
           # @return [T::Array[Integer]] An array of bytes representing the
           #   LEB128 encoding. Ordered from LSB to MSB.
-          def self.encode_unsigned_int(int)
+          def self.encode_unsigned(int)
             # NOTE: adapted from:
             #   https://en.wikipedia.org/wiki/LEB128#C-like_pseudocode
 
@@ -46,7 +46,7 @@ module Lilac
           # @param [Integer] int The signed integer to encode.
           # @return [T::Array[Integer]] An array of bytes representing the
           #   LEB128 encoding. Ordered from LSB to MSB.
-          def self.encode_signed_int(int)
+          def self.encode_signed(int)
             # NOTE: adapted from:
             #   https://en.wikipedia.org/wiki/LEB128#C-like_pseudocode
             negative = int < 0
