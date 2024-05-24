@@ -18,11 +18,13 @@ permissions:
 
 jobs:
   test:
-
+  
     runs-on: ubuntu-latest
     strategy:
       matrix:
         ruby-version: ['3.3']
+        wabt-tag: ['1.0.35']
+        wabt-asset: ['wabt-1.0.35-ubuntu-20.04.tar.gz']
 
     steps:
     - uses: actions/checkout@v3
@@ -34,5 +36,17 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+    - name: Install wabt 1.0.35
+      uses: robinraju/release-downloader@v1.10
+      with:
+        repository: 'WebAssembly/wabt'
+        tag: ${{ matrix.wabt-tag }}
+        fileName: ${{ matrix.wabt-asset }}
+        extract: true
+    - name: Add wabt binaries to PATH
+      run: |
+        WABTASSET=${{ matrix.wabt-asset }}
+        WABTDIR="${WABTASSET%-ubuntu*}"
+        echo "$GITHUB_WORKSPACE/$WABTDIR/bin/" >> $GITHUB_PATH
     - name: Run tests
       run: bundle exec rake test
