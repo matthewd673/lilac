@@ -16,6 +16,7 @@ require_relative "interpreter"
 require_relative "frontend/generator"
 require_relative "code_gen/targets/wasm/wasm_translator"
 require_relative "code_gen/targets/wasm/wat_generator"
+require_relative "code_gen/targets/wasm/wasm_generator"
 require_relative "code_gen/targets/wasm/optimization/tee"
 
 # load requirements for CLI module (may also benefit external programs)

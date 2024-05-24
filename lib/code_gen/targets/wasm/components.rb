@@ -50,31 +50,36 @@ module Lilac
             sig { returns(String) }
             attr_reader :name
 
-            sig { returns(T::Array[FuncParam]) }
+            sig { returns(T::Array[Local]) }
             attr_reader :params
 
-            sig { returns(T.nilable(Type)) }
-            attr_reader :result
+            sig { returns(T::Array[Type]) }
+            attr_reader :results
+
+            sig { returns(T::Hash[Type, T::Array[Local]]) }
+            attr_reader :locals_map
 
             sig { returns(T::Array[WasmInstruction]) }
             attr_reader :instructions
 
             sig do
               params(name: String,
-                     params: T::Array[FuncParam],
-                     result: T.nilable(Type),
+                     params: T::Array[Local],
+                     results: T::Array[Type],
+                     locals_map: T::Hash[Type, T::Array[Local]],
                      instructions: T::Array[WasmInstruction]).void
             end
-            def initialize(name, params, result, instructions)
+            def initialize(name, params, results, locals_map, instructions)
               @name = name
               @params = params
-              @result = result
+              @results = results
+              @locals_map = locals_map
               @instructions = instructions
             end
           end
 
-          # Represents a named +func+ parameter.
-          class FuncParam
+          # Represents a named +local+ value (including func parameters).
+          class Local
             extend T::Sig
 
             include CodeGen::Targets::Wasm
@@ -107,20 +112,21 @@ module Lilac
             sig { returns(T::Array[Type]) }
             attr_reader :param_types
 
-            sig { returns(T.nilable(Type)) }
-            attr_reader :result
+            sig { returns(T::Array[Type]) }
+            attr_reader :results
 
             sig do
               params(module_name: String,
                      func_name: String,
                      param_types: T::Array[Type],
-                     result: T.nilable(Type)).void
+                     results: T::Array[Type])
+                .void
             end
-            def initialize(module_name, func_name, param_types, result)
+            def initialize(module_name, func_name, param_types, results)
               @module_name = module_name
               @func_name = func_name
               @param_types = param_types
-              @result = result
+              @results = results
             end
           end
         end

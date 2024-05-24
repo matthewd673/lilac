@@ -92,6 +92,10 @@ module Lilac
       def integer?
         case self
         when U8 then true
+        when U16 then true
+        when U32 then true
+        when U64 then true
+        when I8 then true
         when I16 then true
         when I32 then true
         when I64 then true
@@ -105,6 +109,7 @@ module Lilac
       # @return [T::Boolean] True if the type is a signed integer type.
       def signed?
         case self
+        when I8 then true
         when I16 then true
         when I32 then true
         when I64 then true
@@ -119,6 +124,9 @@ module Lilac
       def unsigned?
         case self
         when U8 then true
+        when U16 then true
+        when U32 then true
+        when U64 then true
         else false
         end
       end
@@ -229,6 +237,11 @@ module Lilac
         name.eql?(other.name)
       end
 
+      sig { returns(Integer) }
+      def hash
+        @name.hash
+      end
+
       sig { override.returns(ID) }
       def clone
         ID.new(@name)
@@ -267,6 +280,11 @@ module Lilac
         other = T.cast(other, Register)
 
         number.eql?(other.number)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        @number.hash
       end
 
       sig { override.returns(Register) }

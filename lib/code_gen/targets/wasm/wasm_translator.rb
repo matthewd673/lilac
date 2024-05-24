@@ -50,10 +50,13 @@ module Lilac
             end
 
             # translate instructions for main stmt_list
+            main_locals = find_locals(@program.cfg)
             main_instructions = translate_instructions(@program.cfg)
+            main_instructions.push(Instructions::End.new) # always end with End
             components.push(Components::Func.new("__lilac_main",
                                                  [], # no params
-                                                 nil, # no return type
+                                                 [], # no results
+                                                 main_locals,
                                                  main_instructions))
             components.push(Components::Start.new("__lilac_main"))
 
@@ -73,15 +76,16 @@ module Lilac
               param_types.push(Instructions.to_wasm_type(t))
             end
 
+            results = []
             if extern_funcdef.ret_type != IL::Type::Void
-              result = Instructions.to_wasm_type(extern_funcdef.ret_type)
+              results.push(Instructions.to_wasm_type(extern_funcdef.ret_type))
             end
 
             # construct import object
             Components::Import.new(extern_funcdef.source,
                                    extern_funcdef.name,
                                    param_types,
-                                   result)
+                                   results)
           end
 
           sig { params(cfg_funcdef: IL::CFGFuncDef).returns(Components::Func) }
@@ -96,33 +100,36 @@ module Lilac
               # also mark this down for the function signature
               param_type = Instructions.to_wasm_type(p.type)
               param_name = p.id.name
-              params.push(Components::FuncParam.new(param_type, param_name))
+              params.push(Components::Local.new(param_type, param_name))
             end
+
+            # find all locals in the function
+            locals = find_locals(cfg_funcdef.cfg)
 
             # translate instructions and pop the scope we used
             instructions = translate_instructions(cfg_funcdef.cfg)
             @symbols.pop_scope
+            instructions.push(Instructions::End.new) # every func ends with End
 
             # construct func with appropriate params and return type
             # if return type is void then result is simply nil
+            results = []
             if cfg_funcdef.ret_type != IL::Type::Void
-              result = Instructions.to_wasm_type(cfg_funcdef.ret_type)
+              results.push(Instructions.to_wasm_type(cfg_funcdef.ret_type))
             end
             Components::Func.new(cfg_funcdef.name,
                                  params,
-                                 result,
+                                 results,
+                                 locals,
                                  instructions)
           end
 
           sig do
             params(cfg: Analysis::CFG)
-              .returns(T::Array[Instructions::WasmInstruction])
+              .returns(T::Hash[Type, T::Array[Components::Local]])
           end
-          def translate_instructions(cfg)
-            # run relooper on the cfg
-            relooper = Relooper.new(cfg)
-
-            instructions = []
+          def find_locals(cfg)
+            locals = {}
 
             # scan forwards to build a symbol table of all locals and their
             #   types.
@@ -147,12 +154,29 @@ module Lilac
 
                 # push declaration
                 type = Instructions.to_wasm_type(s.type)
-                decl = Instructions::Local.new(type, s.id.name)
-                instructions.push(decl)
+                new_local = Components::Local.new(type, s.id.name)
+                if locals[type]
+                  locals[type].push(new_local)
+                else
+                  locals[type] = [new_local]
+                end
               end
             end
 
-            # translate the WasmBlocks from relooper and return it
+            locals
+          end
+
+          sig do
+            params(cfg: Analysis::CFG)
+              .returns(T::Array[Instructions::WasmInstruction])
+          end
+          def translate_instructions(cfg)
+            # create a relooper instance for the cfg
+            relooper = Relooper.new(cfg)
+
+            instructions = []
+
+            # run relooper, translate the WasmBlocks, and then return that
             root = relooper.translate
             instructions.concat(translate_wasm_block(root))
 
@@ -191,7 +215,9 @@ module Lilac
                   instructions.push(Instructions::EqualZero.new(cond_type))
                 elsif cond_il_type.float?
                   cond_type = Instructions.to_float_type(cond_il_type)
-                  instructions.push(Instructions::Const.new(cond_type, 0.0))
+                  instructions.push(
+                    Instructions::ConstFloat.new(cond_type, "0.0")
+                  )
                   instructions.push(Instructions::Equal.new(cond_type))
                 else # NOTE: I think this never happens
                   raise "Unexpected conditional IL type"
@@ -208,6 +234,11 @@ module Lilac
               if_true_branch = translate_wasm_block(T.unsafe(block.true_branch))
               instructions.concat(if_true_branch)
 
+              # fill in EmptyType if true branch is empty
+              if if_true_branch.empty?
+                instructions.push(Instructions::EmptyType.new)
+              end
+
               # false branch is optional
               if block.false_branch
                 # create the else
@@ -217,6 +248,11 @@ module Lilac
                 block_false_branch = T.unsafe(block.false_branch)
                 if_false_branch = translate_wasm_block(block_false_branch)
                 instructions.concat(if_false_branch)
+
+                # fill in EmptyType if false branch is empty
+                if if_false_branch.empty?
+                  instructions.push(Instructions::EmptyType.new)
+                end
               end
 
               # end the if else statement
@@ -257,7 +293,9 @@ module Lilac
                   cond_insts.push(Instructions::EqualZero.new(cond_type))
                 elsif cond_il_type.float?
                   cond_type = Instructions.to_float_type(cond_il_type)
-                  cond_insts.push(Instructions::Const.new(cond_type, 0.0))
+                  cond_insts.push(
+                    Instructions::ConstFloat.new(cond_type, "0.0")
+                  )
                   cond_insts.push(Instructions::Equal.new(cond_type))
                 else # NOTE: I think this never happens
                   raise "Unexpected conditional IL type"
@@ -326,8 +364,19 @@ module Lilac
           def push_value(value)
             case value
             when IL::Constant
-              Instructions::Const.new(Instructions.to_wasm_type(value.type),
-                                      value.value)
+              if value.type.integer?
+                Instructions::ConstInteger.new(
+                  Instructions.to_integer_type(value.type),
+                  value.value
+                )
+              elsif value.type.float?
+                Instructions::ConstFloat.new(
+                  Instructions.to_float_type(value.type),
+                  value.value
+                )
+              end
+
+              raise "IL::Constant is neither integer nor float"
             when IL::ID
               Instructions::LocalGet.new(value.name)
             when IL::Value # cannot happen, IL::Value is abstract

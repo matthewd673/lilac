@@ -37,7 +37,7 @@ module Lilac
         # find all rules that could apply to this object
         rule = find_rule_for_object(object)
         unless rule
-          raise("No rules found for object #{object}")
+          raise "No rules found for object #{object} (#{object.class})"
         end
 
         # apply the rule to the object
@@ -108,37 +108,19 @@ module Lilac
           return object.is_a?(IL::Constant)
         when Pattern::IntegerConstantWildcard
           return (object.is_a?(IL::Constant) &&
-                  case object.type # match with the four integer types
-                  when IL::Type::U8 then true
-                  when IL::Type::I16 then true
-                  when IL::Type::I32 then true
-                  when IL::Type::I64 then true
-                  else false
-                  end &&
+                  object.type.integer? &&
                   constant_value_matches?(rule.value, object.value))
         when Pattern::SignedConstantWildcard
           return (object.is_a?(IL::Constant) &&
-                  case object.type
-                  when IL::Type::I16 then true
-                  when IL::Type::I32 then true
-                  when IL::Type::I64 then true
-                  else false
-                  end &&
+                  object.type.signed? &&
                   constant_value_matches?(rule.value, object.value))
         when Pattern::UnsignedConstantWildcard
           return (object.is_a?(IL::Constant) &&
-                  case object.type
-                  when IL::Type::U8 then true
-                  else false
-                  end &&
+                  object.type.unsigned? &&
                   constant_value_matches?(rule.value, object.value))
         when Pattern::FloatConstantWildcard
           return (object.is_a?(IL::Constant) &&
-                  case object.type # match with the two floating point types
-                  when IL::Type::F32 then true
-                  when IL::Type::F64 then true
-                  else false
-                  end &&
+                  object.type.float? &&
                   constant_value_matches?(rule.value, object.value))
         when Pattern::ValueWildcard
           return object.is_a?(IL::Value)
@@ -159,6 +141,11 @@ module Lilac
             matches?(rule.value, object.value))
         when IL::Return
           return object.is_a?(IL::Return) && matches?(rule.value, object.value)
+        # Values
+        when IL::Constant
+          return (object.is_a?(IL::Constant) &&
+                  rule.type == object.type &&
+                  constant_value_matches?(rule.value, object.value))
         end
 
         raise "Unsupported pattern match between \"#{rule}\" and \"#{object}\""
@@ -170,9 +157,10 @@ module Lilac
           .returns(T::Boolean)
       end
       def constant_value_matches?(rule, value)
-        case rule
-        when Pattern::ConstantValueWildcard then true
-        else rule == value
+        if rule.is_a?(Pattern::ConstantValueWildcard)
+          true
+        else
+          rule.eql?(value)
         end
       end
     end
