@@ -52,6 +52,7 @@ module Lilac
             # translate instructions for main stmt_list
             main_locals = find_locals(@program.cfg)
             main_instructions = translate_instructions(@program.cfg)
+            main_instructions.push(Instructions::End.new) # always end with End
             components.push(Components::Func.new("__lilac_main",
                                                  [], # no params
                                                  [], # no results
@@ -108,6 +109,7 @@ module Lilac
             # translate instructions and pop the scope we used
             instructions = translate_instructions(cfg_funcdef.cfg)
             @symbols.pop_scope
+            instructions.push(Instructions::End.new) # every func ends with End
 
             # construct func with appropriate params and return type
             # if return type is void then result is simply nil

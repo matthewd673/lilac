@@ -84,7 +84,6 @@ module Lilac
             o.locals_map.each_key do |t|
               locals_str += "#{v.visit(o.locals_map[t], ctx: "#{c}  ")}\n"
             end
-            locals_str.chomp!
 
             # stringify instructions
             instructions_str = v.visit(o.instructions, ctx: "#{c}  ")

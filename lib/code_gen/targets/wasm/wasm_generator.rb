@@ -23,38 +23,90 @@ module Lilac
 
           sig { params(root_component: Components::Module).void }
           def initialize(root_component)
-            @writer = T.let(HexWriter.new, HexWriter)
             @module = root_component
+            @functions = T.let([], T::Array[Components::Func])
+            @func_indices = T.let({}, T::Hash[String, Integer])
+            @imports = T.let([], T::Array[Components::Import])
+            @start = T.let(nil, T.nilable(Components::Start))
+
+            @writer = T.let(HexWriter.new, HexWriter)
+            @sig_map = T.let({}, T::Hash[T::Array[T::Array[Type]], Integer])
+            @sig_arr = T.let([], T::Array[T::Array[T::Array[Type]]])
           end
 
           sig { override.returns(String) }
           def generate
+            # prepare to generate
+            collect_components
+            create_signatures_map
+
             # write header
             write_magic_number
             write_version
 
-            # collect components from the module
-            functions = []
-            @module.components.each do |c|
-              next unless c.is_a?(Components::Func)
+            write_type_section
+            write_import_section
+            write_function_section
 
-              functions.push(c)
+            if @start
+              write_start_section
             end
 
-            imports = []
-            @module.components.each do |c|
-              next unless c.is_a?(Components::Import)
-
-              imports.push(c)
-            end
-
-            write_type_section(functions)
-            write_import_section(imports)
+            write_code_section
 
             @writer.to_s
           end
 
           private
+
+          sig { void }
+          def collect_components
+            @module.components.each do |c|
+              case c
+              when Components::Func
+                @functions.push(c)
+              when Components::Import
+                @imports.push(c)
+              when Components::Start
+                @start = c
+              end
+            end
+          end
+
+          sig { void }
+          def create_signatures_map
+            num = 0
+
+            @imports.each do |i|
+              signature = [i.param_types, i.results]
+              next if @sig_map.key?(signature)
+
+              @sig_map[signature] = num
+              @sig_arr.push(signature)
+              num += 1
+            end
+
+            @functions.each do |f|
+              signature = [f.params.map(&:type), f.results]
+              next if @sig_map.key?(signature)
+
+              @sig_map[signature] = num
+              @sig_arr.push(signature)
+              num += 1
+            end
+          end
+
+          sig { params(name: String).void }
+          # Give a function an index in the @func_indices table.
+          # NOTE: "the [function] index space starts at zero with the function
+          # imports (if any) followed by the functions defined within the
+          # module."
+          # https://github.com/WebAssembly/design/blob/main/Modules.md#function-index-space
+          def mark_function_index(name)
+            return if @func_indices[name]
+
+            @func_indices[name] = @func_indices.keys.length
+          end
 
           sig { void }
           def write_magic_number
@@ -66,33 +118,36 @@ module Lilac
             @writer.write(0x01, 0x00, 0x00, 0x00)
           end
 
-          sig { params(functions: T::Array[Components::Func]).void }
-          def write_type_section(functions)
+          sig { void }
+          def write_type_section
             # write section header
             # LAYOUT: id, size, num functions
             @writer.write(SECTION_TYPE)
 
             # Write all bytes in section to section writer.
-            # Then, once we're done, we can write the correct section size
+            # Then, once we're done,kwe can write the correct section size
             # to the main @writer and then concat the section writer's bytes.
             sw = HexWriter.new
             # num functions
-            sw.write_all(LEB128.encode_unsigned(functions.length))
+            sw.write_all(LEB128.encode_unsigned(@functions.length))
 
             # write all function signatures
             # LAYOUT: FUNC, num params, [param types], num results, [res. types]
-            functions.each do |f|
+            @sig_arr.each do |s|
+              params = T.unsafe(s[0])
+              results = T.unsafe(s[1])
+
               sw.write(FUNC)
 
               # param length and params
-              sw.write_all(LEB128.encode_unsigned(f.params.length))
-              f.params.each do |p|
-                sw.write(T.unsafe(TYPE_MAP[p.type]))
+              sw.write_all(LEB128.encode_unsigned(params.length))
+              params.each do |p|
+                sw.write(T.unsafe(TYPE_MAP[p]))
               end
 
               # result length and results
-              sw.write_all(LEB128.encode_unsigned(f.results.length))
-              f.results.each do |r|
+              sw.write_all(LEB128.encode_unsigned(results.length))
+              results.each do |r|
                 sw.write(T.unsafe(TYPE_MAP[r]))
               end
             end
@@ -102,8 +157,8 @@ module Lilac
             sw.each { |b| @writer.write(b) }
           end
 
-          sig { params(imports: T::Array[Components::Import]).void }
-          def write_import_section(imports)
+          sig { void }
+          def write_import_section
             # write section header
             # LAYOUT: id, size, num imports
             @writer.write(SECTION_IMPORT)
@@ -111,12 +166,12 @@ module Lilac
             # create section writer
             sw = HexWriter.new
             # num imports
-            sw.write_all(LEB128.encode_unsigned(imports.length))
+            sw.write_all(LEB128.encode_unsigned(@imports.length))
 
             # write all imports
             # LAYOUT: str len, module name, str len, field name,
             #         import kind, import func sig index
-            imports.each_with_index do |i, ind|
+            @imports.each do |i|
               sw.write_all(LEB128.encode_unsigned(i.module_name.length))
               sw.write_utf_8(i.module_name)
 
@@ -125,17 +180,146 @@ module Lilac
 
               # NOTE: for now, all imports are function imports
               sw.write(KIND_FUNC)
+              mark_function_index(i.func_name)
 
               # signature index
-              # NOTE: the generate always defines imported functions first in
-              # the types section, so the index of the signature is the same as
-              # the index in the imports array.
+              ind = T.unsafe(@sig_map[[i.param_types, i.results]])
               sw.write_all(LEB128.encode_unsigned(ind))
             end
 
-            # write section size then append section writer contents
+            # write section size then concat section contents
             @writer.write_all(LEB128.encode_unsigned(sw.length))
             sw.each { |b| @writer.write(b) }
+          end
+
+          sig { void }
+          def write_function_section
+            # write section header
+            # LAYOUT: id, size, num functions
+            @writer.write(SECTION_FUNCTION)
+
+            # create section writer
+            sw = HexWriter.new
+            sw.write_all(LEB128.encode_unsigned(@functions.length))
+
+            # write all function signatures
+            # LAYOUT: signature index
+            @functions.each do |f|
+              ind = T.unsafe(@sig_map[[f.params.map(&:type), f.results]])
+              sw.write_all(LEB128.encode_unsigned(ind))
+              mark_function_index(f.name)
+            end
+
+            # write section size then concat section contents
+            @writer.write_all(LEB128.encode_unsigned(sw.length))
+            sw.each { |b| @writer.write(b) }
+          end
+
+          sig { void }
+          def write_start_section
+            # write section header
+            # LAYOUT: id, size, start function index
+            @writer.write(SECTION_START)
+
+            # create section writer
+            sw = HexWriter.new
+
+            # get start function index
+            ind = @func_indices[T.unsafe(@start&.name)]
+
+            unless ind
+              raise "No index for start function \"#{@start&.name}\:"
+            end
+
+            sw.write_all(LEB128.encode_unsigned(ind))
+
+            # write section size and concat section contents
+            @writer.write_all(LEB128.encode_unsigned(sw.length))
+            sw.each { |b| @writer.write(b) }
+          end
+
+          sig { void }
+          def write_code_section
+            # write section header
+            # LAYOUT: id, size, num functions
+            @writer.write(SECTION_CODE)
+
+            # create section writer
+            sw = HexWriter.new
+            sw.write_all(LEB128.encode_unsigned(@functions.length))
+
+            # write all func bodies
+            @functions.each do |f|
+              bw = write_func_body(f)
+
+              # write body size to section writer,
+              # then concat body writer contents
+              sw.write_all(LEB128.encode_unsigned(bw.length))
+
+              bw.each { |b| sw.write(b) }
+            end
+
+            # write section size and concat section contents
+            @writer.write_all(LEB128.encode_unsigned(sw.length))
+            sw.each { |b| @writer.write(b) }
+          end
+
+          sig { params(func: Components::Func).returns(HexWriter) }
+          def write_func_body(func)
+            # create body writer
+            bw = HexWriter.new
+
+            # write locals
+            # LAYOUT: local decl count, [local type count, local type]
+            bw.write_all(LEB128.encode_unsigned(func.locals_map.length))
+
+            # write local counts and types
+            # also, build a map of local name => index to lookup from later
+            total_locals = 0
+
+            local_indices = {}
+            # add func params to local_indices first
+            func.params.each do |p|
+              local_indices[p.name] = total_locals
+              total_locals += 1
+            end
+
+            func.locals_map.each_key do |t|
+              locals = T.unsafe(func.locals_map[t])
+              bw.write_all(LEB128.encode_unsigned(locals.length))
+              bw.write(T.unsafe(TYPE_MAP[t]))
+
+              locals.each do |l|
+                local_indices[l.name] = total_locals
+                total_locals += 1
+              end
+            end
+
+            # write instructions
+            func.instructions.each do |i|
+              bw.write(i.opcode) # always write opcode
+
+              # need to write more for some instructions
+              case i
+              when Instructions::ConstInteger
+                bw.write_all(LEB128.encode_signed(i.value.to_i))
+              when Instructions::LocalGet
+                ind = LEB128.encode_unsigned(local_indices[i.variable])
+                bw.write_all(ind)
+              when Instructions::LocalSet
+                ind = LEB128.encode_unsigned(local_indices[i.variable])
+                bw.write_all(ind)
+              when Instructions::LocalTee
+                ind = LEB128.encode_unsigned(local_indices[i.variable])
+                bw.write_all(ind)
+              when Instructions::Call
+                ind = T.unsafe(@func_indices[i.func_name])
+                bw.write_all(LEB128.encode_unsigned(ind))
+              # TODO: fill in for globals, float consts, etc.
+              end
+            end
+
+            bw
           end
 
           # CONSTANTS
