@@ -18,13 +18,19 @@ permissions:
 
 jobs:
   test:
-
+  
     runs-on: ubuntu-latest
     strategy:
       matrix:
         ruby-version: ['3.3']
 
     steps:
+    - name: Install WebAssembly/wabt
+      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      with:
+        repo: WebAssembly/wabt
+        platform: linux
+        cache: enable
     - uses: actions/checkout@v3
     - name: Set up Ruby
     # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
