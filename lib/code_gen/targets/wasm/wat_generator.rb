@@ -58,8 +58,8 @@ module Lilac
 
             # stringify return type
             result_str = ""
-            if o.result
-              result_str = " (result #{o.result})"
+            o.results.each do |r|
+              result_str += " (result #{o.result})"
             end
 
             "#{c}(func $#{o.func_name} #{import_str}#{params_str}#{result_str})"
@@ -69,18 +69,21 @@ module Lilac
             # stringify params
             params_str = " ".dup # shouldn't be frozen
             o.params.each do |p|
-              params_str += "(param $#{o.name} #{o.type})"
+              params_str += "(param $#{p.name} #{p.type})"
             end
             params_str.chomp!(" ")
 
             # stringify return type
             result_str = ""
-            if o.result
-              result_str = " (result #{o.result})"
+            o.results.each do |r|
+              result_str += " (result #{r})"
             end
 
             # stringify locals
-            locals_str = v.visit(o.locals, ctx: "#{c}  ")
+            locals_str = "".dup
+            o.locals_map.each_key do |t|
+              locals_str += "#{v.visit(o.locals_map[t], ctx: "#{c}  ")}\n"
+            end
             locals_str.chomp!
 
             # stringify instructions
@@ -92,7 +95,7 @@ module Lilac
           }, Visitor::Lambda)
 
           VISIT_LOCAL = T.let(lambda { |v, o, c|
-            "(local %#{o.name} #{o.type})"
+            "#{c}(local $#{o.name} #{o.type})"
           }, Visitor::Lambda)
 
           VISIT_START = T.let(lambda { |v, o, c|
