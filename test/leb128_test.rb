@@ -22,6 +22,15 @@ class LEB128Test < Minitest::Test
     assert_bytes(bytes, [0xc0, 0xbb, 0x78]) # LSB to MSB
   end
 
+  sig { void }
+  def test_signed_eq_unsigned
+    u_bytes = LEB128.encode_unsigned(128)
+    s_bytes = LEB128.encode_signed(128)
+
+    assert_bytes(u_bytes, [0x80, 0x01]) # LSB to MSB
+    assert_bytes(u_bytes, s_bytes)
+  end
+
   private
 
   sig { params(bytes: T::Array[Integer], expected: T::Array[Integer]).void }
