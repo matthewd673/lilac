@@ -15,131 +15,123 @@ module Lilac
             FuncDef, ExternFuncDef, Program)
     end
 
-    # SignedIntegerType is a type-alias for any signed integer type in the IL.
-    SignedIntegerType = T.type_alias do
-      T.any(Type::I8, Type::I16, Type::I32, Type::I64)
-    end
+    module Type
+      # TYPE CATEGORIES
 
-    # UnsignedIntegerType is a type-alias for any unsigned integer type in the
-    # IL.
-    UnsignedIntegerType = T.type_alias do
-      T.any(Type::U8, Type::I16, Type::I32, Type::I64)
-    end
+      class Type
+        extend T::Sig
+        extend T::Helpers
 
-    # IntegerType is a type-alias for any signed or unsigned integer type
-    # in the IL.
-    IntegerType = T.type_alias do
-      T.any(SignedIntegerType, UnsignedIntegerType)
-    end
+        abstract!
 
-    # FloatType is a type-alias for any floating point type in the IL.
-    FloatType = T.type_alias do
-      T.any(Type::F32, Type::F64)
-    end
-
-    # A Type is an enum of all the possible primitive data types in the IL.
-    class Type < T::Enum
-      extend T::Sig
-
-      enums do
-        # Void type. Should only be used by functions.
-        Void = new
-        # An unsigned 8-bit integer.
-        U8 = new
-        # An unsigned 16-bit integer.
-        U16 = new
-        # An unsigned 32-bit integer.
-        U32 = new
-        # An unsigned 64-bit integer.
-        U64 = new
-        # A signed 8-bit integer.
-        I8 = new
-        # A signed 16-bit integer.
-        I16 = new
-        # A signed 32-bit integer.
-        I32 = new
-        # A signed 64-bit integer.
-        I64 = new
-        # A 32-bit floating point number.
-        F32 = new
-        # A 64-bit floating point number.
-        F64 = new
+        sig { abstract.returns(String) }
+        def to_s; end
       end
 
-      sig { returns(String) }
-      def to_s
-        case self
-        when Void then "void"
-        when U8 then "u8"
-        when U16 then "u16"
-        when U32 then "u32"
-        when U64 then "u64"
-        when I8 then "i8"
-        when I16 then "i16"
-        when I32 then "i32"
-        when I64 then "i64"
-        when F32 then "f32"
-        when F64 then "f64"
-        else
-          T.absurd(self)
+      class Numeric < Type; end
+      class Integer < Numeric; end
+      class Signed < Integer; end
+      class Unsigned < Integer; end
+      class Float < Numeric; end
+
+      # TYPES
+
+      class Void
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "void"
         end
       end
 
-      sig { returns(T::Boolean) }
-      # Check if this is an integer type (signed or unsigned).
-      #
-      # @return [T::Boolean] True if the type is an integer type.
-      def integer?
-        case self
-        when U8 then true
-        when U16 then true
-        when U32 then true
-        when U64 then true
-        when I8 then true
-        when I16 then true
-        when I32 then true
-        when I64 then true
-        else false
+      class U8 < Unsigned
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "u8"
         end
       end
 
-      sig { returns(T::Boolean) }
-      # Check if this is a signed integer type.
-      #
-      # @return [T::Boolean] True if the type is a signed integer type.
-      def signed?
-        case self
-        when I8 then true
-        when I16 then true
-        when I32 then true
-        when I64 then true
-        else false
+      class U16 < Unsigned
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "u16"
         end
       end
 
-      sig { returns(T::Boolean) }
-      # Check if this is an unsigned integer type.
-      #
-      # @return [T::Boolean] True if the type is an unsigned integer type.
-      def unsigned?
-        case self
-        when U8 then true
-        when U16 then true
-        when U32 then true
-        when U64 then true
-        else false
+      class U32 < Unsigned
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "u32"
         end
       end
 
-      sig { returns(T::Boolean) }
-      # Check if this is a floating-point type.
-      #
-      # @return [T::Boolean] True if the type is a floating-point type.
-      def float?
-        case self
-        when F32 then true
-        when F64 then true
-        else false
+      class U64 < Unsigned
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "u64"
+        end
+      end
+
+      class I8 < Signed
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "i8"
+        end
+      end
+
+      class I16 < Signed
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "i16"
+        end
+      end
+
+      class I32 < Signed
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "i32"
+        end
+      end
+
+      class I64 < Signed
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "i64"
+        end
+      end
+
+      class F32 < Float
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "f32"
+        end
+      end
+
+      class F64 < Float
+        extend T::Sig
+
+        sig { override.returns(String) }
+        def to_s
+          "f64"
         end
       end
     end
@@ -166,13 +158,13 @@ module Lilac
     class Constant < Value
       extend T::Sig
 
-      sig { returns(Type) }
+      sig { returns(Type::Type) }
       attr_accessor :type
 
       sig { returns(T.untyped) }
       attr_accessor :value
 
-      sig { params(type: Type, value: T.untyped).void }
+      sig { params(type: Type::Type, value: T.untyped).void }
       # Construct a new Constant.
       #
       # @param [Type] type The IL Type of the Constant.
@@ -652,7 +644,7 @@ module Lilac
     class Definition < Statement
       extend T::Sig
 
-      sig { returns(Type) }
+      sig { returns(Type::Type) }
       attr_accessor :type
 
       sig { returns(ID) }
@@ -661,7 +653,7 @@ module Lilac
       sig { returns(T.any(Expression, Value)) }
       attr_accessor :rhs
 
-      sig { params(type: Type, id: ID, rhs: T.any(Expression, Value)).void }
+      sig { params(type: Type::Type, id: ID, rhs: T.any(Expression, Value)).void }
       # Construct a new Definition.
       #
       # @param [Type] type The type of the ID.
@@ -923,13 +915,13 @@ module Lilac
     class FuncParam
       extend T::Sig
 
-      sig { returns(Type) }
+      sig { returns(Type::Type) }
       attr_accessor :type
 
       sig { returns(ID) }
       attr_reader :id
 
-      sig { params(type: Type, id: ID).void }
+      sig { params(type: Type::Type, id: ID).void }
       def initialize(type, id)
         @type = type
         @id = id
@@ -967,7 +959,7 @@ module Lilac
       sig { returns(T::Array[FuncParam]) }
       attr_reader :params
 
-      sig { returns(Type) }
+      sig { returns(Type::Type) }
       attr_accessor :ret_type
 
       sig { returns(T::Array[Statement]) }
@@ -976,7 +968,7 @@ module Lilac
       sig do
         params(name: String,
                params: T::Array[FuncParam],
-               ret_type: Type,
+               ret_type: Type::Type,
                stmt_list: T::Array[Statement])
           .void
       end
@@ -1034,14 +1026,14 @@ module Lilac
       sig { returns(T::Array[Type]) }
       attr_reader :param_types
 
-      sig { returns(Type) }
+      sig { returns(Type::Type) }
       attr_accessor :ret_type
 
       sig do
         params(source: String,
                name: String,
                param_types: T::Array[Type],
-               ret_type: Type).void
+               ret_type: Type::Type).void
       end
       def initialize(source, name, param_types, ret_type)
         @source = source
@@ -1180,7 +1172,7 @@ module Lilac
       sig { returns(T::Array[FuncParam]) }
       attr_reader :params
 
-      sig { returns(Type) }
+      sig { returns(Type::Type) }
       attr_reader :ret_type
 
       sig { returns(Analysis::CFG) }
@@ -1189,7 +1181,7 @@ module Lilac
       sig do
         params(name: String,
                params: T::Array[FuncParam],
-               ret_type: Type,
+               ret_type: Type::Type,
                cfg: Analysis::CFG)
           .void
       end
