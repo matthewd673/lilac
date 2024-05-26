@@ -43,7 +43,7 @@ module Lilac
         # define some hashes and sets ahead of time for use later
         # NOTE: these constructions will be overwritten on run
         @globals = T.let(Set[], T::Set[String])
-        @global_types = T.let({}, T::Hash[String, IL::Type])
+        @global_types = T.let({}, T::Hash[String, IL::Type::Type])
         @blocks = T.let({}, T::Hash[String, T::Set[BB]])
         @df_facts = T.let(CFGFacts.new(cfg), CFGFacts[BB])
       end

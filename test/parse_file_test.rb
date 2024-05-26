@@ -13,10 +13,12 @@ class ParseFileTest < Minitest::Test
 
   sig { void }
   def test_parse_definition
-    expected = Program.new(stmt_list: [
-                             Definition.new(Type::I32, ID.new("a"),
-                                            Constant.new(Type::I32, 5)),
-                           ])
+    expected = Program.new(
+      stmt_list: [
+        Definition.new(Type::I32.new, ID.new("a"),
+                       Constant.new(Type::I32.new, 5)),
+      ]
+    )
     program = Lilac::Frontend::Parser.parse_file(
       "test/programs/frontend/definition.txt"
     )
@@ -26,28 +28,30 @@ class ParseFileTest < Minitest::Test
 
   sig { void }
   def test_parse_types
-    expected = Program.new(stmt_list: [
-                             Definition.new(Type::U8, ID.new("a"),
-                                            Constant.new(Type::U8, 8)),
-                             Definition.new(Type::U16, ID.new("b"),
-                                            Constant.new(Type::U16, 9)),
-                             Definition.new(Type::U32, ID.new("c"),
-                                            Constant.new(Type::U32, 10)),
-                             Definition.new(Type::U64, ID.new("d"),
-                                            Constant.new(Type::U64, 11)),
-                             Definition.new(Type::I8, ID.new("e"),
-                                            Constant.new(Type::I8, -2)),
-                             Definition.new(Type::I16, ID.new("f"),
-                                            Constant.new(Type::I16, -3)),
-                             Definition.new(Type::I32, ID.new("g"),
-                                            Constant.new(Type::I32, 5)),
-                             Definition.new(Type::I64, ID.new("h"),
-                                            Constant.new(Type::I64, 9999)),
-                             Definition.new(Type::F32, ID.new("i"),
-                                            Constant.new(Type::F32, 3.14)),
-                             Definition.new(Type::F64, ID.new("j"),
-                                            Constant.new(Type::F64, -1.0)),
-                           ])
+    expected = Program.new(
+      stmt_list: [
+        Definition.new(Type::U8.new, ID.new("a"),
+                       Constant.new(Type::U8.new, 8)),
+        Definition.new(Type::U16.new, ID.new("b"),
+                       Constant.new(Type::U16.new, 9)),
+        Definition.new(Type::U32.new, ID.new("c"),
+                       Constant.new(Type::U32.new, 10)),
+        Definition.new(Type::U64.new, ID.new("d"),
+                       Constant.new(Type::U64.new, 11)),
+        Definition.new(Type::I8.new, ID.new("e"),
+                       Constant.new(Type::I8.new, -2)),
+        Definition.new(Type::I16.new, ID.new("f"),
+                       Constant.new(Type::I16.new, -3)),
+        Definition.new(Type::I32.new, ID.new("g"),
+                       Constant.new(Type::I32.new, 5)),
+        Definition.new(Type::I64.new, ID.new("h"),
+                       Constant.new(Type::I64.new, 9999)),
+        Definition.new(Type::F32.new, ID.new("i"),
+                       Constant.new(Type::F32.new, 3.14)),
+        Definition.new(Type::F64.new, ID.new("j"),
+                       Constant.new(Type::F64.new, -1.0)),
+      ]
+    )
     program = Lilac::Frontend::Parser.parse_file(
       "test/programs/frontend/types.txt"
     )
@@ -57,12 +61,14 @@ class ParseFileTest < Minitest::Test
 
   sig { void }
   def test_parse_label_and_jmp
-    expected = Program.new(stmt_list: [
-                             Label.new("L0"),
-                             Definition.new(Type::I32, ID.new("a"),
-                                            Constant.new(Type::I32, 3)),
-                             Jump.new("L0"),
-                           ])
+    expected = Program.new(
+      stmt_list: [
+        Label.new("L0"),
+        Definition.new(Type::I32.new, ID.new("a"),
+                       Constant.new(Type::I32.new, 3)),
+        Jump.new("L0"),
+      ]
+    )
     program = Lilac::Frontend::Parser.parse_file(
       "test/programs/frontend/label_and_jmp.txt"
     )
@@ -72,13 +78,15 @@ class ParseFileTest < Minitest::Test
 
   sig { void }
   def test_parse_jz_jnz
-    expected = Program.new(stmt_list: [
-                             Label.new("L0"),
-                             Definition.new(Type::I32, ID.new("a"),
-                                            Constant.new(Type::I32, 5)),
-                             JumpNotZero.new(ID.new("a"), "L0"),
-                             JumpZero.new(Constant.new(Type::U8, 1), "L0"),
-                           ])
+    expected = Program.new(
+      stmt_list: [
+        Label.new("L0"),
+        Definition.new(Type::I32.new, ID.new("a"),
+                       Constant.new(Type::I32.new, 5)),
+        JumpNotZero.new(ID.new("a"), "L0"),
+        JumpZero.new(Constant.new(Type::U8.new, 1), "L0"),
+      ]
+    )
     program = Lilac::Frontend::Parser.parse_file(
       "test/programs/frontend/jz_jnz.txt"
     )
@@ -88,116 +96,82 @@ class ParseFileTest < Minitest::Test
 
   sig { void }
   def test_parse_binop
-    expected = Program.new(stmt_list: [
-                             Definition.new(
-                               Type::I32,
-                               ID.new("a"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::ADD,
-                                 Constant.new(Type::I32, 12),
-                                 Constant.new(Type::I32, 6)
-                               )
-                             ),
-                             Definition.new(
-                               Type::I32,
-                               ID.new("a"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::SUB,
-                                 ID.new("a"),
-                                 Constant.new(Type::I32, 0)
-                               )
-                             ),
-                             Definition.new(
-                               Type::I32,
-                               ID.new("a"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::MUL,
-                                 ID.new("a"),
-                                 Constant.new(Type::I32, -2)
-                               )
-                             ),
-                             Definition.new(
-                               Type::I32,
-                               ID.new("a"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::DIV,
-                                 ID.new("a"),
-                                 Constant.new(Type::I32, -2)
-                               )
-                             ),
-                             Definition.new(
-                               Type::U8,
-                               ID.new("b"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::EQ,
-                                 Constant.new(Type::U8, 0),
-                                 Constant.new(Type::U8, 0)
-                               )
-                             ),
-                             Definition.new(
-                               Type::U8,
-                               ID.new("c"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::NEQ,
-                                 Constant.new(Type::U8, 1),
-                                 Constant.new(Type::U8, 0)
-                               )
-                             ),
-                             Definition.new(
-                               Type::U8,
-                               ID.new("d"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::LT,
-                                 Constant.new(Type::U8, 2),
-                                 Constant.new(Type::U8, 4)
-                               )
-                             ),
-                             Definition.new(
-                               Type::U8,
-                               ID.new("e"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::GT,
-                                 Constant.new(Type::U8, 3),
-                                 Constant.new(Type::U8, 1)
-                               )
-                             ),
-                             Definition.new(
-                               Type::U8,
-                               ID.new("f"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::LEQ,
-                                 Constant.new(Type::U8, 1),
-                                 Constant.new(Type::U8, 1)
-                               )
-                             ),
-                             Definition.new(
-                               Type::U8,
-                               ID.new("g"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::GEQ,
-                                 Constant.new(Type::U8, 0),
-                                 Constant.new(Type::U8, 1)
-                               )
-                             ),
-                             Definition.new(
-                               Type::U8,
-                               ID.new("h"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::OR,
-                                 Constant.new(Type::U8, 1),
-                                 Constant.new(Type::U8, 0)
-                               )
-                             ),
-                             Definition.new(
-                               Type::U8,
-                               ID.new("i"),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::AND,
-                                 Constant.new(Type::U8, 0),
-                                 Constant.new(Type::U8, 1)
-                               )
-                             ),
-                           ])
+    expected = Program.new(
+      stmt_list: [
+        Definition.new(Type::I32.new, ID.new("a"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::ADD,
+                         Constant.new(Type::I32.new, 12),
+                         Constant.new(Type::I32.new, 6)
+                       )),
+        Definition.new(Type::I32.new, ID.new("a"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::SUB,
+                         ID.new("a"),
+                         Constant.new(Type::I32.new, 0)
+                       )),
+        Definition.new(Type::I32.new, ID.new("a"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::MUL,
+                         ID.new("a"),
+                         Constant.new(Type::I32.new, -2)
+                       )),
+        Definition.new(Type::I32.new, ID.new("a"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::DIV,
+                         ID.new("a"),
+                         Constant.new(Type::I32.new, -2)
+                       )),
+        Definition.new(Type::U8.new, ID.new("b"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::EQ,
+                         Constant.new(Type::U8.new, 0),
+                         Constant.new(Type::U8.new, 0)
+                       )),
+        Definition.new(Type::U8.new, ID.new("c"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::NEQ,
+                         Constant.new(Type::U8.new, 1),
+                         Constant.new(Type::U8.new, 0)
+                       )),
+        Definition.new(Type::U8.new, ID.new("d"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::LT,
+                         Constant.new(Type::U8.new, 2),
+                         Constant.new(Type::U8.new, 4)
+                       )),
+        Definition.new(Type::U8.new, ID.new("e"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::GT,
+                         Constant.new(Type::U8.new, 3),
+                         Constant.new(Type::U8.new, 1)
+                       )),
+        Definition.new(Type::U8.new, ID.new("f"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::LEQ,
+                         Constant.new(Type::U8.new, 1),
+                         Constant.new(Type::U8.new, 1)
+                       )),
+        Definition.new(Type::U8.new, ID.new("g"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::GEQ,
+                         Constant.new(Type::U8.new, 0),
+                         Constant.new(Type::U8.new, 1)
+                       )),
+        Definition.new(Type::U8.new, ID.new("h"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::OR,
+                         Constant.new(Type::U8.new, 1),
+                         Constant.new(Type::U8.new, 0)
+                       )),
+        Definition.new(Type::U8.new, ID.new("i"),
+                       BinaryOp.new(
+                         BinaryOp::Operator::AND,
+                         Constant.new(Type::U8.new, 0),
+                         Constant.new(Type::U8.new, 1)
+                       )),
+      ]
+    )
     program = Lilac::Frontend::Parser.parse_file(
       "test/programs/frontend/binop.txt"
     )
@@ -207,15 +181,15 @@ class ParseFileTest < Minitest::Test
 
   sig { void }
   def test_parse_unop
-    expected = Program.new(stmt_list: [
-                             Definition.new(
-                               Type::I16, ID.new("a"),
-                               UnaryOp.new(
-                                 UnaryOp::Operator::NEG,
-                                 Constant.new(Type::I16, 2)
-                               )
-                             ),
-                           ])
+    expected = Program.new(
+      stmt_list: [
+        Definition.new(Type::I16.new, ID.new("a"),
+                       UnaryOp.new(
+                         UnaryOp::Operator::NEG,
+                         Constant.new(Type::I16.new, 2)
+                       )),
+      ]
+    )
     program = Lilac::Frontend::Parser.parse_file(
       "test/programs/frontend/unop.txt"
     )
@@ -225,35 +199,38 @@ class ParseFileTest < Minitest::Test
 
   sig { void }
   def test_parse_func
-    expected = Program.new(stmt_list: [
-                             Definition.new(
-                               Type::I32,
-                               ID.new("ans"),
-                               Call.new(
-                                 "multiply",
-                                 [
-                                   Constant.new(Type::I32, 3),
-                                   Constant.new(Type::I32, 5),
-                                 ]
-                               )
-                             ),
-                           ])
-    expected.add_func(FuncDef.new("multiply",
-                                  [
-                                    FuncParam.new(Type::I32, ID.new("a")),
-                                    FuncParam.new(Type::I32, ID.new("b")),
-                                  ],
-                                  Type::I32,
-                                  [
-                                    Definition.new(Type::I32,
-                                                   Register.new(0),
-                                                   BinaryOp.new(
-                                                     BinaryOp::Operator::MUL,
-                                                     ID.new("a"),
-                                                     ID.new("b")
-                                                   )),
-                                    Return.new(Register.new(0)),
-                                  ]))
+    expected = Program.new(
+      stmt_list: [
+        Definition.new(Type::I32.new, ID.new("ans"),
+                       Call.new(
+                         "multiply",
+                         [
+                           Constant.new(Type::I32.new, 3),
+                           Constant.new(Type::I32.new, 5),
+                         ]
+                       )),
+      ]
+    )
+    expected.add_func(
+      FuncDef.new(
+        "multiply",
+        [
+          FuncParam.new(Type::I32.new, ID.new("a")),
+          FuncParam.new(Type::I32.new, ID.new("b")),
+        ],
+        Type::I32.new,
+        [
+          Definition.new(Type::I32.new,
+                         Register.new(0),
+                         BinaryOp.new(
+                           BinaryOp::Operator::MUL,
+                           ID.new("a"),
+                           ID.new("b")
+                         )),
+          Return.new(Register.new(0)),
+        ]
+      )
+    )
 
     program = Lilac::Frontend::Parser.parse_file(
       "test/programs/frontend/func.txt"
@@ -264,74 +241,41 @@ class ParseFileTest < Minitest::Test
 
   sig { void }
   def test_parse_phi
-    expected = Program.new(stmt_list: [
-                             Definition.new(
-                               Type::I32,
-                               ID.new("a"),
-                               Constant.new(Type::I32, 1)
-                             ),
-                             Definition.new(
-                               Type::I32,
-                               ID.new("b"),
-                               Constant.new(Type::I32, 2)
-                             ),
-                             Definition.new(
-                               Type::I32,
-                               Register.new(0),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::EQ,
-                                 ID.new("a"),
-                                 Constant.new(Type::I32, 1)
-                               )
-                             ),
-                             JumpZero.new(Register.new(0), "L0"),
-                             Definition.new(
-                               Type::I32,
-                               Register.new(1),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::MUL,
-                                 ID.new("b"),
-                                 Constant.new(Type::I32, 2)
-                               )
-                             ),
-                             Definition.new(
-                               Type::I32,
-                               ID.new("b"),
-                               Register.new(0)
-                             ),
-                             Jump.new("L1"),
-                             Label.new("L0"),
-                             Definition.new(
-                               Type::I32,
-                               Register.new(2),
-                               BinaryOp.new(
-                                 BinaryOp::Operator::ADD,
-                                 ID.new("b"),
-                                 Constant.new(Type::I32, 1)
-                               )
-                             ),
-                             Definition.new(
-                               Type::I32,
-                               ID.new("b"),
-                               Register.new(0)
-                             ),
-                             Label.new("L1"),
-                             Definition.new(
-                               Type::I32,
-                               ID.new("b"),
-                               Phi.new(
-                                 [
-                                   ID.new("b"),
-                                   ID.new("b"),
-                                 ]
-                               )
-                             ),
-                             Definition.new(
-                               Type::I32,
-                               ID.new("c"),
-                               ID.new("b")
-                             ),
-                           ])
+    expected = Program.new(
+      stmt_list: [
+        Definition.new(Type::I32.new, ID.new("a"),
+                       Constant.new(Type::I32.new, 1)),
+        Definition.new(Type::I32.new, ID.new("b"),
+                       Constant.new(Type::I32.new, 2)),
+        Definition.new(Type::I32.new, Register.new(0),
+                       BinaryOp.new(
+                         BinaryOp::Operator::EQ,
+                         ID.new("a"),
+                         Constant.new(Type::I32.new, 1)
+                       )),
+        JumpZero.new(Register.new(0), "L0"),
+        Definition.new(Type::I32.new, Register.new(1),
+                       BinaryOp.new(
+                         BinaryOp::Operator::MUL,
+                         ID.new("b"),
+                         Constant.new(Type::I32.new, 2)
+                       )),
+        Definition.new(Type::I32.new, ID.new("b"), Register.new(0)),
+        Jump.new("L1"),
+        Label.new("L0"),
+        Definition.new(Type::I32.new, Register.new(2),
+                       BinaryOp.new(
+                         BinaryOp::Operator::ADD,
+                         ID.new("b"),
+                         Constant.new(Type::I32.new, 1)
+                       )),
+        Definition.new(Type::I32.new, ID.new("b"), Register.new(0)),
+        Label.new("L1"),
+        Definition.new(Type::I32.new, ID.new("b"),
+                       Phi.new([ID.new("b"), ID.new("b")])),
+        Definition.new(Type::I32.new, ID.new("c"), ID.new("b")),
+      ]
+    )
     program = Lilac::Frontend::Parser.parse_file(
       "test/programs/frontend/phi.txt"
     )
@@ -344,50 +288,43 @@ class ParseFileTest < Minitest::Test
     expected = Program.new(stmt_list: [
                              VoidCall.new(Call.new("main", [])),
                            ])
-    expected.add_func(FuncDef.new("main", [], Type::Void, [
-                                    Definition.new(
-                                      Type::I32,
-                                      Register.new(1),
-                                      Call.new(
-                                        "divide",
-                                        [
-                                          Constant.new(Type::F64, 6.0),
-                                          Constant.new(Type::F64, 3.3),
-                                        ]
-                                      )
-                                    ),
-                                    Definition.new(
-                                      Type::F64,
-                                      ID.new("ans"),
-                                      Register.new(1)
-                                    ),
-                                    VoidCall.new(
-                                      ExternCall.new(
-                                        "console",
-                                        "log",
-                                        [ID.new("ans")]
-                                      )
-                                    ),
-                                    Return.new(Constant.new(Type::Void, nil)),
-                                  ]))
-    expected.add_func(FuncDef.new("divide",
-                                  [FuncParam.new(Type::F64, ID.new("a")),
-                                   FuncParam.new(Type::F64, ID.new("b"))],
-                                  Type::F64,
-                                  [
-                                    Definition.new(
-                                      Type::F64,
-                                      Register.new(0),
-                                      BinaryOp.new(
-                                        BinaryOp::Operator::DIV,
-                                        ID.new("a"),
-                                        ID.new("b")
-                                      )
-                                    ),
-                                    Return.new(Register.new(0)),
-                                  ]))
+    expected.add_func(
+      FuncDef.new(
+        "main", [], Type::Void.new,
+        [
+          Definition.new(Type::I32.new, Register.new(1),
+                         Call.new(
+                           "divide",
+                           [
+                             Constant.new(Type::F64.new, 6.0),
+                             Constant.new(Type::F64.new, 3.3),
+                           ]
+                         )),
+          Definition.new(Type::F64.new, ID.new("ans"), Register.new(1)),
+          VoidCall.new(ExternCall.new("console", "log", [ID.new("ans")])),
+          Return.new(Constant.new(Type::Void.new, nil)),
+        ]
+      )
+    )
+    expected.add_func(
+      FuncDef.new(
+        "divide",
+        [FuncParam.new(Type::F64.new, ID.new("a")),
+         FuncParam.new(Type::F64.new, ID.new("b"))],
+        Type::F64.new,
+        [
+          Definition.new(Type::F64.new, Register.new(0),
+                         BinaryOp.new(
+                           BinaryOp::Operator::DIV,
+                           ID.new("a"),
+                           ID.new("b")
+                         )),
+          Return.new(Register.new(0)),
+        ]
+      )
+    )
     expected.add_extern_func(
-      ExternFuncDef.new("console", "log", [Type::F64], Type::Void)
+      ExternFuncDef.new("console", "log", [Type::F64.new], Type::Void.new)
     )
     program = Lilac::Frontend::Parser.parse_file(
       "test/programs/frontend/extern.txt"

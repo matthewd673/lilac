@@ -210,10 +210,10 @@ module Lilac
                                 .get_il_type(bb_exit.cond)
 
                 # handle integer or non-integer IL type
-                if cond_il_type.integer?
+                if cond_il_type.is_a?(IL::Type::Integer)
                   cond_type = Instructions.to_integer_type(cond_il_type)
                   instructions.push(Instructions::EqualZero.new(cond_type))
-                elsif cond_il_type.float?
+                elsif cond_il_type.is_a?(IL::Type::Float)
                   cond_type = Instructions.to_float_type(cond_il_type)
                   instructions.push(
                     Instructions::ConstFloat.new(cond_type, "0.0")
@@ -288,10 +288,10 @@ module Lilac
                                 .get_il_type(bb_exit.cond)
 
                 # handle integer or non-integer IL type
-                if cond_il_type.integer?
+                if cond_il_type.is_a?(IL::Type::Integer)
                   cond_type = Instructions.to_integer_type(cond_il_type)
                   cond_insts.push(Instructions::EqualZero.new(cond_type))
-                elsif cond_il_type.float?
+                elsif cond_il_type.is_a?(IL::Type::Float)
                   cond_type = Instructions.to_float_type(cond_il_type)
                   cond_insts.push(
                     Instructions::ConstFloat.new(cond_type, "0.0")
@@ -364,12 +364,12 @@ module Lilac
           def push_value(value)
             case value
             when IL::Constant
-              if value.type.integer?
+              if value.type.is_a?(IL::Type::Integer)
                 Instructions::ConstInteger.new(
                   Instructions.to_integer_type(value.type),
                   value.value
                 )
-              elsif value.type.float?
+              elsif value.type.is_a?(IL::Type::Float)
                 Instructions::ConstFloat.new(
                   Instructions.to_float_type(value.type),
                   value.value

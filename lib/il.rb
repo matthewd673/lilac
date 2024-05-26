@@ -36,7 +36,7 @@ module Lilac
 
       # TYPES
 
-      class Void
+      class Void < Type
         extend T::Sig
 
         sig { override.returns(String) }
@@ -1023,7 +1023,7 @@ module Lilac
       sig { returns(String) }
       attr_reader :name
 
-      sig { returns(T::Array[Type]) }
+      sig { returns(T::Array[Type::Type]) }
       attr_reader :param_types
 
       sig { returns(Type::Type) }
@@ -1032,7 +1032,7 @@ module Lilac
       sig do
         params(source: String,
                name: String,
-               param_types: T::Array[Type],
+               param_types: T::Array[Type::Type],
                ret_type: Type::Type).void
       end
       def initialize(source, name, param_types, ret_type)
