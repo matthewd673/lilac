@@ -100,7 +100,7 @@ module Lilac
       sig do
         params(expr: IL::Expression,
                symbols: SymbolTable)
-          .returns(T.nilable(IL::Type))
+          .returns(T.nilable(IL::Type::Type))
       end
       def get_expr_type(expr, symbols)
         if expr.is_a?(IL::BinaryOp)
@@ -137,7 +137,7 @@ module Lilac
           end
 
           # return if they match, otherwise nil
-          if ltype == rtype then return ltype end
+          if ltype.eql?(rtype) then return ltype end
 
           return nil
         elsif expr.is_a?(IL::UnaryOp)

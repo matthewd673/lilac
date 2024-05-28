@@ -43,13 +43,14 @@ module Lilac
           end
 
           sig do
-            params(rhs: T.any(IL::Expression, IL::Value)).returns(IL::Type)
+            params(rhs: T.any(IL::Expression, IL::Value))
+              .returns(IL::Type::Type)
           end
           # For internal use. Get the IL::Type of an expression or value.
           #
           # @param [T.any(IL::Expression, IL::Value)] rhs The expression or
           #   value to perform type lookup on.
-          # @return [IL::Type] The type of the expression or value.
+          # @return [IL::Type::Type] The type of the expression or value.
           def get_il_type(rhs)
             case rhs
             when IL::BinaryOp
@@ -69,7 +70,10 @@ module Lilac
             end
           end
 
-          sig { params(rhs: T.any(IL::Expression, IL::Value)).returns(Type) }
+          sig do
+            params(rhs: T.any(IL::Expression, IL::Value))
+              .returns(Type)
+          end
           # For internal use. Get the Wasm::Type of an expression or value.
           #
           # @param [T.any(IL::Expression, IL::Value)] rhs The expression or
@@ -380,7 +384,7 @@ module Lilac
                 instructions
               },
             IL::Return.new(
-              IL::Constant.new(IL::Type::Void,
+              IL::Constant.new(IL::Type::Void.new,
                                Pattern::ConstantValueWildcard.new)
             ) =>
               lambda { |t, o|

@@ -25,7 +25,9 @@ module Lilac
       end
 
       sig do
-        params(program: IL::Program, type_map: T::Hash[IL::Type, IL::Type]).void
+        params(program: IL::Program,
+               type_map: T::Hash[IL::Type::Type, IL::Type::Type])
+          .void
       end
       # Construct a new ReplaceType transformation.
       #
