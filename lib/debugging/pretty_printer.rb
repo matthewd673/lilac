@@ -18,7 +18,7 @@ module Lilac
       # A Map representing the color palette used by PrettyPrinter.
       PALETTE = T.let({
         # IL node colors
-        IL::Type => ANSI::YELLOW,
+        IL::Type::Type => ANSI::YELLOW,
         IL::Constant => ANSI::MAGENTA,
         IL::ID => ANSI::BLUE,
         IL::Register => ANSI::BLUE,
@@ -89,10 +89,11 @@ module Lilac
 
       # A visit context used internally by the PrettyPrinter Visitor.
       PrettyPrinterContext = Struct.new(:gutter_len, :line_num, :indent)
+      private_constant :PrettyPrinterContext
 
       VISIT_LAMBDAS = T.let({
-        IL::Type => lambda { |v, o, c|
-          ANSI.fmt(o.to_s, color: PALETTE[IL::Type])
+        IL::Type::Type => lambda { |v, o, c|
+          ANSI.fmt(o.to_s, color: PALETTE[IL::Type::Type])
         },
         IL::Constant => lambda { |v, o, c|
           if o.type.eql?(IL::Type::Void)
@@ -300,8 +301,7 @@ module Lilac
           s
         },
       }.freeze, Visitor::LambdaHash)
-
-      private
+      private_constant :VISIT_LAMBDAS
 
       sig { params(str: String, len: Integer, pad: String).returns(String) }
       def self.left_pad(str, len, pad: " ")
