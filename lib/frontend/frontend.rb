@@ -149,6 +149,7 @@ module Lilac
       # NOTE: again, actual permitted label names are very broad in the IL
       # (broader than ID names, in fact)
       TokenDef.new(TokenType::Label, /[\w!@$^&\[\];'.?<>]+:/),
+
       # NOTE: anything goes for ID and Func names, this is just a nice subset
       TokenDef.new(TokenType::Name, /[\w!@$^&\[\];'.?<>]+/),
 

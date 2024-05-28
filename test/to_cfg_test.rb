@@ -28,7 +28,7 @@ class ToCFGTest < Minitest::Test
       validate_path_to_exit(cfg)
       validate_edges(cfg)
 
-      assert CFGEquality.eql?(cfg, expected)
+      CFGEquality.assert_cfg_equal(cfg, expected)
     end
   end
 
@@ -43,10 +43,10 @@ class ToCFGTest < Minitest::Test
     cfg.each_node do |n|
       if n.id == CFG::ENTRY
         entry_ct += 1
-        assert cfg.entry == n # NOTE: want shallow eql here
+        assert_equal(cfg.entry, n)
       elsif n.id == CFG::EXIT
         exit_ct += 1
-        assert cfg.exit == n # NOTE: want shallow eql here
+        assert_equal(cfg.exit, n)
       end
     end
 
