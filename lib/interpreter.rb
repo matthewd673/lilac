@@ -364,13 +364,13 @@ module Lilac
     class InterpreterValue
       extend T::Sig
 
-      sig { returns(IL::Type) }
+      sig { returns(IL::Types) }
       attr_reader :type
 
       sig { returns(T.untyped) }
       attr_reader :value
 
-      sig { params(type: IL::Type, value: T.untyped).void }
+      sig { params(type: IL::Types, value: T.untyped).void }
       def initialize(type, value)
         @type = type
         @value = value
@@ -390,7 +390,7 @@ module Lilac
       sig { returns(String) }
       attr_reader :key
 
-      sig { returns(IL::Type) }
+      sig { returns(IL::Types) }
       attr_reader :type
 
       sig { returns(T.untyped) }
@@ -399,7 +399,7 @@ module Lilac
       sig { returns(Integer) }
       attr_accessor :write_time
 
-      sig { params(key: String, type: IL::Type, value: T.untyped).void }
+      sig { params(key: String, type: IL::Types, value: T.untyped).void }
       def initialize(key, type, value)
         @key = key
         @type = type

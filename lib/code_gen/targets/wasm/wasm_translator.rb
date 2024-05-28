@@ -77,7 +77,7 @@ module Lilac
             end
 
             results = []
-            unless extern_funcdef.ret_type.is_a?(IL::Type::Void)
+            unless extern_funcdef.ret_type.is_a?(IL::Types::Void)
               results.push(Instructions.to_wasm_type(extern_funcdef.ret_type))
             end
 
@@ -114,7 +114,7 @@ module Lilac
             # construct func with appropriate params and return type
             # if return type is void then result is simply nil
             results = []
-            unless cfg_funcdef.ret_type.is_a?(IL::Type::Void)
+            unless cfg_funcdef.ret_type.is_a?(IL::Types::Void)
               results.push(Instructions.to_wasm_type(cfg_funcdef.ret_type))
             end
             Components::Func.new(cfg_funcdef.name,
@@ -210,10 +210,10 @@ module Lilac
                                 .get_il_type(bb_exit.cond)
 
                 # handle integer or non-integer IL type
-                if cond_il_type.is_a?(IL::Type::Integer)
+                if cond_il_type.is_a?(IL::Types::IntegerType)
                   cond_type = Instructions.to_integer_type(cond_il_type)
                   instructions.push(Instructions::EqualZero.new(cond_type))
-                elsif cond_il_type.is_a?(IL::Type::Float)
+                elsif cond_il_type.is_a?(IL::Types::FloatType)
                   cond_type = Instructions.to_float_type(cond_il_type)
                   instructions.push(
                     Instructions::ConstFloat.new(cond_type, "0.0")
@@ -288,10 +288,10 @@ module Lilac
                                 .get_il_type(bb_exit.cond)
 
                 # handle integer or non-integer IL type
-                if cond_il_type.is_a?(IL::Type::Integer)
+                if cond_il_type.is_a?(IL::Types::IntegerType)
                   cond_type = Instructions.to_integer_type(cond_il_type)
                   cond_insts.push(Instructions::EqualZero.new(cond_type))
-                elsif cond_il_type.is_a?(IL::Type::Float)
+                elsif cond_il_type.is_a?(IL::Types::FloatType)
                   cond_type = Instructions.to_float_type(cond_il_type)
                   cond_insts.push(
                     Instructions::ConstFloat.new(cond_type, "0.0")
@@ -364,12 +364,12 @@ module Lilac
           def push_value(value)
             case value
             when IL::Constant
-              if value.type.is_a?(IL::Type::Integer)
+              if value.type.is_a?(IL::Types::IntegerType)
                 Instructions::ConstInteger.new(
                   Instructions.to_integer_type(value.type),
                   value.value
                 )
-              elsif value.type.is_a?(IL::Type::Float)
+              elsif value.type.is_a?(IL::Types::FloatType)
                 Instructions::ConstFloat.new(
                   Instructions.to_float_type(value.type),
                   value.value

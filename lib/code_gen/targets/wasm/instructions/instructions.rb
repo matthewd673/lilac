@@ -19,7 +19,7 @@ module Lilac
 
           # HELPER FUNCTIONS
 
-          sig { params(il_type: IL::Type::Type).returns(Type) }
+          sig { params(il_type: IL::Types::Type).returns(Type) }
           # Convert an IL::Type into a Wasm type. Not all IL types are supported
           # by Wasm.
           #
@@ -27,16 +27,16 @@ module Lilac
           # @return [Type] The corresponding Wasm type.
           def self.to_wasm_type(il_type)
             case il_type
-            when IL::Type::I32 then Type::I32
-            when IL::Type::I64 then Type::I64
-            when IL::Type::F32 then Type::F32
-            when IL::Type::F64 then Type::F64
+            when IL::Types::I32 then Type::I32
+            when IL::Types::I64 then Type::I64
+            when IL::Types::F32 then Type::F32
+            when IL::Types::F64 then Type::F64
             else
               raise "IL type #{il_type} is not supported by Wasm"
             end
           end
 
-          sig { params(il_type: IL::Type::Type).returns(IntegerType) }
+          sig { params(il_type: IL::Types::Type).returns(IntegerType) }
           # Convert an IL::Type into a Wasm integer type (I32 or I64). If the
           # provided IL type cannot be converted to an integer type this will
           # raise an exception.
@@ -45,15 +45,15 @@ module Lilac
           # @return [Type] An integer Wasm type (either I32 or I64).
           def self.to_integer_type(il_type)
             case il_type
-            when IL::Type::I32 then Type::I32
-            when IL::Type::I64 then Type::I64
+            when IL::Types::I32 then Type::I32
+            when IL::Types::I64 then Type::I64
             else
               raise "IL type #{il_type} is not an integer type or "\
                     "not supported by Wasm"
             end
           end
 
-          sig { params(il_type: IL::Type::Type).returns(FloatType) }
+          sig { params(il_type: IL::Types::Type).returns(FloatType) }
           # Convert an IL::Type into a Wasm floating point type (F32 or F64).
           # If the provided IL type cannot be converted to a floating point type
           # this will raise an exception.
@@ -62,8 +62,8 @@ module Lilac
           # @return [Type] An integer Wasm type (either F32 or F64).
           def self.to_float_type(il_type)
             case il_type
-            when IL::Type::F32 then Type::F32
-            when IL::Type::F64 then Type::F64
+            when IL::Types::F32 then Type::F32
+            when IL::Types::F64 then Type::F64
             else
               raise "IL type #{il_type} is not an integer type or "\
                     "not supported by Wasm"

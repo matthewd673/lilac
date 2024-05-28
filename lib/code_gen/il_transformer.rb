@@ -108,19 +108,19 @@ module Lilac
           return object.is_a?(IL::Constant)
         when Pattern::IntegerConstantWildcard
           return (object.is_a?(IL::Constant) &&
-                  object.type.is_a?(IL::Type::Integer) &&
+                  object.type.is_a?(IL::Types::IntegerType) &&
                   constant_value_matches?(rule.value, object.value))
         when Pattern::SignedConstantWildcard
           return (object.is_a?(IL::Constant) &&
-                  object.type.is_a?(IL::Type::Signed) &&
+                  object.type.is_a?(IL::Types::SignedType) &&
                   constant_value_matches?(rule.value, object.value))
         when Pattern::UnsignedConstantWildcard
           return (object.is_a?(IL::Constant) &&
-                  object.type.is_a?(IL::Type::Unsigned) &&
+                  object.type.is_a?(IL::Types::UnsignedType) &&
                   constant_value_matches?(rule.value, object.value))
         when Pattern::FloatConstantWildcard
           return (object.is_a?(IL::Constant) &&
-                  object.type.is_a?(IL::Type::Float) &&
+                  object.type.is_a?(IL::Types::FloatType) &&
                   constant_value_matches?(rule.value, object.value))
         when Pattern::ValueWildcard
           return object.is_a?(IL::Value)

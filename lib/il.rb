@@ -15,7 +15,7 @@ module Lilac
             FuncDef, ExternFuncDef, Program)
     end
 
-    module Type
+    module Types
       # TYPE CATEGORIES
 
       class Type
@@ -27,17 +27,30 @@ module Lilac
         sig { abstract.returns(String) }
         def to_s; end
 
+        sig { abstract.returns(Integer) }
+        def size; end
+
         sig { params(other: T.untyped).returns(T::Boolean) }
         def eql?(other)
           self.class == other.class
         end
       end
 
-      class Numeric < Type; end
-      class Integer < Numeric; end
-      class Signed < Integer; end
-      class Unsigned < Integer; end
-      class Float < Numeric; end
+      class NumericType < Type
+        abstract!
+      end
+      class IntegerType < NumericType
+        abstract!
+      end
+      class SignedType < IntegerType
+        abstract!
+      end
+      class UnsignedType < IntegerType
+        abstract!
+      end
+      class FloatType < NumericType
+        abstract!
+      end
 
       # TYPES
 
@@ -48,96 +61,152 @@ module Lilac
         def to_s
           "void"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          0
+        end
       end
 
-      class U8 < Unsigned
+      class U8 < UnsignedType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "u8"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          1
+        end
       end
 
-      class U16 < Unsigned
+      class U16 < UnsignedType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "u16"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          2
+        end
       end
 
-      class U32 < Unsigned
+      class U32 < UnsignedType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "u32"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          4
+        end
       end
 
-      class U64 < Unsigned
+      class U64 < UnsignedType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "u64"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          8
+        end
       end
 
-      class I8 < Signed
+      class I8 < SignedType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "i8"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          1
+        end
       end
 
-      class I16 < Signed
+      class I16 < SignedType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "i16"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          2
+        end
       end
 
-      class I32 < Signed
+      class I32 < SignedType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "i32"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          4
+        end
       end
 
-      class I64 < Signed
+      class I64 < SignedType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "i64"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          8
+        end
       end
 
-      class F32 < Float
+      class F32 < FloatType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "f32"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          4
+        end
       end
 
-      class F64 < Float
+      class F64 < FloatType
         extend T::Sig
 
         sig { override.returns(String) }
         def to_s
           "f64"
         end
+
+        sig { override.returns(Integer) }
+        def size
+          8
+        end
+      end
       end
     end
 
@@ -163,13 +232,13 @@ module Lilac
     class Constant < Value
       extend T::Sig
 
-      sig { returns(Type::Type) }
+      sig { returns(Types::Type) }
       attr_accessor :type
 
       sig { returns(T.untyped) }
       attr_accessor :value
 
-      sig { params(type: Type::Type, value: T.untyped).void }
+      sig { params(type: Types::Type, value: T.untyped).void }
       # Construct a new Constant.
       #
       # @param [Type] type The IL Type of the Constant.
@@ -181,7 +250,7 @@ module Lilac
 
       sig { override.returns(String) }
       def to_s
-        @type == Type::Void ? "void" : @value.to_s
+        @type == Types::Void ? "void" : @value.to_s
       end
 
       sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -649,7 +718,7 @@ module Lilac
     class Definition < Statement
       extend T::Sig
 
-      sig { returns(Type::Type) }
+      sig { returns(Types::Type) }
       attr_accessor :type
 
       sig { returns(ID) }
@@ -658,7 +727,9 @@ module Lilac
       sig { returns(T.any(Expression, Value)) }
       attr_accessor :rhs
 
-      sig { params(type: Type::Type, id: ID, rhs: T.any(Expression, Value)).void }
+      sig do
+        params(type: Types::Type, id: ID, rhs: T.any(Expression, Value)).void
+      end
       # Construct a new Definition.
       #
       # @param [Type] type The type of the ID.
@@ -920,13 +991,13 @@ module Lilac
     class FuncParam
       extend T::Sig
 
-      sig { returns(Type::Type) }
+      sig { returns(Types::Type) }
       attr_accessor :type
 
       sig { returns(ID) }
       attr_reader :id
 
-      sig { params(type: Type::Type, id: ID).void }
+      sig { params(type: Types::Type, id: ID).void }
       def initialize(type, id)
         @type = type
         @id = id
@@ -964,7 +1035,7 @@ module Lilac
       sig { returns(T::Array[FuncParam]) }
       attr_reader :params
 
-      sig { returns(Type::Type) }
+      sig { returns(Types::Type) }
       attr_accessor :ret_type
 
       sig { returns(T::Array[Statement]) }
@@ -973,7 +1044,7 @@ module Lilac
       sig do
         params(name: String,
                params: T::Array[FuncParam],
-               ret_type: Type::Type,
+               ret_type: Types::Type,
                stmt_list: T::Array[Statement])
           .void
       end
@@ -1028,17 +1099,17 @@ module Lilac
       sig { returns(String) }
       attr_reader :name
 
-      sig { returns(T::Array[Type::Type]) }
+      sig { returns(T::Array[Types::Type]) }
       attr_reader :param_types
 
-      sig { returns(Type::Type) }
+      sig { returns(Types::Type) }
       attr_accessor :ret_type
 
       sig do
         params(source: String,
                name: String,
-               param_types: T::Array[Type::Type],
-               ret_type: Type::Type).void
+               param_types: T::Array[Types::Type],
+               ret_type: Types::Type).void
       end
       def initialize(source, name, param_types, ret_type)
         @source = source
@@ -1177,7 +1248,7 @@ module Lilac
       sig { returns(T::Array[FuncParam]) }
       attr_reader :params
 
-      sig { returns(Type::Type) }
+      sig { returns(Types::Type) }
       attr_reader :ret_type
 
       sig { returns(Analysis::CFG) }
@@ -1186,7 +1257,7 @@ module Lilac
       sig do
         params(name: String,
                params: T::Array[FuncParam],
-               ret_type: Type::Type,
+               ret_type: Types::Type,
                cfg: Analysis::CFG)
           .void
       end
