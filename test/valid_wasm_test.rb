@@ -8,13 +8,15 @@ require_relative "../lib/il"
 require_relative "../lib/code_gen/targets/wasm/wasm_translator"
 require_relative "../lib/code_gen/targets/wasm/wasm_generator"
 
-class WasmTest < Minitest::Test
+class ValidWasmTest < Minitest::Test
   extend T::Sig
 
   include Lilac
 
+  OUTPUT_FILE_NAME = "output.tmp.wasm"
+
   sig { void }
-  def test_programs_produce_valid_wasm
+  def test_produce_valid_wasm
     # attempt to compile each "fancy" program
     Dir["test/programs/fancy/*"].each do |f|
       program = Frontend::Parser.parse_file(f)
@@ -27,14 +29,15 @@ class WasmTest < Minitest::Test
       wasm_generator = CodeGen::Targets::Wasm::WasmGenerator.new(wasm_module)
       wasm = wasm_generator.generate
 
-      output = File.open("output.tmp.txt", "w")
+      output = File.open(OUTPUT_FILE_NAME, "w")
       output.write(wasm)
       output.close
 
-      assert system("wasm-validate output.tmp.txt")
+      assert(system("wasm-validate #{OUTPUT_FILE_NAME}"),
+             message { "wasm-validate failed for file #{f}" })
     end
 
     # clean up output
-    system("rm output.tmp.txt")
+    system("rm #{OUTPUT_FILE_NAME}")
   end
 end
