@@ -26,6 +26,11 @@ module Lilac
 
         sig { abstract.returns(String) }
         def to_s; end
+
+        sig { params(other: T.untyped).returns(T::Boolean) }
+        def eql?(other)
+          self.class == other.class
+        end
       end
 
       class Numeric < Type; end
