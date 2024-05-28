@@ -16,10 +16,10 @@ module Lilac
       include Optimization
 
       U = type_member { { fixed: IL::CFGProgram } }
-      P = type_member { { fixed: OptimizationPass } }
+      P = type_member { { fixed: T.class_of(OptimizationPass) } }
 
       sig { params(pass: P).void }
-      # Run an OptimizationPass on every statement list in the Program.
+      # Run an OptimizationPass on everything in the Program.
       # @param [Pass] pass The Pass to run.
       def run_pass(pass)
         # UnitType::None is a placeholder used by the parent class

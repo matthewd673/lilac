@@ -14,7 +14,7 @@ module Lilac
       include Validation
 
       U = type_member { { fixed: IL::Program } }
-      P = type_member { { fixed: ValidationPass } }
+      P = type_member { { fixed: T.class_of(ValidationPass) } }
 
       sig { params(pass: P).void }
       # Run a ValidationPass on the program.

@@ -11,7 +11,7 @@ module Lilac
     extend T::Generic
 
     U = type_member { { upper: T.any(IL::Program, IL::CFGProgram) } }
-    P = type_member { { upper: Pass } }
+    P = type_member { { upper: T.class_of(Pass) } }
 
     sig { returns(U) }
     # The Program that the Runner is operating on.
