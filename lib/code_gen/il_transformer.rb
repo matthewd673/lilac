@@ -144,7 +144,7 @@ module Lilac
         # Values
         when IL::Constant
           return (object.is_a?(IL::Constant) &&
-                  rule.type == object.type &&
+                  rule.type.eql?(object.type) &&
                   constant_value_matches?(rule.value, object.value))
         end
 

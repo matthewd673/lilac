@@ -77,7 +77,7 @@ module Lilac
             end
 
             results = []
-            if extern_funcdef.ret_type != IL::Type::Void
+            unless extern_funcdef.ret_type.is_a?(IL::Type::Void)
               results.push(Instructions.to_wasm_type(extern_funcdef.ret_type))
             end
 
@@ -114,7 +114,7 @@ module Lilac
             # construct func with appropriate params and return type
             # if return type is void then result is simply nil
             results = []
-            if cfg_funcdef.ret_type != IL::Type::Void
+            unless cfg_funcdef.ret_type.is_a?(IL::Type::Void)
               results.push(Instructions.to_wasm_type(cfg_funcdef.ret_type))
             end
             Components::Func.new(cfg_funcdef.name,
