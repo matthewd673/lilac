@@ -78,10 +78,32 @@ module Lilac
       #   print.
       def print_blocks(blocks)
         blocks.each do |b|
-          puts(ANSI.fmt("[#{b.id} (len=#{b.length})]", bold: true))
-          b.stmt_list.each_with_index do |s, i|
-            puts(@visitor.visit(s))
+          puts(ANSI.fmt("[#{b.id}]", bold: true))
+
+          # approximate total line count for gutter length
+          approx_lines = b.stmt_list.length
+          if b.entry then approx_lines += 1 end
+          if b.exit then approx_lines += 1 end
+
+          gutter_len = approx_lines.to_s.length
+          ctx = PrettyPrinterContext.new(gutter_len, 0, 0)
+
+          # print all stmts (as well as entry and exit)
+          if b.entry
+            puts(@visitor.visit(b.entry, ctx:))
+            ctx.line_num += 1
           end
+
+          b.stmt_list.each do |s|
+            puts(@visitor.visit(s, ctx:))
+            ctx.line_num += 1
+          end
+
+          if b.exit
+            puts(@visitor.visit(b.exit, ctx:))
+            ctx.line_num += 1
+          end
+
         end
       end
 
@@ -91,7 +113,7 @@ module Lilac
       PrettyPrinterContext = Struct.new(:gutter_len, :line_num, :indent)
 
       VISIT_LAMBDAS = T.let({
-        IL::Type => lambda { |v, o, c|
+        IL::Type::Type => lambda { |v, o, c|
           ANSI.fmt(o.to_s, color: PALETTE[IL::Type])
         },
         IL::Constant => lambda { |v, o, c|
