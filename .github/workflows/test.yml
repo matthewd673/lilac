@@ -27,13 +27,6 @@ jobs:
         wabt-asset: ['wabt-1.0.35-ubuntu-20.04.tar.gz']
 
     steps:
-    - name: Install WebAssembly/wabt
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
-      with:
-        repo: WebAssembly/wabt
-        platform: ubuntu
-        arch: "-20" # workaround because wabt release files don't contain an architecture
-        cache: enable
     - uses: actions/checkout@v3
     - name: Set up Ruby
     # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
