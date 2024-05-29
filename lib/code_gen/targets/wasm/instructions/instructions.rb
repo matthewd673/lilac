@@ -112,8 +112,6 @@ module Lilac
                 return false
               end
 
-              other = T.cast(other, TypedInstruction)
-
               @type.eql?(other.type)
             end
           end
@@ -141,8 +139,6 @@ module Lilac
               if other.class != self.class
                 return false
               end
-
-              other = T.cast(other, IntegerInstruction)
 
               @type.eql?(other.type)
             end
@@ -172,8 +168,6 @@ module Lilac
                 return false
               end
 
-              other = T.cast(other, FloatInstruction)
-
               @type.eql?(other.type)
             end
           end
@@ -200,8 +194,6 @@ module Lilac
                 return false
               end
 
-              other = T.cast(other, VariableInstruction)
-
               @variable.eql?(other.variable)
             end
           end
@@ -227,9 +219,97 @@ module Lilac
                 return false
               end
 
-              other = T.cast(other, LabelInstruction)
-
               @label.eql?(other.label)
+            end
+          end
+
+          # A Wasm instruction that requires a memory name. A +nil+ memory
+          # name indicates default memory.
+          class MemoryInstruction < WasmInstruction
+            extend T::Sig
+            extend T::Helpers
+
+            abstract!
+
+            sig { returns(T.nilable(String)) }
+            attr_reader :memory
+
+            sig { params(memory: T.nilable(String)).void }
+            def initialize(memory)
+              @memory = memory
+            end
+
+            sig { override.params(other: T.untyped).returns(T::Boolean) }
+            def eql?(other)
+              if other.class != self.class
+                return false
+              end
+
+              @memory.eql?(other.memory)
+            end
+          end
+
+          # A Wasm instruction that requires a type and a memory name.
+          # A +nil+ memory name indicates default memory.
+          class TypedMemoryInstruction < WasmInstruction
+            extend T::Sig
+            extend T::Helpers
+
+            abstract!
+
+            sig { returns(Type) }
+            attr_reader :type
+
+            sig { returns(T.nilable(String)) }
+            attr_reader :memory
+
+            sig { params(type: Type, memory: T.nilable(String)).void }
+            def initialize(type, memory)
+              @type = type
+              @memory = memory
+            end
+
+            sig { override.params(other: T.untyped).returns(T::Boolean) }
+            def eql?(other)
+              if other.class != self.class
+                return false
+              end
+
+              @memory.eql?(other.memory)
+            end
+          end
+
+          # A Wasm instruction that requires an integer type and a memory name.
+          # A +nil+ memory name indicates default memory.
+          class IntegerMemoryInstruction < WasmInstruction
+            extend T::Sig
+            extend T::Helpers
+
+            abstract!
+
+            sig { returns(T.any(Type::I32, Type::I64)) }
+            attr_reader :type
+
+            sig { returns(T.nilable(String)) }
+            attr_reader :memory
+
+            sig do
+              params(type: T.any(Type::I32, Type::I64),
+                     memory: T.nilable(String))
+                .void
+            end
+            def initialize(type, memory)
+              @type = type
+              @memory = memory
+            end
+
+            sig { override.params(other: T.untyped).returns(T::Boolean) }
+            def eql?(other)
+              if other.class != self.class
+                return false
+              end
+
+              @memory.eql?(other.memory)
             end
           end
         end
