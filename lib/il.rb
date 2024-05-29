@@ -293,7 +293,7 @@ module Lilac
 
         other = T.cast(other, Constant)
 
-        type.eql?(other.type) and value.eql?(other.value)
+        type.eql?(other.type) && value.eql?(other.value)
       end
 
       sig { override.returns(Constant) }
@@ -430,8 +430,13 @@ module Lilac
           GT  = new(">")
           LEQ = new("<=")
           GEQ = new(">=")
-          OR  = new("||")
-          AND = new("&&")
+          BOOL_AND = new("&&")
+          BOOL_OR = new("||")
+          BIT_LS = new("<<")
+          BIT_RS = new(">>")
+          BIT_AND = new("&")
+          BIT_OR = new("|")
+          BIT_XOR = new("^")
         end
 
         sig { returns(String) }
@@ -474,7 +479,7 @@ module Lilac
 
         other = T.cast(other, BinaryOp)
 
-        op.eql?(other.op) and left.eql?(other.left) and right.eql?(other.right)
+        op.eql?(other.op) && left.eql?(other.left) && right.eql?(other.right)
       end
 
       sig { override.returns(BinaryOp) }
@@ -513,10 +518,20 @@ module Lilac
           left.value <= right.value ? 1 : 0
         when Operator::GEQ
           left.value >= right.value ? 1 : 0
-        when Operator::OR
-          left.value != 0 || right.value != 0 ? 1 : 0
-        when Operator::AND
+        when Operator::BOOL_AND
           left.value != 0 && right.value != 0 ? 1 : 0
+        when Operator::BOOL_OR
+          left.value != 0 || right.value != 0 ? 1 : 0
+        when Operator::BIT_LS
+          left.value << right.value
+        when Operator::BIT_RS
+          left.value >> right.value # TODO: is this logical shift?
+        when Operator::BIT_AND
+          left.value & right.value
+        when Operator::BIT_OR
+          left.value | right.value
+        when Operator::BIT_XOR
+          left.value ^ right.value
         else T.absurd(self)
         end
       end
@@ -533,6 +548,8 @@ module Lilac
 
         enums do
           NEG = new("-@")
+          BOOL_NOT = new("!@")
+          BIT_NOT = new("~@")
         end
 
         sig { returns(String) }
@@ -570,7 +587,7 @@ module Lilac
 
         other = T.cast(other, UnaryOp)
 
-        op.eql?(other.op) and value.eql?(other.value)
+        op.eql?(other.op) && value.eql?(other.value)
       end
 
       sig { override.returns(UnaryOp) }
@@ -589,7 +606,11 @@ module Lilac
 
         case @op
         when Operator::NEG
-          0 - value.value
+          -value.value
+        when Operator::BOOL_NOT
+          value.value != 0 ? 0 : 1
+        when Operator::BIT_NOT
+          ~value.value
         else T.absurd(self)
         end
       end
@@ -630,7 +651,7 @@ module Lilac
 
         other = T.cast(other, Call)
 
-        func_name.eql?(other.func_name) and args.eql?(other.args)
+        func_name.eql?(other.func_name) && args.eql?(other.args)
       end
 
       sig { override.returns(Call) }
@@ -677,8 +698,8 @@ module Lilac
 
         other = T.cast(other, ExternCall)
 
-        func_source.eql?(other.func_source) and
-          func_name.eql?(other.func_name) and args.eql?(other.args)
+        func_source.eql?(other.func_source) &&
+          func_name.eql?(other.func_name) && args.eql?(other.args)
       end
 
       sig { override.returns(ExternCall) }
@@ -787,7 +808,7 @@ module Lilac
 
         other = T.cast(other, Definition)
 
-        type.eql?(other.type) and id.eql?(other.id) and rhs.eql?(other.rhs)
+        type.eql?(other.type) && id.eql?(other.id) && rhs.eql?(other.rhs)
       end
 
       sig { override.returns(Definition) }
@@ -901,7 +922,7 @@ module Lilac
 
         other = T.cast(other, JumpZero)
 
-        cond.eql?(other.cond) and target.eql?(other.target)
+        cond.eql?(other.cond) && target.eql?(other.target)
       end
 
       sig { override.returns(JumpZero) }
@@ -941,7 +962,7 @@ module Lilac
 
         other = T.cast(other, JumpNotZero)
 
-        cond.eql?(other.cond) and target.eql?(other.target)
+        cond.eql?(other.cond) && target.eql?(other.target)
       end
 
       sig { override.returns(JumpNotZero) }
@@ -1048,7 +1069,7 @@ module Lilac
 
         other = T.cast(other, FuncParam)
 
-        type.eql?(other.type) and id.eql?(other.id)
+        type.eql?(other.type) && id.eql?(other.id)
       end
 
       sig { returns(FuncParam) }
@@ -1111,8 +1132,8 @@ module Lilac
 
         other = T.cast(other, FuncDef)
 
-        name.eql?(other.name) and params.eql?(other.params) and
-          ret_type.eql?(other.ret_type) and stmt_list.eql?(other.stmt_list)
+        name.eql?(other.name) && params.eql?(other.params) &&
+          ret_type.eql?(other.ret_type) && stmt_list.eql?(other.stmt_list)
       end
 
       sig { returns(FuncDef) }
@@ -1163,9 +1184,9 @@ module Lilac
 
         other = T.cast(other, ExternFuncDef)
 
-        source.eql?(other.source) and name.eql?(other.name) and
+        source.eql?(other.source) && name.eql?(other.name) &&
           # TODO: if ret_type comparison goes last then this is nilable. Why?
-          ret_type.eql?(other.ret_type) and param_types.eql?(other.param_types)
+          ret_type.eql?(other.ret_type) && param_types.eql?(other.param_types)
       end
 
       sig { returns(ExternFuncDef) }
@@ -1240,7 +1261,7 @@ module Lilac
 
         other = T.cast(other, Program)
 
-        stmt_list.eql?(other.stmt_list) and func_map.eql?(other.func_map) and
+        stmt_list.eql?(other.stmt_list) && func_map.eql?(other.func_map) &&
           extern_func_map.eql?(other.extern_func_map)
       end
 

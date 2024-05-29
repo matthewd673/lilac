@@ -494,8 +494,13 @@ module Lilac
              when ">" then IL::BinaryOp::Operator::GT
              when "<=" then IL::BinaryOp::Operator::LEQ
              when ">=" then IL::BinaryOp::Operator::GEQ
-             when "||" then IL::BinaryOp::Operator::OR
-             when "&&" then IL::BinaryOp::Operator::AND
+             when "&&" then IL::BinaryOp::Operator::BOOL_AND
+             when "||" then IL::BinaryOp::Operator::BOOL_OR
+             when "<<" then IL::BinaryOp::Operator::BIT_LS
+             when ">>" then IL::BinaryOp::Operator::BIT_RS
+             when "&" then IL::BinaryOp::Operator::BIT_AND
+             when "|" then IL::BinaryOp::Operator::BIT_OR
+             when "^" then IL::BinaryOp::Operator::BIT_XOR
              else
                raise("Invalid BinaryOp token image #{token.image}")
              end
@@ -507,6 +512,8 @@ module Lilac
       def unop_from_token(token, value)
         op = case token.image
              when "-@" then IL::UnaryOp::Operator::NEG
+             when "!@" then IL::UnaryOp::Operator::BOOL_NOT
+             when "~@" then IL::UnaryOp::Operator::BIT_NOT
              else
                raise("Invalid UnaryOp token image #{token.image}")
              end
