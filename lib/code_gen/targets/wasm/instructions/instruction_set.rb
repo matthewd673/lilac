@@ -1010,7 +1010,7 @@ module Lilac
 
             sig { override.returns(String) }
             def wat
-              ""
+              "nop"
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }
