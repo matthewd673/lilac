@@ -185,9 +185,9 @@ module Lilac
                  left.value <= right.value ? 1 : 0
                when IL::BinaryOp::Operator::GEQ
                  left.value >= right.value ? 1 : 0
-               when IL::BinaryOp::Operator::OR
+               when IL::BinaryOp::Operator::BOOL_OR
                  left.value != 0 || right.value != 0 ? 1 : 0
-               when IL::BinaryOp::Operator::AND
+               when IL::BinaryOp::Operator::BOOL_AND
                  left.value != 0 && right.value != 0 ? 1 : 0
                else # cannot use T.absurd since o.op is untyped
                  raise("Unimplemented binary operator '#{op}'")

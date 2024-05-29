@@ -160,13 +160,13 @@ class ParseFileTest < Minitest::Test
                        )),
         Definition.new(Types::U8.new, ID.new("h"),
                        BinaryOp.new(
-                         BinaryOp::Operator::OR,
+                         BinaryOp::Operator::BOOL_OR,
                          Constant.new(Types::U8.new, 1),
                          Constant.new(Types::U8.new, 0)
                        )),
         Definition.new(Types::U8.new, ID.new("i"),
                        BinaryOp.new(
-                         BinaryOp::Operator::AND,
+                         BinaryOp::Operator::BOOL_AND,
                          Constant.new(Types::U8.new, 0),
                          Constant.new(Types::U8.new, 1)
                        )),

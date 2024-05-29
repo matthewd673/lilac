@@ -92,14 +92,14 @@ module Lilac
           if const?(binop.right, 1) # not associative
             return binop.left
           end
-        when IL::BinaryOp::Operator::OR
+        when IL::BinaryOp::Operator::BOOL_OR
           # check for or with something non-zero (which is always true)
           if const?(binop.left, 0, neg: true)
             return binop.left # return the non-zero
           elsif const?(binop.right, 0, neg: true)
             return binop.right # return the non-zero
           end
-        when IL::BinaryOp::Operator::AND
+        when IL::BinaryOp::Operator::BOOL_AND
           # check for and with something zero (which is always false)
           if const?(binop.left, 0)
             return binop.left # return the zero because thats what it evals to
