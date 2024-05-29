@@ -15,6 +15,8 @@ module Lilac
             FuncDef, ExternFuncDef, Program)
     end
 
+    # The Types module contains all the types and categories of types available
+    # in the Lilac IL.
     module Types
       # TYPE CATEGORIES
 
@@ -64,7 +66,7 @@ module Lilac
 
         sig { override.returns(Integer) }
         def size
-          0
+          0 # TODO: void shouldn't really have a size
         end
       end
 
@@ -207,6 +209,36 @@ module Lilac
           8
         end
       end
+
+      class Pointer < Type
+        extend T::Sig
+
+        sig { returns(Type) }
+        attr_reader :type
+
+        sig { params(type: Type).void }
+        def initialize(type)
+          @type = type
+        end
+
+        sig { override.returns(String) }
+        def to_s
+          "*#{@type}"
+        end
+
+        sig { override.returns(Integer) }
+        def size
+          raise "TODO: implement Pointer size"
+        end
+
+        sig { params(other: T.untyped).returns(T::Boolean) }
+        def eql?(other)
+          if other.class != Pointer
+            return false
+          end
+
+          type.eql?(other.type)
+        end
       end
     end
 
