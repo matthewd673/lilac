@@ -106,6 +106,36 @@ module Lilac
           elsif const?(binop.right, 0)
             return binop.right # same idea
           end
+        when IL::BinaryOp::Operator::BIT_LS
+          # check for shifting by zero
+          if const?(binop.right, 0)
+            return binop.left
+          # check for shifting a 0
+          elsif const?(binop.left, 0)
+            return binop.left
+          end
+        when IL::BinaryOp::Operator::BIT_RS
+          # check for shifting by zero
+          if const?(binop.right, 0)
+            return binop.left
+          # check for shifting a 0
+          elsif const?(binop.left, 0)
+            return binop.left
+          end
+        when IL::BinaryOp::Operator::BIT_AND
+          # check for AND-ing with zero
+          if const?(binop.left, 0)
+            return binop.left
+          elsif const?(binop.right, 0)
+            return binop.right
+          end
+        when IL::BinaryOp::Operator::BIT_OR
+          # check for OR-ing with zero
+          if const?(binop.left, 0)
+            return binop.right
+          elsif const?(binop.right, 0)
+            return binop.left
+          end
         end
 
         nil
