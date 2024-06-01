@@ -18,6 +18,7 @@ module Lilac
     module Type
       # TYPE CATEGORIES
 
+      # Represents any type in the IL.
       class Type
         extend T::Sig
         extend T::Helpers
@@ -33,11 +34,30 @@ module Lilac
         end
       end
 
-      class Numeric < Type; end
-      class Integer < Numeric; end
-      class Signed < Integer; end
-      class Unsigned < Integer; end
-      class Float < Numeric; end
+      # Represents any numeric type (integer or floating-point).
+      class NumericType < Type
+        abstract!
+      end
+
+      # Represents any integer type (signed or unsigned).
+      class IntegerType < NumericType
+        abstract!
+      end
+
+      # Represents any signed integer type.
+      class SignedType < IntegerType
+        abstract!
+      end
+
+      # Represents any unsigned integer type.
+      class UnsignedType < IntegerType
+        abstract!
+      end
+
+      # Represents any floating-point type.
+      class FloatType < NumericType
+        abstract!
+      end
 
       # TYPES
 
