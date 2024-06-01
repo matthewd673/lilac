@@ -21,7 +21,7 @@ class ToReducibleTest < Minitest::Test
   def test_already_reducible
     program = Program.new(stmt_list:
       [
-        JumpNotZero.new(Constant.new(Type::I32.new, 0), "L2"),
+        JumpNotZero.new(Constant.new(Types::I32.new, 0), "L2"),
         Label.new("L1"),
         Label.new("L2"),
       ])
@@ -41,11 +41,11 @@ class ToReducibleTest < Minitest::Test
   def test_irreducible_one
     program = Program.new(stmt_list:
       [
-        JumpNotZero.new(Constant.new(Type::I32.new, 0), "L2"),
+        JumpNotZero.new(Constant.new(Types::I32.new, 0), "L2"),
         Label.new("L1"),
-        JumpNotZero.new(Constant.new(Type::I32.new, 0), "L2"),
+        JumpNotZero.new(Constant.new(Types::I32.new, 0), "L2"),
         Label.new("L2"),
-        JumpNotZero.new(Constant.new(Type::I32.new, 0), "L1"),
+        JumpNotZero.new(Constant.new(Types::I32.new, 0), "L1"),
         Label.new("L3"),
       ])
 

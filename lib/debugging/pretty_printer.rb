@@ -18,7 +18,7 @@ module Lilac
       # A Map representing the color palette used by PrettyPrinter.
       PALETTE = T.let({
         # IL node colors
-        IL::Type::Type => ANSI::YELLOW,
+        IL::Types::Type => ANSI::YELLOW,
         IL::Constant => ANSI::MAGENTA,
         IL::ID => ANSI::BLUE,
         IL::Register => ANSI::BLUE,
@@ -103,7 +103,6 @@ module Lilac
             puts(@visitor.visit(b.exit, ctx:))
             ctx.line_num += 1
           end
-
         end
       end
 
@@ -114,11 +113,11 @@ module Lilac
       private_constant :PrettyPrinterContext
 
       VISIT_LAMBDAS = T.let({
-        IL::Type::Type => lambda { |v, o, c|
-          ANSI.fmt(o.to_s, color: PALETTE[IL::Type::Type])
+        IL::Types::Type => lambda { |v, o, c|
+          ANSI.fmt(o.to_s, color: PALETTE[IL::Types::Type])
         },
         IL::Constant => lambda { |v, o, c|
-          if o.type.eql?(IL::Type::Void)
+          if o.type.eql?(IL::Types::Void)
             ANSI.fmt("void", color: PALETTE[IL::Constant])
           else
             ANSI.fmt(o.to_s, color: PALETTE[IL::Constant])

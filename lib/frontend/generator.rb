@@ -190,7 +190,7 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_LAMBDAS = T.let({
-        IL::Type => VISIT_TYPE,
+        IL::Types => VISIT_TYPE,
         IL::Constant => VISIT_CONSTANT,
         IL::ID => VISIT_ID,
         IL::Register => VISIT_REGISTER,

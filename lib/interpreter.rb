@@ -185,9 +185,9 @@ module Lilac
                  left.value <= right.value ? 1 : 0
                when IL::BinaryOp::Operator::GEQ
                  left.value >= right.value ? 1 : 0
-               when IL::BinaryOp::Operator::OR
+               when IL::BinaryOp::Operator::BOOL_OR
                  left.value != 0 || right.value != 0 ? 1 : 0
-               when IL::BinaryOp::Operator::AND
+               when IL::BinaryOp::Operator::BOOL_AND
                  left.value != 0 && right.value != 0 ? 1 : 0
                else # cannot use T.absurd since o.op is untyped
                  raise("Unimplemented binary operator '#{op}'")
@@ -364,13 +364,13 @@ module Lilac
     class InterpreterValue
       extend T::Sig
 
-      sig { returns(IL::Type) }
+      sig { returns(IL::Types) }
       attr_reader :type
 
       sig { returns(T.untyped) }
       attr_reader :value
 
-      sig { params(type: IL::Type, value: T.untyped).void }
+      sig { params(type: IL::Types, value: T.untyped).void }
       def initialize(type, value)
         @type = type
         @value = value
@@ -390,7 +390,7 @@ module Lilac
       sig { returns(String) }
       attr_reader :key
 
-      sig { returns(IL::Type) }
+      sig { returns(IL::Types) }
       attr_reader :type
 
       sig { returns(T.untyped) }
@@ -399,7 +399,7 @@ module Lilac
       sig { returns(Integer) }
       attr_accessor :write_time
 
-      sig { params(key: String, type: IL::Type, value: T.untyped).void }
+      sig { params(key: String, type: IL::Types, value: T.untyped).void }
       def initialize(key, type, value)
         @key = key
         @type = type

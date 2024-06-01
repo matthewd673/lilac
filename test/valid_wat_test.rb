@@ -1,5 +1,5 @@
 # typed: strict
-# frozen_string_literal: ture
+# frozen_string_literal: true
 
 require "sorbet-runtime"
 require "minitest/autorun"
@@ -14,6 +14,7 @@ class ValidWatTest < Minitest::Test
   include Lilac
 
   OUTPUT_FILE_NAME = "output.tmp.wat"
+  GENERATED_FILE_NAME = "output.tmp.wasm"
 
   sig { void }
   def test_produce_valid_wasm
@@ -42,5 +43,6 @@ class ValidWatTest < Minitest::Test
 
     # clean up output
     system("rm #{OUTPUT_FILE_NAME}")
+    system("rm #{GENERATED_FILE_NAME}")
   end
 end

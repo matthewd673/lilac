@@ -44,7 +44,7 @@ module Lilac
 
           sig do
             params(rhs: T.any(IL::Expression, IL::Value))
-              .returns(IL::Type::Type)
+              .returns(IL::Types::Type)
           end
           # For internal use. Get the IL::Type of an expression or value.
           #
@@ -384,7 +384,7 @@ module Lilac
                 instructions
               },
             IL::Return.new(
-              IL::Constant.new(IL::Type::Void.new,
+              IL::Constant.new(IL::Types::Void.new,
                                Pattern::ConstantValueWildcard.new)
             ) =>
               lambda { |t, o|
@@ -414,7 +414,7 @@ module Lilac
               lambda { |t, o|
                 # produce nothing for void constants
                 # these are only used by return statements
-                if o.type == IL::Type::Void
+                if o.type == IL::Types::Void
                   return []
                 end
 
@@ -427,7 +427,7 @@ module Lilac
               lambda { |t, o|
                 # produce nothing for void constants
                 # these are only used by return statements
-                if o.type == IL::Type::Void
+                if o.type == IL::Types::Void
                   return []
                 end
 

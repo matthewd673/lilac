@@ -13,11 +13,11 @@ module Lilac
     # The ID that this symbol corresponds to.
     attr_reader :id
 
-    sig { returns(IL::Type::Type) }
+    sig { returns(IL::Types::Type) }
     # The type of the symbol.
     attr_reader :type
 
-    sig { params(id: IL::ID, type: IL::Type::Type).void }
+    sig { params(id: IL::ID, type: IL::Types::Type).void }
     # Construct a new ILSymbol.
     #
     # @param [IL::ID] id The ID that this symbol corresponds to.

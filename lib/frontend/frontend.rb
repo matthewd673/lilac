@@ -123,8 +123,9 @@ module Lilac
       TokenDef.new(TokenType::Arrow, /->/),
       # NOTE: -@ isn't really standard anywhere else but it will make things
       # much easier here
-      TokenDef.new(TokenType::UnaryOp, /-@/),
-      TokenDef.new(TokenType::BinaryOp, /\+|-|\*|\/|==|!=|<=|>=|<|>|\|\||&&/),
+      TokenDef.new(TokenType::UnaryOp, /-@|!@|~@/),
+      TokenDef.new(TokenType::BinaryOp,
+                   /\+|-|\*|\/|==|!=|<=|>=|<|>|&&|\|\|<<|>>|&|\||\^/),
       TokenDef.new(TokenType::Phi, /phi/),
       TokenDef.new(TokenType::Assignment, /=/),
       TokenDef.new(TokenType::Jump, /jmp/),
