@@ -113,7 +113,7 @@ module Lilac
 
       sig { returns(String) }
       def to_s
-        @type.to_s
+        "#{@type.to_s}#{@image.empty? ? "" : ": \"#{@image}\""}"
       end
     end
 
@@ -125,7 +125,7 @@ module Lilac
       # much easier here
       TokenDef.new(TokenType::UnaryOp, /-@|!@|~@/),
       TokenDef.new(TokenType::BinaryOp,
-                   /\+|-|\*|\/|==|!=|<=|>=|<|>|&&|\|\|<<|>>|&|\||\^/),
+                   /\+|-|\*|\/|==|!=|<=|>=|<|>|&&|\|\||<<|>>|&|\||\^/),
       TokenDef.new(TokenType::Phi, /phi/),
       TokenDef.new(TokenType::Assignment, /=/),
       TokenDef.new(TokenType::Jump, /jmp/),
