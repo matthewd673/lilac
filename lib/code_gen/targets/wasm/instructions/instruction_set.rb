@@ -572,7 +572,238 @@ module Lilac
             end
           end
 
-          # TODO: memory instructions
+          # MEMORY INSTRUCTIONS
+          # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Memory
+
+          # Represents the +memory.grow+ instruction.
+          # Increase the size of a memory by some number of pages.
+          class Grow < MemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              0x40
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "memory.grow#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +memory.size+ instruction.
+          # Get the number of pages in a memory.
+          class Size < MemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              0x3f
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "memory.size#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +load+ instructions.
+          # Load a number from a memory.
+          class Load < TypedMemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0x28
+              when Type::I64 then 0x29
+              when Type::F32 then 0x2a
+              when Type::F64 then 0x2b
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.load#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +load8_s+ instructions.
+          class Load8S < IntegerMemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0x2c
+              when Type::I64 then 0x30
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.load8_s#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +load8_u+ instructions.
+          class Load8U < IntegerMemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0x2d
+              when Type::I64 then 0x31
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.load8_u#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +load16_s+ instructions.
+          class Load16S < IntegerMemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0x2c
+              when Type::I64 then 0x32
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.load16_s#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +load16_u+ instructions.
+          class Load16U < IntegerMemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0x2f
+              when Type::I64 then 0x33
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.load16_u#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +i64.load32_s+ instruction.
+          class Load32S < MemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              0x34
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "i64.load32_s#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +i64.load32_u+ instruction.
+          class Load32U < MemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              0x35
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "i64.load32_u#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +store+ instructions.
+          # Store a number at an offset in a memory.
+          class Store < TypedMemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0x36
+              when Type::I64 then 0x37
+              when Type::F32 then 0x38
+              when Type::F64 then 0x39
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.store#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +store8+ instructions.
+          class Store8 < IntegerMemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0x3a
+              when Type::I64 then 0x3c
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.store8#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +store16+ instructions.
+          class Store16 < IntegerMemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0x3b
+              when Type::I64 then 0x3d
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.store16#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # Represents the +i64.store32+ instruction.
+          class Store32 < MemoryInstruction
+            extend T::Sig
+
+            sig { override.returns(Integer) }
+            def opcode
+              0x3e
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "i64.store32#{@memory ? " (memory $#{@memory})" : ""}"
+            end
+          end
+
+          # TODO: copy
+          # TODO: fill
 
           # CONTROL FLOW INSTRUCTIONS
           # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Control_flow
@@ -779,7 +1010,7 @@ module Lilac
 
             sig { override.returns(String) }
             def wat
-              ""
+              "nop"
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }

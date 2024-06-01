@@ -19,7 +19,7 @@ module Lilac
 
           # HELPER FUNCTIONS
 
-          sig { params(il_type: IL::Type::Type).returns(Type) }
+          sig { params(il_type: IL::Types::Type).returns(Type) }
           # Convert an IL::Type into a Wasm type. Not all IL types are supported
           # by Wasm.
           #
@@ -27,16 +27,16 @@ module Lilac
           # @return [Type] The corresponding Wasm type.
           def self.to_wasm_type(il_type)
             case il_type
-            when IL::Type::I32 then Type::I32
-            when IL::Type::I64 then Type::I64
-            when IL::Type::F32 then Type::F32
-            when IL::Type::F64 then Type::F64
+            when IL::Types::I32 then Type::I32
+            when IL::Types::I64 then Type::I64
+            when IL::Types::F32 then Type::F32
+            when IL::Types::F64 then Type::F64
             else
               raise "IL type #{il_type} is not supported by Wasm"
             end
           end
 
-          sig { params(il_type: IL::Type::Type).returns(IntegerType) }
+          sig { params(il_type: IL::Types::Type).returns(IntegerType) }
           # Convert an IL::Type into a Wasm integer type (I32 or I64). If the
           # provided IL type cannot be converted to an integer type this will
           # raise an exception.
@@ -45,15 +45,15 @@ module Lilac
           # @return [Type] An integer Wasm type (either I32 or I64).
           def self.to_integer_type(il_type)
             case il_type
-            when IL::Type::I32 then Type::I32
-            when IL::Type::I64 then Type::I64
+            when IL::Types::I32 then Type::I32
+            when IL::Types::I64 then Type::I64
             else
               raise "IL type #{il_type} is not an integer type or "\
                     "not supported by Wasm"
             end
           end
 
-          sig { params(il_type: IL::Type::Type).returns(FloatType) }
+          sig { params(il_type: IL::Types::Type).returns(FloatType) }
           # Convert an IL::Type into a Wasm floating point type (F32 or F64).
           # If the provided IL type cannot be converted to a floating point type
           # this will raise an exception.
@@ -62,8 +62,8 @@ module Lilac
           # @return [Type] An integer Wasm type (either F32 or F64).
           def self.to_float_type(il_type)
             case il_type
-            when IL::Type::F32 then Type::F32
-            when IL::Type::F64 then Type::F64
+            when IL::Types::F32 then Type::F32
+            when IL::Types::F64 then Type::F64
             else
               raise "IL type #{il_type} is not an integer type or "\
                     "not supported by Wasm"
@@ -112,8 +112,6 @@ module Lilac
                 return false
               end
 
-              other = T.cast(other, TypedInstruction)
-
               @type.eql?(other.type)
             end
           end
@@ -141,8 +139,6 @@ module Lilac
               if other.class != self.class
                 return false
               end
-
-              other = T.cast(other, IntegerInstruction)
 
               @type.eql?(other.type)
             end
@@ -172,8 +168,6 @@ module Lilac
                 return false
               end
 
-              other = T.cast(other, FloatInstruction)
-
               @type.eql?(other.type)
             end
           end
@@ -200,8 +194,6 @@ module Lilac
                 return false
               end
 
-              other = T.cast(other, VariableInstruction)
-
               @variable.eql?(other.variable)
             end
           end
@@ -227,9 +219,97 @@ module Lilac
                 return false
               end
 
-              other = T.cast(other, LabelInstruction)
-
               @label.eql?(other.label)
+            end
+          end
+
+          # A Wasm instruction that requires a memory name. A +nil+ memory
+          # name indicates default memory.
+          class MemoryInstruction < WasmInstruction
+            extend T::Sig
+            extend T::Helpers
+
+            abstract!
+
+            sig { returns(T.nilable(String)) }
+            attr_reader :memory
+
+            sig { params(memory: T.nilable(String)).void }
+            def initialize(memory)
+              @memory = memory
+            end
+
+            sig { override.params(other: T.untyped).returns(T::Boolean) }
+            def eql?(other)
+              if other.class != self.class
+                return false
+              end
+
+              @memory.eql?(other.memory)
+            end
+          end
+
+          # A Wasm instruction that requires a type and a memory name.
+          # A +nil+ memory name indicates default memory.
+          class TypedMemoryInstruction < WasmInstruction
+            extend T::Sig
+            extend T::Helpers
+
+            abstract!
+
+            sig { returns(Type) }
+            attr_reader :type
+
+            sig { returns(T.nilable(String)) }
+            attr_reader :memory
+
+            sig { params(type: Type, memory: T.nilable(String)).void }
+            def initialize(type, memory)
+              @type = type
+              @memory = memory
+            end
+
+            sig { override.params(other: T.untyped).returns(T::Boolean) }
+            def eql?(other)
+              if other.class != self.class
+                return false
+              end
+
+              @memory.eql?(other.memory)
+            end
+          end
+
+          # A Wasm instruction that requires an integer type and a memory name.
+          # A +nil+ memory name indicates default memory.
+          class IntegerMemoryInstruction < WasmInstruction
+            extend T::Sig
+            extend T::Helpers
+
+            abstract!
+
+            sig { returns(T.any(Type::I32, Type::I64)) }
+            attr_reader :type
+
+            sig { returns(T.nilable(String)) }
+            attr_reader :memory
+
+            sig do
+              params(type: T.any(Type::I32, Type::I64),
+                     memory: T.nilable(String))
+                .void
+            end
+            def initialize(type, memory)
+              @type = type
+              @memory = memory
+            end
+
+            sig { override.params(other: T.untyped).returns(T::Boolean) }
+            def eql?(other)
+              if other.class != self.class
+                return false
+              end
+
+              @memory.eql?(other.memory)
             end
           end
         end

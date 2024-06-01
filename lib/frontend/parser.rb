@@ -288,7 +288,7 @@ module Lilac
         # void constant
         elsif see?(TokenType::VoidConst)
           eat(TokenType::VoidConst)
-          return IL::Constant.new(IL::Type::Void.new, nil)
+          return IL::Constant.new(IL::Types::Void.new, nil)
         # id
         elsif see?(TokenType::Name)
           id_str = eat(TokenType::Name).image
@@ -372,7 +372,7 @@ module Lilac
         parse_func_params(param_list)
       end
 
-      sig { params(param_type_list: T::Array[IL::Type::Type]).void }
+      sig { params(param_type_list: T::Array[IL::Types::Type]).void }
       def parse_extern_func_param_types(param_type_list)
         # epsilon
         if see?(TokenType::RightParen)
@@ -430,20 +430,20 @@ module Lilac
         parse_id_list(id_list)
       end
 
-      sig { params(string: String).returns(IL::Type::Type) }
+      sig { params(string: String).returns(IL::Types::Type) }
       def type_from_string(string)
         case string
-        when "void" then return IL::Type::Void.new
-        when "u8" then return IL::Type::U8.new
-        when "u16" then return IL::Type::U16.new
-        when "u32" then return IL::Type::U32.new
-        when "u64" then return IL::Type::U64.new
-        when "i8" then return IL::Type::I8.new
-        when "i16" then return IL::Type::I16.new
-        when "i32" then return IL::Type::I32.new
-        when "i64" then return IL::Type::I64.new
-        when "f32" then return IL::Type::F32.new
-        when "f64" then return IL::Type::F64.new
+        when "void" then return IL::Types::Void.new
+        when "u8" then return IL::Types::U8.new
+        when "u16" then return IL::Types::U16.new
+        when "u32" then return IL::Types::U32.new
+        when "u64" then return IL::Types::U64.new
+        when "i8" then return IL::Types::I8.new
+        when "i16" then return IL::Types::I16.new
+        when "i32" then return IL::Types::I32.new
+        when "i64" then return IL::Types::I64.new
+        when "f32" then return IL::Types::F32.new
+        when "f64" then return IL::Types::F64.new
         end
 
         raise("Invalid type string \"#{string}\"")
@@ -471,7 +471,7 @@ module Lilac
         type = type_from_string(T.unsafe(type_str[0]))
 
         numeric = string.to_i
-        if type.is_a?(IL::Type::F32) || type.is_a?(IL::Type::F64)
+        if type.is_a?(IL::Types::F32) || type.is_a?(IL::Types::F64)
           numeric = string.to_f
         end
 
@@ -494,8 +494,13 @@ module Lilac
              when ">" then IL::BinaryOp::Operator::GT
              when "<=" then IL::BinaryOp::Operator::LEQ
              when ">=" then IL::BinaryOp::Operator::GEQ
-             when "||" then IL::BinaryOp::Operator::OR
-             when "&&" then IL::BinaryOp::Operator::AND
+             when "&&" then IL::BinaryOp::Operator::BOOL_AND
+             when "||" then IL::BinaryOp::Operator::BOOL_OR
+             when "<<" then IL::BinaryOp::Operator::BIT_LS
+             when ">>" then IL::BinaryOp::Operator::BIT_RS
+             when "&" then IL::BinaryOp::Operator::BIT_AND
+             when "|" then IL::BinaryOp::Operator::BIT_OR
+             when "^" then IL::BinaryOp::Operator::BIT_XOR
              else
                raise("Invalid BinaryOp token image #{token.image}")
              end
@@ -507,6 +512,8 @@ module Lilac
       def unop_from_token(token, value)
         op = case token.image
              when "-@" then IL::UnaryOp::Operator::NEG
+             when "!@" then IL::UnaryOp::Operator::BOOL_NOT
+             when "~@" then IL::UnaryOp::Operator::BIT_NOT
              else
                raise("Invalid UnaryOp token image #{token.image}")
              end

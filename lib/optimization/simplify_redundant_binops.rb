@@ -92,19 +92,49 @@ module Lilac
           if const?(binop.right, 1) # not associative
             return binop.left
           end
-        when IL::BinaryOp::Operator::OR
+        when IL::BinaryOp::Operator::BOOL_OR
           # check for or with something non-zero (which is always true)
           if const?(binop.left, 0, neg: true)
             return binop.left # return the non-zero
           elsif const?(binop.right, 0, neg: true)
             return binop.right # return the non-zero
           end
-        when IL::BinaryOp::Operator::AND
+        when IL::BinaryOp::Operator::BOOL_AND
           # check for and with something zero (which is always false)
           if const?(binop.left, 0)
             return binop.left # return the zero because thats what it evals to
           elsif const?(binop.right, 0)
             return binop.right # same idea
+          end
+        when IL::BinaryOp::Operator::BIT_LS
+          # check for shifting by zero
+          if const?(binop.right, 0)
+            return binop.left
+          # check for shifting a 0
+          elsif const?(binop.left, 0)
+            return binop.left
+          end
+        when IL::BinaryOp::Operator::BIT_RS
+          # check for shifting by zero
+          if const?(binop.right, 0)
+            return binop.left
+          # check for shifting a 0
+          elsif const?(binop.left, 0)
+            return binop.left
+          end
+        when IL::BinaryOp::Operator::BIT_AND
+          # check for AND-ing with zero
+          if const?(binop.left, 0)
+            return binop.left
+          elsif const?(binop.right, 0)
+            return binop.right
+          end
+        when IL::BinaryOp::Operator::BIT_OR
+          # check for OR-ing with zero
+          if const?(binop.left, 0)
+            return binop.right
+          elsif const?(binop.right, 0)
+            return binop.left
           end
         end
 

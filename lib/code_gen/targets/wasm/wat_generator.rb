@@ -88,6 +88,8 @@ module Lilac
             # stringify instructions
             instructions_str = v.visit(o.instructions, ctx: "#{c}  ")
             instructions_str.chomp!
+            # don't print the final End instruction since we're using S-exp
+            instructions_str.chomp!("end")
 
             "#{c}(func $#{o.name}#{params_str}#{result_str}\n"\
             "#{locals_str}#{instructions_str}\n#{c})"
