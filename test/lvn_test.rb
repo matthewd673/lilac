@@ -40,7 +40,7 @@ class LVNTest < Minitest::Test
     Analysis::BB.from_stmt_list(program.stmt_list)
   end
 
-  PROGRAMS = T.let(%w[simple constant_folding].freeze,
+  PROGRAMS = T.let(%w[simple constant_folding non_constant_id].freeze,
                    T::Array[String])
   private_constant :PROGRAMS
 end
