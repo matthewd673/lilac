@@ -208,6 +208,7 @@ module Lilac
           @value_to_index[value]
         end
       end
+      private_constant :ValueNumberMap
 
       # The IDNumberMap class stores mappings of IDs and their local numbers.
       class IDNumberMap
@@ -254,6 +255,7 @@ module Lilac
           id_list[0]
         end
       end
+      private_constant :IDNumberMap
 
       # A ValueNumber is a special +IL::Value+ that represents a local value
       # number.
@@ -278,6 +280,7 @@ module Lilac
           [self.class, @number].hash
         end
       end
+      private_constant :ValueNumber
     end
   end
 end
