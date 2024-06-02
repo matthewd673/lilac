@@ -43,8 +43,6 @@ module Lilac
         @cfg.each_node do |b|
           next if b == @cfg.exit || @cfg.predecessors_length(b) != 1
 
-          puts "ALMOST: #{@cfg.first_predecessor(b)}"
-
           p = @cfg.first_predecessor(b)
           next if !p || p == @cfg.entry || @cfg.successors_length(p) != 1
 
