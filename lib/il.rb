@@ -262,7 +262,7 @@ module Lilac
 
         sig { returns(Integer) }
         def hash
-          [self.class, type.class].hash
+          [self.class, type].hash
         end
       end
     end
@@ -325,6 +325,11 @@ module Lilac
       def clone
         Constant.new(@type, @value)
       end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @type, @value].hash
+      end
     end
 
     # An ID is the name of a variable. When implemented these will often store
@@ -360,14 +365,14 @@ module Lilac
         name.eql?(other.name)
       end
 
-      sig { returns(Integer) }
-      def hash
-        @name.hash
-      end
-
       sig { override.returns(ID) }
       def clone
         ID.new(@name)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @name].hash
       end
     end
 
@@ -405,14 +410,14 @@ module Lilac
         number.eql?(other.number)
       end
 
-      sig { returns(Integer) }
-      def hash
-        @number.hash
-      end
-
       sig { override.returns(Register) }
       def clone
         Register.new(@number)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @number].hash
       end
     end
 
@@ -510,6 +515,11 @@ module Lilac
       sig { override.returns(BinaryOp) }
       def clone
         BinaryOp.new(@op, @left, @right)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @op, @left, @right].hash
       end
 
       sig { returns(T.untyped) }
@@ -620,6 +630,11 @@ module Lilac
         UnaryOp.new(@op, @value)
       end
 
+      sig { returns(Integer) }
+      def hash
+        [self.class, @op, @value].hash
+      end
+
       sig { returns(T.untyped) }
       def calculate
         # calculations can only be performed on constants
@@ -683,6 +698,11 @@ module Lilac
       def clone
         Call.new(@func_name, @args)
       end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @func_name, @args].hash
+      end
     end
 
     # An ExternCall is an Expression that represents a call to an external
@@ -731,6 +751,11 @@ module Lilac
       def clone
         ExternCall.new(@func_source, @func_name, @args)
       end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @func_source, @func_name, @args].hash
+      end
     end
 
     # A Phi function is an Expression that combines multiple possible SSA
@@ -769,6 +794,11 @@ module Lilac
       sig { override.returns(Phi) }
       def clone
         Phi.new(@ids)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @ids].hash
       end
     end
 
@@ -840,6 +870,11 @@ module Lilac
       def clone
         Definition.new(@type, @id, @rhs)
       end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @type, @id, @rhs].hash
+      end
     end
 
     # A Label is a Statement that does nothing but can be jumped to by a Jump.
@@ -877,6 +912,11 @@ module Lilac
       def clone
         Label.new(@name)
       end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @name].hash
+      end
     end
 
     # A Jump is a Statement that will jump to the target Label unconditionally.
@@ -913,6 +953,11 @@ module Lilac
       sig { override.returns(Jump) }
       def clone
         Jump.new(@target)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @target].hash
       end
     end
 
@@ -954,6 +999,11 @@ module Lilac
       def clone
         JumpZero.new(@cond, @target)
       end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @cond, @target].hash
+      end
     end
 
     # A JumpNotZero is a Jump that will jump to the target Label only when its
@@ -994,6 +1044,11 @@ module Lilac
       def clone
         JumpNotZero.new(@cond, @target)
       end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @cond, @target].hash
+      end
     end
 
     # A Return statement is used to return a value from within a FuncDef.
@@ -1027,6 +1082,11 @@ module Lilac
       sig { override.returns(Return) }
       def clone
         Return.new(@value)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @value].hash
       end
     end
 
@@ -1062,6 +1122,11 @@ module Lilac
       sig { override.returns(VoidCall) }
       def clone
         VoidCall.new(@call)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @call].hash
       end
     end
 
@@ -1100,6 +1165,11 @@ module Lilac
       sig { returns(FuncParam) }
       def clone
         FuncParam.new(@type, @id)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @type, @id].hash
       end
     end
 
@@ -1165,6 +1235,11 @@ module Lilac
       def clone
         FuncDef.new(@name, @params, @ret_type, @stmt_list)
       end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @name, @params, @ret_type, @stmt_list].hash
+      end
     end
 
     # An ExternFuncDef is a description of a function described elsewhere.
@@ -1217,6 +1292,11 @@ module Lilac
       sig { returns(ExternFuncDef) }
       def clone
         ExternFuncDef.new(@source, @name, @param_types, @ret_type)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @source, @name, @param_types, @ret_type].hash
       end
     end
 
@@ -1303,6 +1383,11 @@ module Lilac
         new_program
       end
 
+      sig { returns(Integer) }
+      def hash
+        [self.class, @stmt_list, @func_map, @extern_func_map].hash
+      end
+
       protected
 
       sig { returns(T::Hash[String, FuncDef]) }
@@ -1351,6 +1436,8 @@ module Lilac
       # TODO: implement eql?
 
       # TODO: implement clone
+
+      # TODO: implement hash
     end
 
     # A CFGProgram is a Program whose instructions are stored in CFGs.
@@ -1432,6 +1519,8 @@ module Lilac
       # TODO: implement eql?
 
       # TODO: implement clone
+
+      # TODO: implement hash
 
       protected
 
