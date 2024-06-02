@@ -117,7 +117,7 @@ module Lilac
           ANSI.fmt(o.to_s, color: PALETTE[IL::Types::Type])
         },
         IL::Constant => lambda { |v, o, c|
-          if o.type.eql?(IL::Types::Void)
+          if o.type == IL::Types::Void
             ANSI.fmt("void", color: PALETTE[IL::Constant])
           else
             ANSI.fmt(o.to_s, color: PALETTE[IL::Constant])

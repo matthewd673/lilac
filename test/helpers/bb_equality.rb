@@ -88,7 +88,7 @@ module BBEquality
 
         assert(s_a.eql?(s_b),
                message do
-                 "Statement mismatch at position #{s_i} "\
+                 "Statement mismatch at index #{s_i} "\
                  "in block #{i}: saw #{s_a}, expected #{s_b}"
                end)
 

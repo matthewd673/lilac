@@ -159,7 +159,7 @@ module Lilac
       left = v.visit(left, ctx: context)
       right = v.visit(right, ctx: context)
 
-      unless left.type.eql?(right.type)
+      unless left.type == right.type
         raise("Mismatched types '#{left.type}' and '#{right.type}'")
       end
 

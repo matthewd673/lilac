@@ -137,7 +137,7 @@ module Lilac
           end
 
           # return if they match, otherwise nil
-          if ltype.eql?(rtype) then return ltype end
+          if ltype == rtype then return ltype end
 
           return nil
         elsif expr.is_a?(IL::UnaryOp)
