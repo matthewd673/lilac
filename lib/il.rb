@@ -34,8 +34,18 @@ module Lilac
         def size; end
 
         sig { params(other: T.untyped).returns(T::Boolean) }
-        def eql?(other)
+        def ==(other)
           self.class == other.class
+        end
+
+        sig { returns(Integer) }
+        def hash
+          self.class.hash
+        end
+
+        sig { params(other: T.untyped).returns(T::Boolean) }
+        def eql?(other)
+          self == other
         end
       end
 
@@ -242,12 +252,17 @@ module Lilac
         end
 
         sig { params(other: T.untyped).returns(T::Boolean) }
-        def eql?(other)
+        def ==(other)
           if other.class != Pointer
             return false
           end
 
-          type.eql?(other.type)
+          type == other.type
+        end
+
+        sig { returns(Integer) }
+        def hash
+          [self.class, type.class].hash
         end
       end
     end
