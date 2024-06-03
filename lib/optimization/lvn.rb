@@ -80,12 +80,14 @@ module Lilac
           # constants on the rhs are always better off staying as constants
           if rhs.is_a?(IL::Constant)
             s.rhs = rhs
-            s.annotation = "#{number} (is constant)" if existing
             next
           end
 
-          # brand new values will never have their rhs replaced
+          # brand new values will not be replaced with a number
+          # however, constant_folding may have still yielded useful results so
+          # we'll replace rhs
           unless existing
+            s.rhs = rhs
             next
           end
 
@@ -93,7 +95,6 @@ module Lilac
           existing_id = @id_number_map.get_id_by_number(number)
           if existing_id
             s.rhs = existing_id
-            s.annotation = number.to_s # TODO: temp
             next
           end
 
@@ -142,7 +143,7 @@ module Lilac
             return IL::BinaryOp.new(rhs.op, left, right)
           end
 
-          # if they aren't values, theres nothing we can do
+          # if left and right aren't values, theres nothing we can do
         when IL::UnaryOp
           # recurse on value (in case they are ids mapped to constants)
           value = T.cast(constant_folding(rhs.value), IL::Value)
