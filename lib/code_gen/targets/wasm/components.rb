@@ -72,19 +72,29 @@ module Lilac
             sig { returns(T::Array[WasmInstruction]) }
             attr_reader :instructions
 
+            sig { returns(T.nilable(String)) }
+            attr_accessor :export
+
             sig do
               params(name: String,
                      params: T::Array[Local],
                      results: T::Array[Type],
                      locals_map: T::Hash[Type, T::Array[Local]],
-                     instructions: T::Array[WasmInstruction]).void
+                     instructions: T::Array[WasmInstruction],
+                     export: T.nilable(String)).void
             end
-            def initialize(name, params, results, locals_map, instructions)
+            def initialize(name,
+                           params,
+                           results,
+                           locals_map,
+                           instructions,
+                           export: nil)
               @name = name
               @params = params
               @results = results
               @locals_map = locals_map
               @instructions = instructions
+              @export = export
             end
           end
 
