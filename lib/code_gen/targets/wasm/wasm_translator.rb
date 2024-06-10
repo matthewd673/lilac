@@ -31,7 +31,20 @@ module Lilac
             @loop_ct = T.let(0, Integer)
             @block_ct = T.let(0, Integer)
 
+            @output_start_component = T.let(true, T::Boolean)
+            @exported_funcs = T.let(Set.new, T::Set[String])
+
             super(wasm_translator, cfg_program)
+          end
+
+          sig { params(func_name: String).void }
+          def export_function(func_name)
+            @exported_funcs.add(func_name)
+          end
+
+          sig { void }
+          def omit_start_component
+            @output_start_component = false
           end
 
           sig { override.returns(Components::Module) }
@@ -46,16 +59,25 @@ module Lilac
 
             # translate all functions
             @program.each_func do |f|
-              components.push(translate_func(f))
+              func_component = translate_func(f)
+
+              # set function export if it should be exported
+              if @exported_funcs.include?(f.name)
+                func_component.export = f.name
+              end
+
+              components.push(func_component)
             end
 
             # translate instructions for main stmt_list
             main_locals = find_locals(@program.cfg)
             main_instructions = translate_instructions(@program.cfg)
             main_instructions.push(Instructions::End.new) # always end with End
-            components.push(
-              Components::Start.new(main_locals, main_instructions)
-            )
+            if @output_start_component
+              components.push(
+                Components::Start.new(main_locals, main_instructions)
+              )
+            end
 
             Components::Module.new(components)
           end
