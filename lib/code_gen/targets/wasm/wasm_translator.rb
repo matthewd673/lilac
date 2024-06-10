@@ -53,12 +53,9 @@ module Lilac
             main_locals = find_locals(@program.cfg)
             main_instructions = translate_instructions(@program.cfg)
             main_instructions.push(Instructions::End.new) # always end with End
-            components.push(Components::Func.new("__lilac_main",
-                                                 [], # no params
-                                                 [], # no results
-                                                 main_locals,
-                                                 main_instructions))
-            components.push(Components::Start.new("__lilac_main"))
+            components.push(
+              Components::Start.new(main_locals, main_instructions)
+            )
 
             Components::Module.new(components)
           end
