@@ -1189,18 +1189,23 @@ module Lilac
       sig { returns(T::Array[Statement]) }
       attr_reader :stmt_list
 
+      sig { returns(T::Boolean) }
+      attr_accessor :exported
+
       sig do
         params(name: String,
                params: T::Array[FuncParam],
                ret_type: Types::Type,
-               stmt_list: T::Array[Statement])
+               stmt_list: T::Array[Statement],
+               exported: T::Boolean)
           .void
       end
-      def initialize(name, params, ret_type, stmt_list)
+      def initialize(name, params, ret_type, stmt_list, exported: false)
         @name = name
         @params = params
         @ret_type = ret_type
         @stmt_list = stmt_list
+        @exported = exported
       end
 
       sig { returns(String) }
@@ -1417,18 +1422,23 @@ module Lilac
       sig { returns(Analysis::CFG) }
       attr_reader :cfg
 
+      sig { returns(T::Boolean) }
+      attr_accessor :exported
+
       sig do
         params(name: String,
                params: T::Array[FuncParam],
                ret_type: Types::Type,
-               cfg: Analysis::CFG)
+               cfg: Analysis::CFG,
+               exported: T::Boolean)
           .void
       end
-      def initialize(name, params, ret_type, cfg)
+      def initialize(name, params, ret_type, cfg, exported: false)
         @name = name
         @params = params
         @ret_type = ret_type
         @cfg = cfg
+        @exported = exported
       end
 
       # TODO: implement to_s
@@ -1467,7 +1477,11 @@ module Lilac
         program.each_func do |f|
           func_bb = Analysis::BB.from_stmt_list(f.stmt_list)
           func_cfg = Analysis::CFG.new(blocks: func_bb)
-          cfg_funcdef = CFGFuncDef.new(f.name, f.params, f.ret_type, func_cfg)
+          cfg_funcdef = CFGFuncDef.new(f.name,
+                                       f.params,
+                                       f.ret_type,
+                                       func_cfg,
+                                       exported: f.exported)
 
           cfg_program.add_func(cfg_funcdef)
         end
