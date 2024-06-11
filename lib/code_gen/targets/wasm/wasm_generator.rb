@@ -27,6 +27,7 @@ module Lilac
             @functions = T.let([], T::Array[Components::Func])
             @func_indices = T.let({}, T::Hash[String, Integer])
             @imports = T.let([], T::Array[Components::Import])
+            @exports = T.let([], T::Array[Components::Func])
             @start = T.let(nil, T.nilable(Components::Start))
 
             @writer = T.let(HexWriter.new, HexWriter)
@@ -47,6 +48,7 @@ module Lilac
             write_type_section
             write_import_section
             write_function_section
+            write_export_section
 
             if @start
               write_start_section
@@ -65,6 +67,9 @@ module Lilac
               case c
               when Components::Func
                 @functions.push(c)
+                if c.export
+                  @exports.push(c)
+                end
               when Components::Import
                 @imports.push(c)
               when Components::Start
@@ -208,6 +213,33 @@ module Lilac
               ind = T.unsafe(@sig_map[[f.params.map(&:type), f.results]])
               sw.write_all(LEB128.encode_unsigned(ind))
               mark_function_index(f.name)
+            end
+
+            # write section size then concat section contents
+            @writer.write_all(LEB128.encode_unsigned(sw.length))
+            sw.each { |b| @writer.write(b) }
+          end
+
+          sig { void }
+          def write_export_section
+            # write section header
+            # LAYOUT: id, size, num exports, [exports]
+            @writer.write(SECTION_EXPORT)
+
+            # create section writer
+            sw = HexWriter.new
+            sw.write_all(LEB128.encode_unsigned(@exports.length))
+
+            # write all exports
+            # TODO: support non-function exports
+            # LAYOUT: string length, name, kind, func index
+            @exports.each do |f|
+              sw.write_all(LEB128.encode_unsigned(f.name.length))
+              sw.write_utf_8(f.name)
+              sw.write(KIND_FUNC) # NOTE: only func exports are supported so far
+
+              ind = T.unsafe(@sig_map[[f.params.map(&:type), f.results]])
+              sw.write_all(LEB128.encode_unsigned(ind))
             end
 
             # write section size then concat section contents
