@@ -164,6 +164,8 @@ module Lilac
 
           sig { void }
           def write_import_section
+            return if @imports.empty?
+
             # write section header
             # LAYOUT: id, size, num imports
             @writer.write(SECTION_IMPORT)
@@ -222,6 +224,8 @@ module Lilac
 
           sig { void }
           def write_export_section
+            return if @exports.empty?
+
             # write section header
             # LAYOUT: id, size, num exports, [exports]
             @writer.write(SECTION_EXPORT)
