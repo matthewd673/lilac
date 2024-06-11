@@ -32,22 +32,12 @@ module Lilac
           class Start < WasmComponent
             extend T::Sig
 
-            include CodeGen::Targets::Wasm::Instructions
+            sig { returns(String) }
+            attr_reader :name
 
-            sig { returns(T::Hash[Type, T::Array[Local]]) }
-            attr_reader :locals_map
-
-            sig { returns(T::Array[WasmInstruction]) }
-            attr_reader :instructions
-
-            sig do
-              params(locals_map: T::Hash[Type, T::Array[Local]],
-                     instructions: T::Array[WasmInstruction])
-                .void
-            end
-            def initialize(locals_map, instructions)
-              @locals_map = locals_map
-              @instructions = instructions
+            sig { params(name: String).void }
+            def initialize(name)
+              @name = name
             end
           end
 
