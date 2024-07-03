@@ -189,6 +189,10 @@ module Lilac
         "extern call #{o.func_source} #{o.func_name} (#{arg_str})"
       }, Visitor::Lambda)
 
+      VISIT_INLINEASSEMBLY = T.let(lambda { |v, o, c|
+        "asm #{o.gen_format} `#{o.code}`"
+      }, Visitor::Lambda)
+
       VISIT_LAMBDAS = T.let({
         IL::Types => VISIT_TYPE,
         IL::Constant => VISIT_CONSTANT,
@@ -209,6 +213,7 @@ module Lilac
         IL::ExternFuncDef => VISIT_EXTERNFUNCDEF,
         IL::Call => VISIT_CALL,
         IL::ExternCall => VISIT_EXTERNCALL,
+        IL::InlineAssembly => VISIT_INLINEASSEMBLY,
       }.freeze, Visitor::LambdaHash)
     end
   end
