@@ -66,15 +66,21 @@ module Lilac
           }, Visitor::Lambda)
 
           VISIT_FUNC = T.let(lambda { |v, o, c|
+            # stringify export (if it has one)
+            export_str = " ".dup
+            if o.export
+              export_str += "(export \"#{o.export}\") "
+            end
+
             # stringify params
-            params_str = " ".dup # shouldn't be frozen
+            params_str = "".dup
             o.params.each do |p|
               params_str += "(param $#{p.name} #{p.type})"
             end
             params_str.chomp!(" ")
 
             # stringify return type
-            result_str = ""
+            result_str = "".dup
             o.results.each do |r|
               result_str += " (result #{r})"
             end
@@ -91,7 +97,7 @@ module Lilac
             # don't print the final End instruction since we're using S-exp
             instructions_str.chomp!("end")
 
-            "#{c}(func $#{o.name}#{params_str}#{result_str}\n"\
+            "#{c}(func $#{o.name}#{export_str}#{params_str}#{result_str}\n"\
             "#{locals_str}#{instructions_str}\n#{c})"
           }, Visitor::Lambda)
 

@@ -31,7 +31,14 @@ module Lilac
             @loop_ct = T.let(0, Integer)
             @block_ct = T.let(0, Integer)
 
+            @output_start_component = T.let(true, T::Boolean)
+
             super(wasm_translator, cfg_program)
+          end
+
+          sig { void }
+          def omit_start_component
+            @output_start_component = false
           end
 
           sig { override.returns(Components::Module) }
@@ -45,9 +52,7 @@ module Lilac
             end
 
             # translate all functions
-            @program.each_func do |f|
-              components.push(translate_func(f))
-            end
+            @program.each_func { |f| components.push(translate_func(f)) }
 
             # translate instructions for main stmt_list
             main_locals = find_locals(@program.cfg)
@@ -117,11 +122,13 @@ module Lilac
             unless cfg_funcdef.ret_type.is_a?(IL::Types::Void)
               results.push(Instructions.to_wasm_type(cfg_funcdef.ret_type))
             end
+            export_name = cfg_funcdef.exported ? cfg_funcdef.name : nil
             Components::Func.new(cfg_funcdef.name,
                                  params,
                                  results,
                                  locals,
-                                 instructions)
+                                 instructions,
+                                 export: export_name)
           end
 
           sig do
