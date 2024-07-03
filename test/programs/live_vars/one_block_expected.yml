@@ -1,0 +1,16 @@
+- id: ENTRY
+  GEN: []
+  KILL: []
+  IN: []
+  OUT: []
+- id: BB_0
+  GEN: []
+  KILL:
+    - a
+  IN: []
+  OUT: []
+- id: EXIT
+  GEN: []
+  KILL: []
+  IN: []
+  OUT: []
