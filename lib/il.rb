@@ -1130,6 +1130,50 @@ module Lilac
       end
     end
 
+    # An InlineAssembly statement is used to include explicit
+    # machine-dependent code in an IL Program.
+    class InlineAssembly < Statement
+      extend T::Sig
+
+      sig { returns(String) }
+      attr_reader :target
+
+      sig { returns(String) }
+      attr_reader :code
+
+      sig { params(target: String, code: String).void }
+      def initialize(target, code)
+        @target = target
+        @code = code
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "asm #{target} `#{code}`"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != InlineAssembly
+          return false
+        end
+
+        other = T.cast(other, InlineAssembly)
+
+        @target.eql?(other.target) && @code.eql?(other.code)
+      end
+
+      sig { override.returns(InlineAssembly) }
+      def clone
+        InlineAssembly.new(@target, @code)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @target, @code].hash
+      end
+    end
+
     # A FuncParam defines a parameter accepted by a FuncDef.
     class FuncParam
       extend T::Sig
