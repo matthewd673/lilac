@@ -18,7 +18,12 @@ class ILGenerationTest < Minitest::Test
     Dir["test/programs/frontend/*"].each do |f|
       program = Frontend::Parser.parse_file(f)
       generator = Frontend::Generator.new(program)
-      assert generator.generate
+      gen_str = generator.generate
+
+      # parse the generated string and ensure a perfect semantic match
+      sanity_parser = Frontend::Parser.new(gen_str)
+      sanity_program = sanity_parser.parse
+      assert program.eql?(sanity_program)
     end
   end
 end
