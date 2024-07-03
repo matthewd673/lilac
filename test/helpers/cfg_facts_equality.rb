@@ -43,14 +43,15 @@ module CFGFactsEquality
       facts = T.unsafe(expected[i])
       refute_equal(facts, nil)
 
-      expected_id = facts["name"]
+      expected_id = facts["id"]
 
       facts.each_key do |k|
         next if k == "id" # id is not a fact set
 
         # check that facts match up
         expected_fact = T.unsafe(facts[k])
-        actual_fact = actual.get_fact(k.to_sym, n)
+        # NOTE: actual fact symbols should always be lowercase
+        actual_fact = actual.get_fact(k.downcase.to_sym, n)
 
         assert_equal(expected_fact.length,
                      actual_fact.length,
@@ -66,9 +67,6 @@ module CFGFactsEquality
                             "block #{expected_id}"
                           end)
         end
-
-        puts "EXPECTED: #{expected_fact}"
-        puts "ACTUAL: #{actual_fact}"
       end
 
       i += 1
