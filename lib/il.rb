@@ -1136,20 +1136,29 @@ module Lilac
       extend T::Sig
 
       sig { returns(String) }
-      attr_reader :target
+      attr_reader :gen_format
 
       sig { returns(String) }
       attr_reader :code
 
-      sig { params(target: String, code: String).void }
-      def initialize(target, code)
-        @target = target
+      sig { params(gen_format: String, code: String).void }
+      # Construct a new InlineAssembly statement.
+      #
+      # @param [String] gen_format The code generation format that this
+      #   inline assembly is targeting. This may be different from the target
+      #   platform. For example, Wasm is one target platform but the Wasm
+      #   backend can generate both Wat (text) and Wasm (binary) format
+      #   machine code.
+      # @param [String] code The machine-dependent code to include (which may
+      #   not be human-readable).
+      def initialize(gen_format, code)
+        @gen_format = gen_format
         @code = code
       end
 
       sig { override.returns(String) }
       def to_s
-        "asm #{target} `#{code}`"
+        "asm #{gen_format} `#{code}`"
       end
 
       sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -1160,17 +1169,17 @@ module Lilac
 
         other = T.cast(other, InlineAssembly)
 
-        @target.eql?(other.target) && @code.eql?(other.code)
+        @gen_format.eql?(other.gen_format) && @code.eql?(other.code)
       end
 
       sig { override.returns(InlineAssembly) }
       def clone
-        InlineAssembly.new(@target, @code)
+        InlineAssembly.new(@gen_format, @code)
       end
 
       sig { returns(Integer) }
       def hash
-        [self.class, @target, @code].hash
+        [self.class, @gen_format, @code].hash
       end
     end
 
