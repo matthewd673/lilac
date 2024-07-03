@@ -332,4 +332,24 @@ class ParseFileTest < Minitest::Test
 
     assert program.eql?(expected)
   end
+
+  sig { void }
+  def test_parse_inline_wat
+    expected = Program.new(
+      stmt_list: [
+        Definition.new(Types::I32.new,
+                       ID.new("a"),
+                       Constant.new(Types::I32.new, 2)),
+        Definition.new(Types::I32.new,
+                       ID.new("b"),
+                       Constant.new(Types::I32.new, 3)),
+        InlineAssembly.new("wat", "i32.add"),
+      ]
+    )
+    program = Lilac::Frontend::Parser.parse_file(
+      "test/programs/frontend/inline_wat.txt"
+    )
+
+    assert program.eql?(expected)
+  end
 end

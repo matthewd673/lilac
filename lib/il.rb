@@ -1130,6 +1130,59 @@ module Lilac
       end
     end
 
+    # An InlineAssembly statement is used to include explicit
+    # machine-dependent code in an IL Program.
+    class InlineAssembly < Statement
+      extend T::Sig
+
+      sig { returns(String) }
+      attr_reader :gen_format
+
+      sig { returns(String) }
+      attr_reader :code
+
+      sig { params(gen_format: String, code: String).void }
+      # Construct a new InlineAssembly statement.
+      #
+      # @param [String] gen_format The code generation format that this
+      #   inline assembly is targeting. This may be different from the target
+      #   platform. For example, Wasm is one target platform but the Wasm
+      #   backend can generate both Wat (text) and Wasm (binary) format
+      #   machine code.
+      # @param [String] code The machine-dependent code to include (which may
+      #   not be human-readable).
+      def initialize(gen_format, code)
+        @gen_format = gen_format
+        @code = code
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "asm #{gen_format} `#{code}`"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != InlineAssembly
+          return false
+        end
+
+        other = T.cast(other, InlineAssembly)
+
+        @gen_format.eql?(other.gen_format) && @code.eql?(other.code)
+      end
+
+      sig { override.returns(InlineAssembly) }
+      def clone
+        InlineAssembly.new(@gen_format, @code)
+      end
+
+      sig { returns(Integer) }
+      def hash
+        [self.class, @gen_format, @code].hash
+      end
+    end
+
     # A FuncParam defines a parameter accepted by a FuncDef.
     class FuncParam
       extend T::Sig
