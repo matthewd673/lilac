@@ -1,0 +1,3 @@
+i32 a = 2i32
+i32 b = 3i32
+asm wat `i32.add`
