@@ -57,7 +57,7 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_ID = T.let(lambda { |v, o, c|
-        "#{o.name}##{o.number}"
+        "#{o.name}"
       }, Visitor::Lambda)
 
       VISIT_REGISTER = T.let(lambda { |v, o, c|
@@ -73,9 +73,9 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_PHI = T.let(lambda { |v, o, c|
-        val_str = ""
-        o.each_value do |val|
-          val_str += "#{v.visit(val)}, "
+        val_str = "".dup
+        o.ids.each do |id|
+          val_str += "#{v.visit(id)}, "
         end
         val_str.chomp!(", ")
 
@@ -143,7 +143,7 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_FUNCDEF = T.let(lambda { |v, o, c|
-        param_str = ""
+        param_str = "".dup
         o.params.each do |p|
           param_str += "#{v.visit(p)}, "
         end
@@ -170,7 +170,7 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_CALL = T.let(lambda { |v, o, c|
-        arg_str = ""
+        arg_str = "".dup
         o.args.each do |a|
           arg_str += "#{v.visit(a)}, "
         end
@@ -194,7 +194,7 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_LAMBDAS = T.let({
-        IL::Types => VISIT_TYPE,
+        IL::Types::Type => VISIT_TYPE,
         IL::Constant => VISIT_CONSTANT,
         IL::ID => VISIT_ID,
         IL::Register => VISIT_REGISTER,
