@@ -184,6 +184,19 @@ module Lilac
           call = parse_call
 
           return [IL::VoidCall.new(call)]
+        # inline assembly
+        elsif see?(TokenType::Asm)
+          eat(TokenType::Asm)
+          # NOTE: all gen formats should fit into Name constraints
+          # (so just don't include any weird characters, basically)
+          gen_format_name = eat(TokenType::Name).image
+          asm_str = eat(TokenType::AsmString).image
+
+          # trim backticks off asm string
+          asm_str.delete_prefix!("`")
+          asm_str.delete_suffix!("`")
+
+          return [IL::InlineAssembly.new(gen_format_name, asm_str)]
         end
 
         raise("Unexpected token while parsing statement: #{@next_token}")
