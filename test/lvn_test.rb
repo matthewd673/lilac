@@ -4,7 +4,6 @@
 require "sorbet-runtime"
 require "minitest/autorun"
 require_relative "helpers/bb_equality"
-require_relative "../lib/il"
 require_relative "../lib/frontend/parser"
 require_relative "../lib/analysis/bb"
 require_relative "../lib/optimization/lvn"
