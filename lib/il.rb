@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "sorbet-runtime"
+require_relative "code_gen/instruction"
 
 module Lilac
   # IL contains the classes representing the Lilac Intermediate Language.
@@ -1130,56 +1131,52 @@ module Lilac
       end
     end
 
-    # An InlineAssembly statement is used to include explicit
-    # machine-dependent code in an IL Program.
-    class InlineAssembly < Statement
+    # An InlineInstruction statement is used to include an explicit
+    # machine-dependent instruction in an IL Program.
+    class InlineInstruction < Statement
       extend T::Sig
 
       sig { returns(String) }
-      attr_reader :gen_format
+      attr_reader :target
 
-      sig { returns(String) }
-      attr_reader :code
+      sig { returns(CodeGen::Instruction) }
+      attr_reader :instruction
 
-      sig { params(gen_format: String, code: String).void }
+      sig { params(target: String, instruction: CodeGen::Instruction).void }
       # Construct a new InlineAssembly statement.
       #
-      # @param [String] gen_format The code generation format that this
-      #   inline assembly is targeting. This may be different from the target
-      #   platform. For example, Wasm is one target platform but the Wasm
-      #   backend can generate both Wat (text) and Wasm (binary) format
-      #   machine code.
-      # @param [String] code The machine-dependent code to include (which may
-      #   not be human-readable).
-      def initialize(gen_format, code)
-        @gen_format = gen_format
-        @code = code
+      # @param [String] target The machine that this instruction is targeting.
+      # @param [String] instruction The machine-dependent instruction to
+      #   include.
+      def initialize(target, instruction)
+        @target = target
+        @instruction = instruction
       end
 
       sig { override.returns(String) }
       def to_s
-        "asm #{gen_format} `#{code}`"
+        "asm #{target} `#{instruction}`"
       end
 
       sig { override.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other)
-        if other.class != InlineAssembly
+        if other.class != InlineInstruction
           return false
         end
 
-        other = T.cast(other, InlineAssembly)
+        other = T.cast(other, InlineInstruction)
 
-        @gen_format.eql?(other.gen_format) && @code.eql?(other.code)
+        @target.eql?(other.target) && @instruction.eql?(other.instruction)
       end
 
-      sig { override.returns(InlineAssembly) }
+      sig { override.returns(InlineInstruction) }
       def clone
-        InlineAssembly.new(@gen_format, @code)
+        InlineInstruction.new(@target, @instruction)
       end
 
       sig { returns(Integer) }
       def hash
-        [self.class, @gen_format, @code].hash
+        [self.class, @target, @instruction].hash
       end
     end
 
