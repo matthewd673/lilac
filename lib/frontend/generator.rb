@@ -57,7 +57,7 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_ID = T.let(lambda { |v, o, c|
-        "#{o.name}"
+        o.name
       }, Visitor::Lambda)
 
       VISIT_REGISTER = T.let(lambda { |v, o, c|
@@ -213,7 +213,6 @@ module Lilac
         IL::ExternFuncDef => VISIT_EXTERNFUNCDEF,
         IL::Call => VISIT_CALL,
         IL::ExternCall => VISIT_EXTERNCALL,
-        IL::InlineAssembly => VISIT_INLINEASSEMBLY,
       }.freeze, Visitor::LambdaHash)
     end
   end

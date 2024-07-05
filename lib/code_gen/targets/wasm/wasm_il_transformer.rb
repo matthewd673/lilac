@@ -87,6 +87,11 @@ module Lilac
 
           RULES = T.let({
             # STATEMENT RULES
+            # inline instruction
+            Pattern::InlineInstructionWildcard.new =>
+              lambda { |t, o|
+                o.instruction # very easy
+              },
             # definition
             Pattern::DefinitionWildcard.new(Pattern::RhsWildcard.new) =>
               lambda { |t, o|

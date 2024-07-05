@@ -28,6 +28,11 @@ module Lilac
         end
       end
 
+      # A wildcard for any +IL::InlineInstruction+.
+      class InlineInstructionWildcard < IL::Statement
+        # NOTE: stub
+      end
+
       # A wildcard for any +IL::Expression+ and any +IL::Value+.
       # NOTE: while this class inherits from +IL::Expression+ the internal
       # matching implementation will also accept an  +IL::Value+ as a valid

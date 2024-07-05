@@ -38,8 +38,6 @@ module Lilac
         Call = new("Call")
         Comma = new("Comma")
         Extern = new("Extern")
-        Asm = new("Asm")
-        AsmString = new("AsmString")
 
         # special tokens
         NewLine = new("NewLine")
@@ -141,8 +139,6 @@ module Lilac
       TokenDef.new(TokenType::Call, /call/),
       TokenDef.new(TokenType::Comma, /,/),
       TokenDef.new(TokenType::Extern, /extern/),
-      TokenDef.new(TokenType::Asm, /asm/),
-      TokenDef.new(TokenType::AsmString, /`(\\`|[^`])*`/),
 
       # other
       TokenDef.new(TokenType::VoidConst, /void/),
