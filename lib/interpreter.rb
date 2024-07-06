@@ -18,12 +18,24 @@ module Lilac
     extend T::Sig
     include Kernel
 
-    sig { params(program: IL::CFGProgram, validate: T::Boolean).void }
+    sig do
+      params(program: IL::CFGProgram, entry: String, validate: T::Boolean).void
+    end
     # Interpret a program.
     #
-    # @param [IL::CFGProgram] program The program to interpret.
-    def self.interpret(program, validate: true)
-      context = Context.new(program.cfg.entry)
+    # @param [IL::CFGProgram] program The Program to interpret.
+    # @param [String] entry The name of the function that will be called as
+    #   the entry point.
+    # @param [T::Boolean] validate Determines if the interpreter should
+    #   validate the Program for semantic correctness before interpreting it.
+    def self.interpret(program, entry, validate: true)
+      # identify entry point
+      entry_func = program.get_func(entry)
+      unless entry_func
+        raise "Entry point '#{entry}' does not exist"
+      end
+
+      context = Context.new(entry_func.cfg.entry)
       visitor = Visitor.new(VISIT_LAMBDAS)
 
       # run all validations before interpreting
@@ -39,15 +51,15 @@ module Lilac
         context.funcs[f.name] = f
       end
 
-      # collect all labels in program -- including within functions
+      # collect all labels in program
       context.label_blocks = {}
-      register_labels(context.label_blocks, program.cfg)
       program.each_func do |f|
         register_labels(context.label_blocks, f.cfg)
       end
 
       # begin interpretation
-      interpret_cfg(program.cfg, visitor, context)
+
+      interpret_cfg(entry_func.cfg, visitor, context)
 
       puts("---")
       puts("Interpretation complete")
