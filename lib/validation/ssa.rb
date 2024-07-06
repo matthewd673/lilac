@@ -31,8 +31,8 @@ module Lilac
         symbols = SymbolTable.new
         symbols.push_scope # top level scope
 
-        # scan top level of program
-        scan_stmt_list(@program.stmt_list, symbols)
+        # NOTE: globals don't need to be scanned because they are already
+        # stored in a hash with IDs as the key
 
         # scan all funcs
         @program.each_func do |f|
@@ -67,7 +67,7 @@ module Lilac
           end
 
           if symbols.lookup(s.id)
-            raise("Multiple definitions of ID '#{s.id}'")
+            raise "Multiple definitions of ID '#{s.id}'"
           end
 
           symbols.insert(ILSymbol.new(s.id, s.type))
