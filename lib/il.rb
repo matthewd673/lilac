@@ -12,8 +12,7 @@ module Lilac
     # ILObject is a type-alias for any object in the IL that can be
     # "visited". For example, an +IL::Value+ or an +IL::FuncDef+.
     ILObject = T.type_alias do
-      T.any(Value, Expression, Statement, FuncParam,
-            FuncDef, ExternFuncDef, Program)
+      T.any(Value, Expression, Statement, Component, FuncParam, Program)
     end
 
     # The Types module contains all the types and categories of types available
@@ -1180,6 +1179,150 @@ module Lilac
       end
     end
 
+    # A Component is something that appears at the top level of a Program
+    # like a global variable or a function definition.
+    class Component
+      extend T::Sig
+      extend T::Helpers
+
+      abstract!
+
+      sig { abstract.returns(String) }
+      def to_s; end
+
+      sig { abstract.returns(Integer) }
+      def hash; end
+
+      sig { abstract.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other); end
+
+      sig { abstract.returns(Value) }
+      def clone; end
+    end
+
+    # A GlobalDef is a Component that defines a new global variable in a
+    # Program.
+    class GlobalDef < Component
+      extend T::Sig
+
+      sig { returns(Type) }
+      attr_reader :type
+
+      sig { returns(ID) }
+      attr_reader :id
+
+      sig { returns(Constant) }
+      attr_reader :rhs
+
+      sig { params(type: Types::Type, id: ID, rhs: Constant).void }
+      def initialize(type, id, rhs)
+        @type = type
+        @id = id
+        @rhs = rhs
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "global #{@type} #{@id} = #{@rhs}"
+      end
+
+      def eql?(other)
+          return false
+        end
+
+        other = T.cast(other, GlobalDef)
+
+        type.eql?(other.type) && id.eql?(other.id) && rhs.eql?(other.rhs)
+      end
+
+      sig { override.returns(GlobalDef) }
+      def clone
+        GlobalDef.new(@type, @id, @rhs)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @type, @id, @rhs].hash
+      end
+    end
+
+    # A FuncDef is a function definition with a name, params, and body.
+    class FuncDef < Component
+      extend T::Sig
+
+      sig { returns(String) }
+      attr_reader :name
+
+      sig { returns(T::Array[FuncParam]) }
+      attr_reader :params
+
+      sig { returns(Types::Type) }
+      attr_accessor :ret_type
+
+      sig { returns(T::Array[Statement]) }
+      attr_reader :stmt_list
+
+      sig { returns(T::Boolean) }
+      attr_accessor :exported
+
+      sig do
+        params(name: String,
+               params: T::Array[FuncParam],
+               ret_type: Types::Type,
+               stmt_list: T::Array[Statement],
+               exported: T::Boolean)
+          .void
+      end
+      def initialize(name, params, ret_type, stmt_list, exported: false)
+        @name = name
+        @params = params
+        @ret_type = ret_type
+        @stmt_list = stmt_list
+        @exported = exported
+      end
+
+      sig { returns(String) }
+      sig { override.returns(String) }
+      def to_s
+        param_str = ""
+        @params.each do |p|
+          param_str += "#{p}, "
+        end
+        @params.each { |p| param_str += "#{p}, " }
+        param_str.chomp!(", ")
+
+        stmt_str = ""
+        @stmt_list.each do |s|
+          stmt_str += "#{s}\n"
+        end
+        @stmt_list.each { |s| stmt_str += "#{s}\n" }
+
+        "func #{@name}(#{param_str}) -> #{@ret_type}:\n#{stmt_str}\nend"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != FuncDef
+          return false
+        end
+
+        other = T.cast(other, FuncDef)
+
+        name.eql?(other.name) && params.eql?(other.params) &&
+          ret_type.eql?(other.ret_type) && stmt_list.eql?(other.stmt_list)
+      end
+
+      sig { override.returns(FuncDef) }
+      def clone
+        FuncDef.new(@name, @params, @ret_type, @stmt_list)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @name, @params, @ret_type, @stmt_list].hash
+      end
+    end
+
     # A FuncParam defines a parameter accepted by a FuncDef.
     class FuncParam
       extend T::Sig
@@ -1223,82 +1366,8 @@ module Lilac
       end
     end
 
-    # A FuncDef is a function definition with a name, params, and body.
-    class FuncDef
-      extend T::Sig
-
-      sig { returns(String) }
-      attr_reader :name
-
-      sig { returns(T::Array[FuncParam]) }
-      attr_reader :params
-
-      sig { returns(Types::Type) }
-      attr_accessor :ret_type
-
-      sig { returns(T::Array[Statement]) }
-      attr_reader :stmt_list
-
-      sig { returns(T::Boolean) }
-      attr_accessor :exported
-
-      sig do
-        params(name: String,
-               params: T::Array[FuncParam],
-               ret_type: Types::Type,
-               stmt_list: T::Array[Statement],
-               exported: T::Boolean)
-          .void
-      end
-      def initialize(name, params, ret_type, stmt_list, exported: false)
-        @name = name
-        @params = params
-        @ret_type = ret_type
-        @stmt_list = stmt_list
-        @exported = exported
-      end
-
-      sig { returns(String) }
-      def to_s
-        param_str = ""
-        @params.each do |p|
-          param_str += "#{p}, "
-        end
-        param_str.chomp!(", ")
-
-        stmt_str = ""
-        @stmt_list.each do |s|
-          stmt_str += "#{s}\n"
-        end
-
-        "func #{@name}(#{param_str}) -> #{@ret_type}:\n#{stmt_str}\nend"
-      end
-
-      sig { params(other: T.untyped).returns(T::Boolean) }
-      def eql?(other)
-        if other.class != FuncDef
-          return false
-        end
-
-        other = T.cast(other, FuncDef)
-
-        name.eql?(other.name) && params.eql?(other.params) &&
-          ret_type.eql?(other.ret_type) && stmt_list.eql?(other.stmt_list)
-      end
-
-      sig { returns(FuncDef) }
-      def clone
-        FuncDef.new(@name, @params, @ret_type, @stmt_list)
-      end
-
-      sig { returns(Integer) }
-      def hash
-        [self.class, @name, @params, @ret_type, @stmt_list].hash
-      end
-    end
-
     # An ExternFuncDef is a description of a function described elsewhere.
-    class ExternFuncDef
+    class ExternFuncDef < Component
       extend T::Sig
 
       sig { returns(String) }
@@ -1326,12 +1395,16 @@ module Lilac
         @ret_type = ret_type
       end
 
-      sig { returns(String) }
-      def key
-        "#{@source}##{@name}"
+      sig { override.returns(String) }
+      def to_s
+        param_str = ""
+        @params.each { |p| param_str += "#{p}, " }
+        param_str.chomp!(", ")
+
+        "extern func #{@source} #{@name}(#{param_str}) -> #{@ret_type}"
       end
 
-      sig { params(other: T.untyped).returns(T::Boolean) }
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other)
         if other.class != ExternFuncDef
           return false
@@ -1344,12 +1417,12 @@ module Lilac
           ret_type.eql?(other.ret_type) && param_types.eql?(other.param_types)
       end
 
-      sig { returns(ExternFuncDef) }
+      sig { override.returns(ExternFuncDef) }
       def clone
         ExternFuncDef.new(@source, @name, @param_types, @ret_type)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @source, @name, @param_types, @ret_type].hash
       end
@@ -1367,7 +1440,7 @@ module Lilac
       def initialize(stmt_list: [])
         @stmt_list = stmt_list
         @func_map = T.let({}, T::Hash[String, FuncDef])
-        @extern_func_map = T.let({}, T::Hash[String, ExternFuncDef])
+        @extern_func_map = T.let({}, T::Hash[[String, String], ExternFuncDef])
       end
 
       sig { params(funcdef: FuncDef).void }
@@ -1389,7 +1462,8 @@ module Lilac
 
       sig { params(extern_funcdef: ExternFuncDef).void }
       def add_extern_func(extern_funcdef)
-        @extern_func_map[extern_funcdef.key] = extern_funcdef
+        key = [extern_funcdef.source, extern_funcdef.name]
+        @extern_func_map[key] = extern_funcdef
       end
 
       sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
@@ -1399,9 +1473,11 @@ module Lilac
         end
       end
 
-      sig { params(key: String).returns(T.nilable(ExternFuncDef)) }
-      def get_extern_func(key)
-        @extern_func_map[key]
+      sig do
+        params(source: String, name: String).returns(T.nilable(ExternFuncDef))
+      end
+      def get_extern_func(source, name)
+        @extern_func_map[[source, name]]
       end
 
       sig { returns(String) }
@@ -1450,7 +1526,7 @@ module Lilac
         @func_map
       end
 
-      sig { returns(T::Hash[String, ExternFuncDef]) }
+      sig { returns(T::Hash[[String, String], ExternFuncDef]) }
       def extern_func_map
         @extern_func_map
       end
@@ -1511,7 +1587,7 @@ module Lilac
       def initialize(cfg)
         @cfg = cfg
         @func_map = T.let({}, T::Hash[String, CFGFuncDef])
-        @extern_func_map = T.let({}, T::Hash[String, ExternFuncDef])
+        @extern_func_map = T.let({}, T::Hash[[String, String], ExternFuncDef])
       end
 
       sig { params(program: Program).returns(CFGProgram) }
@@ -1563,7 +1639,8 @@ module Lilac
 
       sig { params(extern_funcdef: ExternFuncDef).void }
       def add_extern_func(extern_funcdef)
-        @extern_func_map[extern_funcdef.key] = extern_funcdef
+        key = [extern_funcdef.source, extern_funcdef.name]
+        @extern_func_map[key] = extern_funcdef
       end
 
       sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
@@ -1573,9 +1650,11 @@ module Lilac
         end
       end
 
-      sig { params(key: String).returns(T.nilable(ExternFuncDef)) }
-      def get_extern_func(key)
-        @extern_func_map[key]
+      sig do
+        params(source: String, name: String).returns(T.nilable(ExternFuncDef))
+      end
+      def get_extern_func(source, name)
+        @extern_func_map[[source, name]]
       end
 
       # TODO: implement to_s
