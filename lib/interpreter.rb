@@ -45,6 +45,13 @@ module Lilac
       # validation_runner.run_passes(Validation::VALIDATIONS)
       # end
 
+      # add all globals to the symbol table at top level scope
+      program.each_global do |g|
+        context.symbols.insert(
+          SymbolInfo.new(g.id.name, g.type, visitor.visit(g.rhs, ctx: context))
+        )
+      end
+
       # collect all funcs in the program
       context.funcs = {}
       program.each_func do |f|
@@ -376,13 +383,13 @@ module Lilac
     class InterpreterValue
       extend T::Sig
 
-      sig { returns(IL::Types) }
+      sig { returns(IL::Types::Type) }
       attr_reader :type
 
       sig { returns(T.untyped) }
       attr_reader :value
 
-      sig { params(type: IL::Types, value: T.untyped).void }
+      sig { params(type: IL::Types::Type, value: T.untyped).void }
       def initialize(type, value)
         @type = type
         @value = value
@@ -402,7 +409,7 @@ module Lilac
       sig { returns(String) }
       attr_reader :key
 
-      sig { returns(IL::Types) }
+      sig { returns(IL::Types::Type) }
       attr_reader :type
 
       sig { returns(T.untyped) }
@@ -411,7 +418,7 @@ module Lilac
       sig { returns(Integer) }
       attr_accessor :write_time
 
-      sig { params(key: String, type: IL::Types, value: T.untyped).void }
+      sig { params(key: String, type: IL::Types::Type, value: T.untyped).void }
       def initialize(key, type, value)
         @key = key
         @type = type
