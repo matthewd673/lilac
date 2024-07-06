@@ -88,12 +88,14 @@ module Lilac
       def parse_program
         program = IL::Program.new
 
-        # parse top level items (which include statements and other components)
+        # parse top level components
         until see?(TokenType::EOF)
-          if see?(TokenType::NewLine, TokenType::Type, TokenType::Label,
-                  TokenType::Jump, TokenType::JumpZero, TokenType::JumpNotZero,
-                  TokenType::Return, TokenType::VoidConst)
-            program.stmt_list.concat(parse_stmt_list)
+          # ignore newlines here
+          if see?(TokenType::NewLine)
+            eat(TokenType::NewLine)
+          # global def
+          elsif see?(TokenType::Global)
+            program.add_global(parse_global_def)
           # func def
           elsif see?(TokenType::Func)
             program.add_func(parse_func_def)
@@ -282,9 +284,7 @@ module Lilac
           TokenType::IntConst,
           TokenType::FloatConst
         )
-          const_str = eat(TokenType::UIntConst, TokenType::IntConst,
-                          TokenType::FloatConst).image
-          return constant_from_string(const_str)
+          return(parse_constant)
         # void constant
         elsif see?(TokenType::VoidConst)
           eat(TokenType::VoidConst)
@@ -300,6 +300,39 @@ module Lilac
         end
 
         raise("Unexpected token while parsing value: #{@next_token}")
+      end
+
+      sig { returns(IL::Constant) }
+      def parse_constant
+        if see?(
+          TokenType::UIntConst,
+          TokenType::IntConst,
+          TokenType::FloatConst
+        )
+          const_str = eat(TokenType::UIntConst, TokenType::IntConst,
+                          TokenType::FloatConst).image
+          return constant_from_string(const_str)
+        end
+
+        raise("Unexpected token while parsing constant: #{@next_token}")
+      end
+
+      sig { returns(IL::GlobalDef) }
+      def parse_global_def
+        eat(TokenType::Global)
+
+        type_str = eat(TokenType::Type).image
+        type = type_from_string(type_str)
+
+        # eat global id (NOTE: globals should always be IDs and never Registers)
+        id_str = eat(TokenType::Name).image
+        id = id_from_string(id_str)
+
+        eat(TokenType::Assignment)
+
+        rhs = parse_constant # NOTE: always going to be a Constant
+
+        return IL::GlobalDef.new(type, id, rhs)
       end
 
       sig { returns(IL::FuncDef) }
