@@ -43,29 +43,28 @@ module Lilac
       # @param [IL::Program] program The program to print.
       def print_program(program)
         # approximate total line count for gutter length
-        approx_lines = program.stmt_list.length
-        program.each_extern_func do |f|
-          approx_lines += 1
-        end
-        program.each_func do |f|
-          approx_lines += f.stmt_list.length + 2
-        end
+        approx_lines = 0
+        program.each_global { |g| approx_lines += 1 }
+        program.each_extern_func { |f| approx_lines += 1 }
+        program.each_func { |f| approx_lines += f.stmt_list.length + 2 }
 
         # create context
         gutter_len = approx_lines.to_s.length
         ctx = PrettyPrinterContext.new(gutter_len, 0, 0)
 
         # print all lines
+        program.each_global do |g|
+          puts(@visitor.visit(g, ctx:))
+          ctx.line_num += 1
+        end
+
         program.each_extern_func do |f|
           puts(@visitor.visit(f, ctx:))
           ctx.line_num += 1
         end
+
         program.each_func do |f|
           puts(@visitor.visit(f, ctx:))
-          ctx.line_num += 1
-        end
-        program.stmt_list.each do |s|
-          puts(@visitor.visit(s, ctx:))
           ctx.line_num += 1
         end
       end
@@ -262,6 +261,15 @@ module Lilac
           end
 
           s
+        },
+        IL::GlobalDef => lambda { |v, o, c|
+          # line number
+          num = "#{left_pad(c.line_num.to_s, c.gutter_len)} "
+          c.line_num += 1
+          s = ANSI.fmt(num, color: PALETTE[:gutter])
+
+          s += "#{ANSI.fmt("global", bold: true)} #{v.visit(o.type)} "\
+               "#{v.visit(o.id)} = #{v.visit(o.rhs)}"
         },
         IL::FuncDef => lambda { |v, o, c|
           # line number
