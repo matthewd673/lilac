@@ -38,14 +38,14 @@ module Lilac
           self.class == other.class
         end
 
-        sig { returns(Integer) }
-        def hash
-          self.class.hash
-        end
-
         sig { params(other: T.untyped).returns(T::Boolean) }
         def eql?(other)
           self == other
+        end
+
+        sig { returns(Integer) }
+        def hash
+          self.class.hash
         end
       end
 
@@ -278,6 +278,9 @@ module Lilac
       sig { abstract.returns(String) }
       def to_s; end
 
+      sig { abstract.returns(Integer) }
+      def hash; end
+
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
 
@@ -326,7 +329,7 @@ module Lilac
         Constant.new(@type, @value)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @type, @value].hash
       end
@@ -370,7 +373,7 @@ module Lilac
         ID.new(@name)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @name].hash
       end
@@ -415,7 +418,7 @@ module Lilac
         Register.new(@number)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @number].hash
       end
@@ -431,6 +434,9 @@ module Lilac
 
       sig { abstract.returns(String) }
       def to_s; end
+
+      sig { abstract.returns(Integer) }
+      def hash; end
 
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
@@ -517,7 +523,7 @@ module Lilac
         BinaryOp.new(@op, @left, @right)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @op, @left, @right].hash
       end
@@ -630,7 +636,7 @@ module Lilac
         UnaryOp.new(@op, @value)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @op, @value].hash
       end
@@ -675,9 +681,7 @@ module Lilac
       sig { override.returns(String) }
       def to_s
         arg_str = "".dup
-        @args.each do |a|
-          arg_str += "#{a}, "
-        end
+        @args.each { |a| arg_str += "#{a}, " }
         arg_str.chomp!(", ")
 
         "call #{@func_name}(#{arg_str})"
@@ -699,7 +703,7 @@ module Lilac
         Call.new(@func_name, @args)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @func_name, @args].hash
       end
@@ -727,9 +731,7 @@ module Lilac
       sig { override.returns(String) }
       def to_s
         arg_str = ""
-        @args.each do |a|
-          arg_str += "#{a}, "
-        end
+        @args.each { |a| arg_str += "#{a}, " }
         arg_str.chomp!(", ")
 
         "extern_call #{@func_source}.#{@func_name}(#{arg_str})"
@@ -752,7 +754,7 @@ module Lilac
         ExternCall.new(@func_source, @func_name, @args)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @func_source, @func_name, @args].hash
       end
@@ -772,9 +774,7 @@ module Lilac
       sig { override.returns(String) }
       def to_s
         ids_str = ""
-        @ids.each do |id|
-          ids_str += "#{id.to_s}, "
-        end
+        @ids.each { |id| ids_str += "#{id.to_s}, " }
         ids_str.chomp!(", ")
 
         "phi (#{ids_str})"
@@ -796,7 +796,7 @@ module Lilac
         Phi.new(@ids)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @ids].hash
       end
@@ -814,6 +814,9 @@ module Lilac
 
       sig { abstract.returns(String) }
       def to_s; end
+
+      sig { abstract.returns(Integer) }
+      def hash; end
 
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
@@ -871,7 +874,7 @@ module Lilac
         Definition.new(@type, @id, @rhs)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @type, @id, @rhs].hash
       end
@@ -913,7 +916,7 @@ module Lilac
         Label.new(@name)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @name].hash
       end
@@ -955,7 +958,7 @@ module Lilac
         Jump.new(@target)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @target].hash
       end
@@ -1000,7 +1003,7 @@ module Lilac
         JumpZero.new(@cond, @target)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @cond, @target].hash
       end
@@ -1045,7 +1048,7 @@ module Lilac
         JumpNotZero.new(@cond, @target)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @cond, @target].hash
       end
@@ -1084,7 +1087,7 @@ module Lilac
         Return.new(@value)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @value].hash
       end
@@ -1124,7 +1127,7 @@ module Lilac
         VoidCall.new(@call)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @call].hash
       end
@@ -1173,7 +1176,7 @@ module Lilac
         InlineInstruction.new(@target, @instruction)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @target, @instruction].hash
       end
@@ -1226,7 +1229,9 @@ module Lilac
         "global #{@type} #{@id} = #{@rhs}"
       end
 
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other)
+        if other.class != GlobalDef
           return false
         end
 
@@ -1281,20 +1286,13 @@ module Lilac
         @exported = exported
       end
 
-      sig { returns(String) }
       sig { override.returns(String) }
       def to_s
         param_str = ""
-        @params.each do |p|
-          param_str += "#{p}, "
-        end
         @params.each { |p| param_str += "#{p}, " }
         param_str.chomp!(", ")
 
         stmt_str = ""
-        @stmt_list.each do |s|
-          stmt_str += "#{s}\n"
-        end
         @stmt_list.each { |s| stmt_str += "#{s}\n" }
 
         "func #{@name}(#{param_str}) -> #{@ret_type}:\n#{stmt_str}\nend"
@@ -1450,9 +1448,7 @@ module Lilac
 
       sig { params(block: T.proc.params(arg0: FuncDef).void).void }
       def each_func(&block)
-        @func_map.each_key do |k|
-          yield T.unsafe(@func_map[k])
-        end
+        @func_map.each_key { |k| yield T.unsafe(@func_map[k]) }
       end
 
       sig { params(name: String).returns(T.nilable(FuncDef)) }
@@ -1468,9 +1464,7 @@ module Lilac
 
       sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
       def each_extern_func(&block)
-        @extern_func_map.each_key do |k|
-          yield T.unsafe(@extern_func_map[k])
-        end
+        @extern_func_map.each_key { |k| yield T.unsafe(@extern_func_map[k]) }
       end
 
       sig do
@@ -1613,9 +1607,7 @@ module Lilac
         end
 
         # add all extern functions (which have no body so don't need conversion)
-        program.each_extern_func do |f|
-          cfg_program.add_extern_func(f)
-        end
+        program.each_extern_func { |f| cfg_program.add_extern_func(f) }
 
         cfg_program
       end
@@ -1627,9 +1619,7 @@ module Lilac
 
       sig { params(block: T.proc.params(arg0: CFGFuncDef).void).void }
       def each_func(&block)
-        @func_map.each_key do |k|
-          yield T.unsafe(@func_map[k])
-        end
+        @func_map.each_key { |k| yield T.unsafe(@func_map[k]) }
       end
 
       sig { params(name: String).returns(T.nilable(CFGFuncDef)) }
@@ -1645,9 +1635,7 @@ module Lilac
 
       sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
       def each_extern_func(&block)
-        @extern_func_map.each_key do |k|
-          yield T.unsafe(@extern_func_map[k])
-        end
+        @extern_func_map.each_key { |k| yield T.unsafe(@extern_func_map[k]) }
       end
 
       sig do
