@@ -1433,8 +1433,24 @@ module Lilac
       sig { void }
       # Construct a new Program.
       def initialize
+        @global_map = T.let({}, T::Hash[String, GlobalDef])
         @func_map = T.let({}, T::Hash[String, FuncDef])
         @extern_func_map = T.let({}, T::Hash[[String, String], ExternFuncDef])
+      end
+
+      sig { params(globaldef: GlobalDef).void }
+      def add_global(globaldef)
+        @global_map[globaldef.id.name] = globaldef
+      end
+
+      sig { params(block: T.proc.params(arg0: GlobalDef).void).void }
+      def each_global(&block)
+        @global_map.each_key { |k| yield T.unsafe(@global_map[k]) }
+      end
+
+      sig { params(name: String).returns(T.nilable(Global)) }
+      def get_global(name)
+        @global_map[name]
       end
 
       sig { params(funcdef: FuncDef).void }
@@ -1483,13 +1499,15 @@ module Lilac
 
         other = T.cast(other, Program)
 
-        func_map.eql?(other.func_map) &&
+        global_map.eql?(other.global_map) &&
+          func_map.eql?(other.func_map) &&
           extern_func_map.eql?(other.extern_func_map)
       end
 
       sig { returns(Program) }
       def clone
         new_program = Program.new
+        each_global { |g| new_program.add_global(g) }
         each_func { |f| new_program.add_func(f) }
         each_extern_func { |f| new_program.add_extern_func(f) }
 
@@ -1498,10 +1516,15 @@ module Lilac
 
       sig { returns(Integer) }
       def hash
-        [self.class, @func_map, @extern_func_map].hash
+        [self.class, @global_map, @func_map, @extern_func_map].hash
       end
 
       protected
+
+      sig { returns(T::Hash[String, GlobalDef]) }
+      def global_map
+        @global_map
+      end
 
       sig { returns(T::Hash[String, FuncDef]) }
       def func_map
@@ -1564,6 +1587,7 @@ module Lilac
 
       sig { void }
       def initialize
+        @global_map = T.let({}, T::Hash[String, GlobalDef])
         @func_map = T.let({}, T::Hash[String, CFGFuncDef])
         @extern_func_map = T.let({}, T::Hash[[String, String], ExternFuncDef])
       end
@@ -1572,6 +1596,9 @@ module Lilac
       def self.from_program(program)
         # create CFGProgram from main
         cfg_program = CFGProgram.new
+
+        # add all global definitions
+        program.each_global { |g| cfg_program.add_global(g) }
 
         # convert all functions to cfg and add them
         program.each_func do |f|
@@ -1590,6 +1617,21 @@ module Lilac
         program.each_extern_func { |f| cfg_program.add_extern_func(f) }
 
         cfg_program
+      end
+
+      sig { params(globaldef: GlobalDef).void }
+      def add_global(globaldef)
+        @global_map[globaldef.id.name] = globaldef
+      end
+
+      sig { params(block: T.proc.params(arg0: GlobalDef).void).void }
+      def each_global(&block)
+        @global_map.each_key { |k| yield T.unsafe(@global_map[k]) }
+      end
+
+      sig { params(name: String).returns(T.nilable(Global)) }
+      def get_global(name)
+        @global_map[name]
       end
 
       sig { params(cfg_funcdef: CFGFuncDef).void }
