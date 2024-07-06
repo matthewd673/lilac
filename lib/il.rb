@@ -1199,7 +1199,7 @@ module Lilac
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
 
-      sig { abstract.returns(Value) }
+      sig { abstract.returns(Component) }
       def clone; end
     end
 
@@ -1208,7 +1208,7 @@ module Lilac
     class GlobalDef < Component
       extend T::Sig
 
-      sig { returns(Type) }
+      sig { returns(Types::Type) }
       attr_reader :type
 
       sig { returns(ID) }
@@ -1237,7 +1237,7 @@ module Lilac
 
         other = T.cast(other, GlobalDef)
 
-        type.eql?(other.type) && id.eql?(other.id) && rhs.eql?(other.rhs)
+        @type.eql?(other.type) && @id.eql?(other.id) && @rhs.eql?(other.rhs)
       end
 
       sig { override.returns(GlobalDef) }
@@ -1396,7 +1396,7 @@ module Lilac
       sig { override.returns(String) }
       def to_s
         param_str = ""
-        @params.each { |p| param_str += "#{p}, " }
+        @param_types.each { |t| param_str += "#{t}, " }
         param_str.chomp!(", ")
 
         "extern func #{@source} #{@name}(#{param_str}) -> #{@ret_type}"
@@ -1448,7 +1448,7 @@ module Lilac
         @global_map.each_key { |k| yield T.unsafe(@global_map[k]) }
       end
 
-      sig { params(name: String).returns(T.nilable(Global)) }
+      sig { params(name: String).returns(T.nilable(GlobalDef)) }
       def get_global(name)
         @global_map[name]
       end
@@ -1629,7 +1629,7 @@ module Lilac
         @global_map.each_key { |k| yield T.unsafe(@global_map[k]) }
       end
 
-      sig { params(name: String).returns(T.nilable(Global)) }
+      sig { params(name: String).returns(T.nilable(GlobalDef)) }
       def get_global(name)
         @global_map[name]
       end
