@@ -1430,13 +1430,9 @@ module Lilac
     class Program
       extend T::Sig
 
-      sig { returns(T::Array[Statement]) }
-      attr_reader :stmt_list
-
-      sig { params(stmt_list: T::Array[Statement]).void }
+      sig { void }
       # Construct a new Program.
-      def initialize(stmt_list: [])
-        @stmt_list = stmt_list
+      def initialize
         @func_map = T.let({}, T::Hash[String, FuncDef])
         @extern_func_map = T.let({}, T::Hash[[String, String], ExternFuncDef])
       end
@@ -1476,11 +1472,7 @@ module Lilac
 
       sig { returns(String) }
       def to_s
-        str = ""
-        @stmt_list.each do |i|
-          str += "#{i.to_s}\n"
-        end
-        str
+        "IL::Program" # TODO: improve to_s
       end
 
       sig { params(other: T.untyped).returns(T::Boolean) }
@@ -1491,26 +1483,22 @@ module Lilac
 
         other = T.cast(other, Program)
 
-        stmt_list.eql?(other.stmt_list) && func_map.eql?(other.func_map) &&
+        func_map.eql?(other.func_map) &&
           extern_func_map.eql?(other.extern_func_map)
       end
 
       sig { returns(Program) }
       def clone
-        new_program = Program.new(stmt_list: @stmt_list)
-        each_func do |f|
-          new_program.add_func(f)
-        end
-        each_extern_func do |f|
-          new_program.add_extern_func(f)
-        end
+        new_program = Program.new
+        each_func { |f| new_program.add_func(f) }
+        each_extern_func { |f| new_program.add_extern_func(f) }
 
         new_program
       end
 
       sig { returns(Integer) }
       def hash
-        [self.class, @stmt_list, @func_map, @extern_func_map].hash
+        [self.class, @func_map, @extern_func_map].hash
       end
 
       protected
@@ -1574,24 +1562,16 @@ module Lilac
     class CFGProgram
       extend T::Sig
 
-      sig { returns(Analysis::CFG) }
-      attr_reader :cfg
-
-      sig { params(cfg: Analysis::CFG).void }
-      def initialize(cfg)
-        @cfg = cfg
+      sig { void }
+      def initialize
         @func_map = T.let({}, T::Hash[String, CFGFuncDef])
         @extern_func_map = T.let({}, T::Hash[[String, String], ExternFuncDef])
       end
 
       sig { params(program: Program).returns(CFGProgram) }
       def self.from_program(program)
-        # convert main program stmt list to bb and cfg
-        main_bb = Analysis::BB.from_stmt_list(program.stmt_list)
-        main_cfg = Analysis::CFG.new(blocks: main_bb)
-
         # create CFGProgram from main
-        cfg_program = CFGProgram.new(main_cfg)
+        cfg_program = CFGProgram.new
 
         # convert all functions to cfg and add them
         program.each_func do |f|
