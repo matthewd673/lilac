@@ -102,6 +102,9 @@ module Lilac
           # extern func def
           elsif see?(TokenType::Extern)
             program.add_extern_func(parse_extern_func_def)
+          else
+            raise "Unexpected token while parsing program components: "\
+                  "#{@next_token}"
           end
         end
 
