@@ -65,6 +65,10 @@ module Lilac
         "%#{o.number}"
       }, Visitor::Lambda)
 
+      VISIT_GLOBALID = T.let(lambda { |v, o, c|
+        "@#{o.name}"
+      }, Visitor::Lambda)
+
       VISIT_BINARYOP = T.let(lambda  { |v, o, c|
         "#{v.visit(o.left)} #{o.op} #{v.visit(o.right)}"
       }, Visitor::Lambda)
@@ -140,7 +144,7 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_GLOBALDEF = T.let(lambda { |v, o, c|
-        "#{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}"
+        "global #{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}"
       }, Visitor::Lambda)
 
       VISIT_FUNCDEF = T.let(lambda { |v, o, c|
@@ -203,6 +207,7 @@ module Lilac
         IL::Constant => VISIT_CONSTANT,
         IL::ID => VISIT_ID,
         IL::Register => VISIT_REGISTER,
+        IL::GlobalID => VISIT_GLOBALID,
         IL::BinaryOp => VISIT_BINARYOP,
         IL::UnaryOp => VISIT_UNARYOP,
         IL::Phi => VISIT_PHI,
