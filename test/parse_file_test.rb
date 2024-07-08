@@ -362,4 +362,34 @@ class ParseFileTest < Minitest::Test
 
     assert program.eql?(expected)
   end
+
+  sig { void }
+  def test_parse_global
+    expected = Program.new
+    expected.add_global(GlobalDef.new(Types::I32.new, GlobalID.new("a"),
+                                      Constant.new(Types::I32.new, 2)))
+    expected.add_global(GlobalDef.new(Types::I32.new, GlobalID.new("b"),
+                                      Constant.new(Types::I32.new, 0)))
+    expected.add_func(
+      FuncDef.new(
+        "main", [], Types::Void.new,
+        [
+          Definition.new(Types::I32.new, ID.new("a"),
+                         Constant.new(Types::I32.new, 3)),
+          Definition.new(Types::I32.new, Register.new(0),
+                         BinaryOp.new(
+                           BinaryOp::Operator::ADD,
+                           ID.new("a"),
+                           GlobalID.new("a")
+                         )),
+          Definition.new(Types::I32.new, GlobalID.new("b"), Register.new(0)),
+        ]
+      )
+    )
+    program = Lilac::Frontend::Parser.parse_file(
+      "test/programs/frontend/globals.txt"
+    )
+
+    assert program.eql?(expected)
+  end
 end
