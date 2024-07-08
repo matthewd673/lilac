@@ -1316,14 +1316,14 @@ module Lilac
 
       sig { override.returns(String) }
       def to_s
-        param_str = ""
+        param_str = "".dup
         @params.each { |p| param_str += "#{p}, " }
         param_str.chomp!(", ")
 
         stmt_str = ""
         @stmt_list.each { |s| stmt_str += "#{s}\n" }
 
-        "func #{@name}(#{param_str}) -> #{@ret_type}:\n#{stmt_str}\nend"
+        "func #{@name}(#{param_str}) -> #{@ret_type}\n#{stmt_str}\nend"
       end
 
       sig { override.params(other: T.untyped).returns(T::Boolean) }
