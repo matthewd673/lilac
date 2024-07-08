@@ -1,4 +1,6 @@
-L0:
-i32 a = 5i32
-jnz a L0
-jz 1u8 L0
+func main() -> void
+  L0:
+  i32 a = 5i32
+  jnz a L0
+  jz 1u8 L0
+end
