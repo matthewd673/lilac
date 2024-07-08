@@ -328,6 +328,10 @@ module Lilac
         id_str = eat(TokenType::Name).image
         id = id_from_string(id_str)
 
+        unless id.is_a?(IL::GlobalID)
+          raise "Expected GlobalID (beginning with '@')"
+        end
+
         eat(TokenType::Assignment)
 
         rhs = parse_constant # NOTE: always going to be a Constant
@@ -479,18 +483,28 @@ module Lilac
         when "f64" then return IL::Types::F64.new
         end
 
-        raise("Invalid type string \"#{string}\"")
+        raise "Invalid type string \"#{string}\""
       end
 
       sig { params(string: String).returns(IL::ID) }
       def id_from_string(string)
-        IL::ID.new(string)
+        if string.start_with?("@") # global
+          return IL::GlobalID.new(T.must(string[1..]))
+        else # local
+          return IL::ID.new(string)
+        end
       end
 
       sig { params(string: String).returns(IL::Register) }
       def register_from_string(string)
-        number = T.unsafe(string[1..]).to_i
+        number = T.must(string[1..]).to_i # trim leading '%'
         IL::Register.new(number)
+      end
+
+      sig { params(string: String).returns(IL::GlobalID) }
+      def global_id_from_string(string)
+        name = T.unsafe(string[1..]) # trim leading '@'
+        IL::GlobalID.new(name)
       end
 
       sig { params(string: String).returns(IL::Constant) }

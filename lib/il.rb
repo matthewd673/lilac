@@ -335,8 +335,7 @@ module Lilac
       end
     end
 
-    # An ID is the name of a variable. When implemented these will often store
-    # a type and a value.
+    # An ID is the name of a local variable.
     class ID < Value
       extend T::Sig
 
@@ -379,7 +378,7 @@ module Lilac
       end
     end
 
-    # A Register is a type of ID used in the IL to keep track of temporary
+    # A Register is a local ID used in the IL to keep track of temporary
     # values such as intermediate steps of computation. Registers are numbered,
     # not named (though as IDs they still have a name attribute).
     class Register < ID
@@ -421,6 +420,35 @@ module Lilac
       sig { override.returns(Integer) }
       def hash
         [self.class, @number].hash
+      end
+    end
+
+    # A GlobalID is the name of a global variable.
+    class GlobalID < ID
+      sig { override.returns(String) }
+      def to_s
+        "@#{@name}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != GlobalID
+          return false
+        end
+
+        other = T.cast(other, GlobalID)
+
+        name.eql?(other.name)
+      end
+
+      sig { override.returns(GlobalID) }
+      def clone
+        GlobalID.new(@name)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @name].hash
       end
     end
 
@@ -1211,13 +1239,13 @@ module Lilac
       sig { returns(Types::Type) }
       attr_reader :type
 
-      sig { returns(ID) }
+      sig { returns(GlobalID) }
       attr_reader :id
 
       sig { returns(Constant) }
       attr_reader :rhs
 
-      sig { params(type: Types::Type, id: ID, rhs: Constant).void }
+      sig { params(type: Types::Type, id: GlobalID, rhs: Constant).void }
       def initialize(type, id, rhs)
         @type = type
         @id = id
