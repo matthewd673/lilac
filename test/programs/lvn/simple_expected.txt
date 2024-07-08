@@ -1,3 +1,5 @@
-i32 a = b * c
-i32 d = b
-i32 e = a
+func main() -> void
+  i32 a = b * c
+  i32 d = b
+  i32 e = a
+end
