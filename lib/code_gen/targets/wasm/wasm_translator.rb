@@ -26,14 +26,14 @@ module Lilac
           sig { params(cfg_program: IL::CFGProgram).void }
           def initialize(cfg_program)
             @symbols = T.let(SymbolTable.new, SymbolTable)
-            wasm_translator = WasmILTransformer.new(@symbols)
+            wasm_transformer = WasmILTransformer.new(@symbols)
 
             @loop_ct = T.let(0, Integer)
             @block_ct = T.let(0, Integer)
 
             @start_function = T.let(nil, T.nilable(String))
 
-            super(wasm_translator, cfg_program)
+            super(wasm_transformer, cfg_program)
           end
 
           sig { params(func_name: String).void }
@@ -60,6 +60,8 @@ module Lilac
 
             # translate all globals
             @program.each_global do |g|
+              # add global to top-level scope
+              @symbols.insert(ILSymbol.new(g.id, g.type))
               components.push(translate_global(g))
             end
 
@@ -111,7 +113,8 @@ module Lilac
                     "a ConstFloat"
             end
 
-            Components::Global.new(type, name, const)
+            # TODO: optimization to make some globals not mutable
+            Components::Global.new(type, name, const, mutable: true)
           end
 
           sig { params(cfg_funcdef: IL::CFGFuncDef).returns(Components::Func) }
@@ -171,7 +174,7 @@ module Lilac
                   next
                 end
 
-                # avoid redefining params
+                # avoid redefining globals, params, or ids used more than once
                 if @symbols.lookup(s.id)
                   next
                 end

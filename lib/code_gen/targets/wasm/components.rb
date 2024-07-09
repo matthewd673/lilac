@@ -126,17 +126,22 @@ module Lilac
             end
             attr_reader :default_value
 
+            sig { returns(T::Boolean) }
+            attr_reader :mutable
+
             sig do
               params(type: Type,
                      name: String,
                      default_value: T.any(Instructions::ConstInteger,
-                                          Instructions::ConstFloat))
+                                          Instructions::ConstFloat),
+                     mutable: T::Boolean)
                 .void
             end
-            def initialize(type, name, default_value)
+            def initialize(type, name, default_value, mutable: false)
               @type = type
               @name = name
               @default_value = default_value
+              @mutable = mutable
             end
           end
 
