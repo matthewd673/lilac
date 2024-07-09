@@ -12,8 +12,7 @@ module Lilac
     # ILObject is a type-alias for any object in the IL that can be
     # "visited". For example, an +IL::Value+ or an +IL::FuncDef+.
     ILObject = T.type_alias do
-      T.any(Value, Expression, Statement, FuncParam,
-            FuncDef, ExternFuncDef, Program)
+      T.any(Value, Expression, Statement, Component, FuncParam, Program)
     end
 
     # The Types module contains all the types and categories of types available
@@ -39,14 +38,14 @@ module Lilac
           self.class == other.class
         end
 
-        sig { returns(Integer) }
-        def hash
-          self.class.hash
-        end
-
         sig { params(other: T.untyped).returns(T::Boolean) }
         def eql?(other)
           self == other
+        end
+
+        sig { returns(Integer) }
+        def hash
+          self.class.hash
         end
       end
 
@@ -279,6 +278,9 @@ module Lilac
       sig { abstract.returns(String) }
       def to_s; end
 
+      sig { abstract.returns(Integer) }
+      def hash; end
+
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
 
@@ -327,14 +329,13 @@ module Lilac
         Constant.new(@type, @value)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @type, @value].hash
       end
     end
 
-    # An ID is the name of a variable. When implemented these will often store
-    # a type and a value.
+    # An ID is the name of a local variable.
     class ID < Value
       extend T::Sig
 
@@ -371,13 +372,13 @@ module Lilac
         ID.new(@name)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @name].hash
       end
     end
 
-    # A Register is a type of ID used in the IL to keep track of temporary
+    # A Register is a local ID used in the IL to keep track of temporary
     # values such as intermediate steps of computation. Registers are numbered,
     # not named (though as IDs they still have a name attribute).
     class Register < ID
@@ -416,9 +417,38 @@ module Lilac
         Register.new(@number)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @number].hash
+      end
+    end
+
+    # A GlobalID is the name of a global variable.
+    class GlobalID < ID
+      sig { override.returns(String) }
+      def to_s
+        "@#{@name}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != GlobalID
+          return false
+        end
+
+        other = T.cast(other, GlobalID)
+
+        name.eql?(other.name)
+      end
+
+      sig { override.returns(GlobalID) }
+      def clone
+        GlobalID.new(@name)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @name].hash
       end
     end
 
@@ -432,6 +462,9 @@ module Lilac
 
       sig { abstract.returns(String) }
       def to_s; end
+
+      sig { abstract.returns(Integer) }
+      def hash; end
 
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
@@ -518,7 +551,7 @@ module Lilac
         BinaryOp.new(@op, @left, @right)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @op, @left, @right].hash
       end
@@ -631,7 +664,7 @@ module Lilac
         UnaryOp.new(@op, @value)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @op, @value].hash
       end
@@ -676,9 +709,7 @@ module Lilac
       sig { override.returns(String) }
       def to_s
         arg_str = "".dup
-        @args.each do |a|
-          arg_str += "#{a}, "
-        end
+        @args.each { |a| arg_str += "#{a}, " }
         arg_str.chomp!(", ")
 
         "call #{@func_name}(#{arg_str})"
@@ -700,7 +731,7 @@ module Lilac
         Call.new(@func_name, @args)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @func_name, @args].hash
       end
@@ -728,9 +759,7 @@ module Lilac
       sig { override.returns(String) }
       def to_s
         arg_str = ""
-        @args.each do |a|
-          arg_str += "#{a}, "
-        end
+        @args.each { |a| arg_str += "#{a}, " }
         arg_str.chomp!(", ")
 
         "extern_call #{@func_source}.#{@func_name}(#{arg_str})"
@@ -753,7 +782,7 @@ module Lilac
         ExternCall.new(@func_source, @func_name, @args)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @func_source, @func_name, @args].hash
       end
@@ -773,9 +802,7 @@ module Lilac
       sig { override.returns(String) }
       def to_s
         ids_str = ""
-        @ids.each do |id|
-          ids_str += "#{id.to_s}, "
-        end
+        @ids.each { |id| ids_str += "#{id.to_s}, " }
         ids_str.chomp!(", ")
 
         "phi (#{ids_str})"
@@ -797,7 +824,7 @@ module Lilac
         Phi.new(@ids)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @ids].hash
       end
@@ -815,6 +842,9 @@ module Lilac
 
       sig { abstract.returns(String) }
       def to_s; end
+
+      sig { abstract.returns(Integer) }
+      def hash; end
 
       sig { abstract.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other); end
@@ -872,7 +902,7 @@ module Lilac
         Definition.new(@type, @id, @rhs)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @type, @id, @rhs].hash
       end
@@ -914,7 +944,7 @@ module Lilac
         Label.new(@name)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @name].hash
       end
@@ -956,7 +986,7 @@ module Lilac
         Jump.new(@target)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @target].hash
       end
@@ -1001,7 +1031,7 @@ module Lilac
         JumpZero.new(@cond, @target)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @cond, @target].hash
       end
@@ -1046,7 +1076,7 @@ module Lilac
         JumpNotZero.new(@cond, @target)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @cond, @target].hash
       end
@@ -1085,7 +1115,7 @@ module Lilac
         Return.new(@value)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @value].hash
       end
@@ -1125,7 +1155,7 @@ module Lilac
         VoidCall.new(@call)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @call].hash
       end
@@ -1174,9 +1204,148 @@ module Lilac
         InlineInstruction.new(@target, @instruction)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @target, @instruction].hash
+      end
+    end
+
+    # A Component is something that appears at the top level of a Program
+    # like a global variable or a function definition.
+    class Component
+      extend T::Sig
+      extend T::Helpers
+
+      abstract!
+
+      sig { abstract.returns(String) }
+      def to_s; end
+
+      sig { abstract.returns(Integer) }
+      def hash; end
+
+      sig { abstract.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other); end
+
+      sig { abstract.returns(Component) }
+      def clone; end
+    end
+
+    # A GlobalDef is a Component that defines a new global variable in a
+    # Program.
+    class GlobalDef < Component
+      extend T::Sig
+
+      sig { returns(Types::Type) }
+      attr_reader :type
+
+      sig { returns(GlobalID) }
+      attr_reader :id
+
+      sig { returns(Constant) }
+      attr_reader :rhs
+
+      sig { params(type: Types::Type, id: GlobalID, rhs: Constant).void }
+      def initialize(type, id, rhs)
+        @type = type
+        @id = id
+        @rhs = rhs
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "global #{@type} #{@id} = #{@rhs}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != GlobalDef
+          return false
+        end
+
+        other = T.cast(other, GlobalDef)
+
+        @type.eql?(other.type) && @id.eql?(other.id) && @rhs.eql?(other.rhs)
+      end
+
+      sig { override.returns(GlobalDef) }
+      def clone
+        GlobalDef.new(@type, @id, @rhs)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @type, @id, @rhs].hash
+      end
+    end
+
+    # A FuncDef is a function definition with a name, params, and body.
+    class FuncDef < Component
+      extend T::Sig
+
+      sig { returns(String) }
+      attr_reader :name
+
+      sig { returns(T::Array[FuncParam]) }
+      attr_reader :params
+
+      sig { returns(Types::Type) }
+      attr_accessor :ret_type
+
+      sig { returns(T::Array[Statement]) }
+      attr_reader :stmt_list
+
+      sig { returns(T::Boolean) }
+      attr_accessor :exported
+
+      sig do
+        params(name: String,
+               params: T::Array[FuncParam],
+               ret_type: Types::Type,
+               stmt_list: T::Array[Statement],
+               exported: T::Boolean)
+          .void
+      end
+      def initialize(name, params, ret_type, stmt_list, exported: false)
+        @name = name
+        @params = params
+        @ret_type = ret_type
+        @stmt_list = stmt_list
+        @exported = exported
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        param_str = "".dup
+        @params.each { |p| param_str += "#{p}, " }
+        param_str.chomp!(", ")
+
+        stmt_str = ""
+        @stmt_list.each { |s| stmt_str += "#{s}\n" }
+
+        "func #{@name}(#{param_str}) -> #{@ret_type}\n#{stmt_str}\nend"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != FuncDef
+          return false
+        end
+
+        other = T.cast(other, FuncDef)
+
+        name.eql?(other.name) && params.eql?(other.params) &&
+          ret_type.eql?(other.ret_type) && stmt_list.eql?(other.stmt_list)
+      end
+
+      sig { override.returns(FuncDef) }
+      def clone
+        FuncDef.new(@name, @params, @ret_type, @stmt_list)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @name, @params, @ret_type, @stmt_list].hash
       end
     end
 
@@ -1223,82 +1392,8 @@ module Lilac
       end
     end
 
-    # A FuncDef is a function definition with a name, params, and body.
-    class FuncDef
-      extend T::Sig
-
-      sig { returns(String) }
-      attr_reader :name
-
-      sig { returns(T::Array[FuncParam]) }
-      attr_reader :params
-
-      sig { returns(Types::Type) }
-      attr_accessor :ret_type
-
-      sig { returns(T::Array[Statement]) }
-      attr_reader :stmt_list
-
-      sig { returns(T::Boolean) }
-      attr_accessor :exported
-
-      sig do
-        params(name: String,
-               params: T::Array[FuncParam],
-               ret_type: Types::Type,
-               stmt_list: T::Array[Statement],
-               exported: T::Boolean)
-          .void
-      end
-      def initialize(name, params, ret_type, stmt_list, exported: false)
-        @name = name
-        @params = params
-        @ret_type = ret_type
-        @stmt_list = stmt_list
-        @exported = exported
-      end
-
-      sig { returns(String) }
-      def to_s
-        param_str = ""
-        @params.each do |p|
-          param_str += "#{p}, "
-        end
-        param_str.chomp!(", ")
-
-        stmt_str = ""
-        @stmt_list.each do |s|
-          stmt_str += "#{s}\n"
-        end
-
-        "func #{@name}(#{param_str}) -> #{@ret_type}:\n#{stmt_str}\nend"
-      end
-
-      sig { params(other: T.untyped).returns(T::Boolean) }
-      def eql?(other)
-        if other.class != FuncDef
-          return false
-        end
-
-        other = T.cast(other, FuncDef)
-
-        name.eql?(other.name) && params.eql?(other.params) &&
-          ret_type.eql?(other.ret_type) && stmt_list.eql?(other.stmt_list)
-      end
-
-      sig { returns(FuncDef) }
-      def clone
-        FuncDef.new(@name, @params, @ret_type, @stmt_list)
-      end
-
-      sig { returns(Integer) }
-      def hash
-        [self.class, @name, @params, @ret_type, @stmt_list].hash
-      end
-    end
-
     # An ExternFuncDef is a description of a function described elsewhere.
-    class ExternFuncDef
+    class ExternFuncDef < Component
       extend T::Sig
 
       sig { returns(String) }
@@ -1326,12 +1421,16 @@ module Lilac
         @ret_type = ret_type
       end
 
-      sig { returns(String) }
-      def key
-        "#{@source}##{@name}"
+      sig { override.returns(String) }
+      def to_s
+        param_str = ""
+        @param_types.each { |t| param_str += "#{t}, " }
+        param_str.chomp!(", ")
+
+        "extern func #{@source} #{@name}(#{param_str}) -> #{@ret_type}"
       end
 
-      sig { params(other: T.untyped).returns(T::Boolean) }
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
       def eql?(other)
         if other.class != ExternFuncDef
           return false
@@ -1344,12 +1443,12 @@ module Lilac
           ret_type.eql?(other.ret_type) && param_types.eql?(other.param_types)
       end
 
-      sig { returns(ExternFuncDef) }
+      sig { override.returns(ExternFuncDef) }
       def clone
         ExternFuncDef.new(@source, @name, @param_types, @ret_type)
       end
 
-      sig { returns(Integer) }
+      sig { override.returns(Integer) }
       def hash
         [self.class, @source, @name, @param_types, @ret_type].hash
       end
@@ -1359,15 +1458,27 @@ module Lilac
     class Program
       extend T::Sig
 
-      sig { returns(T::Array[Statement]) }
-      attr_reader :stmt_list
-
-      sig { params(stmt_list: T::Array[Statement]).void }
+      sig { void }
       # Construct a new Program.
-      def initialize(stmt_list: [])
-        @stmt_list = stmt_list
+      def initialize
+        @global_map = T.let({}, T::Hash[String, GlobalDef])
         @func_map = T.let({}, T::Hash[String, FuncDef])
-        @extern_func_map = T.let({}, T::Hash[String, ExternFuncDef])
+        @extern_func_map = T.let({}, T::Hash[[String, String], ExternFuncDef])
+      end
+
+      sig { params(globaldef: GlobalDef).void }
+      def add_global(globaldef)
+        @global_map[globaldef.id.name] = globaldef
+      end
+
+      sig { params(block: T.proc.params(arg0: GlobalDef).void).void }
+      def each_global(&block)
+        @global_map.each_key { |k| yield T.unsafe(@global_map[k]) }
+      end
+
+      sig { params(name: String).returns(T.nilable(GlobalDef)) }
+      def get_global(name)
+        @global_map[name]
       end
 
       sig { params(funcdef: FuncDef).void }
@@ -1377,9 +1488,7 @@ module Lilac
 
       sig { params(block: T.proc.params(arg0: FuncDef).void).void }
       def each_func(&block)
-        @func_map.each_key do |k|
-          yield T.unsafe(@func_map[k])
-        end
+        @func_map.each_key { |k| yield T.unsafe(@func_map[k]) }
       end
 
       sig { params(name: String).returns(T.nilable(FuncDef)) }
@@ -1389,28 +1498,25 @@ module Lilac
 
       sig { params(extern_funcdef: ExternFuncDef).void }
       def add_extern_func(extern_funcdef)
-        @extern_func_map[extern_funcdef.key] = extern_funcdef
+        key = [extern_funcdef.source, extern_funcdef.name]
+        @extern_func_map[key] = extern_funcdef
       end
 
       sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
       def each_extern_func(&block)
-        @extern_func_map.each_key do |k|
-          yield T.unsafe(@extern_func_map[k])
-        end
+        @extern_func_map.each_key { |k| yield T.unsafe(@extern_func_map[k]) }
       end
 
-      sig { params(key: String).returns(T.nilable(ExternFuncDef)) }
-      def get_extern_func(key)
-        @extern_func_map[key]
+      sig do
+        params(source: String, name: String).returns(T.nilable(ExternFuncDef))
+      end
+      def get_extern_func(source, name)
+        @extern_func_map[[source, name]]
       end
 
       sig { returns(String) }
       def to_s
-        str = ""
-        @stmt_list.each do |i|
-          str += "#{i.to_s}\n"
-        end
-        str
+        "IL::Program" # TODO: improve to_s
       end
 
       sig { params(other: T.untyped).returns(T::Boolean) }
@@ -1421,36 +1527,39 @@ module Lilac
 
         other = T.cast(other, Program)
 
-        stmt_list.eql?(other.stmt_list) && func_map.eql?(other.func_map) &&
+        global_map.eql?(other.global_map) &&
+          func_map.eql?(other.func_map) &&
           extern_func_map.eql?(other.extern_func_map)
       end
 
       sig { returns(Program) }
       def clone
-        new_program = Program.new(stmt_list: @stmt_list)
-        each_func do |f|
-          new_program.add_func(f)
-        end
-        each_extern_func do |f|
-          new_program.add_extern_func(f)
-        end
+        new_program = Program.new
+        each_global { |g| new_program.add_global(g) }
+        each_func { |f| new_program.add_func(f) }
+        each_extern_func { |f| new_program.add_extern_func(f) }
 
         new_program
       end
 
       sig { returns(Integer) }
       def hash
-        [self.class, @stmt_list, @func_map, @extern_func_map].hash
+        [self.class, @global_map, @func_map, @extern_func_map].hash
       end
 
       protected
+
+      sig { returns(T::Hash[String, GlobalDef]) }
+      def global_map
+        @global_map
+      end
 
       sig { returns(T::Hash[String, FuncDef]) }
       def func_map
         @func_map
       end
 
-      sig { returns(T::Hash[String, ExternFuncDef]) }
+      sig { returns(T::Hash[[String, String], ExternFuncDef]) }
       def extern_func_map
         @extern_func_map
       end
@@ -1504,24 +1613,20 @@ module Lilac
     class CFGProgram
       extend T::Sig
 
-      sig { returns(Analysis::CFG) }
-      attr_reader :cfg
-
-      sig { params(cfg: Analysis::CFG).void }
-      def initialize(cfg)
-        @cfg = cfg
+      sig { void }
+      def initialize
+        @global_map = T.let({}, T::Hash[String, GlobalDef])
         @func_map = T.let({}, T::Hash[String, CFGFuncDef])
-        @extern_func_map = T.let({}, T::Hash[String, ExternFuncDef])
+        @extern_func_map = T.let({}, T::Hash[[String, String], ExternFuncDef])
       end
 
       sig { params(program: Program).returns(CFGProgram) }
       def self.from_program(program)
-        # convert main program stmt list to bb and cfg
-        main_bb = Analysis::BB.from_stmt_list(program.stmt_list)
-        main_cfg = Analysis::CFG.new(blocks: main_bb)
-
         # create CFGProgram from main
-        cfg_program = CFGProgram.new(main_cfg)
+        cfg_program = CFGProgram.new
+
+        # add all global definitions
+        program.each_global { |g| cfg_program.add_global(g) }
 
         # convert all functions to cfg and add them
         program.each_func do |f|
@@ -1537,11 +1642,24 @@ module Lilac
         end
 
         # add all extern functions (which have no body so don't need conversion)
-        program.each_extern_func do |f|
-          cfg_program.add_extern_func(f)
-        end
+        program.each_extern_func { |f| cfg_program.add_extern_func(f) }
 
         cfg_program
+      end
+
+      sig { params(globaldef: GlobalDef).void }
+      def add_global(globaldef)
+        @global_map[globaldef.id.name] = globaldef
+      end
+
+      sig { params(block: T.proc.params(arg0: GlobalDef).void).void }
+      def each_global(&block)
+        @global_map.each_key { |k| yield T.unsafe(@global_map[k]) }
+      end
+
+      sig { params(name: String).returns(T.nilable(GlobalDef)) }
+      def get_global(name)
+        @global_map[name]
       end
 
       sig { params(cfg_funcdef: CFGFuncDef).void }
@@ -1551,9 +1669,7 @@ module Lilac
 
       sig { params(block: T.proc.params(arg0: CFGFuncDef).void).void }
       def each_func(&block)
-        @func_map.each_key do |k|
-          yield T.unsafe(@func_map[k])
-        end
+        @func_map.each_key { |k| yield T.unsafe(@func_map[k]) }
       end
 
       sig { params(name: String).returns(T.nilable(CFGFuncDef)) }
@@ -1563,19 +1679,20 @@ module Lilac
 
       sig { params(extern_funcdef: ExternFuncDef).void }
       def add_extern_func(extern_funcdef)
-        @extern_func_map[extern_funcdef.key] = extern_funcdef
+        key = [extern_funcdef.source, extern_funcdef.name]
+        @extern_func_map[key] = extern_funcdef
       end
 
       sig { params(block: T.proc.params(arg0: ExternFuncDef).void).void }
       def each_extern_func(&block)
-        @extern_func_map.each_key do |k|
-          yield T.unsafe(@extern_func_map[k])
-        end
+        @extern_func_map.each_key { |k| yield T.unsafe(@extern_func_map[k]) }
       end
 
-      sig { params(key: String).returns(T.nilable(ExternFuncDef)) }
-      def get_extern_func(key)
-        @extern_func_map[key]
+      sig do
+        params(source: String, name: String).returns(T.nilable(ExternFuncDef))
+      end
+      def get_extern_func(source, name)
+        @extern_func_map[[source, name]]
       end
 
       # TODO: implement to_s

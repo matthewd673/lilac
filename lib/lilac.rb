@@ -37,8 +37,8 @@ module Lilac
       puts(ANSI.fmt256("lilac", ANSI::LILAC_256, bold: true))
       puts("  optimizations: list all optimizations")
       puts("  validations: list all validations")
-      puts("  parse <filename>: parse and pretty print an IL text file")
-      puts("  cfg <filename>: parse an IL text file, compute a CFG, "\
+      puts("  parse: parse and pretty print an IL text file")
+      puts("  cfg: parse an IL text file, compute a CFG, "\
            "and output a Graphviz graph for it")
     end
 
@@ -74,32 +74,36 @@ module Lilac
       pp.print_program(program)
     end
 
-    sig { params(filename: T.nilable(String)).void }
-    # Parse a file using +Frontend::Parser+, build a CFG of its top-level
-    # statement list, and print a Graphviz DOT representation of the CFG.
+    sig do
+      params(filename: T.nilable(String), func_name: T.nilable(String)).void
+    end
+    # Parse a file using +Frontend::Parser+, build a CFG of a given function,
+    # and print a Graphviz DOT representation of the CFG.
     #
     # @param [T.nilable(String)] filename The name of the file to parse
     #   (or +nil+ which will be handled nicely).
-    def self.cfg(filename)
-      unless filename
-        puts("usage: lilac cfg <filename>")
+    # @param [T.nilable(String)] func_name The name of the function to generate
+    #   a CFG for (or +nil+ which will be handled nicely).
+    def self.cfg(filename, func_name)
+      unless filename && func_name
+        puts("usage: lilac cfg <filename> <function name>")
         return
       end
 
       program = Frontend::Parser.parse_file(filename)
+      func = program.get_func(func_name)
 
-      func_ct = 0
-      program.each_func do |f|
-        func_ct += 1
+      unless func
+        puts("Function \"#{func_name}\" does not exist in program")
       end
 
-      if func_ct > 0
-        puts("// WARNING: #{func_ct} functions were not included in the CFG")
-      end
-
-      blocks = Analysis::BB.from_stmt_list(program.stmt_list)
+      blocks = Analysis::BB.from_stmt_list(T.must(func).stmt_list)
       cfg = Analysis::CFG.new(blocks:)
       graphviz = Debugging::GraphVisualizer.generate_graphviz(cfg)
+
+      puts("// Program: #{filename}")
+      puts("// Function: #{func_name}")
+      puts("//   Function header: #{func.to_s.match(/func.*\n/)}")
       puts(graphviz)
     end
   end
@@ -115,7 +119,7 @@ module Lilac
     elsif ARGV[0] == "parse"
       CLI.parse(ARGV[1])
     elsif ARGV[0] == "cfg"
-      CLI.cfg(ARGV[1])
+      CLI.cfg(ARGV[1], ARGV[2])
     else # unknown args case
       CLI.main
     end

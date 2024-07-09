@@ -79,9 +79,10 @@ class ToCFGTest < Minitest::Test
   sig { params(il_file: String).returns(CFG) }
   def load_program_cfg(il_file)
     program = Frontend::Parser.parse_file(il_file)
+    main = program.get_func("main")
 
     # compute cfg for program
-    blocks = BB.from_stmt_list(program.stmt_list)
+    blocks = BB.from_stmt_list(T.must(main).stmt_list)
     CFG.new(blocks:)
   end
 

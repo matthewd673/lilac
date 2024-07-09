@@ -36,7 +36,9 @@ class LVNTest < Minitest::Test
   sig { params(il_file: String).returns(T::Array[Analysis::BB]) }
   def load_program_bb(il_file)
     program = Frontend::Parser.parse_file(il_file)
-    Analysis::BB.from_stmt_list(program.stmt_list)
+    main = program.get_func("main")
+
+    Analysis::BB.from_stmt_list(T.must(main).stmt_list)
   end
 
   PROGRAMS = T.let(%w[simple constant_folding non_constant_id].freeze,

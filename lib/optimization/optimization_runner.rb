@@ -27,21 +27,6 @@ module Lilac
           raise "No unit type for optimization pass #{pass.id}"
         end
 
-        # run on main program statements
-        case pass.unit_type
-        when OptimizationPass::UnitType::BasicBlock
-          instance = T.let(nil, T.nilable(OptimizationPass))
-          @program.cfg.each_node do |b|
-            instance = T.unsafe(pass).new(b)
-            instance.run!
-          end
-        when OptimizationPass::UnitType::CFG
-          instance = T.unsafe(pass).new(@program.cfg)
-          instance.run!
-        else
-          raise "Unsupported unit type for #{pass.id}"
-        end
-
         @program.each_func do |f|
           # run on function body
           case pass.unit_type

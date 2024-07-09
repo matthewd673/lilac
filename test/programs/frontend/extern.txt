@@ -11,5 +11,3 @@ func main () -> void
   void extern call console log (ans)
   ret void
 end
-
-void call main ()

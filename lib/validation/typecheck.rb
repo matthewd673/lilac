@@ -33,15 +33,18 @@ module Lilac
         symbols = SymbolTable.new
         funcs = {} # name -> return type
 
+        # scan all globals
+        symbols.push_scope # top level scope
+        @program.each_global do |g|
+          symbols.insert(ILSymbol.new(g.id, g.type))
+        end
+
         # store function return types
         @program.each_func do |f|
           funcs[f.name] = f.ret_type
         end
 
-        # scan on all items
-        symbols.push_scope
-        scan_items(@program.stmt_list, symbols, funcs)
-        # ...and scan on all functions
+        # scan on all functions
         @program.each_func do |f|
           scan_items(f.stmt_list, symbols, funcs)
         end

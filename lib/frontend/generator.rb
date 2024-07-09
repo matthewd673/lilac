@@ -32,15 +32,16 @@ module Lilac
       def generate
         output = ""
 
+        @program.each_global do |g|
+          output += @visitor.visit(g)
+        end
+
         @program.each_extern_func do |f|
           output += @visitor.visit(f)
         end
 
         @program.each_func do |f|
           output += @visitor.visit(f)
-        end
-        @program.stmt_list.each do |s|
-          output += "#{@visitor.visit(s)}\n"
         end
 
         output
@@ -62,6 +63,10 @@ module Lilac
 
       VISIT_REGISTER = T.let(lambda { |v, o, c|
         "%#{o.number}"
+      }, Visitor::Lambda)
+
+      VISIT_GLOBALID = T.let(lambda { |v, o, c|
+        "@#{o.name}"
       }, Visitor::Lambda)
 
       VISIT_BINARYOP = T.let(lambda  { |v, o, c|
@@ -138,8 +143,8 @@ module Lilac
         "void #{v.visit(o.call)}#{annotation}"
       }, Visitor::Lambda)
 
-      VISIT_FUNCPARAM = T.let(lambda { |v, o, c|
-        "#{v.visit(o.type)} #{v.visit(o.id)}"
+      VISIT_GLOBALDEF = T.let(lambda { |v, o, c|
+        "global #{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}"
       }, Visitor::Lambda)
 
       VISIT_FUNCDEF = T.let(lambda { |v, o, c|
@@ -156,6 +161,10 @@ module Lilac
 
         "func #{o.name} (#{param_str}) -> #{v.visit(o.ret_type)}"\
         "#{stmt_str}\nend\n"
+      }, Visitor::Lambda)
+
+      VISIT_FUNCPARAM = T.let(lambda { |v, o, c|
+        "#{v.visit(o.type)} #{v.visit(o.id)}"
       }, Visitor::Lambda)
 
       VISIT_EXTERNFUNCDEF = T.let(lambda { |v, o, c|
@@ -198,6 +207,7 @@ module Lilac
         IL::Constant => VISIT_CONSTANT,
         IL::ID => VISIT_ID,
         IL::Register => VISIT_REGISTER,
+        IL::GlobalID => VISIT_GLOBALID,
         IL::BinaryOp => VISIT_BINARYOP,
         IL::UnaryOp => VISIT_UNARYOP,
         IL::Phi => VISIT_PHI,
@@ -208,8 +218,9 @@ module Lilac
         IL::JumpNotZero => VISIT_JUMPNOTZERO,
         IL::Return => VISIT_RETURN,
         IL::VoidCall => VISIT_VOIDCALL,
-        IL::FuncParam => VISIT_FUNCPARAM,
+        IL::GlobalDef => VISIT_GLOBALDEF,
         IL::FuncDef => VISIT_FUNCDEF,
+        IL::FuncParam => VISIT_FUNCPARAM,
         IL::ExternFuncDef => VISIT_EXTERNFUNCDEF,
         IL::Call => VISIT_CALL,
         IL::ExternCall => VISIT_EXTERNCALL,

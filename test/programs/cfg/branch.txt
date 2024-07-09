@@ -1,12 +1,14 @@
-i32 a = 5i32
-jnz a L2
+func main() -> void
+  i32 a = 5i32
+  jnz a L2
 
-L1:
-i32 a = 3i32
-jmp L3
+  L1:
+  i32 a = 3i32
+  jmp L3
 
-L2:
-i32 a = 4i32
+  L2:
+  i32 a = 4i32
 
-L3:
-i32 b = a * 2i32
+  L3:
+  i32 b = a * 2i32
+end
