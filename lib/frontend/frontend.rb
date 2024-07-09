@@ -38,6 +38,7 @@ module Lilac
         Call = new("Call")
         Comma = new("Comma")
         Extern = new("Extern")
+        Global = new("Global")
 
         # special tokens
         NewLine = new("NewLine")
@@ -139,6 +140,7 @@ module Lilac
       TokenDef.new(TokenType::Call, /call/),
       TokenDef.new(TokenType::Comma, /,/),
       TokenDef.new(TokenType::Extern, /extern/),
+      TokenDef.new(TokenType::Global, /global/),
 
       # other
       TokenDef.new(TokenType::VoidConst, /void/),

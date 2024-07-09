@@ -18,12 +18,24 @@ module Lilac
     extend T::Sig
     include Kernel
 
-    sig { params(program: IL::CFGProgram, validate: T::Boolean).void }
+    sig do
+      params(program: IL::CFGProgram, entry: String, validate: T::Boolean).void
+    end
     # Interpret a program.
     #
-    # @param [IL::CFGProgram] program The program to interpret.
-    def self.interpret(program, validate: true)
-      context = Context.new(program.cfg.entry)
+    # @param [IL::CFGProgram] program The Program to interpret.
+    # @param [String] entry The name of the function that will be called as
+    #   the entry point.
+    # @param [T::Boolean] validate Determines if the interpreter should
+    #   validate the Program for semantic correctness before interpreting it.
+    def self.interpret(program, entry, validate: true)
+      # identify entry point
+      entry_func = program.get_func(entry)
+      unless entry_func
+        raise "Entry point '#{entry}' does not exist"
+      end
+
+      context = Context.new(entry_func.cfg.entry)
       visitor = Visitor.new(VISIT_LAMBDAS)
 
       # run all validations before interpreting
@@ -33,21 +45,28 @@ module Lilac
       # validation_runner.run_passes(Validation::VALIDATIONS)
       # end
 
+      # add all globals to the symbol table at top level scope
+      program.each_global do |g|
+        context.symbols.insert(
+          SymbolInfo.new(g.id.name, g.type, visitor.visit(g.rhs, ctx: context))
+        )
+      end
+
       # collect all funcs in the program
       context.funcs = {}
       program.each_func do |f|
         context.funcs[f.name] = f
       end
 
-      # collect all labels in program -- including within functions
+      # collect all labels in program
       context.label_blocks = {}
-      register_labels(context.label_blocks, program.cfg)
       program.each_func do |f|
         register_labels(context.label_blocks, f.cfg)
       end
 
       # begin interpretation
-      interpret_cfg(program.cfg, visitor, context)
+
+      interpret_cfg(entry_func.cfg, visitor, context)
 
       puts("---")
       puts("Interpretation complete")
@@ -364,13 +383,13 @@ module Lilac
     class InterpreterValue
       extend T::Sig
 
-      sig { returns(IL::Types) }
+      sig { returns(IL::Types::Type) }
       attr_reader :type
 
       sig { returns(T.untyped) }
       attr_reader :value
 
-      sig { params(type: IL::Types, value: T.untyped).void }
+      sig { params(type: IL::Types::Type, value: T.untyped).void }
       def initialize(type, value)
         @type = type
         @value = value
@@ -390,7 +409,7 @@ module Lilac
       sig { returns(String) }
       attr_reader :key
 
-      sig { returns(IL::Types) }
+      sig { returns(IL::Types::Type) }
       attr_reader :type
 
       sig { returns(T.untyped) }
@@ -399,7 +418,7 @@ module Lilac
       sig { returns(Integer) }
       attr_accessor :write_time
 
-      sig { params(key: String, type: IL::Types, value: T.untyped).void }
+      sig { params(key: String, type: IL::Types::Type, value: T.untyped).void }
       def initialize(key, type, value)
         @key = key
         @type = type

@@ -27,6 +27,8 @@ module Lilac
             @functions = T.let([], T::Array[Components::Func])
             @func_indices = T.let({}, T::Hash[String, Integer])
             @imports = T.let([], T::Array[Components::Import])
+            @globals = T.let([], T::Array[Components::Global])
+            @global_indices = T.let({}, T::Hash[String, Integer])
             @exports = T.let([], T::Array[Components::Func])
             @start = T.let(nil, T.nilable(Components::Start))
 
@@ -48,6 +50,7 @@ module Lilac
             write_type_section
             write_import_section
             write_function_section
+            write_global_section
             write_export_section
 
             if @start
@@ -72,6 +75,9 @@ module Lilac
                 end
               when Components::Import
                 @imports.push(c)
+              when Components::Global
+                @global_indices[c.name] = @globals.length
+                @globals.push(c)
               when Components::Start
                 @start = c
               end
@@ -134,7 +140,7 @@ module Lilac
             # to the main @writer and then concat the section writer's bytes.
             sw = HexWriter.new
             # num functions
-            sw.write_all(LEB128.encode_unsigned(@functions.length))
+            sw.write_all(LEB128.encode_unsigned(@sig_arr.length))
 
             # write all function signatures
             # LAYOUT: FUNC, num params, [param types], num results, [res. types]
@@ -215,6 +221,33 @@ module Lilac
               ind = T.unsafe(@sig_map[[f.params.map(&:type), f.results]])
               sw.write_all(LEB128.encode_unsigned(ind))
               mark_function_index(f.name)
+            end
+
+            # write section size then concat section contents
+            @writer.write_all(LEB128.encode_unsigned(sw.length))
+            sw.each { |b| @writer.write(b) }
+          end
+
+          sig { void }
+          def write_global_section
+            return if @globals.empty?
+
+            # write section header
+            # LAYOUT: id, size, num globals
+            @writer.write(SECTION_GLOBAL)
+
+            # create section writer
+            sw = HexWriter.new
+            # num globals
+            sw.write_all(LEB128.encode_unsigned(@globals.length))
+
+            # write all globals
+            # LAYOUT: type, mutability, constant (default value), end
+            @globals.each do |g|
+              sw.write(T.must(TYPE_MAP[g.type]))
+              sw.write(g.mutable ? 0x01 : 0x00)
+              write_instruction(g.default_value, sw)
+              write_instruction(Instructions::End.new, sw)
             end
 
             # write section size then concat section contents
@@ -333,29 +366,45 @@ module Lilac
 
             # write instructions
             func.instructions.each do |i|
-              bw.write(i.opcode) # always write opcode
-
-              # need to write more for some instructions
-              case i
-              when Instructions::ConstInteger
-                bw.write_all(LEB128.encode_signed(i.value.to_i))
-              when Instructions::LocalGet
-                ind = LEB128.encode_unsigned(local_indices[i.variable])
-                bw.write_all(ind)
-              when Instructions::LocalSet
-                ind = LEB128.encode_unsigned(local_indices[i.variable])
-                bw.write_all(ind)
-              when Instructions::LocalTee
-                ind = LEB128.encode_unsigned(local_indices[i.variable])
-                bw.write_all(ind)
-              when Instructions::Call
-                ind = T.unsafe(@func_indices[i.func_name])
-                bw.write_all(LEB128.encode_unsigned(ind))
-              # TODO: fill in for globals, float consts, etc.
-              end
+              write_instruction(i, bw, local_indices:)
             end
 
             bw
+          end
+
+          sig do
+            params(i: Instructions::WasmInstruction,
+                   hw: HexWriter,
+                   local_indices: T::Hash[String, Integer])
+              .void
+          end
+          def write_instruction(i, hw, local_indices: {})
+            hw.write(i.opcode) # always write opcode
+
+            # need to write more for some instructions
+            case i
+            when Instructions::ConstInteger
+              hw.write_all(LEB128.encode_signed(i.value.to_i))
+            when Instructions::LocalGet
+              ind = LEB128.encode_unsigned(T.must(local_indices[i.variable]))
+              hw.write_all(ind)
+            when Instructions::LocalSet
+              ind = LEB128.encode_unsigned(T.must(local_indices[i.variable]))
+              hw.write_all(ind)
+            when Instructions::LocalTee
+              ind = LEB128.encode_unsigned(T.must(local_indices[i.variable]))
+              hw.write_all(ind)
+            when Instructions::GlobalGet
+              ind = LEB128.encode_unsigned(T.must(@global_indices[i.variable]))
+              hw.write_all(ind)
+            when Instructions::GlobalSet
+              ind = LEB128.encode_unsigned(T.must(@global_indices[i.variable]))
+              hw.write_all(ind)
+            when Instructions::Call
+              ind = T.unsafe(@func_indices[i.func_name])
+              hw.write_all(LEB128.encode_unsigned(ind))
+            # TODO: fill in for globals, float consts, etc.
+            end
           end
 
           # CONSTANTS

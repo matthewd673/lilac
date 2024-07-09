@@ -1,1 +1,3 @@
-i32 a = 5i32
+func main() -> void
+  i32 a = 5i32
+end

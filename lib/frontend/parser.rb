@@ -88,18 +88,23 @@ module Lilac
       def parse_program
         program = IL::Program.new
 
-        # parse top level items (which include statements and other components)
+        # parse top level components
         until see?(TokenType::EOF)
-          if see?(TokenType::NewLine, TokenType::Type, TokenType::Label,
-                  TokenType::Jump, TokenType::JumpZero, TokenType::JumpNotZero,
-                  TokenType::Return, TokenType::VoidConst)
-            program.stmt_list.concat(parse_stmt_list)
+          # ignore newlines here
+          if see?(TokenType::NewLine)
+            eat(TokenType::NewLine)
+          # global def
+          elsif see?(TokenType::Global)
+            program.add_global(parse_global_def)
           # func def
           elsif see?(TokenType::Func)
             program.add_func(parse_func_def)
           # extern func def
           elsif see?(TokenType::Extern)
             program.add_extern_func(parse_extern_func_def)
+          else
+            raise "Unexpected token while parsing program components: "\
+                  "#{@next_token}"
           end
         end
 
@@ -282,9 +287,7 @@ module Lilac
           TokenType::IntConst,
           TokenType::FloatConst
         )
-          const_str = eat(TokenType::UIntConst, TokenType::IntConst,
-                          TokenType::FloatConst).image
-          return constant_from_string(const_str)
+          return(parse_constant)
         # void constant
         elsif see?(TokenType::VoidConst)
           eat(TokenType::VoidConst)
@@ -300,6 +303,43 @@ module Lilac
         end
 
         raise("Unexpected token while parsing value: #{@next_token}")
+      end
+
+      sig { returns(IL::Constant) }
+      def parse_constant
+        if see?(
+          TokenType::UIntConst,
+          TokenType::IntConst,
+          TokenType::FloatConst
+        )
+          const_str = eat(TokenType::UIntConst, TokenType::IntConst,
+                          TokenType::FloatConst).image
+          return constant_from_string(const_str)
+        end
+
+        raise("Unexpected token while parsing constant: #{@next_token}")
+      end
+
+      sig { returns(IL::GlobalDef) }
+      def parse_global_def
+        eat(TokenType::Global)
+
+        type_str = eat(TokenType::Type).image
+        type = type_from_string(type_str)
+
+        # eat global id (NOTE: globals should always be IDs and never Registers)
+        id_str = eat(TokenType::Name).image
+        id = id_from_string(id_str)
+
+        unless id.is_a?(IL::GlobalID)
+          raise "Expected GlobalID (beginning with '@')"
+        end
+
+        eat(TokenType::Assignment)
+
+        rhs = parse_constant # NOTE: always going to be a Constant
+
+        return IL::GlobalDef.new(type, id, rhs)
       end
 
       sig { returns(IL::FuncDef) }
@@ -446,18 +486,28 @@ module Lilac
         when "f64" then return IL::Types::F64.new
         end
 
-        raise("Invalid type string \"#{string}\"")
+        raise "Invalid type string \"#{string}\""
       end
 
       sig { params(string: String).returns(IL::ID) }
       def id_from_string(string)
-        IL::ID.new(string)
+        if string.start_with?("@") # global
+          return IL::GlobalID.new(T.must(string[1..]))
+        else # local
+          return IL::ID.new(string)
+        end
       end
 
       sig { params(string: String).returns(IL::Register) }
       def register_from_string(string)
-        number = T.unsafe(string[1..]).to_i
+        number = T.must(string[1..]).to_i # trim leading '%'
         IL::Register.new(number)
+      end
+
+      sig { params(string: String).returns(IL::GlobalID) }
+      def global_id_from_string(string)
+        name = T.unsafe(string[1..]) # trim leading '@'
+        IL::GlobalID.new(name)
       end
 
       sig { params(string: String).returns(IL::Constant) }

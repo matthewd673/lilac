@@ -70,7 +70,10 @@ class ToBBTest < Minitest::Test
   sig { params(il_file: String).returns(T::Array[IL::Statement]) }
   # NOTE: adapted from ToCFGTest::load_program_cfg
   def load_program_stmt_list(il_file)
-    Frontend::Parser.parse_file(il_file).stmt_list
+    program = Frontend::Parser.parse_file(il_file)
+    main = program.get_func("main")
+
+    T.must(main).stmt_list
   end
 
   sig { params(yaml_file: String).returns(CFG) }
