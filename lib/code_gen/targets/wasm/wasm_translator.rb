@@ -31,14 +31,21 @@ module Lilac
             @loop_ct = T.let(0, Integer)
             @block_ct = T.let(0, Integer)
 
-            @output_start_component = T.let(true, T::Boolean)
+            @start_function = T.let(nil, T.nilable(String))
 
             super(wasm_translator, cfg_program)
           end
 
-          sig { void }
-          def omit_start_component
-            @output_start_component = false
+          sig { params(func_name: String).void }
+          # Set the function that will be used as the entry point for the
+          # Wasm program. If no start function is set then the Wasm program
+          # will have no entry point (no Start component in module).
+          def set_start_function(func_name)
+            unless @program.get_func(func_name)
+              raise "Function '#{func_name}' does not exist in Program."
+            end
+
+            @start_function = func_name
           end
 
           sig { override.returns(Components::Module) }
@@ -54,16 +61,10 @@ module Lilac
             # translate all functions
             @program.each_func { |f| components.push(translate_func(f)) }
 
-            # translate instructions for main stmt_list
-            main_locals = find_locals(@program.cfg)
-            main_instructions = translate_instructions(@program.cfg)
-            main_instructions.push(Instructions::End.new) # always end with End
-            components.push(Components::Func.new("__lilac_main",
-                                                 [], # no params
-                                                 [], # no results
-                                                 main_locals,
-                                                 main_instructions))
-            components.push(Components::Start.new("__lilac_main"))
+            # add start component if a start function has been set
+            if @start_function
+              components.push(Components::Start.new(@start_function))
+            end
 
             Components::Module.new(components)
           end
