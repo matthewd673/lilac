@@ -97,9 +97,14 @@ module Lilac
               lambda { |t, o|
                 instructions = []
 
-                # recurse on rhs then push local set
+                # recurse on rhs then push local/global set
                 instructions.concat(t.transform(o.rhs))
-                instructions.push(Instructions::LocalSet.new(o.id.name))
+
+                if o.id.is_a?(IL::GlobalID)
+                  instructions.push(Instructions::GlobalSet.new(o.id.name))
+                else
+                  instructions.push(Instructions::LocalSet.new(o.id.name))
+                end
 
                 instructions
               },
@@ -411,7 +416,11 @@ module Lilac
             # VALUE RULES
             Pattern::IDWildcard.new =>
               lambda { |t, o|
-                [Instructions::LocalGet.new(o.name)]
+                if o.is_a?(IL::GlobalID)
+                  return [Instructions::GlobalGet.new(o.name)]
+                else
+                  return [Instructions::LocalGet.new(o.name)]
+                end
               },
             Pattern::IntegerConstantWildcard.new(
               Pattern::ConstantValueWildcard.new

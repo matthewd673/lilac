@@ -58,6 +58,11 @@ module Lilac
               components.push(translate_import(f))
             end
 
+            # translate all globals
+            @program.each_global do |g|
+              components.push(translate_global(g))
+            end
+
             # translate all functions
             @program.each_func { |f| components.push(translate_func(f)) }
 
@@ -92,6 +97,21 @@ module Lilac
                                    extern_funcdef.name,
                                    param_types,
                                    results)
+          end
+
+          sig { params(global_def: IL::GlobalDef).returns(Components::Global) }
+          def translate_global(global_def)
+            type = Instructions.to_wasm_type(global_def.type)
+            name = global_def.id.name
+            const = @transformer.transform(global_def.rhs)[0]
+
+            unless const.is_a?(Instructions::ConstInteger) ||
+                    const.is_a?(Instructions::ConstFloat)
+              raise "RHS of GlobalDef did not translate to a ConstInteger or "\
+                    "a ConstFloat"
+            end
+
+            Components::Global.new(type, name, const)
           end
 
           sig { params(cfg_funcdef: IL::CFGFuncDef).returns(Components::Func) }
