@@ -97,7 +97,7 @@ module Lilac
         puts("Function \"#{func_name}\" does not exist in program")
       end
 
-      blocks = Analysis::BB.from_stmt_list(func.stmt_list)
+      blocks = Analysis::BB.from_stmt_list(T.must(func).stmt_list)
       cfg = Analysis::CFG.new(blocks:)
       graphviz = Debugging::GraphVisualizer.generate_graphviz(cfg)
 
