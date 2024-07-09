@@ -22,6 +22,7 @@ module Lilac
         IL::Constant => ANSI::MAGENTA,
         IL::ID => ANSI::BLUE,
         IL::Register => ANSI::BLUE,
+        IL::GlobalID => ANSI::BLUE,
         IL::BinaryOp => ANSI::GREEN,
         IL::Label => ANSI::CYAN,
         IL::Jump => ANSI::RED,
@@ -127,6 +128,9 @@ module Lilac
         },
         IL::Register => lambda { |v, o, c|
           ANSI.fmt(o.name, color: PALETTE[IL::Register])
+        },
+        IL::GlobalID => lambda { |v, o, c|
+          ANSI.fmt("@#{o.name}", color: PALETTE[IL::GlobalID])
         },
         IL::BinaryOp => lambda { |v, o, c|
           "#{v.visit(o.left)} "\
