@@ -65,6 +65,14 @@ module Lilac
             "#{c}(func $#{o.func_name} #{import_str}#{params_str}#{result_str})"
           }, Visitor::Lambda)
 
+          VISIT_GLOBAL = T.let(lambda { |v, o, c|
+            type_str = o.type.to_s
+            if o.mutable
+              type_str = "(mut #{type_str})"
+            end
+            "#{c}(global $#{o.name} #{type_str} (#{v.visit(o.default_value)}))"
+          }, Visitor::Lambda)
+
           VISIT_FUNC = T.let(lambda { |v, o, c|
             # stringify export (if it has one)
             export_str = " ".dup
@@ -119,6 +127,7 @@ module Lilac
             Components::Import => VISIT_IMPORT,
             Components::Func => VISIT_FUNC,
             Components::Local => VISIT_LOCAL,
+            Components::Global => VISIT_GLOBAL,
             Components::Start => VISIT_START,
             Instruction => VISIT_INSTRUCTION,
           }.freeze, Visitor::LambdaHash)
