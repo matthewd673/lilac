@@ -134,7 +134,7 @@ module Lilac
             # to the main @writer and then concat the section writer's bytes.
             sw = HexWriter.new
             # num functions
-            sw.write_all(LEB128.encode_unsigned(@functions.length))
+            sw.write_all(LEB128.encode_unsigned(@sig_arr.length))
 
             # write all function signatures
             # LAYOUT: FUNC, num params, [param types], num results, [res. types]
