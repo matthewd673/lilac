@@ -4,6 +4,7 @@
 require "sorbet-runtime"
 require "minitest/autorun"
 require "yaml"
+require_relative "helpers/bb_parser"
 require_relative "helpers/cfg_facts_equality"
 require_relative "../lib/frontend/parser"
 require_relative "../lib/analysis/bb"
@@ -22,8 +23,10 @@ class LiveVarsTest < Minitest::Test
       program_filename = "test/programs/live_vars/#{p}.txt"
       expected_filename = "test/programs/live_vars/#{p}_expected.yml"
 
-      program_cfg = load_program_cfg(program_filename)
-      live_vars = LiveVars.new(program_cfg)
+      blocks = load_blocks(program_filename)
+      cfg = CFG.new(blocks:)
+
+      live_vars = LiveVars.new(cfg)
       program_facts = live_vars.run
 
       expected = load_cfgfacts_yml(expected_filename)
@@ -34,10 +37,10 @@ class LiveVarsTest < Minitest::Test
 
   private
 
-  sig { params(il_file: String).returns(CFG) }
-  def load_program_cfg(il_file)
-    program = Frontend::Parser.parse_file(il_file)
-    CFG.new(blocks: BB.from_stmt_list(program.stmt_list))
+  sig { params(ilbb_file: String).returns(T::Array[BB]) }
+  def load_blocks(ilbb_file)
+    parser = BBParser.new(File.open(ilbb_file, "r").read)
+    parser.parse
   end
 
   sig { params(yml_file: String).returns(T::Array[T::Hash[String, T.untyped]]) }
