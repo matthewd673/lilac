@@ -1,4 +1,4 @@
 func main() -> void
   L1:
-  jz 0 L1
+  jz 0i32 L1
 end

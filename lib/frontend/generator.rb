@@ -58,7 +58,7 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_ID = T.let(lambda { |v, o, c|
-        o.name
+        "$#{o.name}"
       }, Visitor::Lambda)
 
       VISIT_REGISTER = T.let(lambda { |v, o, c|

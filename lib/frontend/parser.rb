@@ -136,8 +136,8 @@ module Lilac
           type_str = eat(TokenType::Type).image
           type = type_from_string(type_str)
 
-          if see?(TokenType::Name)
-            id_str = eat(TokenType::Name).image
+          if see?(TokenType::ID, TokenType::GlobalID)
+            id_str = eat(TokenType::ID, TokenType::GlobalID).image
             id = id_from_string(id_str)
           elsif see?(TokenType::Register)
             register_str = eat(TokenType::Register).image
@@ -201,7 +201,8 @@ module Lilac
           TokenType::UIntConst,
           TokenType::IntConst,
           TokenType::FloatConst,
-          TokenType::Name,
+          TokenType::ID,
+          TokenType::GlobalID,
           TokenType::Register
         )
           val_l = parse_value
@@ -293,8 +294,8 @@ module Lilac
           eat(TokenType::VoidConst)
           return IL::Constant.new(IL::Types::Void.new, nil)
         # id
-        elsif see?(TokenType::Name)
-          id_str = eat(TokenType::Name).image
+        elsif see?(TokenType::ID, TokenType::GlobalID)
+          id_str = eat(TokenType::ID, TokenType::GlobalID).image
           return id_from_string(id_str)
         # register
         elsif see?(TokenType::Register)
@@ -327,8 +328,8 @@ module Lilac
         type_str = eat(TokenType::Type).image
         type = type_from_string(type_str)
 
-        # eat global id (NOTE: globals should always be IDs and never Registers)
-        id_str = eat(TokenType::Name).image
+        # eat global id
+        id_str = eat(TokenType::GlobalID).image
         id = id_from_string(id_str)
 
         unless id.is_a?(IL::GlobalID)
@@ -400,7 +401,7 @@ module Lilac
         type_str = eat(TokenType::Type).image
         type = type_from_string(type_str)
 
-        id_str = eat(TokenType::Name).image
+        id_str = eat(TokenType::ID).image
         id = id_from_string(id_str)
 
         param_list.push(IL::FuncParam.new(type, id))
@@ -451,8 +452,8 @@ module Lilac
       sig { params(id_list: T::Array[IL::ID]).void }
       def parse_id_list(id_list)
         id = nil
-        if see?(TokenType::Name)
-          id = id_from_string(eat(TokenType::Name).image)
+        if see?(TokenType::ID, TokenType::GlobalID)
+          id = id_from_string(eat(TokenType::ID, TokenType::GlobalID).image)
         elsif see?(TokenType::Register)
           id = register_from_string(eat(TokenType::Register).image)
         end
@@ -493,8 +494,8 @@ module Lilac
       def id_from_string(string)
         if string.start_with?("@") # global
           return IL::GlobalID.new(T.must(string[1..]))
-        else # local
-          return IL::ID.new(string)
+        elsif string.start_with?("$") # local
+          return IL::ID.new(T.must(string[1..]))
         end
       end
 
