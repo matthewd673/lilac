@@ -52,6 +52,6 @@ class LiveVarsTest < Minitest::Test
     YAML.load(yml_contents)
   end
 
-  PROGRAMS = T.let(%w[one_block].freeze, T::Array[String])
+  PROGRAMS = T.let(%w[one_block book92].freeze, T::Array[String])
   private_constant :PROGRAMS
 end

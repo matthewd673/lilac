@@ -1,0 +1,35 @@
+[BB_00]
+i32 $i = 1i32
+
+[BB_01 ENTRY=[L0:] EXIT=[jnz %0 L1]]
+i32 $a = 2i32
+i32 $c = 3i32
+i32 %0 = $a < $c
+
+[BB_02]
+i32 $b = 4i32
+i32 $c = 5i32
+i32 $d = 6i32
+
+[BB_03 ENTRY=[L3:] EXIT=[jz %1 L0]]
+i32 $y = $a + $b
+i32 $z = $c + $d
+i32 $i = $i + 1i32
+i32 %1 = $i <= 100i32
+
+[BB_04]
+ret void
+
+[BB_05 ENTRY=[L1:] EXIT=[jnz %2 L2]]
+i32 $a = 7i32
+i32 $d = 8i32
+i32 %2 = $a <= $d
+
+[BB_06]
+i32 $d = 9i32
+
+[BB_07 ENTRY=[L4:] EXIT=[jmp L3]]
+i32 $b = 10i32
+
+[BB_08 ENTRY=[L2:] EXIT=[jmp L4]]
+i32 $c = 11i32
