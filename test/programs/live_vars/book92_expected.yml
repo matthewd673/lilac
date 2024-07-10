@@ -10,6 +10,7 @@
   KILL:
     - a
     - c
+    - "%0" # not in book
 - id: BB_02
   GEN: []
   KILL:
@@ -27,6 +28,7 @@
     - y
     - z
     - i
+    - "%1" # not in book
 - id: BB_04
   GEN: []
   KILL: []
@@ -35,6 +37,7 @@
   KILL:
     - a
     - d
+    - "%2" # not in book
 - id: BB_06
   GEN: []
   KILL:
