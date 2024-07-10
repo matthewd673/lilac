@@ -38,12 +38,14 @@ module CFGFactsEquality
                  actual.cfg.nodes_length,
                  message { "Number of blocks differ in CFGFacts" })
 
-    i = 0
     actual.cfg.each_node do |n|
-      facts = T.unsafe(expected[i])
-      refute_equal(facts, nil)
-
-      expected_id = facts["id"]
+      # select the block with the same ID from the expected YAML
+      facts = T.unsafe(expected.select { |e| e["id"] == n.id }[0])
+      refute_equal(
+        facts,
+        nil,
+        message { "Failed to select expected facts for ID #{n.id}" }
+      )
 
       facts.each_key do |k|
         next if k == "id" # id is not a fact set
@@ -56,7 +58,8 @@ module CFGFactsEquality
         assert_equal(expected_fact.length,
                      actual_fact.length,
                      message do
-                       "Number of items in fact #{k} differ for #{expected_id}"
+                       "Number of items in fact #{k} differ for #{n.id}. "\
+                       "Actual #{k} for #{n.id}: #{actual_fact}"
                      end)
 
         actual_fact.each do |e|
@@ -64,12 +67,10 @@ module CFGFactsEquality
                           e.to_s,
                           message do
                             "Item #{e} does not appear in expected set for "\
-                            "block #{expected_id}"
+                            "block #{n.id}"
                           end)
         end
       end
-
-      i += 1
     end
   end
 end
