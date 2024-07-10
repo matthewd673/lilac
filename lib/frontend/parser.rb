@@ -54,6 +54,18 @@ module Lilac
         parse_program
       end
 
+      sig { returns(T::Array[IL::Statement]) }
+      # Parse a single statement from the Parser's string.
+      #
+      # @return [T::Array[IL::Statement]] The statement represented by the
+      # IL source code string. In the event that the provided string is empty
+      # the array will be empty. Otherwise, there will be exactly one item
+      # in the array.
+      def parse_statement
+        @next_token = @scanner.scan_next
+        parse_stmt
+      end
+
       private
 
       sig { params(types: TokenType).returns(T::Boolean) }
