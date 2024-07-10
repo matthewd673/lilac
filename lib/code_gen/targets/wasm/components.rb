@@ -89,7 +89,7 @@ module Lilac
           end
 
           # Represents a named +local+ value (including func parameters).
-          class Local
+          class Local < WasmComponent
             extend T::Sig
 
             include CodeGen::Targets::Wasm
@@ -104,6 +104,44 @@ module Lilac
             def initialize(type, name)
               @type = type
               @name = name
+            end
+          end
+
+          # Represents a named +global+ value.
+          class Global < WasmComponent
+            extend T::Sig
+
+            include CodeGen::Targets::Wasm
+
+            sig { returns(Type) }
+            attr_reader :type
+
+            sig { returns(String) }
+            attr_reader :name
+
+            sig do
+              returns(
+                T.any(Instructions::ConstInteger, Instructions::ConstFloat)
+              )
+            end
+            attr_reader :default_value
+
+            sig { returns(T::Boolean) }
+            attr_reader :mutable
+
+            sig do
+              params(type: Type,
+                     name: String,
+                     default_value: T.any(Instructions::ConstInteger,
+                                          Instructions::ConstFloat),
+                     mutable: T::Boolean)
+                .void
+            end
+            def initialize(type, name, default_value, mutable: false)
+              @type = type
+              @name = name
+              @default_value = default_value
+              @mutable = mutable
             end
           end
 

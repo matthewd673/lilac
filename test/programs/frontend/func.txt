@@ -1,6 +1,8 @@
-func multiply(i32 a, i32 b) -> i32
-  i32 %0 = a * b
+func multiply(i32 $a, i32 $b) -> i32
+  i32 %0 = $a * $b
   ret %0
 end
 
-i32 ans = call multiply(3i32, 5i32)
+func main() -> void
+  i32 $ans = call multiply(3i32, 5i32)
+end

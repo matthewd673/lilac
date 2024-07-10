@@ -48,6 +48,20 @@ module Lilac
             def wat
               "#{@type.to_s}.const #{@value}"
             end
+
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @type, @value].hash
+            end
+
+            sig { override.params(other: T.untyped).returns(T::Boolean) }
+            def eql?(other)
+              if other.class != self.class
+                return false
+              end
+
+              @type.eql?(other.type) && @value.eql?(other.value)
+            end
           end
 
           # Represents the +f32.const+ and +f64.const+ instructions.
@@ -78,6 +92,20 @@ module Lilac
             sig { override.returns(String) }
             def wat
               "#{@type.to_s}.const #{@value}"
+            end
+
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @type, @value].hash
+            end
+
+            sig { override.params(other: T.untyped).returns(T::Boolean) }
+            def eql?(other)
+              if other.class != self.class
+                return false
+              end
+
+              @type.eql?(other.type) && @value.eql?(other.value)
             end
           end
 
@@ -578,8 +606,6 @@ module Lilac
           # Represents the +memory.grow+ instruction.
           # Increase the size of a memory by some number of pages.
           class Grow < MemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x40
@@ -594,8 +620,6 @@ module Lilac
           # Represents the +memory.size+ instruction.
           # Get the number of pages in a memory.
           class Size < MemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x3f
@@ -610,8 +634,6 @@ module Lilac
           # Represents the +load+ instructions.
           # Load a number from a memory.
           class Load < TypedMemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               case @type
@@ -630,8 +652,6 @@ module Lilac
 
           # Represents the +load8_s+ instructions.
           class Load8S < IntegerMemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               case @type
@@ -648,8 +668,6 @@ module Lilac
 
           # Represents the +load8_u+ instructions.
           class Load8U < IntegerMemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               case @type
@@ -666,8 +684,6 @@ module Lilac
 
           # Represents the +load16_s+ instructions.
           class Load16S < IntegerMemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               case @type
@@ -684,8 +700,6 @@ module Lilac
 
           # Represents the +load16_u+ instructions.
           class Load16U < IntegerMemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               case @type
@@ -702,8 +716,6 @@ module Lilac
 
           # Represents the +i64.load32_s+ instruction.
           class Load32S < MemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x34
@@ -717,8 +729,6 @@ module Lilac
 
           # Represents the +i64.load32_u+ instruction.
           class Load32U < MemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x35
@@ -733,8 +743,6 @@ module Lilac
           # Represents the +store+ instructions.
           # Store a number at an offset in a memory.
           class Store < TypedMemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               case @type
@@ -753,8 +761,6 @@ module Lilac
 
           # Represents the +store8+ instructions.
           class Store8 < IntegerMemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               case @type
@@ -771,8 +777,6 @@ module Lilac
 
           # Represents the +store16+ instructions.
           class Store16 < IntegerMemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               case @type
@@ -789,8 +793,6 @@ module Lilac
 
           # Represents the +i64.store32+ instruction.
           class Store32 < MemoryInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x3e
@@ -811,8 +813,6 @@ module Lilac
           # Represents the +block+ instruction.
           # Create a label that can be branched out of.
           class Block < LabelInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x02
@@ -827,8 +827,6 @@ module Lilac
           # Represents the +br+ instruction.
           # Branch to a loop or block.
           class Branch < LabelInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x0c
@@ -843,8 +841,6 @@ module Lilac
           # Represents the +br_if+ instruction.
           # Conditional branch to a loop or block.
           class BranchIf < LabelInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x0d
@@ -859,8 +855,6 @@ module Lilac
           # Represents the +call+ instruction.
           # Call a function.
           class Call < WasmInstruction
-            extend T::Sig
-
             sig { returns(String) }
             attr_reader :func_name
 
@@ -879,6 +873,11 @@ module Lilac
               "call $#{@func_name}"
             end
 
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @func_name].hash
+            end
+
             sig { override.params(other: T.untyped).returns(T::Boolean) }
             def eql?(other)
               if other.class != Call
@@ -892,8 +891,6 @@ module Lilac
           # Represents the +end+ instruction.
           # Mark the end of a +block+, +if+, +loop+, etc.
           class End < WasmInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x0b
@@ -902,6 +899,11 @@ module Lilac
             sig { override.returns(String) }
             def wat
               "end"
+            end
+
+            sig { override.returns(Integer) }
+            def hash
+              self.class.hash
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -913,8 +915,6 @@ module Lilac
           # Represents the +if+ instruction.
           # Execute a statement if the last item on the stack is true.
           class If < WasmInstruction
-            extend T::Sig
-
             sig { returns(T.nilable(Else)) }
             attr_accessor :else_branch
 
@@ -933,9 +933,18 @@ module Lilac
               "if"
             end
 
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @else_branch].hash
+            end
+
             sig { override.params(other: T.untyped).returns(T::Boolean) }
             def eql?(other)
-              other.class == If
+              unless other.class == If
+                return false
+              end
+
+              @else_branch.eql?(other.else_branch)
             end
           end
 
@@ -943,8 +952,6 @@ module Lilac
           # Can be used with the +if+ instruction to execute a statement if the
           # last item on the stack is false.
           class Else < WasmInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x05
@@ -953,6 +960,11 @@ module Lilac
             sig { override.returns(String) }
             def wat
               "else"
+            end
+
+            sig { override.returns(Integer) }
+            def hash
+              self.class.hash
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -964,8 +976,6 @@ module Lilac
           # Represents the +loop+ instruction.
           # Create a label which can be branched to.
           class Loop < LabelInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x03
@@ -980,8 +990,6 @@ module Lilac
           # Represents the +return+ instruction.
           # Return from a function.
           class Return < WasmInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x0f
@@ -990,6 +998,11 @@ module Lilac
             sig { override.returns(String) }
             def wat
               "return"
+            end
+
+            sig { override.returns(Integer) }
+            def hash
+              self.class.hash
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -1001,8 +1014,6 @@ module Lilac
           # Represents +0x40+, the type of an empty block.
           # https://webassembly.github.io/spec/core/binary/instructions.html#control-instructions
           class EmptyType < WasmInstruction
-            extend T::Sig
-
             sig { override.returns(Integer) }
             def opcode
               0x40
@@ -1011,6 +1022,11 @@ module Lilac
             sig { override.returns(String) }
             def wat
               "nop"
+            end
+
+            sig { override.returns(Integer)}
+            def hash
+              self.class.hash
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }

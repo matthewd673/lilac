@@ -276,7 +276,7 @@ module Lilac
           "##{@number}"
         end
 
-        sig { returns(Integer) }
+        sig { override.returns(Integer) }
         def hash
           [self.class, @number].hash
         end

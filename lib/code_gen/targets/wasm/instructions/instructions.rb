@@ -84,9 +84,6 @@ module Lilac
 
             sig { abstract.returns(String) }
             def wat; end
-
-            sig { abstract.params(other: T.untyped).returns(T::Boolean) }
-            def eql?(other); end
           end
 
           # A Wasm instruction with a type (e.g.: +add+).
@@ -104,6 +101,11 @@ module Lilac
             sig { params(type: Type).void }
             def initialize(type)
               @type = type
+            end
+
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @type].hash
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -134,6 +136,11 @@ module Lilac
               @type = type
             end
 
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @type].hash
+            end
+
             sig { override.params(other: T.untyped).returns(T::Boolean) }
             def eql?(other)
               if other.class != self.class
@@ -162,6 +169,11 @@ module Lilac
               @type = type
             end
 
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @type].hash
+            end
+
             sig { override.params(other: T.untyped).returns(T::Boolean) }
             def eql?(other)
               if other.class != self.class
@@ -186,6 +198,11 @@ module Lilac
             sig { params(variable: String).void }
             def initialize(variable)
               @variable = variable
+            end
+
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @variable].hash
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -213,6 +230,11 @@ module Lilac
               @label = label
             end
 
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @label].hash
+            end
+
             sig { override.params(other: T.untyped).returns(T::Boolean) }
             def eql?(other)
               if other.class != self.class
@@ -237,6 +259,11 @@ module Lilac
             sig { params(memory: T.nilable(String)).void }
             def initialize(memory)
               @memory = memory
+            end
+
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @memory].hash
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -267,6 +294,11 @@ module Lilac
             def initialize(type, memory)
               @type = type
               @memory = memory
+            end
+
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @type, @memory].hash
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }
@@ -301,6 +333,11 @@ module Lilac
             def initialize(type, memory)
               @type = type
               @memory = memory
+            end
+
+            sig { override.returns(Integer) }
+            def hash
+              [self.class, @type, @memory].hash
             end
 
             sig { override.params(other: T.untyped).returns(T::Boolean) }

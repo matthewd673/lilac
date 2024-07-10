@@ -1,0 +1,8 @@
+global i32 @a = 2i32
+global i32 @b = 0i32
+
+func main() -> void
+  i32 $a = 3i32
+  i32 %0 = $a + @a
+  i32 @b = %0
+end

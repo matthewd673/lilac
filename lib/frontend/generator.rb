@@ -32,15 +32,16 @@ module Lilac
       def generate
         output = ""
 
+        @program.each_global do |g|
+          output += @visitor.visit(g)
+        end
+
         @program.each_extern_func do |f|
           output += @visitor.visit(f)
         end
 
         @program.each_func do |f|
           output += @visitor.visit(f)
-        end
-        @program.stmt_list.each do |s|
-          output += "#{@visitor.visit(s)}\n"
         end
 
         output
@@ -57,11 +58,15 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_ID = T.let(lambda { |v, o, c|
-        "#{o.name}##{o.number}"
+        "$#{o.name}"
       }, Visitor::Lambda)
 
       VISIT_REGISTER = T.let(lambda { |v, o, c|
         "%#{o.number}"
+      }, Visitor::Lambda)
+
+      VISIT_GLOBALID = T.let(lambda { |v, o, c|
+        "@#{o.name}"
       }, Visitor::Lambda)
 
       VISIT_BINARYOP = T.let(lambda  { |v, o, c|
@@ -73,9 +78,9 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_PHI = T.let(lambda { |v, o, c|
-        val_str = ""
-        o.each_value do |val|
-          val_str += "#{v.visit(val)}, "
+        val_str = "".dup
+        o.ids.each do |id|
+          val_str += "#{v.visit(id)}, "
         end
         val_str.chomp!(", ")
 
@@ -138,12 +143,12 @@ module Lilac
         "void #{v.visit(o.call)}#{annotation}"
       }, Visitor::Lambda)
 
-      VISIT_FUNCPARAM = T.let(lambda { |v, o, c|
-        "#{v.visit(o.type)} #{v.visit(o.id)}"
+      VISIT_GLOBALDEF = T.let(lambda { |v, o, c|
+        "global #{v.visit(o.type)} #{v.visit(o.id)} = #{v.visit(o.rhs)}"
       }, Visitor::Lambda)
 
       VISIT_FUNCDEF = T.let(lambda { |v, o, c|
-        param_str = ""
+        param_str = "".dup
         o.params.each do |p|
           param_str += "#{v.visit(p)}, "
         end
@@ -158,6 +163,10 @@ module Lilac
         "#{stmt_str}\nend\n"
       }, Visitor::Lambda)
 
+      VISIT_FUNCPARAM = T.let(lambda { |v, o, c|
+        "#{v.visit(o.type)} #{v.visit(o.id)}"
+      }, Visitor::Lambda)
+
       VISIT_EXTERNFUNCDEF = T.let(lambda { |v, o, c|
         param_type_str = ""
         o.param_types.each do |t|
@@ -170,7 +179,7 @@ module Lilac
       }, Visitor::Lambda)
 
       VISIT_CALL = T.let(lambda { |v, o, c|
-        arg_str = ""
+        arg_str = "".dup
         o.args.each do |a|
           arg_str += "#{v.visit(a)}, "
         end
@@ -189,11 +198,16 @@ module Lilac
         "extern call #{o.func_source} #{o.func_name} (#{arg_str})"
       }, Visitor::Lambda)
 
+      VISIT_INLINEASSEMBLY = T.let(lambda { |v, o, c|
+        "asm #{o.gen_format} `#{o.code}`"
+      }, Visitor::Lambda)
+
       VISIT_LAMBDAS = T.let({
-        IL::Types => VISIT_TYPE,
+        IL::Types::Type => VISIT_TYPE,
         IL::Constant => VISIT_CONSTANT,
         IL::ID => VISIT_ID,
         IL::Register => VISIT_REGISTER,
+        IL::GlobalID => VISIT_GLOBALID,
         IL::BinaryOp => VISIT_BINARYOP,
         IL::UnaryOp => VISIT_UNARYOP,
         IL::Phi => VISIT_PHI,
@@ -204,8 +218,9 @@ module Lilac
         IL::JumpNotZero => VISIT_JUMPNOTZERO,
         IL::Return => VISIT_RETURN,
         IL::VoidCall => VISIT_VOIDCALL,
-        IL::FuncParam => VISIT_FUNCPARAM,
+        IL::GlobalDef => VISIT_GLOBALDEF,
         IL::FuncDef => VISIT_FUNCDEF,
+        IL::FuncParam => VISIT_FUNCPARAM,
         IL::ExternFuncDef => VISIT_EXTERNFUNCDEF,
         IL::Call => VISIT_CALL,
         IL::ExternCall => VISIT_EXTERNCALL,

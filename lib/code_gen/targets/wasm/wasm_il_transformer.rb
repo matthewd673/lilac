@@ -87,14 +87,24 @@ module Lilac
 
           RULES = T.let({
             # STATEMENT RULES
+            # inline instruction
+            Pattern::InlineInstructionWildcard.new =>
+              lambda { |t, o|
+                o.instruction # very easy
+              },
             # definition
             Pattern::DefinitionWildcard.new(Pattern::RhsWildcard.new) =>
               lambda { |t, o|
                 instructions = []
 
-                # recurse on rhs then push local set
+                # recurse on rhs then push local/global set
                 instructions.concat(t.transform(o.rhs))
-                instructions.push(Instructions::LocalSet.new(o.id.name))
+
+                if o.id.is_a?(IL::GlobalID)
+                  instructions.push(Instructions::GlobalSet.new(o.id.name))
+                else
+                  instructions.push(Instructions::LocalSet.new(o.id.name))
+                end
 
                 instructions
               },
@@ -163,13 +173,13 @@ module Lilac
 
                 # choose between div_s, div_u, and div
                 div = nil
-                if il_type.signed?
+                if il_type.is_a?(IL::Types::SignedType)
                   type = Instructions.to_integer_type(il_type)
                   div = Instructions::DivideSigned.new(type)
-                elsif il_type.unsigned?
+                elsif il_type.is_a?(IL::Types::UnsignedType)
                   type = Instructions.to_integer_type(il_type)
                   div = Instructions::DivideUnsigned.new(type)
-                elsif il_type.float?
+                elsif il_type.is_a?(IL::Types::FloatType)
                   type = Instructions.to_float_type(il_type)
                   div = Instructions::Divide.new(type)
                 end
@@ -261,13 +271,13 @@ module Lilac
 
                 # choose between gt_s, gt_u, and gt
                 gt = nil
-                if il_type.signed?
+                if il_type.is_a?(IL::Types::SignedType)
                   type = Instructions.to_integer_type(il_type)
                   gt = Instructions::GreaterThanSigned.new(type)
-                elsif il_type.unsigned?
+                elsif il_type.is_a?(IL::Types::UnsignedType)
                   type = Instructions.to_integer_type(il_type)
                   gt = Instructions::GreaterThanUnsigned.new(type)
-                elsif il_type.float?
+                elsif il_type.is_a?(IL::Types::FloatType)
                   type = Instructions.to_float_type(il_type)
                   gt = Instructions::GreaterThan.new(type)
                 end
@@ -291,13 +301,13 @@ module Lilac
 
                 # choose between lt_s, lt_u, and lt
                 lt = nil
-                if il_type.signed?
+                if il_type.is_a?(IL::Types::SignedType)
                   type = Instructions.to_integer_type(il_type)
                   lt = Instructions::LessThanSigned.new(type)
-                elsif il_type.unsigned?
+                elsif il_type.is_a?(IL::Types::UnsignedType)
                   type = Instructions.to_integer_type(il_type)
                   lt = Instructions::LessThanUnsigned.new(type)
-                elsif il_type.float?
+                elsif il_type.is_a?(IL::Types::FloatType)
                   type = Instructions.to_float_type(il_type)
                   lt = Instructions::LessThan.new(type)
                 end
@@ -321,13 +331,13 @@ module Lilac
 
                 # choose between ge_s, ge_u, and ge
                 ge = nil
-                if il_type.signed?
+                if il_type.is_a?(IL::Types::SignedType)
                   type = Instructions.to_integer_type(il_type)
                   ge = Instructions::GreaterOrEqualSigned.new(type)
-                elsif il_type.unsigned?
+                elsif il_type.is_a?(IL::Types::UnsignedType)
                   type = Instructions.to_integer_type(il_type)
                   ge = Instructions::GreaterOrEqualUnsigned.new(type)
-                elsif il_type.float?
+                elsif il_type.is_a?(IL::Types::FloatType)
                   type = Instructions.to_float_type(il_type)
                   ge = Instructions::GreaterOrEqual.new(type)
                 end
@@ -351,13 +361,13 @@ module Lilac
 
                 # choose between le_s, le_u, and le
                 le = nil
-                if il_type.signed?
+                if il_type.is_a?(IL::Types::IntegerType)
                   type = Instructions.to_integer_type(il_type)
                   le = Instructions::LessOrEqualSigned.new(type)
-                elsif il_type.unsigned?
+                elsif il_type.is_a?(IL::Types::UnsignedType)
                   type = Instructions.to_integer_type(il_type)
                   le = Instructions::LessOrEqualUnsigned.new(type)
-                elsif il_type.float?
+                elsif il_type.is_a?(IL::Types::FloatType)
                   type = Instructions.to_float_type(il_type)
                   le = Instructions::LessOrEqual.new(type)
                 end
@@ -406,7 +416,11 @@ module Lilac
             # VALUE RULES
             Pattern::IDWildcard.new =>
               lambda { |t, o|
-                [Instructions::LocalGet.new(o.name)]
+                if o.is_a?(IL::GlobalID)
+                  return [Instructions::GlobalGet.new(o.name)]
+                else
+                  return [Instructions::LocalGet.new(o.name)]
+                end
               },
             Pattern::IntegerConstantWildcard.new(
               Pattern::ConstantValueWildcard.new

@@ -30,6 +30,8 @@ module Lilac
         JumpNotZero = new("JumpNotZero")
         Return = new("Return")
         Func = new("Func")
+        ID = new("ID")
+        GlobalID = new("GlobalID")
         Name = new("Name")
         End = new("End")
         LeftParen = new("LeftParen")
@@ -38,6 +40,7 @@ module Lilac
         Call = new("Call")
         Comma = new("Comma")
         Extern = new("Extern")
+        Global = new("Global")
 
         # special tokens
         NewLine = new("NewLine")
@@ -139,6 +142,7 @@ module Lilac
       TokenDef.new(TokenType::Call, /call/),
       TokenDef.new(TokenType::Comma, /,/),
       TokenDef.new(TokenType::Extern, /extern/),
+      TokenDef.new(TokenType::Global, /global/),
 
       # other
       TokenDef.new(TokenType::VoidConst, /void/),
@@ -152,7 +156,9 @@ module Lilac
       TokenDef.new(TokenType::Label, /[\w!@$^&\[\];'.?<>]+:/),
 
       # NOTE: anything goes for ID and Func names, this is just a nice subset
-      TokenDef.new(TokenType::Name, /[\w!@$^&\[\];'.?<>]+/),
+      TokenDef.new(TokenType::ID, /\$[a-zA-Z0-9_.]+/),
+      TokenDef.new(TokenType::GlobalID, /@[a-zA-Z0-9_.]+/),
+      TokenDef.new(TokenType::Name, /[a-zA-Z_.][a-zA-Z_.0-9]+/),
 
       # NOTE: TokenType::NewLine and ::EOF are special and don't need a TokenDef
     ].freeze, T::Array[TokenDef])

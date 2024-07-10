@@ -1,3 +1,5 @@
-L0:
-i32 a = 3i32
-jmp L0
+func main() -> void
+  L0:
+  i32 $a = 3i32
+  jmp L0
+end

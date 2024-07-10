@@ -77,6 +77,8 @@ module Lilac
         # Statement wildcards
         when Pattern::DefinitionWildcard
           return object.is_a?(IL::Definition) && matches?(rule.rhs, object.rhs)
+        when Pattern::InlineInstructionWildcard
+          return object.is_a?(IL::InlineInstruction)
         when Pattern::StatementWildcard
           return object.is_a?(IL::Statement)
         # Right-hand side wildcard
