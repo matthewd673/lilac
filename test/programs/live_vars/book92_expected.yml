@@ -1,0 +1,55 @@
+- id: ENTRY
+  GEN: []
+  KILL: []
+- id: BB_00
+  GEN: []
+  KILL:
+    - i
+- id: BB_01
+  GEN: []
+  KILL:
+    - a
+    - c
+    - "%0" # not in book
+- id: BB_02
+  GEN: []
+  KILL:
+    - b
+    - c
+    - d
+- id: BB_03
+  GEN:
+    - a
+    - b
+    - c
+    - d
+    - i
+  KILL:
+    - y
+    - z
+    - i
+    - "%1" # not in book
+- id: BB_04
+  GEN: []
+  KILL: []
+- id: BB_05
+  GEN: []
+  KILL:
+    - a
+    - d
+    - "%2" # not in book
+- id: BB_06
+  GEN: []
+  KILL:
+    - d
+- id: BB_07
+  GEN: []
+  KILL:
+    - b
+- id: BB_08
+  GEN: []
+  KILL:
+    - c
+- id: EXIT
+  GEN: []
+  KILL: []

@@ -1,13 +1,13 @@
 extern func console log (f64) -> void
 
-func divide (f64 a, f64 b) -> f64
-  f64 %0 = a / b
+func divide (f64 $a, f64 $b) -> f64
+  f64 %0 = $a / $b
   ret %0
 end
 
 func main () -> void
   i32 %1 = call divide (6.0f64, 3.3f64)
-  f64 ans = %1
-  void extern call console log (ans)
+  f64 $ans = %1
+  void extern call console log ($ans)
   ret void
 end

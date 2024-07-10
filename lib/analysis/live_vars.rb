@@ -13,8 +13,8 @@ module Lilac
       extend T::Sig
       extend T::Generic
 
-      # Domain = variable names
-      Domain = type_member { { fixed: String } }
+      # Domain = ids
+      Domain = type_member { { fixed: IL::ID } }
 
       sig { params(cfg: CFG).void }
       def initialize(cfg)
@@ -59,44 +59,52 @@ module Lilac
       sig { params(b: BB).void }
       def init_sets(b)
         # initialize gen and kill sets
-        @gen[b] = Set[]
-        @kill[b] = Set[]
+        # adapted from Figure 8.14 in Cooper & Torczon 2nd edition
+        @gen[b] = Set[] # UEVar
+        @kill[b] = Set[] # VarKill
 
-        b.stmt_list.each do |s|
+        # we want to examine not only the block stmt list but also its exit
+        exit_arr = b.exit ? [b.exit] : []
+        examined_stmts = b.stmt_list + exit_arr
+
+        examined_stmts.each do |s|
           unless s.is_a?(IL::Definition)
             next
           end
 
-          # find vars that may be upwardly exposed by the stmt
-          # add these to the GEN set
-          ue = find_vars(s)
-          ue.each do |var|
-            b_kill = T.unsafe(@kill[b])
-            unless b_kill.include?(var)
-              T.unsafe(@gen[b]).add(var)
+          # add all ids on the rhs to GEN unless they're already in KILL
+          rhs_vars = find_rhs_vars(s)
+          rhs_vars.each do |v|
+            unless @kill[b].include?(v)
+              @gen[b].add(v)
             end
           end
 
-          # add lhs to KILL set
-          T.unsafe(@kill[b]).add(s.id)
+          # add the id being defined into KILL
+          @kill[b].add(s.id)
         end
       end
 
       sig do
         params(node: T.any(IL::Statement, IL::Expression, IL::Value))
-          .returns(T::Set[String])
+          .returns(T::Set[IL::ID])
       end
-      def find_vars(node)
+      def find_rhs_vars(node)
         case node
         when IL::Definition
-          return find_vars(node.rhs)
+          return find_rhs_vars(node.rhs)
         when IL::BinaryOp
-          return find_vars(node.left) | find_vars(node.right)
+          return find_rhs_vars(node.left) | find_rhs_vars(node.right)
         when IL::UnaryOp
-          return find_vars(node.value)
+          return find_rhs_vars(node.value)
         when IL::ID
-          return Set[node.name]
+          return Set[node]
+        when IL::JumpZero
+          return find_rhs_vars(node.cond)
+        when IL::JumpNotZero
+          return find_rhs_vars(node.cond)
           # TODO: will someday need a case for function calls
+          # TODO: support Phi functions?
         end
 
         Set[] # base case: empty set -- no variables found

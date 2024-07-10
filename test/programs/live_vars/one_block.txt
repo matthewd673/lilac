@@ -1,3 +1,2 @@
-func main() -> void
-  i32 a = 2i32
-end
+[BB_00]
+i32 $a = 2i32

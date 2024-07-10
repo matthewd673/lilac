@@ -1,7 +1,7 @@
 func main() -> void
-  i32 b = 10i32
-  i32 c = 10i32
-  i32 a = 20i32
-  i32 d = 10i32
-  i32 e = 20i32
+  i32 $b = 10i32
+  i32 $c = 10i32
+  i32 $a = 20i32
+  i32 $d = 10i32
+  i32 $e = 20i32
 end

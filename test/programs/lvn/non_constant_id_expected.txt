@@ -1,9 +1,9 @@
 func main() -> void
-  i32 a = 1i32
-  i32 a = 5i32
-  i32 b = 10i32
-  i32 a = 3i32
-  i32 c = 6i32
-  i32 a = e
-  i32 d = e * 2i32
+  i32 $a = 1i32
+  i32 $a = 5i32
+  i32 $b = 10i32
+  i32 $a = 3i32
+  i32 $c = 6i32
+  i32 $a = $e
+  i32 $d = $e * 2i32
 end
