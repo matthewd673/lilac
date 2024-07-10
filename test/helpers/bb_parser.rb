@@ -30,13 +30,13 @@ class BBParser
         # add entry if specified
         if m[3]
           entry_parser = Frontend::Parser.new(m[3])
-          block_entry = T.must(entry_parser.parse[0])
+          block_entry = T.must(entry_parser.parse_statement[0])
         end
 
         # add exit if specified
         if m[5]
           exit_parser = Frontend::Parser.new(m[5])
-          block_exit = T.must(exit_parser.parse[0])
+          block_exit = T.must(exit_parser.parse_statement[0])
         end
 
         # mark as true branch if designated
@@ -64,7 +64,7 @@ class BBParser
   private
 
   BLOCK_HEADER = T.let(
-    /\[(BB[a-zA-Z0-9_]+)( ENTRY=(\[.*\]))?( EXIT=(\[.*\]))?( TRUE_BRANCH)?\]/,
+    /\[(BB[a-zA-Z0-9_]+)( ENTRY=\[([^\]]*)\])?( EXIT=\[([^\]]*)\])?( TRUE_BRANCH)?\]/,
     Regexp
   )
   private_constant :BLOCK_HEADER

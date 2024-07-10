@@ -63,6 +63,10 @@ module Lilac
       # in the array.
       def parse_statement
         @next_token = @scanner.scan_next
+        if see?(TokenType::EOF)
+          return []
+        end
+
         parse_stmt
       end
 
