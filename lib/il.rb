@@ -690,6 +690,66 @@ module Lilac
       end
     end
 
+    # A Conversion is an Expression that converts a Constant value of one
+    # type to another type.
+    class Conversion < Expression
+      extend T::Sig
+      extend T::Helpers
+
+      abstract!
+
+      sig { abstract.returns(Value) }
+      def value; end
+
+      sig { abstract.returns(Types::Type) }
+      def new_type; end
+    end
+
+    # A SignTruncConversion converts a signed integer constant to an
+    # unsigned integer constant represented in the same number of bits.
+    class SignTruncConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::UnsignedType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::UnsignedType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+    end
+
+    # A SignExtendConversion converts an unsigned integer constant to a
+    # signed integer constant represented in the same number of bits (which
+    # may cause overflow).
+    class SignExtendConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::SignedType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::SignedType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+    end
+
     # A Call is an Expression that represents a function call.
     class Call < Expression
       extend T::Sig
