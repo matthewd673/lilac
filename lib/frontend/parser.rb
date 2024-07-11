@@ -513,6 +513,9 @@ module Lilac
         elsif string.start_with?("$") # local
           return IL::ID.new(T.must(string[1..]))
         end
+
+        raise "Cannot parse an ID from string '#{string}'. The string does "\
+              "not begin with a recognized ID prefix."
       end
 
       sig { params(string: String).returns(IL::Register) }

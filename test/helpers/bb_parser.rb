@@ -28,15 +28,21 @@ class BBParser
         id = T.must(m[1])
 
         # add entry if specified
-        if m[3]
-          entry_parser = Frontend::Parser.new(m[3])
-          block_entry = T.must(entry_parser.parse_statement[0])
+        entry_str = m[3]
+        if entry_str
+          entry_parser = Frontend::Parser.new(entry_str)
+          block_entry = T.cast(
+            T.must(entry_parser.parse_statement[0]),
+            IL::Label)
         end
 
         # add exit if specified
-        if m[5]
-          exit_parser = Frontend::Parser.new(m[5])
-          block_exit = T.must(exit_parser.parse_statement[0])
+        exit_str = m[5]
+        if exit_str
+          exit_parser = Frontend::Parser.new(exit_str)
+          block_exit = T.cast(
+            T.must(exit_parser.parse_statement[0]),
+            IL::Jump)
         end
 
         # mark as true branch if designated
@@ -53,7 +59,11 @@ class BBParser
       il_parser = Frontend::Parser.new(l)
       stmt = il_parser.parse_statement[0]
       if stmt
-        last_block = T.must(blocks[-1])
+        if blocks.last == nil
+          raise "Parsed a statement but no blocks have been defined yet"
+        end
+
+        last_block = T.unsafe(blocks.last)
         last_block.stmt_list.push(stmt)
       end
     end

@@ -75,13 +75,13 @@ module Lilac
           # add all ids on the rhs to GEN unless they're already in KILL
           rhs_vars = find_rhs_vars(s)
           rhs_vars.each do |v|
-            unless @kill[b].include?(v)
-              @gen[b].add(v)
+            unless T.unsafe(@kill[b]).include?(v)
+              T.unsafe(@gen[b]).add(v)
             end
           end
 
           # add the id being defined into KILL
-          @kill[b].add(s.id)
+          T.unsafe(@kill[b]).add(s.id)
         end
       end
 
