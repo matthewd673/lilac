@@ -750,6 +750,141 @@ module Lilac
       end
     end
 
+    # A TruncIntConversion converts a signed or unsigned integer to an integer
+    # type represented with fewer bits (which may cause an overflow). The
+    # integer types involved in the conversion must be either both signed or
+    # both unsigned.
+    class TruncIntConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::IntegerType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::IntegerType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+    end
+
+    # An ExtendIntConversion converts a signed or unsigned integer to an integer
+    # type represented with more bits. The integer types involved in the
+    # conversion must be either both signed or both unsigned.
+    class ExtendIntConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::IntegerType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::IntegerType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+    end
+
+    # A TruncFloatConversion converts a floating point number to a floating
+    # point type represented with fewer bits.
+    class TruncFloatConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::FloatType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::FloatType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+    end
+
+    # An ExtendFloatConversion converts a floating point number to a floating
+    # point type represented with more bits.
+    class ExtendFloatConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::FloatType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::FloatType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+    end
+
+    # An IntToFloatConversion converts a signed or unsigned integer to a
+    # floating point type.
+    class IntToFloatConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::FloatType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::FloatType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+    end
+
+    # A FloatToIntConversion converts a floating point number to a signed
+    # integer type.
+    class FloatToIntConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::IntegerType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::IntegerType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+    end
+
     # A Call is an Expression that represents a function call.
     class Call < Expression
       extend T::Sig
