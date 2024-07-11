@@ -725,6 +725,30 @@ module Lilac
         @value = value
         @new_type = new_type
       end
+
+      sig { override.returns(String) }
+      def to_s
+        "sign_trunc #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != SignTruncConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(SignTruncConversion) }
+      def clone
+        SignTruncConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
     end
 
     # A SignExtendConversion converts an unsigned integer constant to a
@@ -747,6 +771,30 @@ module Lilac
       def initialize(value, new_type)
         @value = value
         @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "sign_extend #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != SignExtendConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(SignExtendConversion) }
+      def clone
+        SignExtendConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
       end
     end
 
@@ -772,6 +820,30 @@ module Lilac
         @value = value
         @new_type = new_type
       end
+
+      sig { override.returns(String) }
+      def to_s
+        "trunc_int #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != TruncIntConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(TruncIntConversion) }
+      def clone
+        TruncIntConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
     end
 
     # An ExtendIntConversion converts a signed or unsigned integer to an integer
@@ -795,6 +867,30 @@ module Lilac
         @value = value
         @new_type = new_type
       end
+
+      sig { override.returns(String) }
+      def to_s
+        "extend_int #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != ExtendIntConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(ExtendIntConversion) }
+      def clone
+        ExtendIntConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
     end
 
     # A TruncFloatConversion converts a floating point number to a floating
@@ -816,6 +912,30 @@ module Lilac
       def initialize(value, new_type)
         @value = value
         @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "trunc_float #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != TruncFloatConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(TruncFloatConversion) }
+      def clone
+        TruncFloatConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
       end
     end
 
@@ -839,6 +959,30 @@ module Lilac
         @value = value
         @new_type = new_type
       end
+
+      sig { override.returns(String) }
+      def to_s
+        "extend_float #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != ExtendFloatConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(ExtendFloatConversion) }
+      def clone
+        ExtendFloatConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
     end
 
     # An IntToFloatConversion converts a signed or unsigned integer to a
@@ -861,6 +1005,30 @@ module Lilac
         @value = value
         @new_type = new_type
       end
+
+      sig { override.returns(String) }
+      def to_s
+        "int_to_float #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != IntToFloatConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(IntToFloatConversion) }
+      def clone
+        IntToFloatConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
     end
 
     # A FloatToIntConversion converts a floating point number to a signed
@@ -882,6 +1050,30 @@ module Lilac
       def initialize(value, new_type)
         @value = value
         @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "float_to_int #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != FloatToIntConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(FloatToIntConversion) }
+      def clone
+        FloatToIntConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
       end
     end
 
