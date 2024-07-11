@@ -105,10 +105,20 @@ module Lilac
           return find_rhs_ids(node.cond)
         when IL::Conversion
           return find_rhs_ids(node.value)
+        when IL::Call
+          ids = Set[]
+          node.args.each do |a|
+            ids |= find_rhs_ids(a)
+          end
+          return ids
         when IL::Constant
           return Set[]
-          # TODO: need a case for function calls
-          # TODO: support Phi functions
+        when IL::Phi
+          ids = Set[]
+          node.ids.each do |i|
+            ids |= find_rhs_ids(i) # this recursive call is overkill but oh well
+          end
+          return ids
         end
 
         # this should never hit but it will ensure that new IL objects are
