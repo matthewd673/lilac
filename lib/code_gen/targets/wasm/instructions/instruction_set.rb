@@ -586,7 +586,7 @@ module Lilac
             end
           end
 
-          # Represents the +global.set+ instruction
+          # Represents the +global.set+ instruction.
           # Set the value of a global variable.
           class GlobalSet < VariableInstruction
             sig { override.returns(Integer) }
@@ -597,6 +597,50 @@ module Lilac
             sig { override.returns(String) }
             def wat
               "global.set $#{@variable}"
+            end
+          end
+
+          # CONVERSION
+
+          # Represents the +i64.extend_i32_s+ instruction.
+          # Extend numbers of type +i32+ to type +i64+ (signed).
+          class ExtendI32S < WasmInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              0xac
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "i64.extend_i32_s"
+            end
+          end
+
+          # Represents the +i64.extend_i32_u+ instruction.
+          # Extend numbers of type +i32+ to type +i64+ (unsigned).
+          class ExtendI32U < WasmInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              0xad
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "i64.extend_i32_u"
+            end
+          end
+
+          # Represents the +i32.wrap_i64+ instruction.
+          # Wrap numbers of type +i64+ to type +i32+.
+          class WrapI64 < WasmInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              0xa7
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "i32.wrap_i64"
             end
           end
 
