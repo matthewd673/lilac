@@ -917,7 +917,7 @@ module Lilac
     class Definition < Statement
       extend T::Sig
 
-      sig { returns(Types::Type) }
+      sig { returns(Types::NumericType) }
       attr_accessor :type
 
       sig { returns(ID) }
@@ -927,11 +927,12 @@ module Lilac
       attr_accessor :rhs
 
       sig do
-        params(type: Types::Type, id: ID, rhs: T.any(Expression, Value)).void
+        params(type: Types::NumericType, id: ID, rhs: T.any(Expression, Value))
+          .void
       end
       # Construct a new Definition.
       #
-      # @param [Type] type The type of the ID.
+      # @param [Types::NumericType] type The type of the ID.
       # @param [ID] id The ID.
       # @param [T.any(Expression, Value)] rhs The right hand side of
       # the assignment.
