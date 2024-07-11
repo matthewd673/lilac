@@ -157,9 +157,10 @@ module Lilac
 
           # otherwise, return a unop with value folded
           return IL::UnaryOp.new(rhs.op, value)
-        when IL::Call # TODO
+        # when IL::Call # TODO
         else
-          raise "rhs type #{rhs.class} not supported by constant_folding"
+          raise "Unexpected IL object on rhs: #{rhs} (#{rhs.class}). "\
+                "This class is not supported by constant_folding."
         end
 
         rhs
