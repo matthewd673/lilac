@@ -644,6 +644,172 @@ module Lilac
             end
           end
 
+          # Represents the +f64.promote_f32+ instruction.
+          # Convert a number of type +f32+ to type +f64+.
+          class PromoteF32 < WasmInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              0xbb
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "f64.promote_f32"
+            end
+          end
+
+          # Represents the +f32.demote_f64+ instruction.
+          # Convert a number of type +f64+ to type +f32+.
+          class DemoteF64 < WasmInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              0xb6
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "f32.demote_f64"
+            end
+          end
+
+          # Represents the +convert_i32_s+ instructions.
+          # Convert a signed integer of type +i32+ to a floating point number.
+          class ConvertI32S < FloatInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::F32 then 0xb2
+              when Type::F64 then 0xb7
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.convert_i32_s"
+            end
+          end
+
+          # Represents the +convert_i32_u+ instructions.
+          # Convert an unsigned integer of type +i32+ to a floating point
+          # number.
+          class ConvertI32U < FloatInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::F32 then 0xb3
+              when Type::F64 then 0xb8
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.convert_i32_u"
+            end
+          end
+
+          # Represents the +convert_i64_s+ instructions.
+          # Convert a signed integer of type +i64+ to a floating point number.
+          class ConvertI64S < FloatInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::F32 then 0xb4
+              when Type::F64 then 0xb9
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.convert_i64_s"
+            end
+          end
+
+          # Represents the +convert_i64_u+ instructions.
+          # Convert an unsigned integer of type +i64+ to a floating point
+          # number.
+          class ConvertI64U < FloatInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::F32 then 0xb5
+              when Type::F64 then 0xba
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.convert_i64_u"
+            end
+          end
+
+          # Represents the +trunc_f32_s+ instructions.
+          # Convert a number of type +f32+ to a signed integer.
+          class TruncF32S < IntegerInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0xa8
+              when Type::I64 then 0xae
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.trunc_f32_s"
+            end
+          end
+
+          # Represents the +trunc_f32_u+ instructions.
+          # Convert a number of type +f32+ to an unsigned integer.
+          class TruncF32U < IntegerInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0xa9
+              when TYPE::I64 then 0xaf
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.trunc_f32_u"
+            end
+          end
+
+          # Represents the +trunc_f64_s+ instructions.
+          # Convert a number of type +f64+ to a signed integer.
+          class TruncF64S < IntegerInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0xaa
+              when Type::I64 then 0xb0
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.trunc_f64_s"
+            end
+          end
+
+          # Represents the +trunc_f64_u+ instructions.
+          # Convert a number of type +f64+ to an unsigned integer.
+          class TruncF64U < IntegerInstruction
+            sig { override.returns(Integer) }
+            def opcode
+              case @type
+              when Type::I32 then 0xab
+              when Type::I64 then 0xb1
+              end
+            end
+
+            sig { override.returns(String) }
+            def wat
+              "#{@type}.trunc_f64_u"
+            end
+          end
+
           # MEMORY INSTRUCTIONS
           # https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/Memory
 
