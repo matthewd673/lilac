@@ -63,9 +63,7 @@ class Graph<T> {
 
   public IEnumerable<Edge<T>> GetIncoming(T node) {
     HashSet<Edge<T>>? i;
-    incoming.TryGetValue(node, out i);
-
-    if (i is not null) {
+    if (incoming.TryGetValue(node, out i)) {
       foreach (Edge<T> e in i) {
         yield return e;
       }
@@ -74,9 +72,7 @@ class Graph<T> {
 
   public IEnumerable<Edge<T>> GetOutgoing(T node) {
     HashSet<Edge<T>>? o;
-    outgoing.TryGetValue(node, out o);
-
-    if (o is not null) {
+    if (outgoing.TryGetValue(node, out o)) {
       foreach (Edge<T> e in o) {
         yield return e;
       }
@@ -85,24 +81,20 @@ class Graph<T> {
 
   public int GetIncomingCount(T node) {
     HashSet<Edge<T>>? i;
-    incoming.TryGetValue(node, out i);
-
-    if (i is null) {
-      return 0;
+    if (incoming.TryGetValue(node, out i)) {
+      return i.Count;
     }
 
-    return i.Count;
+    return 0;
   }
 
   public int GetOutgoingCount(T node) {
     HashSet<Edge<T>>? o;
-    outgoing.TryGetValue(node, out o);
-
-    if (o is null) {
-      return 0;
+    if (outgoing.TryGetValue(node, out o)) {
+      return o.Count;
     }
 
-    return o.Count;
+    return 0;
   }
 
   public IEnumerable<T> GetPredecessors(T node) {
@@ -120,25 +112,21 @@ class Graph<T> {
   public int GetPredecessorsCount(T node) {
     // Copied from GetIncomingCount
     HashSet<Edge<T>>? i;
-    incoming.TryGetValue(node, out i);
-
-    if (i is null) {
-      return 0;
+    if (incoming.TryGetValue(node, out i)) {
+      return i.Count;
     }
 
-    return i.Count;
+    return 0;
   }
 
   public int GetSuccessorsCount(T node) {
     // Copied from GetOutgoingCount
     HashSet<Edge<T>>? o;
-    outgoing.TryGetValue(node, out o);
-
-    if (o is null) {
-      return 0;
+    if (outgoing.TryGetValue(node, out o)) {
+      return o.Count;
     }
 
-    return o.Count;
+    return 0;
   }
 
   public bool AddNode(T node) {
