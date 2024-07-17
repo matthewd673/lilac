@@ -73,8 +73,50 @@ class BB {
   }
 
   public static List<BB> FromStmtList(List<IL.Statement> stmtList) {
-    // TODO
-    throw new NotImplementedException();
+    List<BB> blocks = new();
+    List<IL.Statement> blockStmts = new();
+    IL.Label? currentEntry = null;
+
+    foreach (IL.Statement s in stmtList) {
+      // mark beginning of a new block
+      if (s is IL.Label) {
+        // push previous block onto list (its exit will be null)
+        if (!(blockStmts.Count == 0 && currentEntry is null)) {
+          blocks.Add(new(Guid.NewGuid().ToString(),
+                         entry: currentEntry,
+                         stmtList: blockStmts));
+          blockStmts = new();
+        }
+
+        currentEntry = (IL.Label)s;
+      }
+
+      // don't push labels or jumps, they belong in entry/exit
+      if (!(s is IL.Label || s is IL.Jump)) {
+        blockStmts.Add(s);
+      }
+
+      // mark end of a block
+      if (s is not IL.Jump) {
+        continue;
+      }
+
+      blocks.Add(new(Guid.NewGuid().ToString(),
+                     entry: currentEntry,
+                     exit: (IL.Jump)s,
+                     stmtList: blockStmts));
+      blockStmts = new();
+      currentEntry = null;
+    }
+
+    // scoop up stragglers
+    if (blockStmts.Count > 0 || currentEntry is not null) {
+      blocks.Add(new(Guid.NewGuid().ToString(),
+                     entry: currentEntry,
+                     stmtList: blockStmts));
+    }
+
+    return blocks;
   }
 
   public static List<IL.Statement> ToStmtList(List<BB> bbList) {
