@@ -5,7 +5,7 @@ class BB {
   public IL.Label? Entry { get; }
   public IL.Jump? Exit { get; }
   public List<IL.Statement> StmtList { get; }
-  public bool TrueBranch { get; }
+  public bool TrueBranch { get; internal set; }
 
   public int Count {
     get { return StmtList.Count; }
@@ -16,8 +16,8 @@ class BB {
   }
 
   public BB(string id,
-            IL.Label? entry,
-            IL.Jump? exit,
+            IL.Label? entry = null,
+            IL.Jump? exit = null,
             List<IL.Statement> stmtList = null,
             bool trueBranch = false) {
     Id = id;
