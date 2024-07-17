@@ -7,3 +7,7 @@
 
 # gem binary
 *.gem
+
+# csharp
+[bB]in
+[oO]bj
