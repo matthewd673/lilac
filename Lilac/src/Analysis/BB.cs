@@ -1,6 +1,6 @@
 namespace Lilac.Analysis;
 
-class BB {
+public class BB {
   public string Id { get; }
   public IL.Label? Entry { get; }
   public IL.Jump? Exit { get; }
