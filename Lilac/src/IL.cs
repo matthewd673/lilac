@@ -1,405 +1,421 @@
-namespace Lilac {
-  namespace IL {
-    enum Type {
-      U8,
-      U16,
-      U32,
-      U64,
-      I8,
-      I16,
-      I32,
-      I64,
-      F32,
-      F64,
-      Void,
+namespace Lilac.IL;
+
+public enum Type {
+  U8,
+  U16,
+  U32,
+  U64,
+  I8,
+  I16,
+  I32,
+  I64,
+  F32,
+  F64,
+  Void,
+}
+
+public static class TypeMethods {
+  public static bool IsUnsigned(this Type type) {
+    switch (type) {
+      case Type.U8:
+      case Type.U16:
+      case Type.U32:
+      case Type.U64:
+        return true;
+      default:
+        return false;
     }
+  }
 
-    static class TypeMethods {
-      public static bool IsUnsigned(this Type type) {
-        switch (type) {
-          case Type.U8:
-          case Type.U16:
-          case Type.U32:
-          case Type.U64:
-            return true;
-          default:
-            return false;
-        }
-      }
-
-      public static bool IsSigned(this Type type) {
-        switch (type) {
-          case Type.I8:
-          case Type.I16:
-          case Type.I32:
-          case Type.I64:
-            return true;
-          default:
-            return false;
-        }
-      }
-
-      public static bool IsInteger(this Type type) {
-        return type.IsUnsigned() || type.IsSigned();
-      }
-
-      public static bool IsFloat(this Type type) {
-        switch (type) {
-          case Type.F32:
-          case Type.F64:
-            return true;
-          default:
-            return false;
-        }
-      }
-
-      public static bool IsNumeric(this Type type) {
-        return type.IsInteger() || type.IsFloat();
-      }
-
-      public static bool IsVoid(this Type type) {
-        switch (type) {
-          case Type.Void:
-            return true;
-          default:
-            return false;
-        }
-      }
+  public static bool IsSigned(this Type type) {
+    switch (type) {
+      case Type.I8:
+      case Type.I16:
+      case Type.I32:
+      case Type.I64:
+        return true;
+      default:
+        return false;
     }
+  }
 
-    class Value {
-      // Empty
+  public static bool IsInteger(this Type type) {
+    return type.IsUnsigned() || type.IsSigned();
+  }
+
+  public static bool IsFloat(this Type type) {
+    switch (type) {
+      case Type.F32:
+      case Type.F64:
+        return true;
+      default:
+        return false;
     }
+  }
 
-    class Constant : Value {
-      public Type Type { get; }
-      public object Value { get; }
+  public static bool IsNumeric(this Type type) {
+    return type.IsInteger() || type.IsFloat();
+  }
 
-      public Constant(Type type, object @value) {
-        Type = type;
-        Value = @value;
-      }
+  public static bool IsVoid(this Type type) {
+    switch (type) {
+      case Type.Void:
+        return true;
+      default:
+        return false;
     }
+  }
 
-    class ID : Value {
-      public string Name { get; set; }
-
-      public ID(string name) {
-        Name = name;
-      }
+  public static string ToString(this Type type) {
+    switch (type) {
+      case Type.U8: return "u8";
+      case Type.U16: return "u16";
+      case Type.U32: return "u32";
+      case Type.U64: return "u64";
+      case Type.I8: return "i8";
+      case Type.I16: return "i16";
+      case Type.I32: return "i32";
+      case Type.I64: return "i64";
+      case Type.F32: return "f32";
+      case Type.F64: return "f64";
+      case Type.Void: return "void";
+      default:
+        throw new Exception();
     }
+  }
+}
 
-    class GlobalID : ID {
-      public GlobalID(string name) : base(name) {
-        // Empty
-      }
-    }
+public abstract class Value {
+  // Empty
+}
 
-    class Expression {
-      // Empty
-    }
+public class Constant : Value {
+  public Type Type { get; }
+  public object Value { get; }
 
-    class ValueExpr : Expression {
-      public Value Value { get; }
+  public Constant(Type type, object @value) {
+    Type = type;
+    Value = @value;
+  }
+}
 
-      public ValueExpr(Value @value) {
-        Value = @value;
-      }
-    }
+public class ID : Value {
+  public string Name { get; set; }
 
-    class BinaryOp : Expression {
-      public enum Operator {
-        Add,
-        Sub,
-        Mul,
-        Div,
-        Eq,
-        Neq,
-        Lt,
-        Gt,
-        Leq,
-        Geq,
-        BoolAnd,
-        BoolOr,
-        BitLs,
-        BitRs,
-        BitAnd,
-        BitOr,
-        BitXor,
-      }
+  public ID(string name) {
+    Name = name;
+  }
+}
 
-      public Operator Op { get; }
-      public Value Left { get; }
-      public Value Right { get; }
+public class GlobalID : ID {
+  public GlobalID(string name) : base(name) {
+    // Empty
+  }
+}
 
-      public BinaryOp(Operator op, Value left, Value right) {
-        Op = op;
-        Left = left;
-        Right = right;
-      }
-    }
+public abstract class Expression {
+  // Empty
+}
 
-    class UnaryOp : Expression {
-      public enum Operator {
-        Neg,
-        BoolNot,
-        BitNot,
-      }
+public class ValueExpr : Expression {
+  public Value Value { get; }
 
-      public Operator Op { get; }
-      public Value Value { get; }
+  public ValueExpr(Value @value) {
+    Value = @value;
+  }
+}
 
-      public UnaryOp(Operator op, Value @value) {
-        Op = op;
-        Value = @value;
-      }
-    }
+public class BinaryOp : Expression {
+  public enum Operator {
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Eq,
+    Neq,
+    Lt,
+    Gt,
+    Leq,
+    Geq,
+    BoolAnd,
+    BoolOr,
+    BitLs,
+    BitRs,
+    BitAnd,
+    BitOr,
+    BitXor,
+  }
 
-    abstract class Conversion : Expression {
-      public Value Value { get; protected set; }
-      public Type NewType { get; protected set; }
+  public Operator Op { get; }
+  public Value Left { get; }
+  public Value Right { get; }
 
-      public Conversion(Value @value, Type newType) {
-        Value = @value;
-        NewType = newType;
-      }
-    }
+  public BinaryOp(Operator op, Value left, Value right) {
+    Op = op;
+    Left = left;
+    Right = right;
+  }
+}
 
-    class SignTruncConversion : Conversion {
-      public SignTruncConversion(Value @value, Type newType)
-        : base(@value, newType) {
-        // Empty
-      }
-    }
+public class UnaryOp : Expression {
+  public enum Operator {
+    Neg,
+    BoolNot,
+    BitNot,
+  }
 
-    class SignExtendConversion : Conversion {
-      public SignExtendConversion(Value @value, Type newType)
-        : base(@value, newType) {
-        // Empty
-      }
-    }
+  public Operator Op { get; }
+  public Value Value { get; }
 
-    class TruncIntConversion : Conversion {
-      public TruncIntConversion(Value @value, Type newType)
-        : base(@value, newType) {
-        // Empty
-      }
-    }
+  public UnaryOp(Operator op, Value @value) {
+    Op = op;
+    Value = @value;
+  }
+}
 
-    class ExtendIntConversion : Conversion {
-      public ExtendIntConversion(Value @value, Type newType)
-        : base(@value, newType) {
-        // Empty
-      }
-    }
+public abstract class Conversion : Expression {
+  public Value Value { get; protected set; }
+  public Type NewType { get; protected set; }
 
-    class TruncFloatConversion : Conversion {
-      public TruncFloatConversion(Value @value, Type newType)
-        : base(@value, newType) {
-        // Empty
-      }
-    }
+  public Conversion(Value @value, Type newType) {
+    Value = @value;
+    NewType = newType;
+  }
+}
 
-    class ExtendFloatConversion : Conversion {
-      public ExtendFloatConversion(Value @value, Type newType)
-        : base(@value, newType) {
-        // Empty
-      }
-    }
+public class SignTruncConversion : Conversion {
+  public SignTruncConversion(Value @value, Type newType)
+    : base(@value, newType) {
+    // Empty
+  }
+}
 
-    class IntToFloatConversion : Conversion {
-      public IntToFloatConversion(Value @value, Type newType)
-        : base(@value, newType) {
-        // Empty
-      }
-    }
+public class SignExtendConversion : Conversion {
+  public SignExtendConversion(Value @value, Type newType)
+    : base(@value, newType) {
+    // Empty
+  }
+}
 
-    class FloatToIntConversion : Conversion {
-      public FloatToIntConversion(Value @value, Type newType)
-        : base(@value, newType) {
-        // Empty
-      }
-    }
+public class TruncIntConversion : Conversion {
+  public TruncIntConversion(Value @value, Type newType)
+    : base(@value, newType) {
+    // Empty
+  }
+}
 
-    class Call : Expression {
-      public string FuncName { get; protected set; }
-      public Value[] Args { get; protected set; }
+public class ExtendIntConversion : Conversion {
+  public ExtendIntConversion(Value @value, Type newType)
+    : base(@value, newType) {
+    // Empty
+  }
+}
 
-      public Call(string funcName, Value[] args) {
-        FuncName = funcName;
-        Args = args;
-      }
-    }
+public class TruncFloatConversion : Conversion {
+  public TruncFloatConversion(Value @value, Type newType)
+    : base(@value, newType) {
+    // Empty
+  }
+}
 
-    class ExternCall : Call {
-      public string FuncSource { get; }
+public class ExtendFloatConversion : Conversion {
+  public ExtendFloatConversion(Value @value, Type newType)
+    : base(@value, newType) {
+    // Empty
+  }
+}
 
-      public ExternCall(string funcSource, string funcName, Value[] args)
-        : base(funcName, args) {
-        FuncSource = funcSource;
-      }
-    }
+public class IntToFloatConversion : Conversion {
+  public IntToFloatConversion(Value @value, Type newType)
+    : base(@value, newType) {
+    // Empty
+  }
+}
 
-    class Phi : Expression {
-      public ID[] Ids { get; }
+public class FloatToIntConversion : Conversion {
+  public FloatToIntConversion(Value @value, Type newType)
+    : base(@value, newType) {
+    // Empty
+  }
+}
 
-      public Phi(ID[] ids) {
-        Ids = ids;
-      }
-    }
+public class Call : Expression {
+  public string FuncName { get; protected set; }
+  public Value[] Args { get; protected set; }
 
-    class Statement {
-      // Empty
-    }
+  public Call(string funcName, Value[] args) {
+    FuncName = funcName;
+    Args = args;
+  }
+}
 
-    class Definition : Statement {
-      public Type Type { get; }
-      public ID Id { get; }
-      public Expression Rhs { get; }
+public class ExternCall : Call {
+  public string FuncSource { get; }
 
-      public Definition(Type type, ID id, Expression rhs) {
-        Type = type;
-        Id = id;
-        Rhs = rhs;
-      }
-    }
+  public ExternCall(string funcSource, string funcName, Value[] args)
+    : base(funcName, args) {
+    FuncSource = funcSource;
+  }
+}
 
-    class Label : Statement {
-      public string Name { get; }
+public class Phi : Expression {
+  public ID[] Ids { get; }
 
-      public Label(string name) {
-        Name = name;
-      }
-    }
+  public Phi(ID[] ids) {
+    Ids = ids;
+  }
+}
 
-    class Jump : Statement {
-      public string Target { get; }
+public abstract class Statement {
+  // Empty
+}
 
-      public Jump(string target) {
-        Target = target;
-      }
-    }
+public class Definition : Statement {
+  public Type Type { get; }
+  public ID Id { get; }
+  public Expression Rhs { get; }
 
-    abstract class CondJump : Jump {
-      public Value Cond;
+  public Definition(Type type, ID id, Expression rhs) {
+    Type = type;
+    Id = id;
+    Rhs = rhs;
+  }
+}
 
-      public CondJump(string target, Value cond) : base(target) {
-        Cond = cond;
-      }
-    }
+public class Label : Statement {
+  public string Name { get; }
 
-    class JumpZero : CondJump {
-      public JumpZero(string target, Value cond) : base(target, cond) {
-        // Empty
-      }
-    }
+  public Label(string name) {
+    Name = name;
+  }
+}
 
-    class JumpNotZero : CondJump {
-      public JumpNotZero(string target, Value cond) : base(target, cond) {
-        // Empty
-      }
-    }
+public class Jump : Statement {
+  public string Target { get; }
 
-    class Return : Statement {
-      public Value Value { get; }
+  public Jump(string target) {
+    Target = target;
+  }
+}
 
-      public Return(Value @value) {
-        Value = @value;
-      }
-    }
+public abstract class CondJump : Jump {
+  public Value Cond;
 
-    class VoidCall : Statement {
-      public Call Call { get; }
+  public CondJump(string target, Value cond) : base(target) {
+    Cond = cond;
+  }
+}
 
-      public VoidCall(Call call) {
-        Call = call;
-      }
-    }
+public class JumpZero : CondJump {
+  public JumpZero(string target, Value cond) : base(target, cond) {
+    // Empty
+  }
+}
 
-    class InlineInstr : Statement {
-      public string Target { get; }
-      // TODO: store as CodeGen.Instruction
-      public string Instr { get; }
+public class JumpNotZero : CondJump {
+  public JumpNotZero(string target, Value cond) : base(target, cond) {
+    // Empty
+  }
+}
 
-      public InlineInstr(string target, string instr) {
-        Target = target;
-        Instr = instr;
-      }
-    }
+public class Return : Statement {
+  public Value Value { get; }
 
-    class Component {
-      // Empty
-    }
+  public Return(Value @value) {
+    Value = @value;
+  }
+}
 
-    class GlobalDef : Component {
-      public Type Type { get; }
-      public GlobalID Id { get; }
-      public Constant Rhs { get; }
+public class VoidCall : Statement {
+  public Call Call { get; }
 
-      public GlobalDef(Type type, GlobalID id, Constant rhs) {
-        Type = type;
-        Id = id;
-        Rhs = rhs;
-      }
-    }
+  public VoidCall(Call call) {
+    Call = call;
+  }
+}
 
-    class FuncDef : Component {
-      public string Name { get; }
-      public FuncParam[] Params { get; }
-      public Type RetType { get; }
-      public Statement[] StmtList { get; }
-      public bool Exported { get; }
+public class InlineInstr : Statement {
+  public string Target { get; }
+  // TODO: store as CodeGen.Instruction
+  public string Instr { get; }
 
-      public FuncDef(string name,
-                     FuncParam[] @params,
-                     Type retType,
-                     Statement[] stmtList,
-                     bool exported) {
-        Name = name;
-        Params = @params;
-        RetType = retType;
-        StmtList = stmtList;
-        Exported = exported;
-      }
-    }
+  public InlineInstr(string target, string instr) {
+    Target = target;
+    Instr = instr;
+  }
+}
 
-    class FuncParam {
-      public Type Type { get; }
-      public ID Id { get; }
+public abstract class Component {
+  // Empty
+}
 
-      public FuncParam(Type type, ID id) {
-        Type = type;
-        Id = id;
-      }
-    }
+public class GlobalDef : Component {
+  public Type Type { get; }
+  public GlobalID Id { get; }
+  public Constant Rhs { get; }
 
-    class ExternFuncDef : Component {
-      public string Source { get; }
-      public string Name { get; }
-      public Type[] ParamTypes { get; }
-      public Type RetType { get; }
+  public GlobalDef(Type type, GlobalID id, Constant rhs) {
+    Type = type;
+    Id = id;
+    Rhs = rhs;
+  }
+}
 
-      public ExternFuncDef(string source,
-                           string name,
-                           Type[] paramTypes,
-                           Type retType) {
-        Source = source;
-        Name = name;
-        ParamTypes = paramTypes;
-        RetType = retType;
-      }
-    }
+public class FuncDef : Component {
+  public string Name { get; }
+  public FuncParam[] Params { get; }
+  public Type RetType { get; }
+  public Statement[] StmtList { get; }
+  public bool Exported { get; }
 
-    class Program {
-      private Dictionary<string, GlobalDef> globalMap;
-      private Dictionary<string, FuncDef> funcMap;
-      private Dictionary<(string, string), ExternFuncDef> externFuncMap;
+  public FuncDef(string name,
+                 FuncParam[] @params,
+                 Type retType,
+                 Statement[] stmtList,
+                 bool exported) {
+    Name = name;
+    Params = @params;
+    RetType = retType;
+    StmtList = stmtList;
+    Exported = exported;
+  }
+}
 
-      public Program() {
-        globalMap = new();
-        funcMap = new();
-        externFuncMap = new();
-      }
-    }
+public class FuncParam {
+  public Type Type { get; }
+  public ID Id { get; }
+
+  public FuncParam(Type type, ID id) {
+    Type = type;
+    Id = id;
+  }
+}
+
+public class ExternFuncDef : Component {
+  public string Source { get; }
+  public string Name { get; }
+  public Type[] ParamTypes { get; }
+  public Type RetType { get; }
+
+  public ExternFuncDef(string source,
+                       string name,
+                       Type[] paramTypes,
+                       Type retType) {
+    Source = source;
+    Name = name;
+    ParamTypes = paramTypes;
+    RetType = retType;
+  }
+}
+
+public class Program {
+  private Dictionary<string, GlobalDef> globalMap;
+  private Dictionary<string, FuncDef> funcMap;
+  private Dictionary<(string, string), ExternFuncDef> externFuncMap;
+
+  public Program() {
+    globalMap = new();
+    funcMap = new();
+    externFuncMap = new();
   }
 }
