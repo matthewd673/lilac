@@ -47,7 +47,7 @@ class CFG : Graph<BB> {
       newCfg.AddNode(nodeRefs[n.Id]);
     }
 
-    foreach (Edge<BB> e in GetEdges()) {
+    foreach (Edge e in GetEdges()) {
       newCfg.AddEdge(new(nodeRefs[e.From.Id], nodeRefs[e.To.Id]));
     }
 

@@ -1,7 +1,7 @@
 namespace Lilac;
 
-class Graph<T> {
-  public class Edge<T> {
+public class Graph<T> {
+  public class Edge {
     public T From { get; }
     public T To { get; }
 
@@ -11,11 +11,11 @@ class Graph<T> {
     }
 
     public override bool Equals(object? obj) {
-      if (obj.GetType() != typeof(Edge<T>)) {
+      if (obj.GetType() != typeof(Edge)) {
         return false;
       }
 
-      Edge<T> other = (Edge<T>)obj;
+      Edge other = (Edge)obj;
 
       return From.Equals(other.From) && To.Equals(other.To);
     }
@@ -30,9 +30,9 @@ class Graph<T> {
   }
 
   private HashSet<T> nodes;
-  private HashSet<Edge<T>> edges;
-  private Dictionary<T, HashSet<Edge<T>>> incoming;
-  private Dictionary<T, HashSet<Edge<T>>> outgoing;
+  private HashSet<Edge> edges;
+  private Dictionary<T, HashSet<Edge>> incoming;
+  private Dictionary<T, HashSet<Edge>> outgoing;
 
   public int NodesCount {
     get { return nodes.Count; }
@@ -55,32 +55,32 @@ class Graph<T> {
     }
   }
 
-  public IEnumerable<Edge<T>> GetEdges() {
-    foreach (Edge<T> e in edges) {
+  public IEnumerable<Edge> GetEdges() {
+    foreach (Edge e in edges) {
       yield return e;
     }
   }
 
-  public IEnumerable<Edge<T>> GetIncoming(T node) {
-    HashSet<Edge<T>>? i;
+  public IEnumerable<Edge> GetIncoming(T node) {
+    HashSet<Edge>? i;
     if (incoming.TryGetValue(node, out i)) {
-      foreach (Edge<T> e in i) {
+      foreach (Edge e in i) {
         yield return e;
       }
     }
   }
 
-  public IEnumerable<Edge<T>> GetOutgoing(T node) {
-    HashSet<Edge<T>>? o;
+  public IEnumerable<Edge> GetOutgoing(T node) {
+    HashSet<Edge>? o;
     if (outgoing.TryGetValue(node, out o)) {
-      foreach (Edge<T> e in o) {
+      foreach (Edge e in o) {
         yield return e;
       }
     }
   }
 
   public int GetIncomingCount(T node) {
-    HashSet<Edge<T>>? i;
+    HashSet<Edge>? i;
     if (incoming.TryGetValue(node, out i)) {
       return i.Count;
     }
@@ -89,7 +89,7 @@ class Graph<T> {
   }
 
   public int GetOutgoingCount(T node) {
-    HashSet<Edge<T>>? o;
+    HashSet<Edge>? o;
     if (outgoing.TryGetValue(node, out o)) {
       return o.Count;
     }
@@ -98,20 +98,20 @@ class Graph<T> {
   }
 
   public IEnumerable<T> GetPredecessors(T node) {
-    foreach (Edge<T> e in GetIncoming(node)) {
+    foreach (Edge e in GetIncoming(node)) {
       yield return e.From;
     }
   }
 
   public IEnumerable<T> GetSuccessors(T node) {
-    foreach (Edge<T> e in GetOutgoing(node)) {
+    foreach (Edge e in GetOutgoing(node)) {
       yield return e.To;
     }
   }
 
   public int GetPredecessorsCount(T node) {
     // Copied from GetIncomingCount
-    HashSet<Edge<T>>? i;
+    HashSet<Edge>? i;
     if (incoming.TryGetValue(node, out i)) {
       return i.Count;
     }
@@ -121,7 +121,7 @@ class Graph<T> {
 
   public int GetSuccessorsCount(T node) {
     // Copied from GetOutgoingCount
-    HashSet<Edge<T>>? o;
+    HashSet<Edge>? o;
     if (outgoing.TryGetValue(node, out o)) {
       return o.Count;
     }
@@ -140,18 +140,18 @@ class Graph<T> {
       return removed;
     }
 
-    foreach (Edge<T> e in GetIncoming(node)) {
+    foreach (Edge e in GetIncoming(node)) {
       RemoveEdge(e);
     }
 
-    foreach (Edge<T> e in GetOutgoing(node)) {
+    foreach (Edge e in GetOutgoing(node)) {
       RemoveEdge(e);
     }
 
     return removed;
   }
 
-  public bool AddEdge(Edge<T> edge) {
+  public bool AddEdge(Edge edge) {
     bool added = edges.Add(edge);
 
     if (!added) {
@@ -173,7 +173,7 @@ class Graph<T> {
     return added;
   }
 
-  public bool RemoveEdge(Edge<T> edge) {
+  public bool RemoveEdge(Edge edge) {
     bool removed = edges.Remove(edge);
 
     if (!removed) {
