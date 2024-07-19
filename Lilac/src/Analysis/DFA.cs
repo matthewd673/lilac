@@ -9,12 +9,12 @@ abstract class DFA<T> {
   private Direction direction;
   private HashSet<T> boundary;
   private HashSet<T> @init;
-  private CFG cfg;
+  protected CFG CFG { get; }
 
-  private Dictionary<BB, HashSet<T>> @out;
-  private Dictionary<BB, HashSet<T>> @in;
-  private Dictionary<BB, HashSet<T>> gen;
-  private Dictionary<BB, HashSet<T>> kill;
+  protected Dictionary<BB, HashSet<T>> Out;
+  protected Dictionary<BB, HashSet<T>> In;
+  protected Dictionary<BB, HashSet<T>> Gen;
+  protected Dictionary<BB, HashSet<T>> Kill;
 
   public DFA(Direction direction,
              HashSet<T> boundary,
@@ -23,15 +23,20 @@ abstract class DFA<T> {
     this.direction = direction;
     this.boundary = boundary;
     this.@init = @init;
-    this.cfg = cfg;
+    CFG = cfg;
 
-    @out = new();
-    @in = new();
-    gen = new();
-    kill = new();
+    Out = new();
+    In = new();
+    Gen = new();
+    Kill = new();
   }
 
   public CFGFacts<T> Run() {
+    // run custom fact set initialization for each block
+    foreach (BB n in CFG.GetNodes()) {
+      InitSets(n);
+    }
+
     // run the DFA
     switch (direction) {
       case Direction.Forwards:
@@ -43,11 +48,11 @@ abstract class DFA<T> {
     }
 
     // construct and return the CFGFacts from the run
-    CFGFacts<T> facts = new(cfg);
-    facts.AddFactDict("out", @out);
-    facts.AddFactDict("in", @in);
-    facts.AddFactDict("gen", gen);
-    facts.AddFactDict("kill", kill);
+    CFGFacts<T> facts = new(CFG);
+    facts.AddFactDict("out", Out);
+    facts.AddFactDict("in", In);
+    facts.AddFactDict("gen", Gen);
+    facts.AddFactDict("kill", Kill);
 
     return facts;
   }
@@ -56,7 +61,9 @@ abstract class DFA<T> {
 
   protected abstract HashSet<T> Meet(BB block);
 
-  private HashSet<T> GetSet(Dictionary<BB, HashSet<T>> dict, BB block) {
+  protected abstract void InitSets(BB block);
+
+  protected HashSet<T> GetSet(Dictionary<BB, HashSet<T>> dict, BB block) {
     HashSet<T>? blockSet;
     if (!dict.TryGetValue(block, out blockSet)) {
       return new();
@@ -67,13 +74,13 @@ abstract class DFA<T> {
 
   private void RunForwards() {
     // initialize all nodes
-    @out.Add(cfg.Entry, boundary);
-    foreach (BB n in cfg.GetNodes()) {
-      if (n == cfg.Entry) {
+    Out.Add(CFG.Entry, boundary);
+    foreach (BB n in CFG.GetNodes()) {
+      if (n == CFG.Entry) {
         continue;
       }
 
-      @out.Add(n, @init);
+      Out.Add(n, @init);
     }
 
     // iterate
@@ -81,20 +88,20 @@ abstract class DFA<T> {
     while (changed) {
       changed = false;
 
-      foreach (BB n in cfg.GetNodes()) {
-        if (n == cfg.Entry) {
+      foreach (BB n in CFG.GetNodes()) {
+        if (n == CFG.Entry) {
           continue;
         }
 
         HashSet<T>? oldOut;
-        if (!@out.TryGetValue(n, out oldOut)) {
+        if (!Out.TryGetValue(n, out oldOut)) {
           throw new Exception(); // TODO: nicer exception type
         }
 
         StepForwards(n);
 
         HashSet<T>? newOut;
-        if (!@out.TryGetValue(n, out newOut)) {
+        if (!Out.TryGetValue(n, out newOut)) {
           throw new Exception(); // TODO: nicer exception type
         }
 
@@ -106,19 +113,19 @@ abstract class DFA<T> {
   }
 
   private void StepForwards(BB block) {
-    @in.Add(block, Meet(block));
-    @out.Add(block, Transfer(block));
+    In.Add(block, Meet(block));
+    Out.Add(block, Transfer(block));
   }
 
   private void RunBackwards() {
     // initialize all nodes
-    @in.Add(cfg.Exit, boundary);
-    foreach (BB n in cfg.GetNodes()) {
-      if (n == cfg.Exit) {
+    In.Add(CFG.Exit, boundary);
+    foreach (BB n in CFG.GetNodes()) {
+      if (n == CFG.Exit) {
         continue;
       }
 
-      @in.Add(n, @init);
+      In.Add(n, @init);
     }
 
     // iterate
@@ -126,20 +133,20 @@ abstract class DFA<T> {
     while (changed) {
       changed = false;
 
-      foreach (BB n in cfg.GetNodes()) {
-        if (n == cfg.Exit) {
+      foreach (BB n in CFG.GetNodes()) {
+        if (n == CFG.Exit) {
           continue;
         }
 
         HashSet<T>? oldIn;
-        if (!@in.TryGetValue(n, out oldIn)) {
+        if (!In.TryGetValue(n, out oldIn)) {
           throw new Exception(); // TODO: nicer exception type
         }
 
         StepBackwards(n);
 
         HashSet<T>? newIn;
-        if (!@in.TryGetValue(n, out newIn)) {
+        if (!In.TryGetValue(n, out newIn)) {
           throw new Exception(); // TODO: nicer exception type
         }
 
@@ -151,7 +158,7 @@ abstract class DFA<T> {
   }
 
   private void StepBackwards(BB block) {
-    @out.Add(block, Meet(block));
-    @in.Add(block, Transfer(block));
+    Out.Add(block, Meet(block));
+    In.Add(block, Transfer(block));
   }
 }
