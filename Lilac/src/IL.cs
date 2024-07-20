@@ -291,7 +291,7 @@ public class Label : Statement {
 }
 
 public class Jump : Statement {
-  public string Target { get; }
+  public string Target { get; set; }
 
   public Jump(string target) {
     Target = target;
