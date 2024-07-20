@@ -241,9 +241,9 @@ public class FloatToIntConversion : Conversion {
 
 public class Call : Expression {
   public string FuncName { get; protected set; }
-  public Value[] Args { get; protected set; }
+  public List<Value> Args { get; protected set; }
 
-  public Call(string funcName, Value[] args) {
+  public Call(string funcName, List<Value> args) {
     FuncName = funcName;
     Args = args;
   }
@@ -252,16 +252,16 @@ public class Call : Expression {
 public class ExternCall : Call {
   public string FuncSource { get; }
 
-  public ExternCall(string funcSource, string funcName, Value[] args)
+  public ExternCall(string funcSource, string funcName, List<Value> args)
     : base(funcName, args) {
     FuncSource = funcSource;
   }
 }
 
 public class Phi : Expression {
-  public ID[] Ids { get; }
+  public List<IL.ID> Ids { get; }
 
-  public Phi(ID[] ids) {
+  public Phi(List<IL.ID> ids) {
     Ids = ids;
   }
 }
@@ -363,16 +363,16 @@ public class GlobalDef : Component {
 
 public class FuncDef : Component {
   public string Name { get; }
-  public FuncParam[] Params { get; }
+  public List<FuncParam> Params { get; }
   public Type RetType { get; }
-  public Statement[] StmtList { get; }
+  public List<Statement> StmtList { get; }
   public bool Exported { get; }
 
   public FuncDef(string name,
-                 FuncParam[] @params,
+                 List<FuncParam> @params,
                  Type retType,
-                 Statement[] stmtList,
-                 bool exported) {
+                 List<Statement> stmtList,
+                 bool exported = false) {
     Name = name;
     Params = @params;
     RetType = retType;
@@ -394,12 +394,12 @@ public class FuncParam {
 public class ExternFuncDef : Component {
   public string Source { get; }
   public string Name { get; }
-  public Type[] ParamTypes { get; }
+  public List<Type> ParamTypes { get; }
   public Type RetType { get; }
 
   public ExternFuncDef(string source,
                        string name,
-                       Type[] paramTypes,
+                       List<Type> paramTypes,
                        Type retType) {
     Source = source;
     Name = name;
@@ -417,5 +417,48 @@ public class Program {
     globalMap = new();
     funcMap = new();
     externFuncMap = new();
+  }
+
+  public void AddGlobal(GlobalDef globalDef) {
+    globalMap.Add(globalDef.Id.Name, globalDef);
+  }
+
+  public IEnumerable<GlobalDef> GetGlobals() {
+    foreach (GlobalDef g in globalMap.Values) {
+      yield return g;
+    }
+  }
+
+  public GlobalDef? GetGlobal(string name) {
+    return globalMap[name];
+  }
+
+  public void AddFunc(FuncDef funcDef) {
+    funcMap.Add(funcDef.Name, funcDef);
+  }
+
+  public IEnumerable<FuncDef> GetFuncs() {
+    foreach (FuncDef f in funcMap.Values) {
+      yield return f;
+    }
+  }
+
+  public FuncDef? GetFunc(string name) {
+    return funcMap[name];
+  }
+
+  public void AddExternFunc(ExternFuncDef externFuncDef) {
+    externFuncMap.Add((externFuncDef.Source, externFuncDef.Name),
+                      externFuncDef);
+  }
+
+  public IEnumerable<ExternFuncDef> GetExternFuncs() {
+    foreach (ExternFuncDef f in externFuncMap.Values) {
+      yield return f;
+    }
+  }
+
+  public ExternFuncDef? GetExternFunc(string source, string name) {
+    return externFuncMap[(source, name)];
   }
 }
