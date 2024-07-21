@@ -1,15 +1,17 @@
 using Lilac.IL;
 using System.Text.RegularExpressions;
+using Lilac.Frontend.SyntaxExceptions;
 
 namespace Lilac.Frontend;
 
-class Parser {
+public class Parser {
   private Scanner scanner;
   private Token nextToken;
 
   public static IL.Program ParseFile(string filename) {
-    // TODO
-    throw new NotImplementedException();
+    string content = File.ReadAllText(filename);
+    Parser parser = new(content);
+    return parser.Parse();
   }
 
   public Parser(string str) {
@@ -52,7 +54,7 @@ class Parser {
       return eaten;
     }
 
-    throw new Exception(); // TODO: make this a SyntaxException or something
+    throw new UnexpectedToken(nextToken.Position, types, nextToken);
   }
 
   private IL.Program ParseProgram() {
