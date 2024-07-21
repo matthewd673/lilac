@@ -57,7 +57,7 @@ class Scanner {
     }
 
     // trim best match from string and return
-    str.Remove(0, best.Image.Length);
+    str = str.Remove(0, best.Image.Length);
     scanRow += best.Image.Length;
 
     return best;
@@ -68,20 +68,20 @@ class Scanner {
 
     while (true) {
       if (str.StartsWith(" ")) {
-        str.Remove(0, 1);
+        str = str.Remove(0, 1);
         scanCol += 1;
       }
       else if (str.StartsWith("\n")) {
-        str.Remove(0, 1);
+        str = str.Remove(0, 1);
         scanRow += 1;
         scanCol = 0;
         sawNl = true;
       }
       else if (str.StartsWith("\r")) {
-        str.Remove(0, 1);
+        str = str.Remove(0, 1);
       }
       else if (str.StartsWith("\t")) {
-        str.Remove(0, 1);
+        str = str.Remove(0, 1);
         scanRow += 1; // NOTE: assume tab size = 1
       }
       // trim annotations
