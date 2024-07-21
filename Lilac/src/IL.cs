@@ -1,5 +1,13 @@
 namespace Lilac.IL;
 
+internal interface INode<T> {
+  public T Clone();
+}
+
+public abstract class Node<T> : INode<T> where T : Node<T> {
+  public abstract T Clone();
+}
+
 public enum Type {
   U8,
   U16,
@@ -80,16 +88,18 @@ public static class TypeMethods {
       case Type.F64: return "f64";
       case Type.Void: return "void";
       default:
-        throw new Exception();
+        throw new Exception(); // TODO: nice exception
     }
   }
 }
 
-public abstract class Value {
+public interface IValue;
+
+public abstract class Value<T> : Node<Value<T>>, IValue where T : IValue {
   // Empty
 }
 
-public class Constant : Value {
+public class Constant : Value<Constant> {
   public Type Type { get; }
   public object Value { get; }
 
@@ -97,35 +107,53 @@ public class Constant : Value {
     Type = type;
     Value = @value;
   }
+
+  public override Constant Clone() => new(Type, Value);
 }
 
-public class ID : Value {
+public class ID : Value<ID> {
   public string Name { get; set; }
 
   public ID(string name) {
     Name = name;
   }
+
+  public override ID Clone() => new(Name);
 }
 
 public class GlobalID : ID {
   public GlobalID(string name) : base(name) {
     // Empty
   }
+
+  public override GlobalID Clone() => new(Name);
 }
 
-public abstract class Expression {
+public interface IExpression;
+
+public abstract class Expression<T>
+  : Node<Expression<T>>,
+    IExpression
+    where T : IExpression {
   // Empty
 }
 
-public class ValueExpr : Expression {
-  public Value Value { get; }
+public class ValueExpr<U>
+  : Expression<ValueExpr<U>>
+    where U : Value<U> {
+  public Value<U> Value { get; }
 
-  public ValueExpr(Value @value) {
+  public ValueExpr(Value<U> @value) {
     Value = @value;
   }
+
+  public override ValueExpr<U> Clone() => new(Value);
 }
 
-public class BinaryOp : Expression {
+public class BinaryOp<TLeft, TRight>
+  : Expression<BinaryOp<TLeft, TRight>>
+    where TLeft : Value<TLeft>
+    where TRight : Value<TRight> {
   public enum Operator {
     Add,
     Sub,
@@ -147,17 +175,20 @@ public class BinaryOp : Expression {
   }
 
   public Operator Op { get; }
-  public Value Left { get; }
-  public Value Right { get; }
+  public Value<TLeft> Left { get; }
+  public Value<TRight> Right { get; }
 
-  public BinaryOp(Operator op, Value left, Value right) {
+  public BinaryOp(Operator op, Value<TLeft> left, Value<TRight> right) {
     Op = op;
     Left = left;
     Right = right;
   }
+
+  public override BinaryOp<TLeft, TRight> Clone() => new(Op, Left, Right);
 }
 
-public class UnaryOp : Expression {
+public class UnaryOp<TValue>
+  : Expression<UnaryOp<TValue>> where TValue : Value<TValue> {
   public enum Operator {
     Neg,
     BoolNot,
@@ -165,176 +196,239 @@ public class UnaryOp : Expression {
   }
 
   public Operator Op { get; }
-  public Value Value { get; }
+  public Value<TValue> Value { get; }
 
-  public UnaryOp(Operator op, Value @value) {
+  public UnaryOp(Operator op, Value<TValue> @value) {
     Op = op;
     Value = @value;
   }
+
+  public override UnaryOp<TValue> Clone() => new(Op, Value);
 }
 
-public abstract class Conversion : Expression {
-  public Value Value { get; protected set; }
+public abstract class Conversion<TConversion, TValue>
+  : Expression<Conversion<TConversion, TValue>>
+  where TConversion : Conversion<TConversion, TValue>
+  where TValue : Value<TValue> {
+  public Value<TValue> Value { get; protected set; }
   public Type NewType { get; protected set; }
 
-  public Conversion(Value @value, Type newType) {
+  public Conversion(Value<TValue> @value, Type newType) {
     Value = @value;
     NewType = newType;
   }
 }
 
-public class SignTruncConversion : Conversion {
-  public SignTruncConversion(Value @value, Type newType)
+public class SignTruncConversion<TValue>
+  : Conversion<SignTruncConversion<TValue>, TValue>
+  where TValue : Value<TValue> {
+  public SignTruncConversion(Value<TValue> @value, Type newType)
     : base(@value, newType) {
     // Empty
   }
+
+  public override SignTruncConversion<TValue> Clone() => new(Value, NewType);
 }
 
-public class SignExtendConversion : Conversion {
-  public SignExtendConversion(Value @value, Type newType)
+public class SignExtendConversion<TValue>
+  : Conversion<SignExtendConversion<TValue>, TValue>
+  where TValue : Value<TValue> {
+  public SignExtendConversion(Value<TValue> @value, Type newType)
     : base(@value, newType) {
     // Empty
   }
+
+  public override SignExtendConversion<TValue> Clone() => new(Value, NewType);
 }
 
-public class TruncIntConversion : Conversion {
-  public TruncIntConversion(Value @value, Type newType)
+public class TruncIntConversion<TValue>
+  : Conversion<TruncIntConversion<TValue>, TValue>
+  where TValue : Value<TValue> {
+  public TruncIntConversion(Value<TValue> @value, Type newType)
     : base(@value, newType) {
     // Empty
   }
+
+  public override TruncIntConversion<TValue> Clone() => new(Value, NewType);
 }
 
-public class ExtendIntConversion : Conversion {
-  public ExtendIntConversion(Value @value, Type newType)
+public class ExtendIntConversion<TValue>
+  : Conversion<ExtendIntConversion<TValue>, TValue>
+  where TValue : Value<TValue> {
+  public ExtendIntConversion(Value<TValue> @value, Type newType)
     : base(@value, newType) {
     // Empty
   }
+
+  public override ExtendIntConversion<TValue> Clone() => new(Value, NewType);
 }
 
-public class TruncFloatConversion : Conversion {
-  public TruncFloatConversion(Value @value, Type newType)
+public class TruncFloatConversion<TValue>
+  : Conversion<TruncFloatConversion<TValue>, TValue>
+  where TValue : Value<TValue> {
+  public TruncFloatConversion(Value<TValue> @value, Type newType)
     : base(@value, newType) {
     // Empty
   }
+
+  public override TruncFloatConversion<TValue> Clone() => new(Value, NewType);
 }
 
-public class ExtendFloatConversion : Conversion {
-  public ExtendFloatConversion(Value @value, Type newType)
+public class ExtendFloatConversion<TValue>
+  : Conversion<ExtendFloatConversion<TValue>, TValue>
+  where TValue : Value<TValue> {
+  public ExtendFloatConversion(Value<TValue> @value, Type newType)
     : base(@value, newType) {
     // Empty
   }
+
+  public override ExtendFloatConversion<TValue> Clone() => new(Value, NewType);
 }
 
-public class IntToFloatConversion : Conversion {
-  public IntToFloatConversion(Value @value, Type newType)
+public class IntToFloatConversion<TValue>
+  : Conversion<IntToFloatConversion<TValue>, TValue>
+  where TValue : Value<TValue> {
+  public IntToFloatConversion(Value<TValue> @value, Type newType)
     : base(@value, newType) {
     // Empty
   }
+
+  public override IntToFloatConversion<TValue> Clone() => new(Value, NewType);
 }
 
-public class FloatToIntConversion : Conversion {
-  public FloatToIntConversion(Value @value, Type newType)
+public class FloatToIntConversion<TValue>
+  : Conversion<FloatToIntConversion<TValue>, TValue>
+  where TValue : Value<TValue> {
+  public FloatToIntConversion(Value<TValue> @value, Type newType)
     : base(@value, newType) {
     // Empty
   }
+
+  public override FloatToIntConversion<TValue> Clone() => new(Value, NewType);
 }
 
-public class Call : Expression {
+public class Call : Expression<Call> {
   public string FuncName { get; protected set; }
-  public List<Value> Args { get; protected set; }
+  public List<Value<IValue>> Args { get; protected set; }
 
-  public Call(string funcName, List<Value> args) {
+  public Call(string funcName, List<Value<IValue>> args) {
     FuncName = funcName;
     Args = args;
   }
+
+  public override Call Clone() => new(FuncName, Args);
 }
 
 public class ExternCall : Call {
   public string FuncSource { get; }
 
-  public ExternCall(string funcSource, string funcName, List<Value> args)
+  public ExternCall(string funcSource,
+                    string funcName,
+                    List<Value<IValue>> args)
     : base(funcName, args) {
     FuncSource = funcSource;
   }
+
+  public override ExternCall Clone() => new(FuncSource, FuncName, Args);
 }
 
-public class Phi : Expression {
-  public List<IL.ID> Ids { get; }
+public class Phi : Expression<Phi> {
+  public List<ID> Ids { get; }
 
-  public Phi(List<IL.ID> ids) {
+  public Phi(List<ID> ids) {
     Ids = ids;
   }
+
+  public override Phi Clone() => new(Ids);
 }
 
-public abstract class Statement {
+public interface IStatement;
+
+public abstract class Statement<T>
+  : Node<Statement<T>>,
+    IStatement {
   // Empty
 }
 
-public class Definition : Statement {
+public class Definition : Statement<Definition> {
   public Type Type { get; }
   public ID Id { get; }
-  public Expression Rhs { get; }
+  public Expression<IExpression> Rhs { get; }
 
-  public Definition(Type type, ID id, Expression rhs) {
+  public Definition(Type type, ID id, Expression<IExpression> rhs) {
     Type = type;
     Id = id;
     Rhs = rhs;
   }
+
+  public override Definition Clone() => new(Type, Id, Rhs);
 }
 
-public class Label : Statement {
+public class Label : Statement<Label> {
   public string Name { get; }
 
   public Label(string name) {
     Name = name;
   }
+
+  public override Label Clone() => new(Name);
 }
 
-public class Jump : Statement {
+public class Jump : Statement<Jump> {
   public string Target { get; set; }
 
   public Jump(string target) {
     Target = target;
   }
+
+  public override Jump Clone() => new(Target);
 }
 
 public abstract class CondJump : Jump {
-  public Value Cond;
+  public Value<IValue> Cond;
 
-  public CondJump(string target, Value cond) : base(target) {
+  public CondJump(string target, Value<IValue> cond) : base(target) {
     Cond = cond;
   }
 }
 
 public class JumpZero : CondJump {
-  public JumpZero(string target, Value cond) : base(target, cond) {
+  public JumpZero(string target, Value<IValue> cond) : base(target, cond) {
     // Empty
   }
+
+  public override JumpZero Clone() => new(Target, Cond);
 }
 
 public class JumpNotZero : CondJump {
-  public JumpNotZero(string target, Value cond) : base(target, cond) {
+  public JumpNotZero(string target, Value<IValue> cond) : base(target, cond) {
     // Empty
   }
+
+  public override JumpNotZero Clone() => new(Target, Cond);
 }
 
-public class Return : Statement {
-  public Value Value { get; }
+public class Return : Statement<Return> {
+  public Value<IValue> Value { get; }
 
-  public Return(Value @value) {
+  public Return(Value<IValue> @value) {
     Value = @value;
   }
+
+  public override Return Clone() => new(Value);
 }
 
-public class VoidCall : Statement {
+public class VoidCall : Statement<VoidCall> {
   public Call Call { get; }
 
   public VoidCall(Call call) {
     Call = call;
   }
+
+  public override VoidCall Clone() => new(Call);
 }
 
-public class InlineInstr : Statement {
+public class InlineInstr : Statement<InlineInstr> {
   public string Target { get; }
   // TODO: store as CodeGen.Instruction
   public string Instr { get; }
@@ -343,13 +437,20 @@ public class InlineInstr : Statement {
     Target = target;
     Instr = instr;
   }
+
+  public override InlineInstr Clone() => new(Target, Instr);
 }
 
-public abstract class Component {
+public interface IComponent;
+
+public abstract class Component<T>
+  : Node<Component<T>>,
+    IComponent
+    where T : IComponent {
   // Empty
 }
 
-public class GlobalDef : Component {
+public class GlobalDef : Component<GlobalDef> {
   public Type Type { get; }
   public GlobalID Id { get; }
   public Constant Rhs { get; }
@@ -359,19 +460,21 @@ public class GlobalDef : Component {
     Id = id;
     Rhs = rhs;
   }
+
+  public override GlobalDef Clone() => new(Type, Id, Rhs);
 }
 
-public class FuncDef : Component {
+public class FuncDef : Component<FuncDef> {
   public string Name { get; }
   public List<FuncParam> Params { get; }
   public Type RetType { get; }
-  public List<Statement> StmtList { get; }
+  public List<Statement<IStatement>> StmtList { get; }
   public bool Exported { get; }
 
   public FuncDef(string name,
                  List<FuncParam> @params,
                  Type retType,
-                 List<Statement> stmtList,
+                 List<Statement<IStatement>> stmtList,
                  bool exported = false) {
     Name = name;
     Params = @params;
@@ -379,9 +482,12 @@ public class FuncDef : Component {
     StmtList = stmtList;
     Exported = exported;
   }
+
+  public override FuncDef Clone() =>
+    new(Name, Params, RetType, StmtList, Exported);
 }
 
-public class FuncParam {
+public class FuncParam : Node<FuncParam> {
   public Type Type { get; }
   public ID Id { get; }
 
@@ -389,9 +495,11 @@ public class FuncParam {
     Type = type;
     Id = id;
   }
+
+  public override FuncParam Clone() => new(Type, Id);
 }
 
-public class ExternFuncDef : Component {
+public class ExternFuncDef : Component<ExternFuncDef> {
   public string Source { get; }
   public string Name { get; }
   public List<Type> ParamTypes { get; }
@@ -406,6 +514,9 @@ public class ExternFuncDef : Component {
     ParamTypes = paramTypes;
     RetType = retType;
   }
+
+  public override ExternFuncDef Clone() =>
+    new(Source, Name, ParamTypes, RetType);
 }
 
 public class Program {
