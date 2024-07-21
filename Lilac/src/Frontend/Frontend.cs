@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Lilac.Frontend;
 
-enum TokenType {
+public enum TokenType {
   None,
 
   Type,
@@ -47,7 +47,7 @@ Pattern = pattern;
   }
 }
 
-class Position {
+public class Position {
   public int Row { get; }
   public int Col { get; }
 
@@ -55,9 +55,13 @@ class Position {
     Row = row;
     Col = col;
   }
+
+  public override string ToString() {
+    return $"{Row}:{Col}";
+  }
 }
 
-class Token {
+public class Token {
   public TokenType Type { get; }
   public string Image { get; }
   public Position Position { get; }
@@ -66,6 +70,10 @@ class Token {
     Type = type;
     Image = image;
     Position = position;
+  }
+
+  public override string ToString() {
+    return $"({Type}, \"{Image}\", {Position})";
   }
 }
 
@@ -104,6 +112,6 @@ static class TokenDefConstants {
     new(TokenType.Label, new(@"[\w!@$^&\[\];'.?<>]+:")),
     new(TokenType.ID, new(@"\$[a-zA-Z0-9_.]+")),
     new(TokenType.GlobalID, new("@[a-zA-Z0-9_.]+")),
-    new(TokenType.Name, new("[a-zA-Z_.][a-zA-Z_.0-9]+")),
+    new(TokenType.Name, new("[a-zA-Z_.][a-zA-Z_.0-9]*")),
   };
 }
