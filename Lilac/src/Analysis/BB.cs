@@ -1,10 +1,12 @@
+using Lilac.IL;
+
 namespace Lilac.Analysis;
 
 public class BB {
   public string Id { get; }
-  public IL.Label? Entry { get; }
-  public IL.Jump? Exit { get; }
-  public List<IL.Statement> StmtList { get; }
+  public Label? Entry { get; }
+  public Jump? Exit { get; }
+  public List<Statement> StmtList { get; }
   public bool TrueBranch { get; internal set; }
 
   public int Count {
@@ -18,22 +20,17 @@ public class BB {
   public BB(string id,
             IL.Label? entry = null,
             IL.Jump? exit = null,
-            List<IL.Statement> stmtList = null,
+            List<Statement>? stmtList = null,
             bool trueBranch = false) {
     Id = id;
     Entry = entry;
     Exit = exit;
-    if (stmtList is not null) {
-      StmtList = stmtList;
-    }
-    else {
-      StmtList = new();
-    }
+    StmtList = stmtList ?? [];
     TrueBranch = trueBranch;
   }
 
   public override bool Equals(object? obj) {
-    if (obj.GetType() != typeof(BB)) {
+    if (obj is null || obj.GetType() != typeof(BB)) {
       return false;
     }
 
@@ -72,7 +69,7 @@ public class BB {
     return s;
   }
 
-  public static List<BB> FromStmtList(List<IL.Statement> stmtList) {
+  public static List<BB> FromStmtList(List<Statement> stmtList) {
     List<BB> blocks = new();
     List<IL.Statement> blockStmts = new();
     IL.Label? currentEntry = null;
@@ -92,18 +89,18 @@ public class BB {
       }
 
       // don't push labels or jumps, they belong in entry/exit
-      if (!(s is IL.Label || s is IL.Jump)) {
+      if (!(s is Label or Jump)) {
         blockStmts.Add(s);
       }
 
       // mark end of a block
-      if (s is not IL.Jump) {
+      if (s is not Jump) {
         continue;
       }
 
       blocks.Add(new(Guid.NewGuid().ToString(),
                      entry: currentEntry,
-                     exit: (IL.Jump)s,
+                     exit: (Jump)s,
                      stmtList: blockStmts));
       blockStmts = new();
       currentEntry = null;
