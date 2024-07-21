@@ -26,4 +26,10 @@
     <ProjectReference Include="..\Lilac\Lilac.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\definition.lilac">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
