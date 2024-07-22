@@ -3,7 +3,7 @@ using Type = Lilac.IL.Type;
 
 namespace Lilac.Tests.FrontendTests;
 
-public class ParseFileTest {
+public class ParseFileTests {
   [Fact]
   public void ParseDefinition() {
     Program expected = new();
