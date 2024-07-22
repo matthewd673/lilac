@@ -286,10 +286,13 @@ public abstract class Conversion : Expression {
   }
 
   public override bool Equals(object? obj) {
-    // NOTE: this type equality check isn't as strict as usual
-    if (obj is not Conversion other) {
+    // NOTE: this type equality check is a little less strict than usual
+    // so that it doesn't have to be rewritten for every conversion.
+    if (obj is null || GetType() != obj.GetType()) {
       return false;
     }
+
+    Conversion other = (Conversion)obj;
 
     return Value.Equals(other.Value) && NewType.Equals(other.NewType);
   }
@@ -386,7 +389,7 @@ public class Call : Expression {
     }
 
     Call other = (Call)obj;
-    return FuncName.Equals(other.FuncName) && Args.Equals(other.Args);
+    return FuncName.Equals(other.FuncName) && Args.SequenceEqual(other.Args);
   }
 
   public override int GetHashCode() {
@@ -414,7 +417,7 @@ public class ExternCall : Call {
     ExternCall other = (ExternCall)obj;
     return FuncSource.Equals(other.FuncSource) &&
            FuncName.Equals(other.FuncName) &&
-           Args.Equals(other.Args);
+           Args.SequenceEqual(other.Args);
   }
 
   public override int GetHashCode() {
@@ -437,7 +440,7 @@ public class Phi : Expression {
     }
 
     Phi other = (Phi)obj;
-    return Ids.Equals(other.Ids);
+    return Ids.SequenceEqual(other.Ids);
   }
 
   public override int GetHashCode() {
@@ -696,8 +699,10 @@ public class FuncDef : Component {
     }
 
     FuncDef other = (FuncDef)obj;
-    return Name.Equals(other.Name) && Params.Equals(other.Params) &&
-           RetType.Equals(other.RetType) && StmtList.Equals(other.StmtList) &&
+
+    return Name.Equals(other.Name) && Params.SequenceEqual(other.Params) &&
+           RetType.Equals(other.RetType) &&
+           StmtList.SequenceEqual(other.StmtList) &&
            Exported.Equals(other.Exported);
   }
 
@@ -725,7 +730,7 @@ public class FuncParam : Node {
     }
 
     FuncParam other = (FuncParam)obj;
-    return Type.Equals(other.Type) && Id.Equals(Id);
+    return Type.Equals(other.Type) && Id.Equals(other.Id);
   }
 
   public override int GetHashCode() {
@@ -758,7 +763,8 @@ public class ExternFuncDef : Component {
 
     ExternFuncDef other = (ExternFuncDef)obj;
     return Source.Equals(other.Source) && Name.Equals(other.Name) &&
-           ParamTypes.Equals(other.ParamTypes) && RetType.Equals(other.RetType);
+           ParamTypes.SequenceEqual(other.ParamTypes) &&
+           RetType.Equals(other.RetType);
   }
 
   public override int GetHashCode() {
@@ -773,6 +779,10 @@ public class Program {
   private Dictionary<string, GlobalDef> globalMap;
   private Dictionary<string, FuncDef> funcMap;
   private Dictionary<(string, string), ExternFuncDef> externFuncMap;
+
+  public int GlobalCount => globalMap.Count;
+  public int FuncCount => funcMap.Count;
+  public int ExternFuncCount => externFuncMap.Count;
 
   public Program() {
     globalMap = new();
@@ -821,5 +831,47 @@ public class Program {
 
   public ExternFuncDef? GetExternFunc(string source, string name) {
     return externFuncMap[(source, name)];
+  }
+
+  public override bool Equals(object? obj) {
+    if (obj is null || obj.GetType() != typeof(Program)) {
+      return false;
+    }
+
+    Program other = (Program)obj;
+
+    if (GlobalCount != other.GlobalCount) {
+      return false;
+    }
+    foreach (string k in globalMap.Keys) {
+      if (!globalMap[k].Equals(other.GetGlobal(k))) {
+        return false;
+      }
+    }
+
+    if (FuncCount != other.FuncCount) {
+      return false;
+    }
+    foreach (string k in funcMap.Keys) {
+      if (!funcMap[k].Equals(other.GetFunc(k))) {
+        return false;
+      }
+    }
+
+    if (ExternFuncCount != other.ExternFuncCount) {
+      return false;
+    }
+    foreach ((string, string) k in externFuncMap.Keys) {
+      if (!externFuncMap[k].Equals(other.GetExternFunc(k.Item1,
+                                     k.Item2))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  public override int GetHashCode() {
+    return HashCode.Combine(GetType(), globalMap, funcMap, externFuncMap);
   }
 }
