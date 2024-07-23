@@ -203,6 +203,7 @@ public class BinaryOp : Expression {
     Sub,
     Mul,
     Div,
+    Mod,
     Eq,
     Neq,
     Lt,
