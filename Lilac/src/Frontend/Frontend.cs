@@ -85,7 +85,7 @@ static class TokenDefConstants {
     // NOTE: -@ isn't really used anywhere else but it will make parsing easier
     new(TokenType.UnaryOp, new("-@|!@|~@")),
     new(TokenType.BinaryOp,
-        new(@"\+|-|\*|\/|==|!=|<=|>=|<<|>>|&&|\|\||<|>|&|\||\^")),
+        new(@"\+|-|\*|\/|%|==|!=|<=|>=|<<|>>|&&|\|\||<|>|&|\||\^")),
     new(TokenType.Phi, new("phi")),
     new(TokenType.Assignment, new("=")),
     new(TokenType.Jump, new("jmp")),
@@ -103,8 +103,8 @@ static class TokenDefConstants {
 
     // other
     new(TokenType.VoidConst, new("void")),
-    new(TokenType.UIntConst, new("[0-9]+(u8|u16|u32|u64)")),
-    new(TokenType.IntConst, new("-?[0-9]+(i8|i16|i32|i64)")),
+    new(TokenType.UIntConst, new("([0-9]+)(u8|u16|u32|u64)")),
+    new(TokenType.IntConst, new("(-?[0-9]+)(i8|i16|i32|i64)")),
     new(TokenType.FloatConst,
         new(@"-?(([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+))(f32|f64)")),
     // NOTE: there are no restrictions on these names when constructing IL

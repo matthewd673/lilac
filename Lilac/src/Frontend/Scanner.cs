@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Lilac.Frontend.SyntaxExceptions;
 
 namespace Lilac.Frontend;
 
@@ -53,7 +54,7 @@ class Scanner {
     }
 
     if (best is null) {
-      throw new Exception(); // TODO: nice exception
+      throw new InvalidCharacterException(pos, str[0]);
     }
 
     // trim best match from string and return

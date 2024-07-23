@@ -8,7 +8,7 @@ public class Parser {
   private Scanner scanner;
   private Token nextToken;
 
-  public static IL.Program ParseFile(string filename) {
+  public static Program ParseFile(string filename) {
     string content = File.ReadAllText(filename);
     Parser parser = new(content);
     return parser.Parse();
@@ -19,12 +19,12 @@ public class Parser {
     nextToken = new(TokenType.None, "", new(0, 0));
   }
 
-  public IL.Program Parse() {
+  public Program Parse() {
     nextToken = scanner.ScanNext();
     return ParseProgram();
   }
 
-  public List<IL.Statement> ParseStatement() {
+  public List<Statement> ParseStatement() {
     nextToken = scanner.ScanNext();
     if (See(TokenType.EOF)) {
       return new();
@@ -54,11 +54,11 @@ public class Parser {
       return eaten;
     }
 
-    throw new UnexpectedToken(nextToken.Position, types, nextToken);
+    throw new UnexpectedTokenException(nextToken.Position, types, nextToken);
   }
 
-  private IL.Program ParseProgram() {
-    IL.Program program = new();
+  private Program ParseProgram() {
+    Program program = new();
 
     // parse top level components
     while (!See(TokenType.EOF)) {
@@ -79,7 +79,8 @@ public class Parser {
         program.AddExternFunc(ParseExternFuncDef());
       }
       else {
-        throw new Exception(); // TODO: nice error
+        throw new CannotBeginException(nextToken.Position, "program",
+                                       nextToken);
       }
     }
 
@@ -88,8 +89,8 @@ public class Parser {
     return program;
   }
 
-  private List<IL.Statement> ParseStmtList() {
-    List<IL.Statement> stmtList = new();
+  private List<Statement> ParseStmtList() {
+    List<Statement> stmtList = new();
 
     // parse stmts until we reach the end
     while (!See(TokenType.EOF, TokenType.End, TokenType.Func)) {
@@ -99,7 +100,7 @@ public class Parser {
     return stmtList;
   }
 
-  private List<IL.Statement> ParseStmt() {
+  private List<Statement> ParseStmt() {
     // empty stmt
     if (See(TokenType.NewLine)) {
       Eat(TokenType.NewLine);
@@ -115,83 +116,84 @@ public class Parser {
       }
 
       string idStr = Eat(TokenType.ID, TokenType.GlobalID).Image;
-      IL.ID id = IdFromString(idStr);
+      ID id = IdFromString(idStr);
 
       Eat(TokenType.Assignment);
 
-      IL.Expression rhs = ParseExpr();
+      Expression rhs = ParseExpr();
 
-      return new() { new IL.Definition(type, id, rhs) };
+      return new() { new Definition(type, id, rhs) };
     }
     // label
     else if (See(TokenType.Label)) {
       string labelStr = Eat(TokenType.Label).Image;
       labelStr = labelStr.Remove(labelStr.Length - 1); // remove ':'
 
-      return new() { new IL.Label(labelStr) };
+      return new() { new Label(labelStr) };
     }
     // jump
     else if (See(TokenType.Jump)) {
       Eat(TokenType.Jump);
       string targetStr = Eat(TokenType.Name).Image;
 
-      return new() { new IL.Jump(targetStr) };
+      return new() { new Jump(targetStr) };
     }
     // jump zero
     else if (See(TokenType.JumpZero)) {
       Eat(TokenType.JumpZero);
-      IL.Value @value = ParseValue();
+      Value @value = ParseValue();
       string targetStr = Eat(TokenType.Name).Image;
 
-      return new() { new IL.JumpZero(targetStr, @value) };
+      return new() { new JumpZero(targetStr, @value) };
     }
     // jump not zero
     else if (See(TokenType.JumpNotZero)) {
       Eat(TokenType.JumpNotZero);
-      IL.Value @value = ParseValue();
+      Value @value = ParseValue();
       string targetStr = Eat(TokenType.Name).Image;
 
-      return new() { new IL.JumpNotZero(targetStr, @value) };
+      return new() { new JumpNotZero(targetStr, @value) };
     }
     // return
     else if (See(TokenType.Return)) {
       Eat(TokenType.Return);
-      IL.Value @value = ParseValue();
+      Value @value = ParseValue();
 
-      return new() { new IL.Return(@value) };
+      return new() { new Return(@value) };
     }
     // void call
     else if (See(TokenType.VoidConst)) {
       Eat(TokenType.VoidConst);
-      IL.Call call = ParseCall();
+      Call call = ParseCall();
 
-      return new() { new IL.VoidCall(call) };
+      return new() { new VoidCall(call) };
     }
 
-    throw new Exception(); // TODO: nice exception
+    throw new CannotBeginException(nextToken.Position, "stmt",
+                                   nextToken);
   }
 
-  private IL.Expression ParseExpr() {
+  private Expression ParseExpr() {
     // value or binary op
     if (See(TokenType.UIntConst, TokenType.IntConst, TokenType.FloatConst,
             TokenType.ID, TokenType.GlobalID)) {
-      IL.Value lVal = ParseValue();
+      Value lVal = ParseValue();
 
       // if see a binary op, parse that
       // otherwise, we're done
       if (!See(TokenType.BinaryOp)) {
-        return new IL.ValueExpr(lVal);
+        return new ValueExpr(lVal);
       }
 
       Token binopTok = Eat(TokenType.BinaryOp);
-      IL.Value rVal = ParseValue();
+      Value rVal = ParseValue();
 
       return BinOpFromToken(binopTok, lVal, rVal);
     }
     // unary op
     else if (See(TokenType.UnaryOp)) {
       Token unopTok = Eat(TokenType.UnaryOp);
-      IL.Value @value = ParseValue();
+      Value @value = ParseValue();
 
       return UnOpFromToken(unopTok, @value);
     }
@@ -205,16 +207,17 @@ public class Parser {
 
       // eat id list
       Eat(TokenType.LeftParen);
-      List<IL.ID> ids = ParseIdList().ToList();
+      List<ID> ids = ParseIdList().ToList();
       Eat(TokenType.RightParen);
 
-      return new IL.Phi(ids);
+      return new Phi(ids);
     }
 
-    throw new Exception(); // TODO: nice error
+    throw new CannotBeginException(nextToken.Position, "expr",
+                                   nextToken);
   }
 
-  private IL.Call ParseCall() {
+  private Call ParseCall() {
     // func call
     if (See(TokenType.Call)) {
       // eat func name
@@ -223,10 +226,10 @@ public class Parser {
 
       // eat args
       Eat(TokenType.LeftParen);
-      List<IL.Value> args = ParseCallArgs().ToList();
+      List<Value> args = ParseCallArgs().ToList();
       Eat(TokenType.RightParen);
 
-      return new IL.Call(funcName, args);
+      return new Call(funcName, args);
     }
     // extern func call
     else if (See(TokenType.Extern)) {
@@ -238,16 +241,17 @@ public class Parser {
 
       // eat args
       Eat(TokenType.LeftParen);
-      List<IL.Value> args = ParseCallArgs().ToList();
+      List<Value> args = ParseCallArgs().ToList();
       Eat(TokenType.RightParen);
 
-      return new IL.ExternCall(funcSource, funcName, args);
+      return new ExternCall(funcSource, funcName, args);
     }
 
-    throw new Exception(); // TODO: nice exception
+    throw new CannotBeginException(nextToken.Position, "call",
+                                   nextToken);
   }
 
-  private IL.Value ParseValue() {
+  private Value ParseValue() {
     // constant
     if (See(TokenType.UIntConst, TokenType.IntConst, TokenType.FloatConst)) {
       return ParseConstant();
@@ -255,7 +259,7 @@ public class Parser {
     // void constant
     else if (See(TokenType.VoidConst)) {
       Eat(TokenType.VoidConst);
-      return new IL.Constant(IL.Type.Void, null);
+      return new Constant(IL.Type.Void, null);
     }
     // id
     else if (See(TokenType.ID, TokenType.GlobalID)) {
@@ -263,41 +267,43 @@ public class Parser {
       return IdFromString(idStr);
     }
 
-    throw new Exception(); // TODO: nice exception
+    throw new CannotBeginException(nextToken.Position, "value",
+                                   nextToken);
   }
 
-  private IL.Constant ParseConstant() {
+  private Constant ParseConstant() {
     if (See(TokenType.UIntConst, TokenType.IntConst, TokenType.FloatConst)) {
       string constStr = Eat(TokenType.UIntConst, TokenType.IntConst,
                             TokenType.FloatConst).Image;
       return ConstantFromString(constStr);
     }
 
-    throw new Exception(); // TODO: nice exception
+    throw new CannotBeginException(nextToken.Position, "constant",
+                                   nextToken);
   }
 
-  private IL.GlobalDef ParseGlobalDef() {
+  private GlobalDef ParseGlobalDef() {
     Eat(TokenType.Global);
 
     string typeStr = Eat(TokenType.Type).Image;
     IL.Type type = TypeFromString(typeStr);
 
     string idStr = Eat(TokenType.GlobalID).Image;
-    IL.GlobalID id = GlobalIdFromString(idStr);
+    GlobalID id = GlobalIdFromString(idStr);
 
     Eat(TokenType.Assignment);
 
-    IL.Constant rhs = ParseConstant(); // rhs of GlobalDef is always a Constant
+    Constant rhs = ParseConstant(); // rhs of GlobalDef is always a Constant
 
-    return new IL.GlobalDef(type, id, rhs);
+    return new GlobalDef(type, id, rhs);
   }
 
-  private IL.FuncDef ParseFuncDef() {
+  private FuncDef ParseFuncDef() {
     Eat(TokenType.Func);
     string name = Eat(TokenType.Name).Image;
 
     Eat(TokenType.LeftParen);
-    List<IL.FuncParam> funcParams = ParseFuncParams().ToList();
+    List<FuncParam> funcParams = ParseFuncParams().ToList();
     Eat(TokenType.RightParen);
 
     Eat(TokenType.Arrow);
@@ -305,14 +311,14 @@ public class Parser {
     IL.Type retType = TypeFromString(retTypeStr);
     Eat(TokenType.NewLine);
 
-    List<IL.Statement> stmtList = ParseStmtList();
+    List<Statement> stmtList = ParseStmtList();
 
     Eat(TokenType.End);
 
-    return new IL.FuncDef(name, funcParams, retType, stmtList);
+    return new FuncDef(name, funcParams, retType, stmtList);
   }
 
-  private IL.ExternFuncDef ParseExternFuncDef() {
+  private ExternFuncDef ParseExternFuncDef() {
     Eat(TokenType.Extern);
     Eat(TokenType.Func);
     string source = Eat(TokenType.Name).Image;
@@ -327,10 +333,10 @@ public class Parser {
     IL.Type retType = TypeFromString(retTypeStr);
     Eat(TokenType.NewLine);
 
-    return new IL.ExternFuncDef(source, name, funcParamTypes, retType);
+    return new ExternFuncDef(source, name, funcParamTypes, retType);
   }
 
-  private IEnumerable<IL.FuncParam> ParseFuncParams() {
+  private IEnumerable<FuncParam> ParseFuncParams() {
     // epsilon
     if (See(TokenType.RightParen)) {
       yield break;
@@ -340,9 +346,9 @@ public class Parser {
     IL.Type type = TypeFromString(typeStr);
 
     string idStr = Eat(TokenType.ID).Image;
-    IL.ID id = IdFromString(idStr);
+    ID id = IdFromString(idStr);
 
-    yield return new IL.FuncParam(type, id);
+    yield return new FuncParam(type, id);
 
     // if we see a comma then we have to recurse
     if (!See(TokenType.Comma)) {
@@ -350,7 +356,7 @@ public class Parser {
     }
 
     Eat(TokenType.Comma);
-    foreach (IL.FuncParam p in ParseFuncParams()) {
+    foreach (FuncParam p in ParseFuncParams()) {
       yield return p;
     }
   }
@@ -377,13 +383,13 @@ public class Parser {
     }
   }
 
-  private IEnumerable<IL.Value> ParseCallArgs() {
+  private IEnumerable<Value> ParseCallArgs() {
     // epsilon
     if (See(TokenType.RightParen)) {
       yield break;
     }
 
-    IL.Value @value = ParseValue();
+    Value @value = ParseValue();
     yield return @value;
 
     // if we see a comma then we have to recurse
@@ -392,13 +398,13 @@ public class Parser {
     }
 
     Eat(TokenType.Comma);
-    foreach (IL.Value v in ParseCallArgs()) {
+    foreach (Value v in ParseCallArgs()) {
       yield return v;
     }
   }
 
-  private IEnumerable<IL.ID> ParseIdList() {
-    IL.ID id = IdFromString(Eat(TokenType.ID, TokenType.GlobalID).Image);
+  private IEnumerable<ID> ParseIdList() {
+    ID id = IdFromString(Eat(TokenType.ID, TokenType.GlobalID).Image);
 
     yield return id;
 
@@ -408,7 +414,7 @@ public class Parser {
     }
 
     Eat(TokenType.Comma);
-    foreach (IL.ID i in ParseIdList()) {
+    foreach (ID i in ParseIdList()) {
       yield return i;
     }
   }
@@ -428,36 +434,41 @@ public class Parser {
       case "f64": return IL.Type.F64;
     }
 
-    throw new Exception(); // TODO: nice exception
+    // NOTE: if this happens then something is wrong in the Scanner
+    throw new InvalidTypeException(nextToken.Position, str);
   }
 
-  private IL.ID IdFromString(string str) {
+  private ID IdFromString(string str) {
     if (str.StartsWith("@")) { // global
-      return new IL.GlobalID(str.Remove(0, 1));
+      return new GlobalID(str.Remove(0, 1));
     }
     else if (str.StartsWith("$")) { // local
-      return new IL.ID(str.Remove(0, 1));
+      return new ID(str.Remove(0, 1));
     }
 
-    throw new Exception(); // TODO: nice exception
+    throw new InvalidStringFormatException(nextToken.Position, str,
+                                           "ID");
   }
 
-  private IL.GlobalID GlobalIdFromString(string str) {
-    IL.ID id = IdFromString(str);
-    if (id is IL.GlobalID) {
-      return (IL.GlobalID)id;
+  private GlobalID GlobalIdFromString(string str) {
+    ID id = IdFromString(str);
+    if (id is GlobalID) {
+      return (GlobalID)id;
     }
 
-    throw new Exception(); // TODO: nice exception
+    throw new InvalidStringFormatException(nextToken.Position, str,
+                                           "GlobalID");
   }
 
-  private IL.Constant ConstantFromString(string str) {
+  private Constant ConstantFromString(string str) {
     // find numeric and type in constant string
-    Regex valRegex = new("([0-9.])([uif][0-9]{1,2})");
+    Regex valRegex = new(@"(-?[0-9]*\.?[0-9]*)([uif][0-9]{1,2})");
     Match m = valRegex.Match(str);
     if (m.Groups.Count < 3) {
-      throw new Exception(); // TODO: nice exception
+      throw new InvalidStringFormatException(nextToken.Position, str,
+                                             "Constant");
     }
+
     string valStr = m.Groups[1].Value;
     string typeStr = m.Groups[2].Value;
 
@@ -466,64 +477,72 @@ public class Parser {
     if (type.IsInteger()) {
       long @value;
       if (!long.TryParse(valStr, out @value)) {
-        throw new Exception(); // TODO: nice exception
+        throw new InvalidStringFormatException(nextToken.Position, valStr,
+                                               "integer");
       }
-      return new IL.Constant(type, @value);
+      return new Constant(type, @value);
     }
     else if (type.IsFloat()) {
       double @value;
       if (!double.TryParse(valStr, out @value)) {
-        throw new Exception(); // TODO: nice exception
+        throw new InvalidStringFormatException(nextToken.Position, valStr,
+                                               "float");
       }
-      return new IL.Constant(type, @value);
+      return new Constant(type, @value);
     }
 
-    throw new Exception(); // TODO: nice exception
+    throw new InvalidStringFormatException(nextToken.Position, valStr,
+                                           "Constant");
   }
 
-  private IL.BinaryOp BinOpFromToken(Token token,
-                                     IL.Value left,
-                                     IL.Value right) {
-    IL.BinaryOp.Operator? op = token.Image switch {
-      "+" => IL.BinaryOp.Operator.Add,
-      "-" => IL.BinaryOp.Operator.Sub,
-      "*" => IL.BinaryOp.Operator.Mul,
-      "/" => IL.BinaryOp.Operator.Div,
-      "==" => IL.BinaryOp.Operator.Eq,
-      "!=" => IL.BinaryOp.Operator.Neq,
-      "<" => IL.BinaryOp.Operator.Lt,
-      ">" => IL.BinaryOp.Operator.Gt,
-      "<=" => IL.BinaryOp.Operator.Leq,
-      ">=" => IL.BinaryOp.Operator.Geq,
-      "&&" => IL.BinaryOp.Operator.BoolAnd,
-      "||" => IL.BinaryOp.Operator.BoolOr,
-      "<<" => IL.BinaryOp.Operator.BitLs,
-      ">>" => IL.BinaryOp.Operator.BitRs,
-      "&" => IL.BinaryOp.Operator.BitAnd,
-      "|" => IL.BinaryOp.Operator.BitOr,
-      "^" => IL.BinaryOp.Operator.BitXor,
+  private BinaryOp BinOpFromToken(Token token,
+                                     Value left,
+                                     Value right) {
+    BinaryOp.Operator? op = token.Image switch {
+      "+" => BinaryOp.Operator.Add,
+      "-" => BinaryOp.Operator.Sub,
+      "*" => BinaryOp.Operator.Mul,
+      "/" => BinaryOp.Operator.Div,
+      "%" => BinaryOp.Operator.Mod,
+      "==" => BinaryOp.Operator.Eq,
+      "!=" => BinaryOp.Operator.Neq,
+      "<" => BinaryOp.Operator.Lt,
+      ">" => BinaryOp.Operator.Gt,
+      "<=" => BinaryOp.Operator.Leq,
+      ">=" => BinaryOp.Operator.Geq,
+      "&&" => BinaryOp.Operator.BoolAnd,
+      "||" => BinaryOp.Operator.BoolOr,
+      "<<" => BinaryOp.Operator.BitLs,
+      ">>" => BinaryOp.Operator.BitRs,
+      "&" => BinaryOp.Operator.BitAnd,
+      "|" => BinaryOp.Operator.BitOr,
+      "^" => BinaryOp.Operator.BitXor,
       _ => null,
     };
 
     if (op is null) {
-      throw new Exception(); // TODO: nice exception
+      // NOTE: if we hit this then the TokenDef or the switch statement is wrong
+      throw new InvalidStringFormatException(nextToken.Position, token.Image,
+                                             "binary operator");
     }
 
-    return new IL.BinaryOp((IL.BinaryOp.Operator)op, left, right);
+    return new BinaryOp((BinaryOp.Operator)op, left, right);
   }
 
-  private IL.UnaryOp UnOpFromToken(Token token, IL.Value @value) {
-    IL.UnaryOp.Operator? op = token.Image switch {
-      "-@" => IL.UnaryOp.Operator.Neg,
-      "!@" => IL.UnaryOp.Operator.BoolNot,
-      "~@" => IL.UnaryOp.Operator.BitNot,
+  private UnaryOp UnOpFromToken(Token token, Value @value) {
+    UnaryOp.Operator? op = token.Image switch {
+      "-@" => UnaryOp.Operator.Neg,
+      "!@" => UnaryOp.Operator.BoolNot,
+      "~@" => UnaryOp.Operator.BitNot,
       _ => null,
     };
 
     if (op is null) {
-      throw new Exception(); // TODO: nice exception
+      // NOTE: if we hit this then the TokenDef or the switch statement is wrong
+      throw new InvalidStringFormatException(nextToken.Position, token.Image,
+                                             "unary operator");
     }
 
-    return new IL.UnaryOp((IL.UnaryOp.Operator)op, @value);
+    return new UnaryOp((UnaryOp.Operator)op, @value);
   }
 }
