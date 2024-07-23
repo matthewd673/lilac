@@ -472,4 +472,108 @@ public class EqualityTests {
                           Type.F32);
     Assert.NotEqual(g, h);
   }
+
+  [Fact]
+  public void ProgramsEqual() {
+    Program a = new();
+    Program b = new();
+    Assert.Equal(a, b);
+
+    Program c = new();
+    c.AddGlobal(new(Type.I32, new("global"),
+                    new Constant(Type.I32, 8)));
+    c.AddFunc(new FuncDef("main", [], Type.I32,
+                          [
+                            new Definition(Type.I32, new("a"),
+                              new ValueExpr(new Constant(Type.I32, 0))),
+                            new Return(new ID("a")),
+                          ])
+              );
+    c.AddExternFunc(new("source", "name", [],
+                        Type.Void));
+    Program d = new();
+    d.AddGlobal(new(Type.I32, new("global"),
+                    new Constant(Type.I32, 8)));
+    d.AddFunc(new FuncDef("main", [], Type.I32,
+                          [
+                            new Definition(Type.I32, new("a"),
+                              new ValueExpr(new Constant(Type.I32, 0))),
+                            new Return(new ID("a")),
+                          ])
+              );
+    d.AddExternFunc(new("source", "name", [],
+                        Type.Void));
+    Assert.Equal(c, d);
+  }
+
+  [Fact]
+  public void ProgramsNotEqual() {
+    Program a = new();
+    Program b = new();
+    a.AddGlobal(new(Type.I32, new("global"),
+                    new Constant(Type.I32, 8)));
+    Assert.NotEqual(a, b);
+
+    Program c = new();
+    Program d = new();
+    c.AddGlobal(new(Type.I32, new("global"),
+                    new Constant(Type.I32, 8)));
+    d.AddGlobal(new(Type.I32, new("global2"),
+                    new Constant(Type.I32, 8)));
+    Assert.NotEqual(c, d);
+
+    Program e = new();
+    Program f = new();
+    e.AddFunc(new FuncDef("main", [], Type.I32,
+                          [
+                            new Definition(Type.I32, new("a"),
+                              new ValueExpr(new Constant(Type.I32, 0))),
+                            new Return(new ID("a")),
+                          ])
+              );
+    Assert.NotEqual(e, f);
+
+    Program g = new();
+    Program h = new();
+    g.AddFunc(new FuncDef("main", [], Type.I32,
+                          [
+                            new Definition(Type.I32, new("a"),
+                              new ValueExpr(new Constant(Type.I32, 0))),
+                            new Return(new ID("a")),
+                          ])
+              );
+    h.AddFunc(new FuncDef("main", [], Type.I32,
+                          [
+                            new Return(new Constant(Type.I32, 0)),
+                          ])
+              );
+    Assert.NotEqual(g, h);
+
+    Program i = new();
+    i.AddExternFunc(new("source", "name", [],
+                        Type.Void));
+    Program j = new();
+    Assert.NotEqual(i, j);
+
+    Program k = new();
+    k.AddExternFunc(new("source", "name", [],
+                        Type.Void));
+    Program l = new();
+    l.AddExternFunc(new("source", "name", [],
+                        Type.I32));
+    Assert.NotEqual(k, l);
+  }
+
+  [Fact]
+  public void StmtListEqual() {
+    List<Statement> a = [
+                          new Label("1"),
+                          new Jump("1"),
+                        ];
+    List<Statement> b = [
+                          new Label("1"),
+                          new Jump("1"),
+                        ];
+    Assert.Equal(a, b);
+  }
 }
