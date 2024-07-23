@@ -801,7 +801,12 @@ public class Program {
   }
 
   public GlobalDef? GetGlobal(string name) {
-    return globalMap[name];
+    try {
+      return globalMap[name];
+    }
+    catch (KeyNotFoundException e) {
+      return null;
+    }
   }
 
   public void AddFunc(FuncDef funcDef) {
@@ -815,7 +820,12 @@ public class Program {
   }
 
   public FuncDef? GetFunc(string name) {
-    return funcMap[name];
+    try {
+      return funcMap[name];
+    }
+    catch (KeyNotFoundException e) {
+      return null;
+    }
   }
 
   public void AddExternFunc(ExternFuncDef externFuncDef) {
@@ -830,7 +840,12 @@ public class Program {
   }
 
   public ExternFuncDef? GetExternFunc(string source, string name) {
-    return externFuncMap[(source, name)];
+    try {
+      return externFuncMap[(source, name)];
+    }
+    catch (KeyNotFoundException e) {
+      return null;
+    }
   }
 
   public override bool Equals(object? obj) {
