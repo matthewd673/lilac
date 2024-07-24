@@ -1,6 +1,6 @@
 namespace Lilac.Analysis;
 
-class CFG : Graph<BB> {
+public class CFG : Graph<BB> {
   public const string EntryId = "ENTRY";
   public const string ExitId = "EXIT";
 
@@ -100,24 +100,27 @@ class CFG : Graph<BB> {
       }
 
       // create an edge to the next block sequentially
-      BB following = blocks[i + 1];
-      if (following is not null) {
+      try {
+        BB following = blocks[i + 1];
         following.TrueBranch = false;
         AddEdge(new(b, following));
       }
-      // if there is no following block, connect to EXIT
-      else {
+      // if there is no following block, connect to EXIT instead
+      catch (ArgumentOutOfRangeException e) {
         Exit.TrueBranch = false;
         AddEdge(new(b, Exit));
       }
     }
 
-    // create an edge from ENTRY to first block (or EXIT if no blocks)
-    BB first = GetNodes().First();
-    if (first is null) {
-      first = Exit;
+    // create an edge from ENTRY to first block
+    try {
+      BB first = GetNodes().First();
+      first.TrueBranch = false;
+      AddEdge(new(Entry, first));
     }
-    first.TrueBranch = false;
-    AddEdge(new(Entry, first));
+    // no blocks, create an edge from ENTRY to EXIT instead
+    catch (ArgumentNullException e) {
+      AddEdge(new(Entry, Exit));
+    }
   }
 }

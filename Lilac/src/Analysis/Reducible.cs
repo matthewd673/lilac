@@ -1,6 +1,6 @@
 namespace Lilac.Analysis;
 
-class Reducible {
+public class Reducible {
   private CFG cfg;
 
   public Reducible(CFG cfg) {
