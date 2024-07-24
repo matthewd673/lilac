@@ -862,6 +862,7 @@ public class Program {
     if (GlobalCount != other.GlobalCount) {
       return false;
     }
+
     foreach (string k in globalMap.Keys) {
       if (!globalMap[k].Equals(other.GetGlobal(k))) {
         return false;
@@ -871,6 +872,7 @@ public class Program {
     if (FuncCount != other.FuncCount) {
       return false;
     }
+
     foreach (string k in funcMap.Keys) {
       if (!funcMap[k].Equals(other.GetFunc(k))) {
         return false;
@@ -880,9 +882,9 @@ public class Program {
     if (ExternFuncCount != other.ExternFuncCount) {
       return false;
     }
+
     foreach ((string, string) k in externFuncMap.Keys) {
-      if (!externFuncMap[k].Equals(other.GetExternFunc(k.Item1,
-                                     k.Item2))) {
+      if (!externFuncMap[k].Equals(other.GetExternFunc(k.Item1, k.Item2))) {
         return false;
       }
     }
