@@ -35,7 +35,7 @@ class Scope {
 }
 
 class SymbolTable {
-  private List<Scope> scopes;
+  private Stack<Scope> scopes;
 
   public Symbol? this[ID id] {
     get {
@@ -55,18 +55,18 @@ class SymbolTable {
   }
 
   public void PushScope() {
-    scopes.Insert(0, new Scope());
+    scopes.Push(new Scope());
   }
 
   public void PopScope() {
-    scopes.RemoveAt(0);
+    scopes.Pop();
   }
 
   public void Add(Symbol symbol) {
-    scopes[0].Add(symbol);
+    scopes.Peek().Add(symbol);
   }
 
-  public Scope? GetTopScope() {
-    return scopes[0];
+  public Scope GetTopScope() {
+    return scopes.Peek();
   }
 }
