@@ -166,4 +166,47 @@ public class ParseFileTests {
 
     Assert.Equal(expected, actual);
   }
+
+  [Fact]
+  public void ParseExtern() {
+    Program expected = new();
+    expected.AddExternFunc(new("console", "log",
+                               [Type.F64], Type.Void));
+    FuncDef divide = new("divide",
+                         [
+                           new(Type.F64, new ID("a")),
+                           new(Type.F64, new ID("b")),
+                         ],
+                         Type.F64,
+                         [
+                           new Definition(Type.F64, new ID("0"),
+                                          new BinaryOp(
+                                            BinaryOp.Operator.Div,
+                                            new ID("a"),
+                                            new ID("b")
+                                          )),
+                           new Return(new ID("0")),
+                         ]);
+    FuncDef main = new("main", [], Type.Void,
+                       [
+                         new Definition(Type.F64, new ID("1"),
+                                        new Call("divide",
+                                                 [
+                                                   new Constant(Type.F64, 6.0),
+                                                   new Constant(Type.F64, 3.3),
+                                                 ])),
+                         new Definition(Type.F64, new ID("ans"),
+                                        new ValueExpr(new ID("1"))),
+                         new VoidCall(
+                           new ExternCall("console", "log",
+                                          [new ID("ans")])),
+                         new Return(new Constant(Type.Void, 0)),
+                       ]);
+    expected.AddFunc(divide);
+    expected.AddFunc(main);
+
+    Program actual =
+      Frontend.Parser.ParseFile("./Resources/extern.lilac");
+    Assert.Equal(expected, actual);
+  }
 }
