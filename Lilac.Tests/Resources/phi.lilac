@@ -1,0 +1,17 @@
+func main() -> void
+  i32 $a = 1i32
+  i32 $b = 2i32
+  " if statement
+  i32 $0 = $a == 1i32
+  jz $0 L0
+  i32 $1 = $b * 2i32 " true branch
+  i32 $b = $0
+  jmp L1
+  L0: " false branch
+  i32 $2 = $b + 1i32
+  i32 $b = $0
+  " end of if statement
+  L1:
+  i32 $b = phi ($b, $b)
+  i32 $c = $b
+end

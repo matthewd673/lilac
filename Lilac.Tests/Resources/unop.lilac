@@ -1,0 +1,5 @@
+func main() -> void
+  i16 $a = -@ 2i16
+  u8 $b = !@ 0u8
+  u16 $c = ~@ 12u16
+end
