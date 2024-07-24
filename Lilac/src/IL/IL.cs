@@ -120,7 +120,10 @@ public class Constant : Value {
     }
 
     Constant other = (Constant)obj;
-    return Type.Equals(other.Type) && Value.Equals(other.Value);
+    // Don't check for value equality on void constants, conceptually they don't
+    // have a value. This has also been the source of an extremely annoying bug.
+    return Type.Equals(other.Type) &&
+           (Type.Equals(Type.Void) || Value.Equals(other.Value));
   }
 
   public override int GetHashCode() {
