@@ -9,6 +9,11 @@ public class EqualityTests {
     Constant a = new(Type.I32, 5);
     Constant b = new(Type.I32, 5);
     Assert.Equal(a, b);
+
+    // special behavior for void constants
+    Constant c = new(Type.Void, 0);
+    Constant d = new(Type.Void, 1);
+    Assert.Equal(c, d);
   }
 
   [Fact]
