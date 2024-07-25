@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lilac", "Lilac\Lilac.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lilac.Tests", "Lilac.Tests\Lilac.Tests.csproj", "{9F6D2DC1-7358-4A9A-B2C5-D08786813FAC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lilac.CLI", "Lilac.CLI\Lilac.CLI.csproj", "{CE5252EE-C0DD-4CF9-9D60-0E7F8B2B67F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{9F6D2DC1-7358-4A9A-B2C5-D08786813FAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F6D2DC1-7358-4A9A-B2C5-D08786813FAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F6D2DC1-7358-4A9A-B2C5-D08786813FAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE5252EE-C0DD-4CF9-9D60-0E7F8B2B67F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE5252EE-C0DD-4CF9-9D60-0E7F8B2B67F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE5252EE-C0DD-4CF9-9D60-0E7F8B2B67F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE5252EE-C0DD-4CF9-9D60-0E7F8B2B67F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
