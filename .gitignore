@@ -5,6 +5,10 @@
 *.swp
 *.swo
 
+# rider files
+.idea
+*.DotSettings.user
+
 # gem binary
 *.gem
 
