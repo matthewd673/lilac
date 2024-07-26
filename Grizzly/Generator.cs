@@ -2,17 +2,17 @@ using System.Text;
 using Lilac.IL;
 using IL = Lilac.IL;
 
-namespace Grizzly.Generator;
+namespace Grizzly;
 
 public class Generator {
   public int MinFunctions { get; set; } = 1;
-  public int MaxFunctions { get; set; } = 1;
+  public int MaxFunctions { get; set; } = 4;
 
   public int MinGlobals { get; set; } = 0;
-  public int MaxGlobals { get; set; } = 4;
+  public int MaxGlobals { get; set; } = 8;
 
   public int MinStmtListLength { get; set; } = 1;
-  public int MaxStmtListLength { get; set; } = 10;
+  public int MaxStmtListLength { get; set; } = 20;
 
   public HashSet<IL.Type> TypeSet { get; set; } = [IL.Type.I32];
 
