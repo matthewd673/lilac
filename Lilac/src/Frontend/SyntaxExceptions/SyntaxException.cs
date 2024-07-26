@@ -62,3 +62,10 @@ public class InvalidStringFormatException : SyntaxException {
     // Empty
   }
 }
+
+public class CannotGenerateException : Exception {
+  public CannotGenerateException(object node)
+    : base($"Cannot generate IL text format string for object {node}") {
+    // Empty
+  }
+}
