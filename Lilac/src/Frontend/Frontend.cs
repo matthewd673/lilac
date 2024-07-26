@@ -10,7 +10,6 @@ public enum TokenType {
   IntConst,
   FloatConst,
   VoidConst,
-  Register,
   BinaryOp,
   UnaryOp,
   Phi,
@@ -57,7 +56,7 @@ public class Position {
   }
 
   public override string ToString() {
-    return $"{Row}:{Col}";
+    return $"{Row + 1}:{Col + 1}";
   }
 }
 
@@ -73,7 +72,7 @@ public class Token {
   }
 
   public override string ToString() {
-    return $"({Type}, \"{Image}\", {Position})";
+    return $"{{ type: {Type}, image: \"{Image}\", position: {Position} }}";
   }
 }
 
@@ -82,7 +81,6 @@ static class TokenDefConstants {
     // keywords
     new(TokenType.Type, new("u8|u16|u32|u64|i8|i16|i32|i64|f32|f64")),
     new(TokenType.Arrow, new("->")),
-    // NOTE: -@ isn't really used anywhere else but it will make parsing easier
     new(TokenType.UnaryOp, new("-@|!@|~@")),
     new(TokenType.BinaryOp,
         new(@"\+|-|\*|\/|%|==|!=|<=|>=|<<|>>|&&|\|\||<|>|&|\||\^")),
