@@ -3,7 +3,7 @@ using Lilac.Frontend.SyntaxExceptions;
 
 namespace Lilac.Frontend;
 
-class Scanner {
+internal class Scanner {
   private string str;
   private int scanRow;
   private int scanCol;
