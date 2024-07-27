@@ -36,27 +36,17 @@ public enum Type {
 
 public static class TypeMethods {
   public static bool IsUnsigned(this Type type) {
-    switch (type) {
-      case Type.U8:
-      case Type.U16:
-      case Type.U32:
-      case Type.U64:
-        return true;
-      default:
-        return false;
-    }
+    return type switch {
+      Type.U8 or Type.U16 or Type.U32 or Type.U64 => true,
+      _ => false,
+    };
   }
 
   public static bool IsSigned(this Type type) {
-    switch (type) {
-      case Type.I8:
-      case Type.I16:
-      case Type.I32:
-      case Type.I64:
-        return true;
-      default:
-        return false;
-    }
+    return type switch {
+      Type.I8 or Type.I16 or Type.I32 or Type.I64 => true,
+      _ => false,
+    };
   }
 
   public static bool IsInteger(this Type type) {
@@ -64,13 +54,10 @@ public static class TypeMethods {
   }
 
   public static bool IsFloat(this Type type) {
-    switch (type) {
-      case Type.F32:
-      case Type.F64:
-        return true;
-      default:
-        return false;
-    }
+    return type switch {
+      Type.F32 or Type.F64 => true,
+      _ => false,
+    };
   }
 
   public static bool IsNumeric(this Type type) {
@@ -78,30 +65,27 @@ public static class TypeMethods {
   }
 
   public static bool IsVoid(this Type type) {
-    switch (type) {
-      case Type.Void:
-        return true;
-      default:
-        return false;
-    }
+    return type switch {
+      Type.Void => true,
+      _ => false,
+    };
   }
 
   public static string ToString(this Type type) {
-    switch (type) {
-      case Type.U8: return "u8";
-      case Type.U16: return "u16";
-      case Type.U32: return "u32";
-      case Type.U64: return "u64";
-      case Type.I8: return "i8";
-      case Type.I16: return "i16";
-      case Type.I32: return "i32";
-      case Type.I64: return "i64";
-      case Type.F32: return "f32";
-      case Type.F64: return "f64";
-      case Type.Void: return "void";
-      default:
-        throw new Exception(); // TODO: nice exception
-    }
+    return type switch {
+      Type.U8 => "u8",
+      Type.U16 => "u16",
+      Type.U32 => "u32",
+      Type.U64 => "u64",
+      Type.I8 => "i8",
+      Type.I16 => "i16",
+      Type.I32 => "i32",
+      Type.I64 => "i64",
+      Type.F32 => "f32",
+      Type.F64 => "f64",
+      Type.Void => "void",
+      _ => throw new ArgumentOutOfRangeException(),
+    };
   }
 }
 
