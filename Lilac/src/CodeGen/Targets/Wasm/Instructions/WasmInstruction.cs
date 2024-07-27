@@ -33,6 +33,24 @@ public abstract class TypedWasmInstruction(Type type) : WasmInstruction {
   }
 }
 
+public abstract class IntegerTypedWasmInstruction
+  : TypedWasmInstruction {
+  public IntegerTypedWasmInstruction(Type type) : base(type) {
+    if (!type.IsInteger()) {
+      throw new IllegalTypeException(type, this);
+    }
+  }
+}
+
+public abstract class FloatTypedWasmInstruction
+  : TypedWasmInstruction {
+  public FloatTypedWasmInstruction(Type type) : base(type) {
+    if (!type.IsFloat()) {
+      throw new IllegalTypeException(type, this);
+    }
+  }
+}
+
 public abstract class VariableWasmInstruction(string variable)
   : WasmInstruction {
   public string Variable { get; } = variable;
@@ -98,5 +116,15 @@ public abstract class TypedMemoryWasmInstruction(Type type, string memory = "")
 
   public override int GetHashCode() {
     return HashCode.Combine(OpCode, Type, Memory);
+  }
+}
+
+public abstract class IntegerTypedMemoryWasmInstruction
+  : TypedMemoryWasmInstruction {
+  public IntegerTypedMemoryWasmInstruction(Type type, string memory)
+    : base(type, memory) {
+    if (!type.IsInteger()) {
+      throw new IllegalTypeException(type, this);
+    }
   }
 }
