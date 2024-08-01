@@ -1,3 +1,5 @@
+using Lilac.Analysis;
+
 namespace Lilac;
 
 public class Graph<T> {
@@ -187,6 +189,86 @@ public class Graph<T> {
     incoming[edge.To].Remove(edge);
 
     return removed;
+  }
+
+  public IEnumerable<T> PostorderTraversal(T node) {
+    foreach (T n in PostorderTraversalHelper(node, [])) {
+      yield return n;
+    }
+  }
+
+  public Dictionary<T, int> ComputePostorderNumbering(T node) {
+    Dictionary<T, int> numbering = [];
+
+    int i = 0;
+    foreach (T n in PostorderTraversal(node)) {
+      numbering.Add(n, i);
+      i += 1;
+    }
+
+    return numbering;
+  }
+
+  public Dictionary<T, int> ComputeReversePostorderNumbering(T node) {
+    Dictionary<T, int> numbering = [];
+
+    int i = nodes.Count - 1;
+    foreach (T n in PostorderTraversal(node)) {
+      numbering.Add(n, i);
+      i -= 1;
+    }
+
+    return numbering;
+  }
+
+  public IEnumerable<T> PreorderTraversal(T node) {
+    foreach (T n in PreorderTraversalHelper(node, [])) {
+      yield return n;
+    }
+  }
+
+  public Dictionary<T, int> ComputePreorderNumbering(T node) {
+    Dictionary<T, int> numbering = [];
+
+    int i = 0;
+    foreach (T n in PostorderTraversal(node)) {
+      numbering.Add(n, i);
+      i += 1;
+    }
+
+    return numbering;
+  }
+
+  private IEnumerable<T> PostorderTraversalHelper(T node, HashSet<T> seen) {
+    if (seen.Contains(node)) {
+      yield break;
+    }
+
+    seen.Add(node);
+
+    foreach (T s in GetSuccessors(node)) {
+      foreach (T n in PostorderTraversalHelper(s, seen)) {
+        yield return n;
+      }
+    }
+
+    yield return node;
+  }
+
+  private IEnumerable<T> PreorderTraversalHelper(T node, HashSet<T> seen) {
+    if (seen.Contains(node)) {
+      yield break;
+    }
+
+    seen.Add(node);
+
+    yield return node;
+
+    foreach (T s in GetSuccessors(node)) {
+      foreach (T n in PostorderTraversalHelper(s, seen)) {
+        yield return n;
+      }
+    }
   }
 }
 
