@@ -4,7 +4,7 @@ namespace Lilac.CodeGen.Targets.Wasm;
 
 public class WasmBlock {
   public BB BB { get; }
-  public WasmBlock? NextBlock { get; }
+  public WasmBlock? NextBlock { get; set; }
 
   public WasmBlock(BB bb, WasmBlock? nextBlock = null) {
     BB = bb;
@@ -13,8 +13,8 @@ public class WasmBlock {
 }
 
 public class WasmIfBlock : WasmBlock {
-  public WasmBlock? TrueBranch { get; }
-  public WasmBlock? FalseBranch { get; }
+  public WasmBlock? TrueBranch { get; set; }
+  public WasmBlock? FalseBranch { get; set; }
 
   public WasmIfBlock(BB bb,
                      WasmBlock? trueBranch = null,
@@ -26,7 +26,7 @@ public class WasmIfBlock : WasmBlock {
 }
 
 public class WasmLoopBlock : WasmBlock {
-  public WasmBlock? Inner { get; }
+  public WasmBlock? Inner { get; set; }
 
   public WasmLoopBlock(BB bb, WasmBlock? inner = null)
     : base(bb) {
