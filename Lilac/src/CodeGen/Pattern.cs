@@ -23,7 +23,7 @@ internal static class Pattern {
     }
   }
 
-  public class InlineInstructionWildcard : Statement {
+  public class InlineInstrWildcard : Statement {
     // NOTE: stub
 
     public override Node Clone() {
