@@ -154,7 +154,9 @@ public class CloneTests {
 
   [Fact]
   public void CloneInlineInstr() {
-    InlineInstr a = new("wasm", "i32.add");
+    InlineInstr a = new("wasm",
+                        new CodeGen.Targets.Wasm.Instructions.Add(
+                         CodeGen.Targets.Wasm.Instructions.Type.I32));
     InlineInstr b = a.Clone();
 
     Assert.False(a == b);

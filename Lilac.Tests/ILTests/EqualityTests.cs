@@ -1,5 +1,9 @@
 using Lilac.IL;
 using Type = Lilac.IL.Type;
+using Lilac.CodeGen.Targets.Wasm.Instructions;
+using WasmType = Lilac.CodeGen.Targets.Wasm.Instructions.Type;
+using Call = Lilac.IL.Call;
+using Return = Lilac.IL.Return;
 
 namespace Lilac.Tests.ILTests;
 
@@ -334,19 +338,19 @@ public class EqualityTests {
 
   [Fact]
   public void InlineInstrsEqual() {
-    InlineInstr a = new("target", "inst");
-    InlineInstr b = new("target", "inst");
+    InlineInstr a = new("target", new Add(WasmType.F32));
+    InlineInstr b = new("target", new Add(WasmType.F32));
     Assert.Equal(a, b);
   }
 
   [Fact]
   public void InlineInstrsNotEqual() {
-    InlineInstr a = new("target", "inst");
-    InlineInstr b = new("target2", "inst");
+    InlineInstr a = new("target", new Add(WasmType.F32));
+    InlineInstr b = new("target2", new Add(WasmType.F32));
     Assert.NotEqual(a, b);
 
-    InlineInstr c = new("target", "inst");
-    InlineInstr d = new("target", "inst2");
+    InlineInstr c = new("target", new Add(WasmType.F32));
+    InlineInstr d = new("target", new Subtract(WasmType.F32));
     Assert.NotEqual(c, d);
   }
 

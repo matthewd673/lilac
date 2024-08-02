@@ -610,10 +610,9 @@ public class VoidCall : Statement {
 
 public class InlineInstr : Statement {
   public string Target { get; }
-  // TODO: store as CodeGen.Instruction
-  public string Instr { get; }
+  public CodeGen.Instruction Instr { get; }
 
-  public InlineInstr(string target, string instr) {
+  public InlineInstr(string target, CodeGen.Instruction instr) {
     Target = target;
     Instr = instr;
   }
