@@ -2,7 +2,7 @@ using Lilac.IL;
 
 namespace Lilac;
 
-class Symbol {
+public class Symbol {
   public ID Id { get; }
   public IL.Type Type { get; }
 
@@ -12,7 +12,7 @@ class Symbol {
   }
 }
 
-class Scope {
+public class Scope {
   private Dictionary<ID, Symbol> symbols;
 
   public Symbol? this[ID id] {
@@ -34,7 +34,7 @@ class Scope {
   }
 }
 
-class SymbolTable {
+public class SymbolTable {
   private Stack<Scope> scopes;
 
   public Symbol? this[ID id] {
