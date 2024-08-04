@@ -5,7 +5,7 @@ using Type = Lilac.CodeGen.Targets.Wasm.Instructions.Type;
 
 namespace Lilac.CodeGen.Targets.Wasm;
 
-public class WasmILTransformer(SymbolTable symbolTable)
+internal class WasmILTransformer(SymbolTable symbolTable)
   : ILTransformer<WasmInstruction> {
   private SymbolTable symbolTable = symbolTable;
 
@@ -107,25 +107,13 @@ public class WasmILTransformer(SymbolTable symbolTable)
       Constant constant =>
         constant.Type.IsVoid() ?
           [] :
-          [new Const(ILTypeToWasmType(constant.Type),
+          [new Const(constant.Type.ToWasmType(),
                      constant.Value.ToString())],
       _ => throw new ArgumentOutOfRangeException(),
     };
   }
 
-  private Type ILTypeToWasmType(IL.Type type) {
-    return type switch {
-      IL.Type.I32 => Type.I32,
-      IL.Type.I64 => Type.I64,
-      IL.Type.F32 => Type.F32,
-      IL.Type.F64 => Type.F64,
-      _ => throw new ArgumentOutOfRangeException(nameof(type), type,
-                                                 "IL type not supported in Wasm"
-                                                 ),
-    };
-  }
-
-  private IL.Type GetILType(Expression expr) {
+  public IL.Type GetILType(Expression expr) {
     return expr switch {
       BinaryOp binaryOp => GetILType(binaryOp.Left), // left & right must match
       UnaryOp unaryOp => GetILType(unaryOp.Value),
@@ -133,7 +121,7 @@ public class WasmILTransformer(SymbolTable symbolTable)
     };
   }
 
-  private IL.Type GetILType(Value value) {
+  public IL.Type GetILType(Value value) {
     return value switch {
       ID id => (symbolTable[id] ?? throw new NullReferenceException()).Type,
       Constant constant => constant.Type,
@@ -142,6 +130,6 @@ public class WasmILTransformer(SymbolTable symbolTable)
   }
 
   private Type GetWasmType(Value value) {
-    return ILTypeToWasmType(GetILType(value));
+    return GetILType(value).ToWasmType();
   }
 }

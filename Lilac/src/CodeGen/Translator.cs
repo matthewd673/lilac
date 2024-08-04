@@ -1,16 +1,20 @@
 using Lilac.Analysis;
-using Lilac.CodeGen.Targets.Wasm.Instructions;
 
 namespace Lilac.CodeGen;
 
-public abstract class Translator {
-  protected ILTransformer<WasmInstruction> Transformer { get; }
-  protected CFGProgram CFGProgram { get; }
+public abstract class Translator<TInstr> where TInstr : Instruction {
+  protected ILTransformer<TInstr> Transformer { get; set; }
+  protected CFGProgram CFGProgram { get; set; }
 
-  public Translator(ILTransformer<WasmInstruction> transformer,
+  public Translator(ILTransformer<TInstr> transformer,
                     CFGProgram cfgProgram) {
     Transformer = transformer;
     CFGProgram = cfgProgram;
+  }
+
+  // NOTE: for use by Translators that cannot use the default constructor.
+  protected Translator() {
+    throw new NotImplementedException();
   }
 
   public abstract Component Translate();

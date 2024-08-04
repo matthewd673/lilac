@@ -31,4 +31,16 @@ public static class TypeMethods {
       _ => throw new ArgumentOutOfRangeException(),
     };
   }
+
+  public static Type ToWasmType(this IL.Type type) {
+    return type switch {
+      IL.Type.I32 => Type.I32,
+      IL.Type.I64 => Type.I64,
+      IL.Type.F32 => Type.F32,
+      IL.Type.F64 => Type.F64,
+      _ => throw new ArgumentOutOfRangeException(nameof(type),
+                                                 type,
+                                                 "IL type not support in Wasm"),
+    };
+  }
 }
