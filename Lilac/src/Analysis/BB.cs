@@ -9,17 +9,13 @@ public class BB {
   public List<Statement> StmtList { get; }
   public bool TrueBranch { get; internal set; }
 
-  public int Count {
-    get { return StmtList.Count; }
-  }
+  public int Count => StmtList.Count;
 
-  public bool Empty {
-    get { return StmtList.Count == 0; }
-  }
+  public bool Empty => StmtList.Count == 0;
 
   public BB(string id,
-            IL.Label? entry = null,
-            IL.Jump? exit = null,
+            Label? entry = null,
+            Jump? exit = null,
             List<Statement>? stmtList = null,
             bool trueBranch = false) {
     Id = id;
@@ -55,11 +51,11 @@ public class BB {
       s += " (";
 
       if (Entry is not null) {
-        s += $"entry={Entry.ToString()}, ";
+        s += $"entry={Entry}, ";
       }
 
       if (Exit is not null) {
-        s += $"exit={Exit.ToString()}, ";
+        s += $"exit={Exit}, ";
       }
 
       s = s.Remove(s.Length - 2);
@@ -71,12 +67,12 @@ public class BB {
 
   public static List<BB> FromStmtList(List<Statement> stmtList) {
     List<BB> blocks = new();
-    List<IL.Statement> blockStmts = new();
-    IL.Label? currentEntry = null;
+    List<Statement> blockStmts = new();
+    Label? currentEntry = null;
 
-    foreach (IL.Statement s in stmtList) {
+    foreach (Statement s in stmtList) {
       // mark beginning of a new block
-      if (s is IL.Label) {
+      if (s is Label) {
         // push previous block onto list (its exit will be null)
         if (!(blockStmts.Count == 0 && currentEntry is null)) {
           blocks.Add(new(Guid.NewGuid().ToString(),
@@ -85,7 +81,7 @@ public class BB {
           blockStmts = new();
         }
 
-        currentEntry = (IL.Label)s;
+        currentEntry = (Label)s;
       }
 
       // don't push labels or jumps, they belong in entry/exit
@@ -116,7 +112,7 @@ public class BB {
     return blocks;
   }
 
-  public static List<IL.Statement> ToStmtList(List<BB> bbList) {
+  public static List<Statement> ToStmtList(List<BB> bbList) {
     // TODO
     throw new NotImplementedException();
   }
