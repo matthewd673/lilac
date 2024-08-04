@@ -15,9 +15,7 @@ public class Symbol {
 public class Scope {
   private Dictionary<ID, Symbol> symbols;
 
-  public Symbol? this[ID id] {
-    get { return symbols[id]; }
-  }
+  public Symbol this[ID id] => symbols[id];
 
   public Scope() {
     symbols = new();
@@ -40,9 +38,11 @@ public class SymbolTable {
   public Symbol? this[ID id] {
     get {
       foreach (Scope s in scopes) {
-        Symbol? sym = s[id];
-        if (sym is not null) {
-          return sym;
+        try {
+          return s[id];
+        }
+        catch {
+          // Ignored
         }
       }
 

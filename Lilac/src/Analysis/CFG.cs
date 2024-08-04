@@ -57,9 +57,6 @@ public class CFG : Graph<BB> {
   private void ComputeGraph(List<BB> blocks) {
     // this can only ever be called at construction so it will never be run
     // more than once.
-    Entry = new(EntryId, stmtList: new());
-    Exit = new(ExitId, stmtList: new());
-
     Dictionary<string, BB> labelMap = new();
 
     // add all blocks to the graph nodes
@@ -106,7 +103,7 @@ public class CFG : Graph<BB> {
         AddEdge(new(b, following));
       }
       // if there is no following block, connect to EXIT instead
-      catch (ArgumentOutOfRangeException e) {
+      catch (ArgumentOutOfRangeException) {
         Exit.TrueBranch = false;
         AddEdge(new(b, Exit));
       }
@@ -114,12 +111,12 @@ public class CFG : Graph<BB> {
 
     // create an edge from ENTRY to first block
     try {
-      BB first = GetNodes().First();
+      BB first = blocks[0];
       first.TrueBranch = false;
       AddEdge(new(Entry, first));
     }
     // no blocks, create an edge from ENTRY to EXIT instead
-    catch (ArgumentNullException e) {
+    catch (ArgumentOutOfRangeException) {
       AddEdge(new(Entry, Exit));
     }
   }
