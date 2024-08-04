@@ -441,7 +441,7 @@ public class Phi : Expression {
 public class Definition : Statement {
   public Type Type { get; }
   public ID Id { get; }
-  public Expression Rhs { get; }
+  public Expression Rhs { get; set; }
 
   public Definition(Type type, ID id, Expression rhs) {
     Type = type;
