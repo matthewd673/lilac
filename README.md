@@ -3,12 +3,14 @@
 ![Build workflow](https://github.com/matthewd673/lilac/actions/workflows/build.yml/badge.svg)
 ![Test workflow](https://github.com/matthewd673/lilac/actions/workflows/test.yml/badge.svg)
 
-Lilac is a small compiler infrastructure written in Ruby.
+Lilac is a little intermediate language (Lilac IL) and compiler for the IL.
+It currently targets Wasm and features a number of small optimizations and analyses with more on the way.
+Lilac was originally written in Ruby and was recently rewritten in C#, some features and tests are still being
+translated.
 
 * [Features](#features)
 * [Documentation](#documentation)
 * [Build and run](#build-and-run)
-* [Why Ruby?](#why-ruby)
 
 ## Features
 
@@ -30,62 +32,25 @@ Lilac is a small compiler infrastructure written in Ruby.
 
 ## Documentation
 
-API docs for Lilac are available [here](https://matthewd673.github.io/lilac/).
-Documentation is generated automatically with [Yard](https://yardoc.org)
-whenever `master` changes.
+API docs for Lilac are available [here](https://matthewd673.github.io/lilac/). The API docs are updated automatically whenever `master` changes.
 
 ## Build and run
 
-Lilac uses [rbenv](https://github.com/rbenv/rbenv) to manage its Ruby version.
+Lilac has no dependencies which makes it very easy to get started.
 
-To set up Lilac:
-
-```
-bundle install
-rake
-```
-
-To build and use Lilac in another gem:
+To build Lilac:
 
 ```
-cd ~/.../lilac
-rake
-cd ~/.../other_gem
-gem install --local ~/.../lilac/lilac-X.X.X.gem
+dotnet build
 ```
-
-### CLI
-
-Lilac also has a very simple CLI that can be run with the following:
-```
-ruby lib/lilac.rb
-```
-
-The Lilac CLI includes tools for printing information about Lilac and parsing
-Lilac IL source code files.
 
 ### Tests
 
 To run Lilac's tests:
 ```
-rake test
+dotnet test
 ```
 
 Some of Lilac's tests require the
 [WebAssembly/wabt](https://github.com/webassembly/wabt) tools to be installed
 and accessible in `PATH`.
-
-## Why Ruby?
-
-Ruby may seem like an odd choice for implementing a compiler. Lilac is written
-in Ruby because:
-
-* The language is easy to understand so I can focus on the logic instead.
-* Its object-oriented which fits the `IL` and `Instruction` classes well.
-* The most painful parts of the language can largely be handled with Sorbet.
-* Writing a frontend is pretty easy in Ruby (powerful Regex, etc.)
-* Speed and memory usage don't matter (yet).
-
-In the event that the project becomes too unwieldy or Lilac gets more
-sophisticated and performance becomes important I plan to slowly transition
-the codebase to Rust with FFI.
