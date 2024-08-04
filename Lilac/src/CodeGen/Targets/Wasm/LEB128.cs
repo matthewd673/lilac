@@ -1,6 +1,6 @@
 namespace Lilac.CodeGen.Targets.Wasm;
 
-public static class LEB128 {
+internal static class LEB128 {
   public static byte[] EncodeUnsigned(long number) {
     // NOTE: adapted from https://en.wikipedia.org/wiki/LEB128#C-like_pseudocode
     List<byte> bytes = [];
