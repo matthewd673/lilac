@@ -1,7 +1,7 @@
 namespace Lilac;
 
-abstract class Pass {
-  public string Id { get; }
+public abstract class Pass {
+  public abstract string Id { get; }
 
   public abstract void Run();
 

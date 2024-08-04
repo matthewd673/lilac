@@ -4,6 +4,8 @@ using System;
 namespace Lilac.Transformations;
 
 class ToReducible : Pass {
+  public override string Id => "to_reducible";
+
   private CFG cfg;
   private int labelCt;
 
