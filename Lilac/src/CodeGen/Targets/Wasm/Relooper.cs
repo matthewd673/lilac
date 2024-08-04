@@ -4,17 +4,12 @@ namespace Lilac.CodeGen.Targets.Wasm;
 
 public class Relooper {
   private CFG cfg;
-  private DomTree domTree;
-  private Dictionary<BB, int> cfgRpo;
-  private Dictionary<BB, BlockProperty> props;
+  private DomTree? domTree;
+  private Dictionary<BB, int>? cfgRpo;
+  private Dictionary<BB, BlockProperty>? props;
 
   public Relooper(CFG cfg) {
     this.cfg = cfg;
-
-    // these will be filled in later
-    domTree = new DomTree(new CFGFacts<BB>(new CFG()));
-    cfgRpo = new();
-    props = new();
   }
 
   public WasmBlock Translate() {
@@ -34,6 +29,7 @@ public class Relooper {
     cfgRpo = cfg.ComputeReversePostorderNumbering(cfg.Entry);
 
     // classify each node in the CFG
+    props = new();
     ClassifyNodes();
 
     // translate everything starting at ENTRY

@@ -14,7 +14,7 @@ public abstract class Translator<TInstr> where TInstr : Instruction {
 
   // NOTE: for use by Translators that cannot use the default constructor.
   protected Translator() {
-    throw new NotImplementedException();
+    // Empty
   }
 
   public abstract Component Translate();

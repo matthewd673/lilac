@@ -40,7 +40,11 @@ public class WatGenerator(WasmComponent rootComponent)
       Module module => GenerateModule(module, indent),
       Import import => GenerateImport(import, indent),
       Global global => GenerateGlobal(global, indent),
-      _ => throw new ArgumentOutOfRangeException(),
+      Local local => GenerateLocal(local, indent),
+      Start start => GenerateStart(start, indent),
+      Func func => GenerateFunc(func, indent),
+      _ => throw new ArgumentOutOfRangeException(nameof(comp), comp,
+                                                 "Cannot generate component"),
     };
   }
 

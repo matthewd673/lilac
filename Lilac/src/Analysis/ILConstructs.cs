@@ -6,13 +6,13 @@ public class CFGFuncDef {
   public string Name { get; }
   public List<FuncParam> Params { get; }
   public IL.Type RetType { get; }
-  public Analysis.CFG CFG { get; }
+  public CFG CFG { get; }
   public bool Exported { get; }
 
   public CFGFuncDef(string name,
                     List<FuncParam> @params,
                     IL.Type retType,
-                    Analysis.CFG cfg,
+                    CFG cfg,
                     bool exported) {
     Name = name;
     Params = @params;
@@ -46,8 +46,8 @@ public class CFGProgram {
 
     // convert all functions to cfg and add them
     foreach (FuncDef f in program.GetFuncs()) {
-      List<Analysis.BB> funcBlocks = Analysis.BB.FromStmtList(f.StmtList);
-      Analysis.CFG funcCfg = new Analysis.CFG(funcBlocks);
+      List<BB> funcBlocks = BB.FromStmtList(f.StmtList);
+      CFG funcCfg = new CFG(funcBlocks);
       CFGFuncDef cfgFuncDef = new CFGFuncDef(f.Name,
                                              f.Params,
                                              f.RetType,

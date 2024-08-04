@@ -16,7 +16,8 @@ public class WasmTranslator : Translator<WasmInstruction> {
     get => _startFunction;
     set {
       _startFunction = value;
-      if (CFGProgram.GetFunc(_startFunction) is null) {
+      if (_startFunction != null &&
+          CFGProgram.GetFunc(_startFunction) is null) {
         throw new KeyNotFoundException();
       }
     }
