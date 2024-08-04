@@ -438,6 +438,26 @@ public class Phi : Expression {
   public override Phi Clone() => new(Ids);
 }
 
+public class Load(Type type, Value address) : Expression {
+  public Type Type { get; } = type;
+  public Value Address { get; } = address;
+
+  public override bool Equals(object? obj) {
+    if (obj is null || obj.GetType() != typeof(Load)) {
+      return false;
+    }
+
+    Load other = (Load)obj;
+    return Type.Equals(other.Type) && Address.Equals(other.Address);
+  }
+
+  public override int GetHashCode() {
+    return HashCode.Combine(GetType(), Type, Address);
+  }
+
+  public override Load Clone() => new(Type, Address);
+}
+
 public class Definition : Statement {
   public Type Type { get; }
   public ID Id { get; }
@@ -631,6 +651,22 @@ public class InlineInstr : Statement {
   }
 
   public override InlineInstr Clone() => new(Target, Instr);
+}
+
+public class Store(Type type, Value address) : Statement {
+  public Type Type { get; } = type;
+  public Value Address { get; } = address;
+
+  public override bool Equals(object? obj) {
+    if (obj is null || obj.GetType() != typeof(Store)) {
+      return false;
+    }
+
+    Store other = (Store)obj;
+    return Type.Equals(other.Type) && Address.Equals(other.Address);
+  }
+
+  public override Store Clone() => new(Type, Address);
 }
 
 public class GlobalDef : Component {
