@@ -151,6 +151,9 @@ module Lilac
         elsif see?(TokenType::Type)
           type_str = eat(TokenType::Type).image
           type = type_from_string(type_str)
+          unless type.is_a?(IL::Types::NumericType)
+            raise "Expected numeric type in definition"
+          end
 
           if see?(TokenType::ID, TokenType::GlobalID)
             id_str = eat(TokenType::ID, TokenType::GlobalID).image

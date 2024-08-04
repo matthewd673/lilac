@@ -73,7 +73,7 @@ module Lilac
           end
 
           # add all ids on the rhs to GEN unless they're already in KILL
-          rhs_vars = find_rhs_vars(s)
+          rhs_vars = find_rhs_ids(s)
           rhs_vars.each do |v|
             unless T.unsafe(@kill[b]).include?(v)
               T.unsafe(@gen[b]).add(v)
@@ -89,25 +89,42 @@ module Lilac
         params(node: T.any(IL::Statement, IL::Expression, IL::Value))
           .returns(T::Set[IL::ID])
       end
-      def find_rhs_vars(node)
+      def find_rhs_ids(node)
         case node
         when IL::Definition
-          return find_rhs_vars(node.rhs)
+          return find_rhs_ids(node.rhs)
         when IL::BinaryOp
-          return find_rhs_vars(node.left) | find_rhs_vars(node.right)
+          return find_rhs_ids(node.left) | find_rhs_ids(node.right)
         when IL::UnaryOp
-          return find_rhs_vars(node.value)
+          return find_rhs_ids(node.value)
         when IL::ID
           return Set[node]
         when IL::JumpZero
-          return find_rhs_vars(node.cond)
+          return find_rhs_ids(node.cond)
         when IL::JumpNotZero
-          return find_rhs_vars(node.cond)
-          # TODO: will someday need a case for function calls
-          # TODO: support Phi functions?
+          return find_rhs_ids(node.cond)
+        when IL::Conversion
+          return find_rhs_ids(node.value)
+        when IL::Call
+          ids = Set[]
+          node.args.each do |a|
+            ids |= find_rhs_ids(a)
+          end
+          return ids
+        when IL::Constant
+          return Set[]
+        when IL::Phi
+          ids = Set[]
+          node.ids.each do |i|
+            ids |= find_rhs_ids(i) # this recursive call is overkill but oh well
+          end
+          return ids
         end
 
-        Set[] # base case: empty set -- no variables found
+        # this should never hit but it will ensure that new IL objects are
+        # considered
+        raise "Unexpected IL object when running find_rhs_ids: "\
+              "#{node} (#{node.class})."
       end
     end
   end

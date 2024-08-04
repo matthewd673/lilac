@@ -690,6 +690,393 @@ module Lilac
       end
     end
 
+    # A Conversion is an Expression that converts a Constant value of one
+    # type to another type.
+    class Conversion < Expression
+      extend T::Sig
+      extend T::Helpers
+
+      abstract!
+
+      sig { abstract.returns(Value) }
+      def value; end
+
+      sig { abstract.returns(Types::Type) }
+      def new_type; end
+    end
+
+    # A SignTruncConversion converts a signed integer constant to an
+    # unsigned integer constant represented in the same number of bits.
+    class SignTruncConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::UnsignedType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::UnsignedType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "sign_trunc #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != SignTruncConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(SignTruncConversion) }
+      def clone
+        SignTruncConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
+    end
+
+    # A SignExtendConversion converts an unsigned integer constant to a
+    # signed integer constant represented in the same number of bits (which
+    # may cause overflow).
+    class SignExtendConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::SignedType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::SignedType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "sign_extend #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != SignExtendConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(SignExtendConversion) }
+      def clone
+        SignExtendConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
+    end
+
+    # A TruncIntConversion converts a signed or unsigned integer to an integer
+    # type represented with fewer bits (which may cause an overflow). The
+    # integer types involved in the conversion must be either both signed or
+    # both unsigned.
+    class TruncIntConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::IntegerType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::IntegerType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "trunc_int #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != TruncIntConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(TruncIntConversion) }
+      def clone
+        TruncIntConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
+    end
+
+    # An ExtendIntConversion converts a signed or unsigned integer to an integer
+    # type represented with more bits. The integer types involved in the
+    # conversion must be either both signed or both unsigned.
+    class ExtendIntConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::IntegerType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::IntegerType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "extend_int #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != ExtendIntConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(ExtendIntConversion) }
+      def clone
+        ExtendIntConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
+    end
+
+    # A TruncFloatConversion converts a floating point number to a floating
+    # point type represented with fewer bits.
+    class TruncFloatConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::FloatType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::FloatType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "trunc_float #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != TruncFloatConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(TruncFloatConversion) }
+      def clone
+        TruncFloatConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
+    end
+
+    # An ExtendFloatConversion converts a floating point number to a floating
+    # point type represented with more bits.
+    class ExtendFloatConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::FloatType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::FloatType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "extend_float #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != ExtendFloatConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(ExtendFloatConversion) }
+      def clone
+        ExtendFloatConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
+    end
+
+    # An IntToFloatConversion converts a signed or unsigned integer to a
+    # floating point type.
+    class IntToFloatConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::FloatType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::FloatType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "int_to_float #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != IntToFloatConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(IntToFloatConversion) }
+      def clone
+        IntToFloatConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
+    end
+
+    # A FloatToIntConversion converts a floating point number to a signed
+    # integer type.
+    class FloatToIntConversion < Conversion
+      extend T::Sig
+
+      sig { override.returns(Value) }
+      def value
+        @value
+      end
+
+      sig { override.returns(Types::IntegerType) }
+      def new_type
+        @new_type
+      end
+
+      sig { params(value: Value, new_type: Types::IntegerType).void }
+      def initialize(value, new_type)
+        @value = value
+        @new_type = new_type
+      end
+
+      sig { override.returns(String) }
+      def to_s
+        "float_to_int #{@value} #{@new_type}"
+      end
+
+      sig { override.params(other: T.untyped).returns(T::Boolean) }
+      def eql?(other)
+        if other.class != FloatToIntConversion
+          return false
+        end
+
+        @value.eql?(other.value) && @new_type.eql?(other.new_type)
+      end
+
+      sig { override.returns(FloatToIntConversion) }
+      def clone
+        FloatToIntConversion.new(@value, @new_type)
+      end
+
+      sig { override.returns(Integer) }
+      def hash
+        [self.class, @value, @new_type].hash
+      end
+    end
+
     # A Call is an Expression that represents a function call.
     class Call < Expression
       extend T::Sig
@@ -857,7 +1244,7 @@ module Lilac
     class Definition < Statement
       extend T::Sig
 
-      sig { returns(Types::Type) }
+      sig { returns(Types::NumericType) }
       attr_accessor :type
 
       sig { returns(ID) }
@@ -867,11 +1254,12 @@ module Lilac
       attr_accessor :rhs
 
       sig do
-        params(type: Types::Type, id: ID, rhs: T.any(Expression, Value)).void
+        params(type: Types::NumericType, id: ID, rhs: T.any(Expression, Value))
+          .void
       end
       # Construct a new Definition.
       #
-      # @param [Type] type The type of the ID.
+      # @param [Types::NumericType] type The type of the ID.
       # @param [ID] id The ID.
       # @param [T.any(Expression, Value)] rhs The right hand side of
       # the assignment.

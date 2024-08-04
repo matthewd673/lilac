@@ -17,8 +17,9 @@ class RunOptimizationTest < Minitest::Test
 
   sig { void }
   def test_optimizations_run_without_exception
-    # attempt to perform optimizations on each "fancy" program
-    Dir["test/programs/fancy/*"].each do |f|
+    files = Dir["test/programs/fancy/*"] + Dir["test/programs/frontend/*"]
+
+    files.each do |f|
       program = Frontend::Parser.parse_file(f)
 
       OPTIMIZATIONS.each do |o|
