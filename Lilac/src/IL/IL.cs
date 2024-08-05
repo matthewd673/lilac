@@ -438,9 +438,9 @@ public class Phi : Expression {
   public override Phi Clone() => new(Ids);
 }
 
-public class Load(Type type, Value address) : Expression {
+public class Load(Type type, Pointer pointer) : Expression {
   public Type Type { get; } = type;
-  public Value Address { get; } = address;
+  public Pointer Pointer { get; } = pointer;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Load)) {
@@ -448,14 +448,14 @@ public class Load(Type type, Value address) : Expression {
     }
 
     Load other = (Load)obj;
-    return Type.Equals(other.Type) && Address.Equals(other.Address);
+    return Type.Equals(other.Type) && Pointer.Equals(other.Pointer);
   }
 
   public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Type, Address);
+    return HashCode.Combine(GetType(), Type, Pointer);
   }
 
-  public override Load Clone() => new(Type, Address);
+  public override Load Clone() => new(Type, Pointer);
 }
 
 public class Definition : Statement {
@@ -653,9 +653,9 @@ public class InlineInstr : Statement {
   public override InlineInstr Clone() => new(Target, Instr);
 }
 
-public class Store(Type type, Value address) : Statement {
+public class Store(Type type, Pointer pointer) : Statement {
   public Type Type { get; } = type;
-  public Value Address { get; } = address;
+  public Pointer Pointer { get; } = pointer;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Store)) {
@@ -663,10 +663,10 @@ public class Store(Type type, Value address) : Statement {
     }
 
     Store other = (Store)obj;
-    return Type.Equals(other.Type) && Address.Equals(other.Address);
+    return Type.Equals(other.Type) && Pointer.Equals(other.Pointer);
   }
 
-  public override Store Clone() => new(Type, Address);
+  public override Store Clone() => new(Type, Pointer);
 }
 
 public class GlobalDef : Component {
@@ -914,4 +914,23 @@ public class Program {
   public override int GetHashCode() {
     return HashCode.Combine(GetType(), globalMap, funcMap, externFuncMap);
   }
+}
+
+public class Pointer(string name) : Node {
+  public string Name { get; } = name;
+
+  public override bool Equals(object? obj) {
+    if (obj is null || obj.GetType() != typeof(Pointer)) {
+      return false;
+    }
+
+    Pointer other = (Pointer)obj;
+    return Name.Equals(other.Name);
+  }
+
+  public override int GetHashCode() {
+    return HashCode.Combine(GetType(), Name);
+  }
+
+  public override Pointer Clone() => new(Name);
 }
