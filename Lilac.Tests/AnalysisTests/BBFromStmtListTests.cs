@@ -88,4 +88,57 @@ public class BBFromStmtListTests {
     Assert.Equal(new VoidCall(new Call("b", [])),
                  blocks[1].StmtList[0]);
   }
+
+  [Fact]
+  public void BlocksSplitByLabelAndJump() {
+    List<Statement> stmtList = [
+                                 new VoidCall(new Call("a", [])),
+                                 new Jump("label"),
+                                 new Label("label"),
+                                 new VoidCall(new Call("b", [])),
+                               ];
+    List<BB> blocks = BB.FromStmtList(stmtList);
+
+    Assert.Equal(2, blocks.Count);
+    Assert.Equal(new Jump("label"), blocks[0].Exit);
+    Assert.Equal(new Label("label"), blocks[1].Entry);
+    Assert.Null(blocks[0].Entry);
+    Assert.Null(blocks[1].Exit);
+    Assert.Single(blocks[0].StmtList);
+    Assert.Single(blocks[1].StmtList);
+    Assert.Equal(new VoidCall(new Call("a", [])),
+                 blocks[0].StmtList[0]);
+    Assert.Equal(new VoidCall(new Call("b", [])),
+                 blocks[1].StmtList[0]);
+  }
+
+  [Fact]
+  public void LabelFirst() {
+    List<Statement> stmtList = [
+                                 new Label("label"),
+                                 new VoidCall(new Call("a", [])),
+                               ];
+    List<BB> blocks = BB.FromStmtList(stmtList);
+
+    Assert.Single(blocks);
+    Assert.Equal(new Label("label"), blocks[0].Entry);
+    Assert.Null(blocks[0].Exit);
+    Assert.Single(blocks[0].StmtList);
+    Assert.Equal(new VoidCall(new Call("a", [])), blocks[0].StmtList[0]);
+  }
+
+  [Fact]
+  public void JumpLast() {
+    List<Statement> stmtList = [
+                                 new VoidCall(new Call("a", [])),
+                                 new Jump("label"),
+                               ];
+    List<BB> blocks = BB.FromStmtList(stmtList);
+
+    Assert.Single(blocks);
+    Assert.Equal(new Jump("label"), blocks[0].Exit);
+    Assert.Null(blocks[0].Entry);
+    Assert.Single(blocks[0].StmtList);
+    Assert.Equal(new VoidCall(new Call("a", [])), blocks[0].StmtList[0]);
+  }
 }
