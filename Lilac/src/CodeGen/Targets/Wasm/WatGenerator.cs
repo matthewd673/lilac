@@ -59,11 +59,13 @@ public class WatGenerator(WasmComponent rootComponent)
 
   private string GenerateGlobal(Global global, string indent = "") =>
     $"{indent}(global ${global.Name} " +
-    $"{(global.Mutable ? $"(mut ${global.Type}" : global.Type)} " +
+    $"{(global.Mutable ?
+          $"(mut ${GenerateType(global.Type)}"
+          : global.Type)} " +
     $"({GenerateInstruction(global.DefaultValue)})";
 
   private string GenerateLocal(Local local, string indent = "") =>
-    $"{indent}(local ${local.Name} {local.Type})";
+    $"{indent}(local ${local.Name} {GenerateType(local.Type)})";
 
   private string GenerateStart(Start start, string indent = "") =>
     $"{indent}(start ${start.Name})";
@@ -79,10 +81,18 @@ public class WatGenerator(WasmComponent rootComponent)
                                      string indent = "") =>
     $"{indent}{instruction.Wat}";
 
+  private string GenerateType(Type type, string indent = "") => type switch {
+    Type.I32 => "i32",
+    Type.I64 => "i64",
+    Type.F32 => "f32",
+    Type.F64 => "f64",
+    _ => throw new ArgumentOutOfRangeException(),
+  };
+
   private string StringifyParams(List<Local> @params) {
     string str = "";
     foreach (Local p in @params) {
-      str += $"(param ${p.Name} {p.Type}) ";
+      str += $"(param ${p.Name} {GenerateType(p.Type)}) ";
     }
 
     return str.TrimEnd();
@@ -101,7 +111,7 @@ public class WatGenerator(WasmComponent rootComponent)
   private string StringifyParamTypes(List<Type> paramTypes) {
     string str = " ";
     foreach (Type t in paramTypes) {
-      str += $"(param {t}) ";
+      str += $"(param {GenerateType(t)}) ";
     }
 
     return str.TrimEnd();
@@ -110,7 +120,7 @@ public class WatGenerator(WasmComponent rootComponent)
   private string StringifyResultTypes(List<Type> resultTypes) {
     string str = "";
     foreach (Type t in resultTypes) {
-      str += $" (result {t})";
+      str += $" (result {GenerateType(t)})";
     }
 
     return str;
