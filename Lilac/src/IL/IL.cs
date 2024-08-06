@@ -87,6 +87,23 @@ public static class TypeMethods {
       _ => throw new ArgumentOutOfRangeException(),
     };
   }
+
+  public static int GetSize(this Type type) {
+    return type switch {
+      Type.U8 => 8,
+      Type.U16 => 16,
+      Type.U32 => 32,
+      Type.U64 => 64,
+      Type.I8 => 8,
+      Type.I16 => 16,
+      Type.I32 => 32,
+      Type.I64 => 64,
+      Type.F32 => 32,
+      Type.F64 => 64,
+      Type.Void => throw new NotSupportedException(),
+      _ => throw new ArgumentOutOfRangeException(),
+    };
+  }
 }
 
 public class Constant : Value {
