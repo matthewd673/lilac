@@ -33,18 +33,18 @@ public class EqualityTests {
 
   [Fact]
   public void IdsEqual() {
-    ID a = new("a");
-    ID b = new("a");
+    ID a = new LocalID("a");
+    ID b = new LocalID("a");
     Assert.Equal(a, b);
   }
 
   [Fact]
   public void IdsNotEqual() {
-    ID a = new("a");
-    ID b = new("b");
+    ID a = new LocalID("a");
+    ID b = new LocalID("b");
     Assert.NotEqual(a, b);
 
-    ID c = new("var");
+    ID c = new LocalID("var");
     GlobalID d = new("var");
     Assert.NotEqual(c, d);
   }
@@ -59,7 +59,7 @@ public class EqualityTests {
   [Fact]
   public void ValueExprsNotEqual() {
     ValueExpr a = new(new Constant(Type.F32, 3.3));
-    ValueExpr b = new(new ID("a"));
+    ValueExpr b = new(new LocalID("a"));
     Assert.NotEqual(a, b);
   }
 
@@ -67,10 +67,10 @@ public class EqualityTests {
   public void BinaryOpsEqual() {
     BinaryOp a = new(BinaryOp.Operator.Add,
                      new Constant(Type.I32, 5),
-                     new ID("a"));
+                     new LocalID("a"));
     BinaryOp b = new(BinaryOp.Operator.Add,
                      new Constant(Type.I32, 5),
-                     new ID("a"));
+                     new LocalID("a"));
     Assert.Equal(a, b);
   }
 
@@ -78,50 +78,50 @@ public class EqualityTests {
   public void BinaryOpsNotEqual() {
     BinaryOp a = new(BinaryOp.Operator.Add,
                      new Constant(Type.I32, 5),
-                     new ID("a"));
+                     new LocalID("a"));
     BinaryOp b = new(BinaryOp.Operator.BitAnd,
                      new Constant(Type.I32, 5),
-                     new ID("a"));
+                     new LocalID("a"));
     Assert.NotEqual(a, b);
 
     BinaryOp c = new(BinaryOp.Operator.Mul,
-                     new ID("test"),
-                     new ID("a"));
+                     new LocalID("test"),
+                     new LocalID("a"));
     BinaryOp d = new(BinaryOp.Operator.Mul,
                      new Constant(Type.I32, 5),
-                     new ID("a"));
+                     new LocalID("a"));
     Assert.NotEqual(c, d);
 
     BinaryOp e = new(BinaryOp.Operator.Sub,
-                     new ID("a"),
+                     new LocalID("a"),
                      new Constant(Type.I32, 5));
     BinaryOp f = new(BinaryOp.Operator.Sub,
                      new Constant(Type.I32, 5),
-                     new ID("a"));
+                     new LocalID("a"));
     Assert.NotEqual(e, f);
   }
 
   [Fact]
   public void UnaryOpsEqual() {
     UnaryOp a = new(UnaryOp.Operator.Neg,
-                    new ID("a"));
+                    new LocalID("a"));
     UnaryOp b = new(UnaryOp.Operator.Neg,
-                    new ID("a"));
+                    new LocalID("a"));
     Assert.Equal(a, b);
   }
 
   [Fact]
   public void UnaryOpsNotEqual() {
     UnaryOp a = new(UnaryOp.Operator.Neg,
-                    new ID("a"));
+                    new LocalID("a"));
     UnaryOp b = new(UnaryOp.Operator.BitNot,
-                    new ID("a"));
+                    new LocalID("a"));
     Assert.NotEqual(a, b);
 
     UnaryOp c = new(UnaryOp.Operator.Neg,
-                    new ID("a"));
+                    new LocalID("a"));
     UnaryOp d = new(UnaryOp.Operator.Neg,
-                    new ID("b"));
+                    new LocalID("b"));
     Assert.NotEqual(c, d);
   }
 
@@ -156,8 +156,8 @@ public class EqualityTests {
     Call b = new("func", []);
     Assert.Equal(a, b);
 
-    Call c = new("func", [new ID("a")]);
-    Call d = new("func", [new ID("a")]);
+    Call c = new("func", [new LocalID("a")]);
+    Call d = new("func", [new LocalID("a")]);
     Assert.Equal(c, d);
   }
 
@@ -182,8 +182,8 @@ public class EqualityTests {
     ExternCall b = new("source", "func", []);
     Assert.Equal(a, b);
 
-    ExternCall c = new("a", "b", [new ID("id")]);
-    ExternCall d = new("a", "b", [new ID("id")]);
+    ExternCall c = new("a", "b", [new LocalID("id")]);
+    ExternCall d = new("a", "b", [new LocalID("id")]);
     Assert.Equal(c, d);
   }
 
@@ -197,7 +197,7 @@ public class EqualityTests {
     ExternCall d = new("source", "func2", []);
     Assert.NotEqual(c, d);
 
-    ExternCall e = new("a", "b", [new ID("id")]);
+    ExternCall e = new("a", "b", [new LocalID("id")]);
     ExternCall f = new("a", "b", []);
     Assert.NotEqual(e, f);
   }
@@ -208,44 +208,44 @@ public class EqualityTests {
     Phi b = new([]);
     Assert.Equal(a, b);
 
-    Phi c = new([new ID("a"), new ID("b")]);
-    Phi d = new([new ID("a"), new ID("b")]);
+    Phi c = new([new LocalID("a"), new LocalID("b")]);
+    Phi d = new([new LocalID("a"), new LocalID("b")]);
     Assert.Equal(c, d);
   }
 
   [Fact]
   public void PhisNotEqual() {
-    Phi a = new([new ID("a"), new ID("b")]);
-    Phi b = new([new ID("a")]);
+    Phi a = new([new LocalID("a"), new LocalID("b")]);
+    Phi b = new([new LocalID("a")]);
     Assert.NotEqual(a, b);
   }
 
   [Fact]
   public void DefinitionsEqual() {
-    Definition a = new(Type.I8, new ID("a"),
+    Definition a = new(Type.I8, new LocalID("a"),
                        new ValueExpr(new Constant(Type.I8, 5)));
-    Definition b = new(Type.I8, new ID("a"),
+    Definition b = new(Type.I8, new LocalID("a"),
                        new ValueExpr(new Constant(Type.I8, 5)));
     Assert.Equal(a, b);
   }
 
   [Fact]
   public void DefinitionsNotEqual() {
-    Definition a = new(Type.I8, new ID("a"),
+    Definition a = new(Type.I8, new LocalID("a"),
                        new ValueExpr(new Constant(Type.I8, 5)));
-    Definition b = new(Type.I16, new ID("a"),
+    Definition b = new(Type.I16, new LocalID("a"),
                        new ValueExpr(new Constant(Type.I8, 5)));
     Assert.NotEqual(a, b);
 
-    Definition c = new(Type.I8, new ID("a"),
+    Definition c = new(Type.I8, new LocalID("a"),
                        new ValueExpr(new Constant(Type.I8, 5)));
-    Definition d = new(Type.I8, new ID("b"),
+    Definition d = new(Type.I8, new LocalID("b"),
                        new ValueExpr(new Constant(Type.I8, 5)));
     Assert.NotEqual(c, d);
 
-    Definition e = new(Type.I8, new ID("a"),
+    Definition e = new(Type.I8, new LocalID("a"),
                        new ValueExpr(new Constant(Type.I8, 5)));
-    Definition f = new(Type.I8, new ID("a"),
+    Definition f = new(Type.I8, new LocalID("a"),
                        new ValueExpr(new Constant(Type.I8, 6)));
     Assert.NotEqual(e, f);
   }
@@ -280,27 +280,27 @@ public class EqualityTests {
 
   [Fact]
   public void CondJumpsEqual() {
-    JumpZero a = new("a", new ID("a"));
-    JumpZero b = new("a", new ID("a"));
+    JumpZero a = new("a", new LocalID("a"));
+    JumpZero b = new("a", new LocalID("a"));
     Assert.Equal(a, b);
 
-    JumpNotZero c = new("a", new ID("a"));
-    JumpNotZero d = new("a", new ID("a"));
+    JumpNotZero c = new("a", new LocalID("a"));
+    JumpNotZero d = new("a", new LocalID("a"));
     Assert.Equal(c, d);
   }
 
   [Fact]
   public void CondJumpsNotEqual() {
-    JumpZero a = new("a", new ID("a"));
-    JumpZero b = new("b", new ID("a"));
+    JumpZero a = new("a", new LocalID("a"));
+    JumpZero b = new("b", new LocalID("a"));
     Assert.NotEqual(a, b);
 
-    JumpNotZero c = new("a", new ID("a"));
-    JumpNotZero d = new("a", new ID("b"));
+    JumpNotZero c = new("a", new LocalID("a"));
+    JumpNotZero d = new("a", new LocalID("b"));
     Assert.NotEqual(c, d);
 
-    CondJump e = new JumpZero("a", new ID("a"));
-    CondJump f = new JumpNotZero("a", new ID("b"));
+    CondJump e = new JumpZero("a", new LocalID("a"));
+    CondJump f = new JumpNotZero("a", new LocalID("b"));
     Assert.NotEqual(e, f);
   }
 
@@ -314,7 +314,7 @@ public class EqualityTests {
   [Fact]
   public void ReturnsNotEqual() {
     Return a = new(new Constant(Type.I32, 3));
-    Return b = new(new ID("a"));
+    Return b = new(new LocalID("a"));
     Assert.NotEqual(a, b);
   }
 
@@ -390,9 +390,9 @@ public class EqualityTests {
     FuncDef b = new("func", [], Type.U8, [], false);
     Assert.Equal(a, b);
 
-    FuncDef c = new("func", [new(Type.I8, new ID("a"))],
+    FuncDef c = new("func", [new(Type.I8, new LocalID("a"))],
                     Type.U8, [], false);
-    FuncDef d = new("func", [new(Type.I8, new ID("a"))],
+    FuncDef d = new("func", [new(Type.I8, new LocalID("a"))],
                     Type.U8, [], false);
     Assert.Equal(c, d);
 
@@ -409,7 +409,7 @@ public class EqualityTests {
     FuncDef b = new("func2", [], Type.U8, [], false);
     Assert.NotEqual(a, b);
 
-    FuncDef c = new("func", [new(Type.I8, new ID("a"))],
+    FuncDef c = new("func", [new(Type.I8, new LocalID("a"))],
                     Type.U8, [], false);
     FuncDef d = new("func", [],
                     Type.U8, [], false);
@@ -432,19 +432,19 @@ public class EqualityTests {
 
   [Fact]
   public void FuncParamsEqual() {
-    FuncParam a = new(Type.F32, new ID("a"));
-    FuncParam b = new(Type.F32, new ID("a"));
+    FuncParam a = new(Type.F32, new LocalID("a"));
+    FuncParam b = new(Type.F32, new LocalID("a"));
     Assert.Equal(a, b);
   }
 
   [Fact]
   public void FuncParamsNotEqual() {
-    FuncParam a = new(Type.F32, new ID("a"));
-    FuncParam b = new(Type.F64, new ID("a"));
+    FuncParam a = new(Type.F32, new LocalID("a"));
+    FuncParam b = new(Type.F64, new LocalID("a"));
     Assert.NotEqual(a, b);
 
-    FuncParam c = new(Type.F32, new ID("a"));
-    FuncParam d = new(Type.F32, new ID("b"));
+    FuncParam c = new(Type.F32, new LocalID("a"));
+    FuncParam d = new(Type.F32, new LocalID("b"));
     Assert.NotEqual(c, d);
   }
 
@@ -493,9 +493,9 @@ public class EqualityTests {
                     new Constant(Type.I32, 8)));
     c.AddFunc(new FuncDef("main", [], Type.I32,
                           [
-                            new Definition(Type.I32, new("a"),
+                            new Definition(Type.I32, new LocalID("a"),
                               new ValueExpr(new Constant(Type.I32, 0))),
-                            new Return(new ID("a")),
+                            new Return(new LocalID("a")),
                           ])
               );
     c.AddExternFunc(new("source", "name", [],
@@ -505,9 +505,9 @@ public class EqualityTests {
                     new Constant(Type.I32, 8)));
     d.AddFunc(new FuncDef("main", [], Type.I32,
                           [
-                            new Definition(Type.I32, new("a"),
+                            new Definition(Type.I32, new LocalID("a"),
                               new ValueExpr(new Constant(Type.I32, 0))),
-                            new Return(new ID("a")),
+                            new Return(new LocalID("a")),
                           ])
               );
     d.AddExternFunc(new("source", "name", [],
@@ -535,9 +535,9 @@ public class EqualityTests {
     Program f = new();
     e.AddFunc(new FuncDef("main", [], Type.I32,
                           [
-                            new Definition(Type.I32, new("a"),
+                            new Definition(Type.I32, new LocalID("a"),
                               new ValueExpr(new Constant(Type.I32, 0))),
-                            new Return(new ID("a")),
+                            new Return(new LocalID("a")),
                           ])
               );
     Assert.NotEqual(e, f);
@@ -546,9 +546,9 @@ public class EqualityTests {
     Program h = new();
     g.AddFunc(new FuncDef("main", [], Type.I32,
                           [
-                            new Definition(Type.I32, new("a"),
+                            new Definition(Type.I32, new LocalID("a"),
                               new ValueExpr(new Constant(Type.I32, 0))),
-                            new Return(new ID("a")),
+                            new Return(new LocalID("a")),
                           ])
               );
     h.AddFunc(new FuncDef("main", [], Type.I32,

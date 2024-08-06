@@ -259,7 +259,7 @@ public class Parser {
     // void constant
     else if (See(TokenType.VoidConst)) {
       Eat(TokenType.VoidConst);
-      return new Constant(IL.Type.Void, null);
+      return new Constant(IL.Type.Void, 0);
     }
     // id
     else if (See(TokenType.ID, TokenType.GlobalID)) {
@@ -346,7 +346,7 @@ public class Parser {
     IL.Type type = TypeFromString(typeStr);
 
     string idStr = Eat(TokenType.ID).Image;
-    ID id = IdFromString(idStr);
+    LocalID id = LocalIdFromString(idStr);
 
     yield return new FuncParam(type, id);
 
@@ -443,17 +443,27 @@ public class Parser {
       return new GlobalID(str.Remove(0, 1));
     }
     else if (str.StartsWith("$")) { // local
-      return new ID(str.Remove(0, 1));
+      return new LocalID(str.Remove(0, 1));
     }
 
     throw new InvalidStringFormatException(nextToken.Position, str,
                                            "ID");
   }
 
+  private LocalID LocalIdFromString(string str) {
+    ID id = IdFromString(str);
+    if (id is LocalID lId) {
+      return lId;
+    }
+
+    throw new InvalidStringFormatException(nextToken.Position, str,
+                                           "LocalID");
+  }
+
   private GlobalID GlobalIdFromString(string str) {
     ID id = IdFromString(str);
-    if (id is GlobalID) {
-      return (GlobalID)id;
+    if (id is GlobalID gId) {
+      return gId;
     }
 
     throw new InvalidStringFormatException(nextToken.Position, str,

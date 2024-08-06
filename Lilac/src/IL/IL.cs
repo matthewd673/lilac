@@ -134,19 +134,21 @@ public class Constant : Value {
   public override Constant Clone() => new(Type, Value);
 }
 
-public class ID : Value {
+public abstract class ID : Value {
   public string Name { get; }
 
   public ID(string name) {
     Name = name;
   }
+}
 
+public class LocalID(string name) : ID(name) {
   public override bool Equals(object? obj) {
-    if (obj is null || obj.GetType() != typeof(ID)) {
+    if (obj is null || obj.GetType() != typeof(LocalID)) {
       return false;
     }
 
-    ID other = (ID)obj;
+    LocalID other = (LocalID)obj;
     return Name.Equals(other.Name);
   }
 
@@ -154,14 +156,10 @@ public class ID : Value {
     return HashCode.Combine(GetType(), Name);
   }
 
-  public override ID Clone() => new(Name);
+  public override LocalID Clone() => new(Name);
 }
 
-public class GlobalID : ID {
-  public GlobalID(string name) : base(name) {
-    // Empty
-  }
-
+public class GlobalID(string name) : ID(name) {
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(GlobalID)) {
       return false;
@@ -683,7 +681,31 @@ public class Store(Type type, Pointer pointer) : Statement {
     return Type.Equals(other.Type) && Pointer.Equals(other.Pointer);
   }
 
+  public override int GetHashCode() {
+    return HashCode.Combine(GetType(), Type, Pointer);
+  }
+
   public override Store Clone() => new(Type, Pointer);
+}
+
+public class StackAlloc(Type type, LocalID id) : Statement {
+  public LocalID Id { get; } = id;
+  public Type Type { get; } = type;
+
+  public override bool Equals(object? obj) {
+    if (obj is null || obj.GetType() != typeof(StackAlloc)) {
+      return false;
+    }
+
+    StackAlloc other = (StackAlloc)obj;
+    return Type.Equals(other.Type);
+  }
+
+  public override int GetHashCode() {
+    return HashCode.Combine(GetType(), Type);
+  }
+
+  public override StackAlloc Clone() => new(Type, Id);
 }
 
 public class GlobalDef : Component {
@@ -757,9 +779,9 @@ public class FuncDef : Component {
 
 public class FuncParam : Node {
   public Type Type { get; }
-  public ID Id { get; }
+  public LocalID Id { get; }
 
-  public FuncParam(Type type, ID id) {
+  public FuncParam(Type type, LocalID id) {
     Type = type;
     Id = id;
   }
