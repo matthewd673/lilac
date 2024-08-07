@@ -4,7 +4,7 @@ public class Reducible {
   private CFG cfg;
 
   public Reducible(CFG cfg) {
-    this.cfg = cfg;
+    this.cfg = cfg.Clone();
   }
 
   public bool Run() {
