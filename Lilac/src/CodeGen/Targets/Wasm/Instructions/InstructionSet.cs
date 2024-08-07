@@ -10,7 +10,7 @@ public class Const(Type type, string value) : TypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.const {Value}";
+  public override string Wat => $"{Type.GetWat()}.const {Value}";
 
   public string Value { get; } = value;
 
@@ -38,7 +38,7 @@ public class Equal(Type type) : TypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.eq";
+  public override string Wat => $"{Type.GetWat()}.eq";
 }
 
 public class EqualZero(Type type) : IntegerTypedWasmInstruction(type) {
@@ -49,7 +49,7 @@ public class EqualZero(Type type) : IntegerTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.eqz";
+  public override string Wat => $"{Type.GetWat()}.eqz";
 }
 
 public class NotEqual(Type type) : TypedWasmInstruction(type) {
@@ -62,7 +62,7 @@ public class NotEqual(Type type) : TypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.ne";
+  public override string Wat => $"{Type.GetWat()}.ne";
 }
 
 public class GreaterThanSigned(Type type)
@@ -74,7 +74,7 @@ public class GreaterThanSigned(Type type)
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.gt_s";
+  public override string Wat => $"{Type.GetWat()}.gt_s";
 }
 
 public class GreaterThanUnsigned(Type type)
@@ -86,7 +86,7 @@ public class GreaterThanUnsigned(Type type)
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.gt_u";
+  public override string Wat => $"{Type.GetWat()}.gt_u";
 }
 
 public class GreaterThan(Type type) : FloatTypedWasmInstruction(type) {
@@ -97,7 +97,7 @@ public class GreaterThan(Type type) : FloatTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.gt";
+  public override string Wat => $"{Type.GetWat()}.gt";
 }
 
 public class LessThanSigned(Type type)
@@ -109,7 +109,7 @@ public class LessThanSigned(Type type)
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.lt_s";
+  public override string Wat => $"{Type.GetWat()}.lt_s";
 }
 
 public class LessThanUnsigned(Type type)
@@ -121,7 +121,7 @@ public class LessThanUnsigned(Type type)
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.lt_u";
+  public override string Wat => $"{Type.GetWat()}.lt_u";
 }
 
 public class LessThan(Type type) : FloatTypedWasmInstruction(type) {
@@ -132,7 +132,7 @@ public class LessThan(Type type) : FloatTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.lt";
+  public override string Wat => $"{Type.GetWat()}.lt";
 }
 
 public class GreaterOrEqualSigned(Type type)
@@ -144,7 +144,7 @@ public class GreaterOrEqualSigned(Type type)
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.ge_s";
+  public override string Wat => $"{Type.GetWat()}.ge_s";
 }
 
 public class GreaterOrEqualUnsigned(Type type)
@@ -156,7 +156,7 @@ public class GreaterOrEqualUnsigned(Type type)
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.ge_u";
+  public override string Wat => $"{Type.GetWat()}.ge_u";
 }
 
 public class GreaterOrEqual(Type type) : FloatTypedWasmInstruction(type) {
@@ -167,7 +167,7 @@ public class GreaterOrEqual(Type type) : FloatTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.ge";
+  public override string Wat => $"{Type.GetWat()}.ge";
 }
 
 public class LessOrEqualSigned(Type type)
@@ -179,7 +179,7 @@ public class LessOrEqualSigned(Type type)
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.le_s";
+  public override string Wat => $"{Type.GetWat()}.le_s";
 }
 
 public class LessOrEqualUnsigned(Type type)
@@ -191,7 +191,7 @@ public class LessOrEqualUnsigned(Type type)
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.le_u";
+  public override string Wat => $"{Type.GetWat()}.le_u";
 }
 
 public class LessOrEqual(Type type) : FloatTypedWasmInstruction(type) {
@@ -202,7 +202,7 @@ public class LessOrEqual(Type type) : FloatTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.le";
+  public override string Wat => $"{Type.GetWat()}.le";
 }
 
 
@@ -216,7 +216,7 @@ public class Add(Type type) : TypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.add";
+  public override string Wat => $"{Type.GetWat()}.add";
 }
 
 public class Subtract(Type type) : TypedWasmInstruction(type) {
@@ -229,7 +229,7 @@ public class Subtract(Type type) : TypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.sub";
+  public override string Wat => $"{Type.GetWat()}.sub";
 }
 
 public class Multiply(Type type) : TypedWasmInstruction(type) {
@@ -242,7 +242,7 @@ public class Multiply(Type type) : TypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.mul";
+  public override string Wat => $"{Type.GetWat()}.mul";
 }
 
 public class DivideSigned(Type type) : IntegerTypedWasmInstruction(type) {
@@ -253,7 +253,7 @@ public class DivideSigned(Type type) : IntegerTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.div_s";
+  public override string Wat => $"{Type.GetWat()}.div_s";
 }
 
 public class DivideUnsigned(Type type) : IntegerTypedWasmInstruction(type) {
@@ -264,7 +264,7 @@ public class DivideUnsigned(Type type) : IntegerTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.div_u";
+  public override string Wat => $"{Type.GetWat()}.div_u";
 }
 
 public class Divide(Type type) : FloatTypedWasmInstruction(type) {
@@ -275,7 +275,7 @@ public class Divide(Type type) : FloatTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.div";
+  public override string Wat => $"{Type.GetWat()}.div";
 }
 
 public class RemainderSigned(Type type) : IntegerTypedWasmInstruction(type) {
@@ -286,7 +286,7 @@ public class RemainderSigned(Type type) : IntegerTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.rem_s";
+  public override string Wat => $"{Type.GetWat()}.rem_s";
 }
 
 public class RemainderUnsigned(Type type) : IntegerTypedWasmInstruction(type) {
@@ -297,7 +297,7 @@ public class RemainderUnsigned(Type type) : IntegerTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.rem_u";
+  public override string Wat => $"{Type.GetWat()}.rem_u";
 }
 
 public class LocalGet(string variable) : VariableWasmInstruction(variable) {
@@ -368,7 +368,7 @@ public class ConvertI32S(Type type) : FloatTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.convert_i32_s";
+  public override string Wat => $"{Type.GetWat()}.convert_i32_s";
 }
 
 public class ConvertI32U(Type type) : FloatTypedWasmInstruction(type) {
@@ -379,7 +379,7 @@ public class ConvertI32U(Type type) : FloatTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.convert_i32_u";
+  public override string Wat => $"{Type.GetWat()}.convert_i32_u";
 }
 
 public class ConvertI64S(Type type) : FloatTypedWasmInstruction(type) {
@@ -390,7 +390,7 @@ public class ConvertI64S(Type type) : FloatTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.convert_i64_s";
+  public override string Wat => $"{Type.GetWat()}.convert_i64_s";
 }
 
 public class ConvertI64U(Type type) : FloatTypedWasmInstruction(type) {
@@ -401,7 +401,7 @@ public class ConvertI64U(Type type) : FloatTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.convert_i64_u";
+  public override string Wat => $"{Type.GetWat()}.convert_i64_u";
 }
 
 public class TruncF32S(Type type) : IntegerTypedWasmInstruction(type) {
@@ -412,7 +412,7 @@ public class TruncF32S(Type type) : IntegerTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.trunc_f32_s";
+  public override string Wat => $"{Type.GetWat()}.trunc_f32_s";
 }
 
 public class TruncF32U(Type type) : IntegerTypedWasmInstruction(type) {
@@ -423,7 +423,7 @@ public class TruncF32U(Type type) : IntegerTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.trunc_f32_u";
+  public override string Wat => $"{Type.GetWat()}.trunc_f32_u";
 }
 
 public class TruncF64S(Type type) : IntegerTypedWasmInstruction(type) {
@@ -434,7 +434,7 @@ public class TruncF64S(Type type) : IntegerTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.trunc_f64_s";
+  public override string Wat => $"{Type.GetWat()}.trunc_f64_s";
 }
 
 public class TruncF64U(Type type) : IntegerTypedWasmInstruction(type) {
@@ -445,7 +445,7 @@ public class TruncF64U(Type type) : IntegerTypedWasmInstruction(type) {
       _ => throw new ArgumentOutOfRangeException(),
     };
 
-  public override string Wat => $"{Type}.trunc_f64_u";
+  public override string Wat => $"{Type.GetWat()}.trunc_f64_u";
 }
 
 public class Grow(string memory) : MemoryWasmInstruction(memory) {
@@ -474,7 +474,7 @@ public class Load(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type}.load{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
 }
 
 public class Load8S(Type type, string memory)
@@ -487,7 +487,7 @@ public class Load8S(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type}.load8_s{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load8_s{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
 }
 
 public class Load8U(Type type, string memory)
@@ -500,7 +500,7 @@ public class Load8U(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type}.load8_u{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load8_u{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
 }
 
 public class Load16S(Type type, string memory)
@@ -513,7 +513,7 @@ public class Load16S(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type}.load16_s{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load16_s{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
 }
 
 public class Load16U(Type type, string memory)
@@ -526,7 +526,7 @@ public class Load16U(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type}.load16_u{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load16_u{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
 }
 
 public class Load32S(string memory) : MemoryWasmInstruction(memory) {
@@ -556,7 +556,7 @@ public class Store(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type}.store{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.store{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
 }
 
 public class Store8(Type type, string memory)
@@ -569,7 +569,7 @@ public class Store8(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type}.store8{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.store8{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
 }
 
 public class Store16(Type type, string memory)
@@ -582,7 +582,7 @@ public class Store16(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type}.store16{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.store16{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
 }
 
 public class Store32(string memory) : MemoryWasmInstruction(memory) {

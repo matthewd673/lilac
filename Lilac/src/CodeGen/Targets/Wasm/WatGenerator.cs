@@ -60,12 +60,12 @@ public class WatGenerator(WasmComponent rootComponent)
   private string GenerateGlobal(Global global, string indent = "") =>
     $"{indent}(global ${global.Name} " +
     $"{(global.Mutable ?
-          $"(mut ${GenerateType(global.Type)}"
+          $"(mut ${global.Type.GetWat()}"
           : global.Type)} " +
     $"({GenerateInstruction(global.DefaultValue)})";
 
   private string GenerateLocal(Local local, string indent = "") =>
-    $"{indent}(local ${local.Name} {GenerateType(local.Type)})";
+    $"{indent}(local ${local.Name} {local.Type.GetWat()})";
 
   private string GenerateStart(Start start, string indent = "") =>
     $"{indent}(start ${start.Name})";
@@ -74,25 +74,17 @@ public class WatGenerator(WasmComponent rootComponent)
     $"{indent}(func ${func.Name}" +
     $"{(func.Export is not null ? $"(export \"{func.Export}\") " : " ")}" +
     $"{StringifyParams(func.Params)}{StringifyResultTypes(func.Results)}\n" +
-    $"{StringifyLocals(func.LocalsDict, indent + "  ")}" +
+    $"{StringifyLocals(func.LocalsDict, indent)}" +
     $"{GenerateRange(func.Instructions, indent + "  ")}\n{indent})";
 
   private string GenerateInstruction(WasmInstruction instruction,
                                      string indent = "") =>
     $"{indent}{instruction.Wat}";
 
-  private string GenerateType(Type type, string indent = "") => type switch {
-    Type.I32 => "i32",
-    Type.I64 => "i64",
-    Type.F32 => "f32",
-    Type.F64 => "f64",
-    _ => throw new ArgumentOutOfRangeException(),
-  };
-
   private string StringifyParams(List<Local> @params) {
     string str = "";
     foreach (Local p in @params) {
-      str += $"(param ${p.Name} {GenerateType(p.Type)}) ";
+      str += $"(param ${p.Name} {p.Type.GetWat()}) ";
     }
 
     return str.TrimEnd();
@@ -111,7 +103,7 @@ public class WatGenerator(WasmComponent rootComponent)
   private string StringifyParamTypes(List<Type> paramTypes) {
     string str = " ";
     foreach (Type t in paramTypes) {
-      str += $"(param {GenerateType(t)}) ";
+      str += $"(param {t.GetWat()}) ";
     }
 
     return str.TrimEnd();
@@ -120,7 +112,7 @@ public class WatGenerator(WasmComponent rootComponent)
   private string StringifyResultTypes(List<Type> resultTypes) {
     string str = "";
     foreach (Type t in resultTypes) {
-      str += $" (result {GenerateType(t)})";
+      str += $" (result {t.GetWat()})";
     }
 
     return str;
