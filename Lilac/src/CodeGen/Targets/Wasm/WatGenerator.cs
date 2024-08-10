@@ -43,6 +43,7 @@ public class WatGenerator(WasmComponent rootComponent)
       Local local => GenerateLocal(local, indent),
       Start start => GenerateStart(start, indent),
       Func func => GenerateFunc(func, indent),
+      Memory memory => GenerateMemory(memory, indent),
       _ => throw new ArgumentOutOfRangeException(nameof(comp), comp,
                                                  "Cannot generate component"),
     };
@@ -76,6 +77,9 @@ public class WatGenerator(WasmComponent rootComponent)
     $"{StringifyParams(func.Params)}{StringifyResultTypes(func.Results)}\n" +
     $"{StringifyLocals(func.LocalsDict, indent)}" +
     $"{GenerateRange(func.Instructions, indent + "  ")}\n{indent})";
+
+  private string GenerateMemory(Memory memory, string indent = "") =>
+    $"{indent}(memory ${memory.Name} {memory.Size})";
 
   private string GenerateInstruction(WasmInstruction instruction,
                                      string indent = "") =>

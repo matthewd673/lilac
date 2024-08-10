@@ -536,8 +536,8 @@ public class Load32S(string memory) : MemoryWasmInstruction(memory) {
     $"i64.load32_s{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
 }
 
-public class Load32U(Type type, string memory)
-  : IntegerTypedMemoryWasmInstruction(type, memory) {
+public class Load32U(string memory)
+  : MemoryWasmInstruction(memory) {
   public override byte OpCode => 0x35;
 
   public override string Wat =>
@@ -657,7 +657,8 @@ public class If : WasmInstruction {
       return false;
     }
 
-    return ElseBranch.Equals(other.ElseBranch);
+    return ElseBranch is null && other.ElseBranch is null ||
+           ElseBranch != null && ElseBranch.Equals(other.ElseBranch);
   }
 
   public override int GetHashCode() {
