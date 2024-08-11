@@ -22,12 +22,22 @@ public static class TypeMethods {
     };
   }
 
-  public static string ToString(this Type type) {
+  public static string GetWat(this Type type) {
     return type switch {
       Type.I32 => "i32",
       Type.I64 => "i64",
       Type.F32 => "f32",
       Type.F64 => "f64",
+      _ => throw new ArgumentOutOfRangeException(),
+    };
+  }
+
+  public static int GetSizeBytes(this Type type) {
+    return type switch {
+      Type.I32 => 4,
+      Type.I64 => 4,
+      Type.F32 => 4,
+      Type.F64 => 4,
       _ => throw new ArgumentOutOfRangeException(),
     };
   }
@@ -38,9 +48,11 @@ public static class TypeMethods {
       IL.Type.I64 => Type.I64,
       IL.Type.F32 => Type.F32,
       IL.Type.F64 => Type.F64,
+      IL.Type.Pointer => Runtime.PointerType,
       _ => throw new ArgumentOutOfRangeException(nameof(type),
                                                  type,
                                                  "IL type not support in Wasm"),
     };
   }
+
 }
