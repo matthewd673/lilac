@@ -1,3 +1,5 @@
+using Lilac.CodeGen.Targets.Wasm.Instructions;
+
 namespace Lilac.IL;
 
 public abstract class Node {
@@ -31,6 +33,7 @@ public enum Type {
   I64,
   F32,
   F64,
+  Pointer,
   Void,
 }
 
@@ -64,27 +67,17 @@ public static class TypeMethods {
     return type.IsInteger() || type.IsFloat();
   }
 
-  public static bool IsVoid(this Type type) {
+  public static bool IsPointer(this Type type) {
     return type switch {
-      Type.Void => true,
+      Type.Pointer => true,
       _ => false,
     };
   }
 
-  public static string ToString(this Type type) {
+  public static bool IsVoid(this Type type) {
     return type switch {
-      Type.U8 => "u8",
-      Type.U16 => "u16",
-      Type.U32 => "u32",
-      Type.U64 => "u64",
-      Type.I8 => "i8",
-      Type.I16 => "i16",
-      Type.I32 => "i32",
-      Type.I64 => "i64",
-      Type.F32 => "f32",
-      Type.F64 => "f64",
-      Type.Void => "void",
-      _ => throw new ArgumentOutOfRangeException(),
+      Type.Void => true,
+      _ => false,
     };
   }
 
@@ -100,6 +93,7 @@ public static class TypeMethods {
       Type.I64 => 64,
       Type.F32 => 32,
       Type.F64 => 64,
+      Type.Pointer => throw new NotSupportedException(),
       Type.Void => throw new NotSupportedException(),
       _ => throw new ArgumentOutOfRangeException(),
     };
@@ -453,9 +447,9 @@ public class Phi : Expression {
   public override Phi Clone() => new(Ids);
 }
 
-public class Load(Type type, Pointer pointer) : Expression {
+public class Load(Type type, Value address) : Expression {
   public Type Type { get; } = type;
-  public Pointer Pointer { get; } = pointer;
+  public Value Address { get; } = address;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Load)) {
@@ -463,14 +457,33 @@ public class Load(Type type, Pointer pointer) : Expression {
     }
 
     Load other = (Load)obj;
-    return Type.Equals(other.Type) && Pointer.Equals(other.Pointer);
+    return Type.Equals(other.Type) && Address.Equals(other.Address);
   }
 
   public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Type, Pointer);
+    return HashCode.Combine(GetType(), Type, Address);
   }
 
-  public override Load Clone() => new(Type, Pointer);
+  public override Load Clone() => new(Type, Address);
+}
+
+public class StackAlloc(Type type) : Expression {
+  public Type Type { get; } = type;
+
+  public override bool Equals(object? obj) {
+    if (obj is null || obj.GetType() != typeof(StackAlloc)) {
+      return false;
+    }
+
+    StackAlloc other = (StackAlloc)obj;
+    return Type.Equals(other.Type);
+  }
+
+  public override int GetHashCode() {
+    return HashCode.Combine(GetType(), Type);
+  }
+
+  public override StackAlloc Clone() => new(Type);
 }
 
 public class Definition : Statement {
@@ -668,9 +681,10 @@ public class InlineInstr : Statement {
   public override InlineInstr Clone() => new(Target, Instr);
 }
 
-public class Store(Type type, Pointer pointer) : Statement {
+public class Store(Type type, Value address, Value value) : Statement {
   public Type Type { get; } = type;
-  public Pointer Pointer { get; } = pointer;
+  public Value Address { get; } = address;
+  public Value Value { get; } = value;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Store)) {
@@ -678,34 +692,15 @@ public class Store(Type type, Pointer pointer) : Statement {
     }
 
     Store other = (Store)obj;
-    return Type.Equals(other.Type) && Pointer.Equals(other.Pointer);
+    return Type.Equals(other.Type) && Address.Equals(other.Address) &&
+           Value.Equals(other.Value);
   }
 
   public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Type, Pointer);
+    return HashCode.Combine(GetType(), Type, Address, Value);
   }
 
-  public override Store Clone() => new(Type, Pointer);
-}
-
-public class StackAlloc(Type type, LocalID id) : Statement {
-  public LocalID Id { get; } = id;
-  public Type Type { get; } = type;
-
-  public override bool Equals(object? obj) {
-    if (obj is null || obj.GetType() != typeof(StackAlloc)) {
-      return false;
-    }
-
-    StackAlloc other = (StackAlloc)obj;
-    return Type.Equals(other.Type);
-  }
-
-  public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Type);
-  }
-
-  public override StackAlloc Clone() => new(Type, Id);
+  public override Store Clone() => new(Type, Address, Value);
 }
 
 public class GlobalDef : Component {
@@ -953,23 +948,4 @@ public class Program {
   public override int GetHashCode() {
     return HashCode.Combine(GetType(), globalMap, funcMap, externFuncMap);
   }
-}
-
-public class Pointer(string name) : Node {
-  public string Name { get; } = name;
-
-  public override bool Equals(object? obj) {
-    if (obj is null || obj.GetType() != typeof(Pointer)) {
-      return false;
-    }
-
-    Pointer other = (Pointer)obj;
-    return Name.Equals(other.Name);
-  }
-
-  public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Name);
-  }
-
-  public override Pointer Clone() => new(Name);
 }
