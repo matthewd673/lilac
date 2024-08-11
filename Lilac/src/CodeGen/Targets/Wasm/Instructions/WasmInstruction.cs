@@ -84,16 +84,18 @@ public abstract class LabelWasmInstruction(string label) : WasmInstruction {
   }
 }
 
-public abstract class MemoryWasmInstruction(string memory = "")
+public abstract class MemoryWasmInstruction(string? memory = null)
   : WasmInstruction {
-  public string Memory { get; } = memory;
+  public string? Memory { get; } = memory;
 
   public override bool Equals(object? obj) {
     if (obj is not MemoryWasmInstruction other) {
       return false;
     }
 
-    return OpCode.Equals(other.OpCode) && Memory.Equals(other.Memory);
+    return OpCode.Equals(other.OpCode) &&
+           (Memory is null && other.Memory is null ||
+            Memory is not null && Memory.Equals(other.Memory));
   }
 
   public override int GetHashCode() {
@@ -101,17 +103,19 @@ public abstract class MemoryWasmInstruction(string memory = "")
   }
 }
 
-public abstract class TypedMemoryWasmInstruction(Type type, string memory = "")
+public abstract class TypedMemoryWasmInstruction(Type type, string? memory)
   : WasmInstruction {
   public Type Type { get; } = type;
-  public string Memory { get; } = memory;
+  public string? Memory { get; } = memory;
 
   public override bool Equals(object? obj) {
     if (obj is not TypedMemoryWasmInstruction other) {
       return false;
     }
 
-    return Type.Equals(other.Type) && Memory.Equals(other.Memory);
+    return Type.Equals(other.Type) &&
+           (Memory is null && other.Memory is null ||
+            Memory is not null && Memory.Equals(other.Memory));
   }
 
   public override int GetHashCode() {
@@ -121,7 +125,7 @@ public abstract class TypedMemoryWasmInstruction(Type type, string memory = "")
 
 public abstract class IntegerTypedMemoryWasmInstruction
   : TypedMemoryWasmInstruction {
-  public IntegerTypedMemoryWasmInstruction(Type type, string memory)
+  public IntegerTypedMemoryWasmInstruction(Type type, string? memory = null)
     : base(type, memory) {
     if (!type.IsInteger()) {
       throw new IllegalTypeException(type, this);

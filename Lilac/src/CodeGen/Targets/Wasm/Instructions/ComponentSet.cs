@@ -50,3 +50,8 @@ public class Import(string moduleName,
   public List<Type> ParamTypes { get; } = paramTypes;
   public List<Type> Results { get; } = results;
 }
+
+public class Memory(int size, string? name = null) : WasmComponent {
+  public int Size { get; } = size;
+  public string? Name { get; } = name;
+}

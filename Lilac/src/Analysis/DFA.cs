@@ -113,8 +113,8 @@ abstract class DFA<T> {
   }
 
   private void StepForwards(BB block) {
-    In.Add(block, Meet(block));
-    Out.Add(block, Transfer(block));
+    In[block] = Meet(block);
+    Out[block] = Transfer(block);
   }
 
   private void RunBackwards() {
@@ -158,7 +158,7 @@ abstract class DFA<T> {
   }
 
   private void StepBackwards(BB block) {
-    Out.Add(block, Meet(block));
-    In.Add(block, Transfer(block));
+    Out[block] = Meet(block);
+    In[block] = Transfer(block);
   }
 }

@@ -40,8 +40,17 @@ public class BB {
   }
 
   public BB Clone() {
-    // TODO
-    throw new NotImplementedException();
+    // clone all statements (don't forget entry and exit)
+    List<Statement> newStmtList = [];
+    foreach (Statement s in StmtList) {
+      newStmtList.Add((Statement)s.Clone());
+    }
+
+    return new((string)Id.Clone(),
+               Entry?.Clone(),
+               Exit?.Clone(),
+               newStmtList,
+               TrueBranch);
   }
 
   public override string ToString() {

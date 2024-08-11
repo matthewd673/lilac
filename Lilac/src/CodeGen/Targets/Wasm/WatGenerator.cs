@@ -43,6 +43,7 @@ public class WatGenerator(WasmComponent rootComponent)
       Local local => GenerateLocal(local, indent),
       Start start => GenerateStart(start, indent),
       Func func => GenerateFunc(func, indent),
+      Memory memory => GenerateMemory(memory, indent),
       _ => throw new ArgumentOutOfRangeException(nameof(comp), comp,
                                                  "Cannot generate component"),
     };
@@ -55,15 +56,17 @@ public class WatGenerator(WasmComponent rootComponent)
     $"{indent}(func ${import.FuncName} " +
     $"(import \"{import.ModuleName}\" \"{import.FuncName}\")" +
     $"{StringifyParamTypes(import.ParamTypes)}" +
-    $"{StringifyResultTypes(import.Results)}";
+    $"{StringifyResultTypes(import.Results)})";
 
   private string GenerateGlobal(Global global, string indent = "") =>
     $"{indent}(global ${global.Name} " +
-    $"{(global.Mutable ? $"(mut ${global.Type}" : global.Type)} " +
-    $"({GenerateInstruction(global.DefaultValue)})";
+    $"{(global.Mutable ?
+          $"(mut {global.Type.GetWat()})"
+          : global.Type)} " +
+    $"({GenerateInstruction(global.DefaultValue)}))";
 
   private string GenerateLocal(Local local, string indent = "") =>
-    $"{indent}(local ${local.Name} {local.Type})";
+    $"{indent}(local ${local.Name} {local.Type.GetWat()})";
 
   private string GenerateStart(Start start, string indent = "") =>
     $"{indent}(start ${start.Name})";
@@ -72,8 +75,12 @@ public class WatGenerator(WasmComponent rootComponent)
     $"{indent}(func ${func.Name}" +
     $"{(func.Export is not null ? $"(export \"{func.Export}\") " : " ")}" +
     $"{StringifyParams(func.Params)}{StringifyResultTypes(func.Results)}\n" +
-    $"{StringifyLocals(func.LocalsDict, indent + "  ")}" +
+    $"{StringifyLocals(func.LocalsDict, indent)}" +
     $"{GenerateRange(func.Instructions, indent + "  ")}\n{indent})";
+
+  private string GenerateMemory(Memory memory, string indent = "") =>
+    $"{indent}(memory{(memory.Name is null ? "" : $" ${memory.Name}")}" +
+    $" {memory.Size})";
 
   private string GenerateInstruction(WasmInstruction instruction,
                                      string indent = "") =>
@@ -82,7 +89,7 @@ public class WatGenerator(WasmComponent rootComponent)
   private string StringifyParams(List<Local> @params) {
     string str = "";
     foreach (Local p in @params) {
-      str += $"(param ${p.Name} {p.Type}) ";
+      str += $"(param ${p.Name} {p.Type.GetWat()}) ";
     }
 
     return str.TrimEnd();
@@ -101,7 +108,7 @@ public class WatGenerator(WasmComponent rootComponent)
   private string StringifyParamTypes(List<Type> paramTypes) {
     string str = " ";
     foreach (Type t in paramTypes) {
-      str += $"(param {t}) ";
+      str += $"(param {t.GetWat()}) ";
     }
 
     return str.TrimEnd();
@@ -110,7 +117,7 @@ public class WatGenerator(WasmComponent rootComponent)
   private string StringifyResultTypes(List<Type> resultTypes) {
     string str = "";
     foreach (Type t in resultTypes) {
-      str += $" (result {t})";
+      str += $" (result {t.GetWat()})";
     }
 
     return str;

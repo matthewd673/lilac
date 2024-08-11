@@ -1,3 +1,5 @@
+using Lilac.CodeGen.Targets.Wasm.Instructions;
+
 namespace Lilac.IL;
 
 public abstract class Node {
@@ -31,6 +33,7 @@ public enum Type {
   I64,
   F32,
   F64,
+  Pointer,
   Void,
 }
 
@@ -64,6 +67,13 @@ public static class TypeMethods {
     return type.IsInteger() || type.IsFloat();
   }
 
+  public static bool IsPointer(this Type type) {
+    return type switch {
+      Type.Pointer => true,
+      _ => false,
+    };
+  }
+
   public static bool IsVoid(this Type type) {
     return type switch {
       Type.Void => true,
@@ -71,19 +81,20 @@ public static class TypeMethods {
     };
   }
 
-  public static string ToString(this Type type) {
+  public static int GetSize(this Type type) {
     return type switch {
-      Type.U8 => "u8",
-      Type.U16 => "u16",
-      Type.U32 => "u32",
-      Type.U64 => "u64",
-      Type.I8 => "i8",
-      Type.I16 => "i16",
-      Type.I32 => "i32",
-      Type.I64 => "i64",
-      Type.F32 => "f32",
-      Type.F64 => "f64",
-      Type.Void => "void",
+      Type.U8 => 8,
+      Type.U16 => 16,
+      Type.U32 => 32,
+      Type.U64 => 64,
+      Type.I8 => 8,
+      Type.I16 => 16,
+      Type.I32 => 32,
+      Type.I64 => 64,
+      Type.F32 => 32,
+      Type.F64 => 64,
+      Type.Pointer => throw new NotSupportedException(),
+      Type.Void => throw new NotSupportedException(),
       _ => throw new ArgumentOutOfRangeException(),
     };
   }
@@ -117,19 +128,21 @@ public class Constant : Value {
   public override Constant Clone() => new(Type, Value);
 }
 
-public class ID : Value {
+public abstract class ID : Value {
   public string Name { get; }
 
   public ID(string name) {
     Name = name;
   }
+}
 
+public class LocalID(string name) : ID(name) {
   public override bool Equals(object? obj) {
-    if (obj is null || obj.GetType() != typeof(ID)) {
+    if (obj is null || obj.GetType() != typeof(LocalID)) {
       return false;
     }
 
-    ID other = (ID)obj;
+    LocalID other = (LocalID)obj;
     return Name.Equals(other.Name);
   }
 
@@ -137,14 +150,10 @@ public class ID : Value {
     return HashCode.Combine(GetType(), Name);
   }
 
-  public override ID Clone() => new(Name);
+  public override LocalID Clone() => new(Name);
 }
 
-public class GlobalID : ID {
-  public GlobalID(string name) : base(name) {
-    // Empty
-  }
-
+public class GlobalID(string name) : ID(name) {
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(GlobalID)) {
       return false;
@@ -438,6 +447,45 @@ public class Phi : Expression {
   public override Phi Clone() => new(Ids);
 }
 
+public class Load(Type type, Value address) : Expression {
+  public Type Type { get; } = type;
+  public Value Address { get; } = address;
+
+  public override bool Equals(object? obj) {
+    if (obj is null || obj.GetType() != typeof(Load)) {
+      return false;
+    }
+
+    Load other = (Load)obj;
+    return Type.Equals(other.Type) && Address.Equals(other.Address);
+  }
+
+  public override int GetHashCode() {
+    return HashCode.Combine(GetType(), Type, Address);
+  }
+
+  public override Load Clone() => new(Type, Address);
+}
+
+public class StackAlloc(Type type) : Expression {
+  public Type Type { get; } = type;
+
+  public override bool Equals(object? obj) {
+    if (obj is null || obj.GetType() != typeof(StackAlloc)) {
+      return false;
+    }
+
+    StackAlloc other = (StackAlloc)obj;
+    return Type.Equals(other.Type);
+  }
+
+  public override int GetHashCode() {
+    return HashCode.Combine(GetType(), Type);
+  }
+
+  public override StackAlloc Clone() => new(Type);
+}
+
 public class Definition : Statement {
   public Type Type { get; }
   public ID Id { get; }
@@ -633,6 +681,28 @@ public class InlineInstr : Statement {
   public override InlineInstr Clone() => new(Target, Instr);
 }
 
+public class Store(Type type, Value address, Value value) : Statement {
+  public Type Type { get; } = type;
+  public Value Address { get; } = address;
+  public Value Value { get; } = value;
+
+  public override bool Equals(object? obj) {
+    if (obj is null || obj.GetType() != typeof(Store)) {
+      return false;
+    }
+
+    Store other = (Store)obj;
+    return Type.Equals(other.Type) && Address.Equals(other.Address) &&
+           Value.Equals(other.Value);
+  }
+
+  public override int GetHashCode() {
+    return HashCode.Combine(GetType(), Type, Address, Value);
+  }
+
+  public override Store Clone() => new(Type, Address, Value);
+}
+
 public class GlobalDef : Component {
   public Type Type { get; }
   public GlobalID Id { get; }
@@ -704,9 +774,9 @@ public class FuncDef : Component {
 
 public class FuncParam : Node {
   public Type Type { get; }
-  public ID Id { get; }
+  public LocalID Id { get; }
 
-  public FuncParam(Type type, ID id) {
+  public FuncParam(Type type, LocalID id) {
     Type = type;
     Id = id;
   }

@@ -3,19 +3,12 @@ using Lilac.IL;
 
 namespace Lilac.Frontend;
 
-public class Generator {
-  private Program program;
+public class Generator(Program program) {
+  public string Generate() =>
+    GenerateProgram(program);
 
-  public Generator(Program program) {
-    this.program = program;
-  }
-
-  public string Generate() {
-    return GenerateProgram(program);
-  }
-
-  protected virtual string GenerateType(IL.Type type) {
-    return type switch {
+  protected virtual string GenerateType(IL.Type type) =>
+    type switch {
       IL.Type.U8 => "u8",
       IL.Type.U16 => "u16",
       IL.Type.U32 => "u32",
@@ -26,10 +19,10 @@ public class Generator {
       IL.Type.I64 => "i64",
       IL.Type.F32 => "f32",
       IL.Type.F64 => "f64",
+      IL.Type.Pointer => "ptr",
       IL.Type.Void => "void",
       _ => throw new CannotGenerateException(type),
     };
-  }
 
   protected virtual string GenerateProgram(Program program) {
     string str = "";
@@ -49,16 +42,14 @@ public class Generator {
     return str;
   }
 
-  protected virtual string GenerateGlobalDef(GlobalDef globalDef) {
-    return $"global {GenerateType(globalDef.Type)} {GenerateID(globalDef.Id)} " +
-           $"= {GenerateConstant(globalDef.Rhs)}";
-  }
+  protected virtual string GenerateGlobalDef(GlobalDef globalDef) =>
+    $"global {GenerateType(globalDef.Type)} {GenerateID(globalDef.Id)} " +
+      $"= {GenerateConstant(globalDef.Rhs)}";
 
-  protected virtual string GenerateExternFuncDef(ExternFuncDef externFuncDef) {
-    return $"extern func {externFuncDef.Source} {externFuncDef.Name} (" +
-           $"{GenerateTypeList(externFuncDef.ParamTypes)}) -> " +
-           $"{GenerateType(externFuncDef.RetType)}";
-  }
+  protected virtual string GenerateExternFuncDef(ExternFuncDef externFuncDef) =>
+    $"extern func {externFuncDef.Source} {externFuncDef.Name} (" +
+      $"{GenerateTypeList(externFuncDef.ParamTypes)}) -> " +
+      $"{GenerateType(externFuncDef.RetType)}";
 
   protected virtual string GenerateFuncDef(FuncDef funcDef) {
     string str =
@@ -74,78 +65,73 @@ public class Generator {
     return str;
   }
 
-  protected virtual string GenerateFuncParam(FuncParam funcParam) {
-    return $"{GenerateType(funcParam.Type)} {GenerateID(funcParam.Id)}";
-  }
+  protected virtual string GenerateFuncParam(FuncParam funcParam) =>
+    $"{GenerateType(funcParam.Type)} {GenerateID(funcParam.Id)}";
 
-  protected virtual string GenerateStatement(Statement stmt) {
-    return stmt switch {
+  protected virtual string GenerateStatement(Statement stmt) =>
+    stmt switch {
       Definition definition => GenerateDefinition(definition),
       Label label => GenerateLabel(label),
       Jump jump => GenerateJump(jump),
       Return @return => GenerateReturn(@return),
       VoidCall voidCall => GenerateVoidCall(voidCall),
       InlineInstr inlineInstr => GenerateInlineInstr(inlineInstr),
+      Store store => GenerateStore(store),
       _ => throw new CannotGenerateException(stmt),
     };
-  }
 
-  protected virtual string GenerateDefinition(Definition definition) {
-    return $"{GenerateType(definition.Type)} {GenerateID(definition.Id)} = " +
-           $"{GenerateExpression(definition.Rhs)}";
-  }
+  protected virtual string GenerateDefinition(Definition definition) =>
+    $"{GenerateType(definition.Type)} {GenerateID(definition.Id)} = " +
+      $"{GenerateExpression(definition.Rhs)}";
 
-  protected virtual string GenerateLabel(Label label) {
-    return $"{label.Name}:";
-  }
+  protected virtual string GenerateLabel(Label label) =>
+    $"{label.Name}:";
 
-  protected virtual string GenerateJump(Jump jump) {
-    return jump switch {
+  protected virtual string GenerateJump(Jump jump) =>
+    jump switch {
       JumpZero jumpZero => $"jz {GenerateValue(jumpZero.Cond)} " +
                            $"{jumpZero.Target}",
       JumpNotZero jumpNotZero => $"jnz {GenerateValue(jumpNotZero.Cond)} " +
                                  $"{jumpNotZero.Target}",
       _ => $"jmp {jump.Target}",
     };
-  }
 
-  protected virtual string GenerateReturn(Return @return) {
-    return $"ret {GenerateValue(@return.Value)}";
-  }
+  protected virtual string GenerateReturn(Return @return) =>
+    $"ret {GenerateValue(@return.Value)}";
 
-  protected virtual string GenerateVoidCall(VoidCall voidCall) {
-    return $"void {GenerateCall(voidCall.Call)}";
-  }
+  protected virtual string GenerateVoidCall(VoidCall voidCall) =>
+    $"void {GenerateCall(voidCall.Call)}";
 
-  protected virtual string GenerateInlineInstr(InlineInstr inlineInstr) {
+  protected virtual string GenerateInlineInstr(InlineInstr inlineInstr) =>
     // TODO: syntax is not implemented
     throw new CannotGenerateException(inlineInstr);
-  }
 
-  protected virtual string GenerateExpression(Expression expr) {
-    return expr switch {
+  protected virtual string GenerateStore(Store store) =>
+    $"store {GenerateType(store.Type)} {GenerateValue(store.Address)} " +
+    $"{GenerateValue(store.Value)}";
+
+  protected virtual string GenerateExpression(Expression expr) =>
+    expr switch {
       ValueExpr valueExpr => GenerateValueExpr(valueExpr),
       BinaryOp binaryOp => GenerateBinaryOp(binaryOp),
       UnaryOp unaryOp => GenerateUnaryOp(unaryOp),
       Conversion conversion => GenerateConversion(conversion),
       Call call => GenerateCall(call),
       Phi phi => GeneratePhi(phi),
+      StackAlloc stackAlloc => GenerateStackAlloc(stackAlloc),
+      Load load => GenerateLoad(load),
       _ => throw new CannotGenerateException(expr),
     };
-  }
 
-  protected virtual string GenerateValueExpr(ValueExpr valueExpr) {
-    return GenerateValue(valueExpr.Value);
-  }
+  protected virtual string GenerateValueExpr(ValueExpr valueExpr) =>
+    GenerateValue(valueExpr.Value);
 
-  protected virtual string GenerateBinaryOp(BinaryOp binaryOp) {
-    return $"{GenerateValue(binaryOp.Left)} " +
-           $"{GenerateBinaryOpOperator(binaryOp.Op)} " +
-           $"{GenerateValue(binaryOp.Right)}";
-  }
+  protected virtual string GenerateBinaryOp(BinaryOp binaryOp) =>
+    $"{GenerateValue(binaryOp.Left)} {GenerateBinaryOpOperator(binaryOp.Op)} " +
+      $"{GenerateValue(binaryOp.Right)}";
 
-  protected virtual string GenerateBinaryOpOperator(BinaryOp.Operator op) {
-    return op switch {
+  protected virtual string GenerateBinaryOpOperator(BinaryOp.Operator op) =>
+    op switch {
       BinaryOp.Operator.Add => "+",
       BinaryOp.Operator.Sub => "-",
       BinaryOp.Operator.Mul => "*",
@@ -164,47 +150,48 @@ public class Generator {
       BinaryOp.Operator.BitAnd => "&",
       BinaryOp.Operator.BitOr => "|",
       BinaryOp.Operator.BitXor => "^",
+      _ => throw new CannotGenerateException(op),
     };
-  }
 
-  protected virtual string GenerateUnaryOp(UnaryOp unaryOp) {
-    return $"{GenerateUnaryOpOperator(unaryOp.Op)} " +
-           $"{GenerateValue(unaryOp.Value)}";
-  }
+  protected virtual string GenerateUnaryOp(UnaryOp unaryOp) =>
+    $"{GenerateUnaryOpOperator(unaryOp.Op)}{GenerateValue(unaryOp.Value)}";
 
-  protected virtual string GenerateUnaryOpOperator(UnaryOp.Operator op) {
-    return op switch {
+  protected virtual string GenerateUnaryOpOperator(UnaryOp.Operator op) =>
+    op switch {
       UnaryOp.Operator.Neg => "-@",
       UnaryOp.Operator.BoolNot => "!@",
       UnaryOp.Operator.BitNot => "~@",
+      _ => throw new CannotGenerateException(op),
     };
-  }
 
   protected virtual string GenerateConversion(Conversion conversion) {
     // TODO: syntax is not implemented
     throw new CannotGenerateException(conversion);
   }
 
-  protected virtual string GenerateCall(Call call) {
-    return call switch {
+  protected virtual string GenerateCall(Call call) =>
+    call switch {
       ExternCall externCall => $"extern call {externCall.FuncSource} " +
                                $"{externCall.FuncName} " +
                                $"({GenerateValueList(externCall.Args)})",
       _ => $"call {call.FuncName} ({GenerateValueList(call.Args)})",
     };
-  }
 
-  protected virtual string GeneratePhi(Phi phi) {
-    return $"phi ({GenerateValueList(new(phi.Ids))})";
-  }
+  protected virtual string GeneratePhi(Phi phi) =>
+    $"phi ({GenerateValueList(new(phi.Ids))})";
 
-  protected virtual string GenerateValue(Value value) {
-    return value switch {
+  protected virtual string GenerateStackAlloc(StackAlloc stackAlloc) =>
+    $"stack_alloc {GenerateType(stackAlloc.Type)}";
+
+  protected virtual string GenerateLoad(Load load) =>
+    $"load {GenerateType(load.Type)} {GenerateValue(load.Address)}";
+
+  protected virtual string GenerateValue(Value value) =>
+    value switch {
       Constant constant => GenerateConstant(constant),
       ID id => GenerateID(id),
       _ => throw new CannotGenerateException(value),
     };
-  }
 
   protected virtual string GenerateConstant(Constant constant) {
     if (constant.Type.IsVoid()) {
@@ -212,20 +199,20 @@ public class Generator {
     }
 
     string valStr = constant.Value.ToString();
-    if (constant.Type.IsFloat() && !valStr.Contains(".")) {
+    // easy patch for generating floats with 0s in the decimal
+    if (constant.Type.IsFloat() && !valStr.Contains('.')) {
       valStr += ".";
     }
 
     return $"{valStr}{GenerateType(constant.Type)}";
   }
 
-  protected virtual string GenerateID(ID id) {
-    return id switch {
+  protected virtual string GenerateID(ID id) =>
+    id switch {
       GlobalID => $"@{id.Name}",
       ID => $"${id.Name}",
       _ => throw new CannotGenerateException(id),
     };
-  }
 
   protected string GenerateTypeList(List<IL.Type> typeList) {
     string str = "";

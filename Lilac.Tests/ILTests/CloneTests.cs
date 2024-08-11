@@ -15,8 +15,8 @@ public class CloneTests {
 
   [Fact]
   public void CloneId() {
-    ID a = new("var");
-    ID b = a.Clone();
+    LocalID a = new("var");
+    LocalID b = a.Clone();
 
     Assert.False(a == b);
     Assert.Equal(a, b);
@@ -44,7 +44,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneUnaryOp() {
-    UnaryOp a = new(UnaryOp.Operator.BitNot, new ID("var"));
+    UnaryOp a = new(UnaryOp.Operator.BitNot, new LocalID("var"));
     UnaryOp b = a.Clone();
 
     Assert.False(a == b);
@@ -62,7 +62,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneCall() {
-    Call a = new("func", [new ID("arg")]);
+    Call a = new("func", [new LocalID("arg")]);
     Call b = a.Clone();
 
     Assert.False(a == b);
@@ -81,7 +81,7 @@ public class CloneTests {
 
   [Fact]
   public void ClonePhi() {
-    Phi a = new([new ID("a"), new ID("b")]);
+    Phi a = new([new LocalID("a"), new LocalID("b")]);
     Phi b = a.Clone();
 
     Assert.False(a == b);
@@ -90,7 +90,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneDefinition() {
-    Definition a = new(Type.I32, new ID("var"),
+    Definition a = new(Type.I32, new LocalID("var"),
                        new ValueExpr(new Constant(Type.I32, 5)));
     Definition b = a.Clone();
 
@@ -136,7 +136,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneReturn() {
-    Return a = new(new ID("var"));
+    Return a = new(new LocalID("var"));
     Return b = a.Clone();
 
     Assert.False(a == b);
@@ -145,7 +145,10 @@ public class CloneTests {
 
   [Fact]
   public void CloneVoidCall() {
-    VoidCall a = new(new Call("func", [new ID("a"), new ID("b")]));
+    VoidCall a = new(new Call("func", [
+                                        new LocalID("a"),
+                                        new LocalID("b")
+                                      ]));
     VoidCall b = a.Clone();
 
     Assert.False(a == b);
@@ -175,7 +178,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneFuncDef() {
-    FuncDef a = new("func", [new FuncParam(Type.I32, new ID("p"))],
+    FuncDef a = new("func", [new(Type.I32, new LocalID("p"))],
                     Type.Void, [new Label("L1"), new Jump("L1")],
                     true);
     FuncDef b = a.Clone();
@@ -186,7 +189,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneFuncParam() {
-    FuncParam a = new(Type.U8, new ID("var"));
+    FuncParam a = new(Type.U8, new LocalID("var"));
     FuncParam b = a.Clone();
 
     Assert.False(a == b);
