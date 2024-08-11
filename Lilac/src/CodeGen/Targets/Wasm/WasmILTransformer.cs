@@ -1,6 +1,6 @@
 using Lilac.CodeGen.Targets.Wasm.Instructions;
 using Lilac.IL;
-using Return = Lilac.IL.Return;
+using Load = Lilac.CodeGen.Targets.Wasm.Instructions.Load;
 using Type = Lilac.CodeGen.Targets.Wasm.Instructions.Type;
 
 namespace Lilac.CodeGen.Targets.Wasm;
@@ -15,6 +15,111 @@ internal class WasmILTransformer(SymbolTable symbolTable)
       InlineInstr inlineInstr =>
         [inlineInstr.Instr as WasmInstruction ??
           throw new InvalidOperationException(),
+        ],
+      Definition { Rhs: StackAlloc stackAlloc } def =>
+        [new GlobalGet(Runtime.StackPointerName),
+         def.Id is GlobalID ? // NOTE: only locals should be stack alloc'd
+          new GlobalSet(def.Id.Name) :
+          new LocalSet(def.Id.Name),
+         def.Id is GlobalID ?
+          new GlobalGet(def.Id.Name) :
+          new LocalGet(def.Id.Name), // has a change to become a tee
+         new Const(Runtime.PointerType,
+                   stackAlloc.Type.ToWasmType().GetSizeBytes().ToString()),
+         new Add(Runtime.PointerType),
+         new GlobalSet(Runtime.StackPointerName),
+        ],
+      Definition { Rhs: IL.Load { Type: IL.Type.U8 } load } def =>
+        [
+          ..Transform(load.Address),
+          new Load8U(def.Type.ToWasmType()),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
+      Definition { Rhs: IL.Load { Type: IL.Type.I8 } load } def =>
+        [
+          ..Transform(load.Address),
+          new Load8S(def.Type.ToWasmType()),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
+      Definition { Rhs: IL.Load { Type: IL.Type.U16 } load } def =>
+        [
+          ..Transform(load.Address),
+          new Load16U(def.Type.ToWasmType()),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
+      Definition { Rhs: IL.Load { Type: IL.Type.I16 } load } def =>
+        [
+          ..Transform(load.Address),
+          new Load16S(def.Type.ToWasmType()),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
+      Definition {
+          Rhs: IL.Load { Type: IL.Type.U32 } load,
+          Type: IL.Type.I64,
+        } def =>
+        [
+          ..Transform(load.Address),
+          new Load32U(),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
+      Definition {
+          Rhs: IL.Load { Type: IL.Type.I32 } load,
+          Type: IL.Type.I64,
+        } def =>
+        [
+          ..Transform(load.Address),
+          new Load32S(),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
+      Definition {
+          Rhs: IL.Load { Type: IL.Type.U32 or IL.Type.I32 } load,
+          Type: IL.Type.U32 or IL.Type.I32,
+        } def =>
+        [
+          ..Transform(load.Address),
+          new Load(Type.I32),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
+      Definition {
+          Rhs: IL.Load { Type: IL.Type.U64 or IL.Type.I64 } load,
+          Type: IL.Type.U64 or IL.Type.I32,
+        } def =>
+        [
+          ..Transform(load.Address),
+          new Load(Type.I64),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
+      Definition { Rhs: IL.Load { Type: IL.Type.F32 } load } def =>
+        [
+          ..Transform(load.Address),
+          new Load(Type.F32),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
+      Definition { Rhs: IL.Load { Type: IL.Type.F64 } load } def =>
+        [
+          ..Transform(load.Address),
+          new Load(Type.F64),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
         ],
       Definition def =>
         [..Transform(def.Rhs),
@@ -95,9 +200,47 @@ internal class WasmILTransformer(SymbolTable symbolTable)
         [..call.Args.SelectMany(Transform),
          new Instructions.Call(call.FuncName),
         ],
-      Return @return =>
+      IL.Return @return =>
         [..Transform(@return.Value),
          new Instructions.Return()],
+      ValueExpr valueExpr =>
+        Transform(valueExpr.Value), // ValueExpr is just a wrapper
+      IL.Store { Type: IL.Type.U8 or IL.Type.I8 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Store8(Type.I32),
+        ],
+      IL.Store { Type: IL.Type.U16 or IL.Type.I16 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Store16(Type.I32),
+        ],
+      IL.Store { Type: IL.Type.U32 or IL.Type.I32 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Type.I32),
+        ],
+      IL.Store { Type: IL.Type.U64 or IL.Type.U64 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Type.I64),
+        ],
+      IL.Store { Type: IL.Type.F32 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Type.F32),
+        ],
+      IL.Store { Type: IL.Type.F64 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Type.F64),
+        ],
       // VALUE RULES
       ID id =>
         [id is GlobalID ?

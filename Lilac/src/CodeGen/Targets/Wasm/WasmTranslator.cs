@@ -61,6 +61,9 @@ public class WasmTranslator : Translator<WasmInstruction> {
       components.Add(new Start(StartFunction));
     }
 
+    // add runtime memory helpers
+    components.AddRange(Runtime.StackEmulatorComponents);
+
     return new Module(components);
   }
 

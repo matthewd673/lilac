@@ -56,14 +56,14 @@ public class WatGenerator(WasmComponent rootComponent)
     $"{indent}(func ${import.FuncName} " +
     $"(import \"{import.ModuleName}\" \"{import.FuncName}\")" +
     $"{StringifyParamTypes(import.ParamTypes)}" +
-    $"{StringifyResultTypes(import.Results)}";
+    $"{StringifyResultTypes(import.Results)})";
 
   private string GenerateGlobal(Global global, string indent = "") =>
     $"{indent}(global ${global.Name} " +
     $"{(global.Mutable ?
-          $"(mut ${global.Type.GetWat()}"
+          $"(mut {global.Type.GetWat()})"
           : global.Type)} " +
-    $"({GenerateInstruction(global.DefaultValue)})";
+    $"({GenerateInstruction(global.DefaultValue)}))";
 
   private string GenerateLocal(Local local, string indent = "") =>
     $"{indent}(local ${local.Name} {local.Type.GetWat()})";
@@ -79,7 +79,8 @@ public class WatGenerator(WasmComponent rootComponent)
     $"{GenerateRange(func.Instructions, indent + "  ")}\n{indent})";
 
   private string GenerateMemory(Memory memory, string indent = "") =>
-    $"{indent}(memory ${memory.Name} {memory.Size})";
+    $"{indent}(memory{(memory.Name is null ? "" : $" ${memory.Name}")}" +
+    $" {memory.Size})";
 
   private string GenerateInstruction(WasmInstruction instruction,
                                      string indent = "") =>
