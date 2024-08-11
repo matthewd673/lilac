@@ -452,17 +452,17 @@ public class Grow(string memory) : MemoryWasmInstruction(memory) {
   public override byte OpCode => 0x40;
 
   public override string Wat =>
-    $"memory.grow{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"memory.grow{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
 public class Size(string memory) : MemoryWasmInstruction(memory) {
   public override byte OpCode => 0x3f;
 
   public override string Wat =>
-    $"memory.size{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"memory.size{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load(Type type, string memory)
+public class Load(Type type, string? memory = null)
   : TypedMemoryWasmInstruction(type, memory) {
   public override byte OpCode =>
     Type switch {
@@ -474,10 +474,10 @@ public class Load(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type.GetWat()}.load{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load8S(Type type, string memory)
+public class Load8S(Type type, string? memory = null)
   : IntegerTypedMemoryWasmInstruction(type, memory) {
   public override byte OpCode =>
     Type switch {
@@ -487,10 +487,10 @@ public class Load8S(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type.GetWat()}.load8_s{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load8_s{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load8U(Type type, string memory)
+public class Load8U(Type type, string? memory = null)
   : IntegerTypedMemoryWasmInstruction(type, memory) {
   public override byte OpCode =>
     Type switch {
@@ -500,10 +500,10 @@ public class Load8U(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type.GetWat()}.load8_u{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load8_u{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load16S(Type type, string memory)
+public class Load16S(Type type, string? memory = null)
   : IntegerTypedMemoryWasmInstruction(type, memory) {
   public override byte OpCode =>
     Type switch {
@@ -513,10 +513,10 @@ public class Load16S(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type.GetWat()}.load16_s{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load16_s{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load16U(Type type, string memory)
+public class Load16U(Type type, string? memory = null)
   : IntegerTypedMemoryWasmInstruction(type, memory) {
   public override byte OpCode =>
     Type switch {
@@ -526,25 +526,25 @@ public class Load16U(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type.GetWat()}.load16_u{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.load16_u{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load32S(string memory) : MemoryWasmInstruction(memory) {
+public class Load32S(string? memory = null) : MemoryWasmInstruction(memory) {
   public override byte OpCode => 0x34;
 
   public override string Wat =>
-    $"i64.load32_s{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"i64.load32_s{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load32U(string memory)
+public class Load32U(string? memory = null)
   : MemoryWasmInstruction(memory) {
   public override byte OpCode => 0x35;
 
   public override string Wat =>
-    $"i64.load32_u{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"i64.load32_u{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Store(Type type, string memory)
+public class Store(Type type, string? memory = null)
   : TypedMemoryWasmInstruction(type, memory) {
   public override byte OpCode =>
     Type switch {
@@ -556,10 +556,10 @@ public class Store(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type.GetWat()}.store{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.store{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Store8(Type type, string memory)
+public class Store8(Type type, string? memory = null)
   : TypedMemoryWasmInstruction(type, memory) {
   public override byte OpCode =>
     Type switch {
@@ -569,10 +569,10 @@ public class Store8(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type.GetWat()}.store8{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.store8{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Store16(Type type, string memory)
+public class Store16(Type type, string? memory = null)
   : TypedMemoryWasmInstruction(type, memory) {
   public override byte OpCode =>
     Type switch {
@@ -582,14 +582,14 @@ public class Store16(Type type, string memory)
     };
 
   public override string Wat =>
-    $"{Type.GetWat()}.store16{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"{Type.GetWat()}.store16{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Store32(string memory) : MemoryWasmInstruction(memory) {
+public class Store32(string? memory = null) : MemoryWasmInstruction(memory) {
   public override byte OpCode => 0x3e;
 
   public override string Wat =>
-    $"i64.store32{(Memory.Length > 0 ? $" (memory ${Memory})" : "")}";
+    $"i64.store32{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
 // TODO: copy
