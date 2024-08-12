@@ -1,5 +1,6 @@
 using Lilac.Analysis;
 using Lilac.IL;
+using Lilac.IL.Utils;
 
 namespace Lilac.Optimization;
 

@@ -1,4 +1,4 @@
-namespace Lilac.IL;
+namespace Lilac.IL.Utils;
 
 public static class InternalMath {
   public static Constant Calculate(BinaryOp.Operator op,
