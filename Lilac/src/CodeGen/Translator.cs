@@ -3,8 +3,8 @@ using Lilac.Analysis;
 namespace Lilac.CodeGen;
 
 public abstract class Translator<TInstr> where TInstr : Instruction {
-  protected ILTransformer<TInstr> Transformer { get; set; }
-  protected CFGProgram CFGProgram { get; set; }
+  protected ILTransformer<TInstr> Transformer { get; set; } = null!;
+  protected CFGProgram CFGProgram { get; set; } = null!;
 
   public Translator(ILTransformer<TInstr> transformer,
                     CFGProgram cfgProgram) {

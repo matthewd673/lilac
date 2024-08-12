@@ -37,7 +37,7 @@ internal static class LEB128 {
 
       // manually sign extend
       if (negative) {
-        number |= (~0 << (size - 7));
+        number |= ~0 << (size - 7);
       }
 
       if ((number == 0 && (nextByte & 0x40) == 0) ||

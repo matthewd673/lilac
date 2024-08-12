@@ -190,7 +190,7 @@ internal class IDNumberMap {
 
     idToNumber[id] = number;
 
-    if (numberToIds.TryGetValue(number, out List<ID> idList)) {
+    if (numberToIds.TryGetValue(number, out List<ID>? idList)) {
       idList.Add(id);
     }
     else {

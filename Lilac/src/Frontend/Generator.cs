@@ -198,7 +198,8 @@ public class Generator(Program program) {
       return "void";
     }
 
-    string valStr = constant.Value.ToString();
+    string valStr = constant.Value.ToString()
+                    ?? throw new InvalidOperationException();
     // easy patch for generating floats with 0s in the decimal
     if (constant.Type.IsFloat() && !valStr.Contains('.')) {
       valStr += ".";
@@ -210,7 +211,7 @@ public class Generator(Program program) {
   protected virtual string GenerateID(ID id) =>
     id switch {
       GlobalID => $"@{id.Name}",
-      ID => $"${id.Name}",
+      LocalID => $"${id.Name}",
       _ => throw new CannotGenerateException(id),
     };
 

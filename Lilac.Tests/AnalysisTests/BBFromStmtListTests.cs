@@ -9,7 +9,7 @@ public class BBFromStmtListTests {
   public void Simple() {
     List<Statement> stmtList = [
                                  new Definition(Type.I32,
-                                                new("a"),
+                                                new LocalID("a"),
                                                 new ValueExpr(new
                                                   Constant(Type.I32, 2))),
                                ];
@@ -27,7 +27,7 @@ public class BBFromStmtListTests {
     List<Statement> stmtList = [
                                  new Label("label"),
                                  new Definition(Type.I32,
-                                                new("a"),
+                                                new LocalID("a"),
                                                 new ValueExpr(new
                                                        Constant(Type.I32, 2))),
                                  new Jump("label"),
@@ -39,7 +39,7 @@ public class BBFromStmtListTests {
     Assert.Equal(new Jump("label"), blocks[0].Exit);
     Assert.Single(blocks[0].StmtList);
     Assert.Equal(new Definition(Type.I32,
-                                new ID("a"),
+                                new LocalID("a"),
                                 new ValueExpr(new
                                                 Constant(Type.I32, 2))),
                  blocks[0].StmtList[0]);

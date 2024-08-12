@@ -1,8 +1,6 @@
-using Lilac.Analysis;
-
 namespace Lilac;
 
-public class Graph<T> {
+public class Graph<T> where T : notnull {
   public class Edge {
     public T From { get; }
     public T To { get; }
@@ -13,7 +11,7 @@ public class Graph<T> {
     }
 
     public override bool Equals(object? obj) {
-      if (obj.GetType() != typeof(Edge)) {
+      if (obj is null || obj.GetType() != typeof(Edge)) {
         return false;
       }
 
@@ -36,13 +34,9 @@ public class Graph<T> {
   private Dictionary<T, HashSet<Edge>> incoming;
   private Dictionary<T, HashSet<Edge>> outgoing;
 
-  public int NodesCount {
-    get { return nodes.Count; }
-  }
+  public int NodesCount => nodes.Count;
 
-  public int EdgesCount {
-    get { return edges.Count; }
-  }
+  public int EdgesCount => edges.Count;
 
   public Graph() {
     nodes = new();

@@ -5,8 +5,8 @@ namespace Lilac.CodeGen.Targets.Wasm;
 public class Relooper {
   private CFG cfg;
   private DomTree? domTree;
-  private Dictionary<BB, int>? cfgRpo;
-  private Dictionary<BB, BlockProperty>? props;
+  private Dictionary<BB, int> cfgRpo = new();
+  private Dictionary<BB, BlockProperty> props = new();
 
   public Relooper(CFG cfg) {
     this.cfg = cfg;
@@ -91,6 +91,11 @@ public class Relooper {
   private WasmBlock DoTree(BB node) {
     // children are sorted by rpo numbering
     List<BB> children = [];
+
+    if (domTree is null) { // should never happen
+      throw new NullReferenceException();
+    }
+
     foreach (BB s in domTree.GetSuccessors(node)) {
       children.Add(s);
     }
@@ -135,7 +140,8 @@ public class Relooper {
         bool isInner = false;
         foreach (BB d in domTree.GetDomBy(c)) {
           foreach (CFG.Edge o in cfg.GetOutgoing(d)) {
-            if (o.To == node && IsBackEdge(o)) {
+            // NOTE: shallow equality is fine here but
+            if (o.To.Equals(node) && IsBackEdge(o)) {
               isInner = true;
               break;
             }

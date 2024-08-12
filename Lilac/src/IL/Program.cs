@@ -29,7 +29,7 @@ public class Program {
     try {
       return globalMap[name];
     }
-    catch (KeyNotFoundException e) {
+    catch (KeyNotFoundException) {
       return null;
     }
   }
@@ -48,7 +48,7 @@ public class Program {
     try {
       return funcMap[name];
     }
-    catch (KeyNotFoundException e) {
+    catch (KeyNotFoundException) {
       return null;
     }
   }
@@ -68,7 +68,7 @@ public class Program {
     try {
       return externFuncMap[(source, name)];
     }
-    catch (KeyNotFoundException e) {
+    catch (KeyNotFoundException) {
       return null;
     }
   }

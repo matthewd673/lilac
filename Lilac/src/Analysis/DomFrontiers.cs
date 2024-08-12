@@ -31,8 +31,7 @@ class DomFrontiers {
         // NOTE: original algorithm does not enforce runner != null
         while (runner is not null && runner != domTree.IDom(j)) {
           // add j to runner's DF (which I think may not exist yet)
-          HashSet<BB> runnerDf;
-          if (!df.TryGetValue(runner, out runnerDf)) {
+          if (!df.TryGetValue(runner, out HashSet<BB>? runnerDf)) {
             runnerDf = new();
             df.Add(runner, runnerDf);
           }

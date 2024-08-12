@@ -57,7 +57,7 @@ public class CFGProgram {
     try {
       return globalMap[name];
     }
-    catch (KeyNotFoundException e) {
+    catch (KeyNotFoundException) {
       return null;
     }
   }
@@ -76,7 +76,7 @@ public class CFGProgram {
     try {
       return funcMap[name];
     }
-    catch (KeyNotFoundException e) {
+    catch (KeyNotFoundException) {
       return null;
     }
   }
@@ -96,7 +96,7 @@ public class CFGProgram {
     try {
       return externFuncMap[(source, name)];
     }
-    catch (KeyNotFoundException e) {
+    catch (KeyNotFoundException) {
       return null;
     }
   }
