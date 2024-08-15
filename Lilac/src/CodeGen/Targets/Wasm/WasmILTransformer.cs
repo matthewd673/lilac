@@ -261,8 +261,9 @@ internal class WasmILTransformer(SymbolTable symbolTable)
         constant.Type.IsVoid() ?
           [] :
           [new Const(constant.Type.ToWasmType(),
-                     constant.Value.ToString()
-                       ?? throw new InvalidOperationException())],
+                     ValueEncoder.StringifyValue(constant.Type,
+                                                 constant.Value)),
+            ],
       _ => throw new ArgumentOutOfRangeException(),
     };
   }

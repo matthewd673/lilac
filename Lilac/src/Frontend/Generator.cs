@@ -1,6 +1,7 @@
 using System.Buffers.Binary;
 using Lilac.Frontend.SyntaxExceptions;
 using Lilac.IL;
+using Lilac.IL.Math;
 using Type = Lilac.IL.Type;
 
 namespace Lilac.Frontend;
@@ -11,18 +12,18 @@ public class Generator(Program program) {
 
   protected virtual string GenerateType(IL.Type type) =>
     type switch {
-      IL.Type.U8 => "u8",
-      IL.Type.U16 => "u16",
-      IL.Type.U32 => "u32",
-      IL.Type.U64 => "u64",
-      IL.Type.I8 => "i8",
-      IL.Type.I16 => "i16",
-      IL.Type.I32 => "i32",
-      IL.Type.I64 => "i64",
-      IL.Type.F32 => "f32",
-      IL.Type.F64 => "f64",
-      IL.Type.Pointer => "ptr",
-      IL.Type.Void => "void",
+      Type.U8 => "u8",
+      Type.U16 => "u16",
+      Type.U32 => "u32",
+      Type.U64 => "u64",
+      Type.I8 => "i8",
+      Type.I16 => "i16",
+      Type.I32 => "i32",
+      Type.I64 => "i64",
+      Type.F32 => "f32",
+      Type.F64 => "f64",
+      Type.Pointer => "ptr",
+      Type.Void => "void",
       _ => throw new CannotGenerateException(type),
     };
 
@@ -200,7 +201,7 @@ public class Generator(Program program) {
       return "void";
     }
 
-    string valStr = GenerateConstantValue(constant.Type, constant.Value);
+    string valStr = ValueEncoder.StringifyValue(constant.Type, constant.Value);
     // easy patch for generating floats with 0s in the decimal
     if (constant.Type.IsFloat() && !valStr.Contains('.')) {
       valStr += ".";
@@ -256,23 +257,5 @@ public class Generator(Program program) {
     }
 
     return str;
-  }
-
-  protected string GenerateConstantValue(Type type, byte[] value) {
-    return type switch {
-      Type.U8 => value[0].ToString(),
-      Type.I8 => ((sbyte)value[0]).ToString(),
-      Type.U16 => BinaryPrimitives.ReadUInt16LittleEndian(value).ToString(),
-      Type.I16 => BinaryPrimitives.ReadInt16LittleEndian(value).ToString(),
-      Type.U32 => BinaryPrimitives.ReadUInt32LittleEndian(value).ToString(),
-      Type.I32 => BinaryPrimitives.ReadInt32LittleEndian(value).ToString(),
-      Type.U64 => BinaryPrimitives.ReadUInt64LittleEndian(value).ToString(),
-      Type.I64 => BinaryPrimitives.ReadInt64LittleEndian(value).ToString(),
-      Type.F32 => BinaryPrimitives.ReadSingleLittleEndian(value)
-                                  .ToString("0.00"),
-      Type.F64 => BinaryPrimitives.ReadDoubleLittleEndian(value)
-                                  .ToString("0.00"),
-      _ => throw new ArgumentOutOfRangeException(),
-    };
   }
 }

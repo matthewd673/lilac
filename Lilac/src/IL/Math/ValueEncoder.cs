@@ -54,4 +54,22 @@ public static class ValueEncoder {
 
     return arr;
   }
+
+  public static string StringifyValue(Type type, byte[] value) {
+    return type switch {
+      Type.U8 => value[0].ToString(),
+      Type.I8 => ((sbyte)value[0]).ToString(),
+      Type.U16 => BinaryPrimitives.ReadUInt16LittleEndian(value).ToString(),
+      Type.I16 => BinaryPrimitives.ReadInt16LittleEndian(value).ToString(),
+      Type.U32 => BinaryPrimitives.ReadUInt32LittleEndian(value).ToString(),
+      Type.I32 => BinaryPrimitives.ReadInt32LittleEndian(value).ToString(),
+      Type.U64 => BinaryPrimitives.ReadUInt64LittleEndian(value).ToString(),
+      Type.I64 => BinaryPrimitives.ReadInt64LittleEndian(value).ToString(),
+      Type.F32 => BinaryPrimitives.ReadSingleLittleEndian(value)
+                                  .ToString("0.00"),
+      Type.F64 => BinaryPrimitives.ReadDoubleLittleEndian(value)
+                                  .ToString("0.00"),
+      _ => throw new ArgumentOutOfRangeException(),
+    };
+  }
 }
