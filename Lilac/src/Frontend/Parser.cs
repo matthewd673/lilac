@@ -1,6 +1,7 @@
 using Lilac.IL;
 using System.Text.RegularExpressions;
 using Lilac.Frontend.SyntaxExceptions;
+using Lilac.IL.Math;
 
 namespace Lilac.Frontend;
 
@@ -259,7 +260,7 @@ public class Parser {
     // void constant
     else if (See(TokenType.VoidConst)) {
       Eat(TokenType.VoidConst);
-      return new Constant(IL.Type.Void, 0);
+      return new Constant(IL.Type.Void, []);
     }
     // id
     else if (See(TokenType.ID, TokenType.GlobalID)) {
@@ -485,20 +486,18 @@ public class Parser {
     IL.Type type = TypeFromString(typeStr);
 
     if (type.IsInteger()) {
-      long @value;
-      if (!long.TryParse(valStr, out @value)) {
+      if (!long.TryParse(valStr, out long value)) {
         throw new InvalidStringFormatException(nextToken.Position, valStr,
                                                "integer");
       }
-      return new Constant(type, @value);
+      return new Constant(type, ValueEncoder.Encode(type, value));
     }
     else if (type.IsFloat()) {
-      double @value;
-      if (!double.TryParse(valStr, out @value)) {
+      if (!double.TryParse(valStr, out double value)) {
         throw new InvalidStringFormatException(nextToken.Position, valStr,
                                                "float");
       }
-      return new Constant(type, @value);
+      return new Constant(type, ValueEncoder.Encode(type, value));
     }
 
     throw new InvalidStringFormatException(nextToken.Position, valStr,

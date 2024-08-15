@@ -2,23 +2,77 @@ namespace Lilac.IL;
 
 public class BinaryOp : Expression {
   public enum Operator {
+    /// <summary>
+    /// Addition
+    /// </summary>
     Add,
+    /// <summary>
+    /// Subtraction
+    /// </summary>
     Sub,
+    /// <summary>
+    /// Multiplication
+    /// </summary>
     Mul,
+    /// <summary>
+    /// Division. If the operands are integers then integer division.
+    /// </summary>
     Div,
+    /// <summary>
+    /// Modulo
+    /// </summary>
     Mod,
+    /// <summary>
+    /// Equals
+    /// </summary>
     Eq,
+    /// <summary>
+    /// Not equals
+    /// </summary>
     Neq,
+    /// <summary>
+    /// Less than
+    /// </summary>
     Lt,
+    /// <summary>
+    /// Greater than
+    /// </summary>
     Gt,
+    /// <summary>
+    /// Less than or equals
+    /// </summary>
     Leq,
+    /// <summary>
+    /// Greater than or equals
+    /// </summary>
     Geq,
+    /// <summary>
+    /// Boolean AND. Behavior is undefined if operands are floats.
+    /// </summary>
     BoolAnd,
+    /// <summary>
+    /// Boolean OR. Behavior is undefined if operands are floats.
+    /// </summary>
     BoolOr,
+    /// <summary>
+    /// Bitwise left shift
+    /// </summary>
     BitLs,
+    /// <summary>
+    /// Bitwise arithmetic right shift
+    /// </summary>
     BitRs,
+    /// <summary>
+    /// Bitwise AND
+    /// </summary>
     BitAnd,
+    /// <summary>
+    /// Bitwise OR
+    /// </summary>
     BitOr,
+    /// <summary>
+    /// Bitwise XOR
+    /// </summary>
     BitXor,
   }
 

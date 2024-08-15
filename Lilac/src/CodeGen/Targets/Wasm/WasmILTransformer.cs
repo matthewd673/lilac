@@ -1,5 +1,6 @@
 using Lilac.CodeGen.Targets.Wasm.Instructions;
 using Lilac.IL;
+using Lilac.IL.Math;
 using Load = Lilac.CodeGen.Targets.Wasm.Instructions.Load;
 using Type = Lilac.CodeGen.Targets.Wasm.Instructions.Type;
 
@@ -130,71 +131,73 @@ internal class WasmILTransformer(SymbolTable symbolTable)
       VoidCall voidCall =>
         Transform(voidCall.Call),
       // EXPRESSION RULES
-      BinaryOp { Op: BinaryOp.Operator.Add } binaryOpAdd =>
-        [..Transform(binaryOpAdd.Left),
-         ..Transform(binaryOpAdd.Right),
-         new Add(GetWasmType(binaryOpAdd.Left)),
+      BinaryOp { Op: BinaryOp.Operator.Add } binaryOp =>
+        [..Transform(binaryOp.Left),
+         ..Transform(binaryOp.Right),
+         new Add(GetWasmType(binaryOp.Left)),
         ],
-      BinaryOp { Op: BinaryOp.Operator.Sub } binaryOpSub =>
-        [..Transform(binaryOpSub.Left),
-         ..Transform(binaryOpSub.Right),
-         new Subtract(GetWasmType(binaryOpSub.Left)),
+      BinaryOp { Op: BinaryOp.Operator.Sub } binaryOp =>
+        [..Transform(binaryOp.Left),
+         ..Transform(binaryOp.Right),
+         new Subtract(GetWasmType(binaryOp.Left)),
         ],
-      BinaryOp { Op: BinaryOp.Operator.Mul } binaryOpMul =>
-        [..Transform(binaryOpMul.Left),
-         ..Transform(binaryOpMul.Right),
-         new Multiply(GetWasmType(binaryOpMul.Left)),
+      BinaryOp { Op: BinaryOp.Operator.Mul } binaryOp =>
+        [..Transform(binaryOp.Left),
+         ..Transform(binaryOp.Right),
+         new Multiply(GetWasmType(binaryOp.Left)),
         ],
-      BinaryOp { Op: BinaryOp.Operator.Div } binaryOpDiv =>
-        [..Transform(binaryOpDiv.Left),
-         ..Transform(binaryOpDiv.Right),
-         GetILType(binaryOpDiv.Left).IsFloat() ?
-           new Divide(GetWasmType(binaryOpDiv.Left)) :
-           GetILType(binaryOpDiv.Left).IsSigned() ?
-             new DivideSigned(GetWasmType(binaryOpDiv.Left)) :
-             new DivideUnsigned(GetWasmType(binaryOpDiv.Right)),
-        ],
-      BinaryOp {
-          Op: BinaryOp.Operator.Eq,
-          Left: Constant { Type: var leftType, Value: 0 },
-        } binaryOpEqZLeft when leftType.IsInteger() =>
-        [..Transform(binaryOpEqZLeft.Right),
-         new EqualZero(GetWasmType(binaryOpEqZLeft.Right))
+      BinaryOp { Op: BinaryOp.Operator.Div } binaryOp =>
+        [..Transform(binaryOp.Left),
+         ..Transform(binaryOp.Right),
+         GetILType(binaryOp.Left).IsFloat() ?
+           new Divide(GetWasmType(binaryOp.Left)) :
+           GetILType(binaryOp.Left).IsSigned() ?
+             new DivideSigned(GetWasmType(binaryOp.Left)) :
+             new DivideUnsigned(GetWasmType(binaryOp.Right)),
         ],
       BinaryOp {
           Op: BinaryOp.Operator.Eq,
-          Right: Constant { Type: var rightType, Value: 0 },
-        } binaryOpEqZRight when rightType.IsInteger() =>
-        [..Transform(binaryOpEqZRight.Left),
-         new EqualZero(GetWasmType(binaryOpEqZRight.Left)),
+          Left: Constant { Type: var leftType,
+                           Value: var value }
+        } binaryOp when leftType.IsInteger() && InternalMath.IsZero(value) =>
+        [..Transform(binaryOp.Right),
+         new EqualZero(GetWasmType(binaryOp.Right)),
         ],
-      BinaryOp { Op: BinaryOp.Operator.Eq } binaryOpEq =>
-        [..Transform(binaryOpEq.Left),
-         ..Transform(binaryOpEq.Right),
-         new Equal(GetWasmType(binaryOpEq.Left)),
+      BinaryOp {
+          Op: BinaryOp.Operator.Eq,
+          Right: Constant { Type: var rightType,
+                            Value: var value },
+        } binaryOp when rightType.IsInteger() && InternalMath.IsZero(value) =>
+        [..Transform(binaryOp.Left),
+         new EqualZero(GetWasmType(binaryOp.Left)),
         ],
-      BinaryOp { Op: BinaryOp.Operator.Neq } binaryOpNeq =>
-        [..Transform(binaryOpNeq.Left),
-         ..Transform(binaryOpNeq.Right),
-         new Equal(GetWasmType(binaryOpNeq.Left)),
+      BinaryOp { Op: BinaryOp.Operator.Eq } binaryOp =>
+        [..Transform(binaryOp.Left),
+         ..Transform(binaryOp.Right),
+         new Equal(GetWasmType(binaryOp.Left)),
         ],
-      BinaryOp { Op: BinaryOp.Operator.Gt } binaryOpGt =>
-        [..Transform(binaryOpGt.Left),
-         ..Transform(binaryOpGt.Right),
-         GetILType(binaryOpGt.Left).IsFloat() ?
-           new GreaterThan(GetWasmType(binaryOpGt.Left)) :
-           GetILType(binaryOpGt.Left).IsSigned() ?
-             new GreaterThanSigned(GetWasmType(binaryOpGt.Left)) :
-             new GreaterThanUnsigned(GetWasmType(binaryOpGt.Right)),
+      BinaryOp { Op: BinaryOp.Operator.Neq } binaryOp =>
+        [..Transform(binaryOp.Left),
+         ..Transform(binaryOp.Right),
+         new Equal(GetWasmType(binaryOp.Left)),
         ],
-      BinaryOp { Op: BinaryOp.Operator.Lt } binaryOpLt =>
-        [..Transform(binaryOpLt.Left),
-         ..Transform(binaryOpLt.Right),
-         GetILType(binaryOpLt.Left).IsFloat() ?
-           new LessThan(GetWasmType(binaryOpLt.Left)) :
-           GetILType(binaryOpLt.Left).IsSigned() ?
-             new LessThanSigned(GetWasmType(binaryOpLt.Left)) :
-             new LessThanUnsigned(GetWasmType(binaryOpLt.Right)),
+      BinaryOp { Op: BinaryOp.Operator.Gt } binaryOp =>
+        [..Transform(binaryOp.Left),
+         ..Transform(binaryOp.Right),
+         GetILType(binaryOp.Left).IsFloat() ?
+           new GreaterThan(GetWasmType(binaryOp.Left)) :
+           GetILType(binaryOp.Left).IsSigned() ?
+             new GreaterThanSigned(GetWasmType(binaryOp.Left)) :
+             new GreaterThanUnsigned(GetWasmType(binaryOp.Right)),
+        ],
+      BinaryOp { Op: BinaryOp.Operator.Lt } binaryOp =>
+        [..Transform(binaryOp.Left),
+         ..Transform(binaryOp.Right),
+         GetILType(binaryOp.Left).IsFloat() ?
+           new LessThan(GetWasmType(binaryOp.Left)) :
+           GetILType(binaryOp.Left).IsSigned() ?
+             new LessThanSigned(GetWasmType(binaryOp.Left)) :
+             new LessThanUnsigned(GetWasmType(binaryOp.Right)),
         ],
       IL.Call call =>
         [..call.Args.SelectMany(Transform),

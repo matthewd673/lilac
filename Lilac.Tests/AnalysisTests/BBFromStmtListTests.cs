@@ -11,7 +11,7 @@ public class BBFromStmtListTests {
                                  new Definition(Type.I32,
                                                 new LocalID("a"),
                                                 new ValueExpr(new
-                                                  Constant(Type.I32, 2))),
+                                                  Constant(Type.I32, [2]))),
                                ];
 
     List<BB> blocks = BB.FromStmtList(stmtList);
@@ -29,7 +29,7 @@ public class BBFromStmtListTests {
                                  new Definition(Type.I32,
                                                 new LocalID("a"),
                                                 new ValueExpr(new
-                                                       Constant(Type.I32, 2))),
+                                                       Constant(Type.I32, [2]))),
                                  new Jump("label"),
                                ];
     List<BB> blocks = BB.FromStmtList(stmtList);
@@ -41,7 +41,7 @@ public class BBFromStmtListTests {
     Assert.Equal(new Definition(Type.I32,
                                 new LocalID("a"),
                                 new ValueExpr(new
-                                                Constant(Type.I32, 2))),
+                                                Constant(Type.I32, [2]))),
                  blocks[0].StmtList[0]);
   }
 

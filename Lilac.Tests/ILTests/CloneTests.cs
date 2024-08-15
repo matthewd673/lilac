@@ -6,7 +6,7 @@ namespace Lilac.Tests.ILTests;
 public class CloneTests {
   [Fact]
   public void CloneConstant() {
-    Constant a = new(Type.I32, 5);
+    Constant a = new(Type.I32, [5]);
     Constant b = a.Clone();
 
     Assert.False(a == b);
@@ -24,7 +24,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneValueExpr() {
-    ValueExpr a = new(new Constant(Type.F64, 3.14));
+    ValueExpr a = new(new Constant(Type.F64, [0]));
     ValueExpr b = a.Clone();
 
     Assert.False(a == b);
@@ -34,8 +34,8 @@ public class CloneTests {
   [Fact]
   public void CloneBinaryOp() {
     BinaryOp a = new(BinaryOp.Operator.Mul,
-                     new Constant(Type.I32, 3),
-                     new Constant(Type.I32, 5));
+                     new Constant(Type.I32, [3]),
+                     new Constant(Type.I32, [5]));
     BinaryOp b = a.Clone();
 
     Assert.False(a == b);
@@ -53,7 +53,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneConversion() {
-    IntToFloatConversion a = new(new Constant(Type.I32, 5), Type.F32);
+    IntToFloatConversion a = new(new Constant(Type.I32, [5]), Type.F32);
     IntToFloatConversion b = a.Clone();
 
     Assert.False(a == b);
@@ -72,7 +72,7 @@ public class CloneTests {
   [Fact]
   public void CloneExternCall() {
     ExternCall a = new("source", "func",
-                       [new Constant(Type.I32, 5)]);
+                       [new Constant(Type.I32, [5])]);
     ExternCall b = a.Clone();
 
     Assert.False(a == b);
@@ -89,9 +89,27 @@ public class CloneTests {
   }
 
   [Fact]
+  public void CloneLoad() {
+    Load a = new(Type.I32, new Constant(Type.Pointer, [0]));
+    Load b = a.Clone();
+
+    Assert.False(a == b);
+    Assert.Equal(a, b);
+  }
+
+  [Fact]
+  public void CloneStackAlloc() {
+    StackAlloc a = new(Type.I32);
+    StackAlloc b = a.Clone();
+
+    Assert.False(a == b);
+    Assert.Equal(a, b);
+  }
+
+  [Fact]
   public void CloneDefinition() {
     Definition a = new(Type.I32, new LocalID("var"),
-                       new ValueExpr(new Constant(Type.I32, 5)));
+                       new ValueExpr(new Constant(Type.I32, [5])));
     Definition b = a.Clone();
 
     Assert.False(a == b);
@@ -118,7 +136,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneJumpZero() {
-    JumpZero a = new("L1", new Constant(Type.I32, 0));
+    JumpZero a = new("L1", new Constant(Type.I32, [0]));
     JumpZero b = a.Clone();
 
     Assert.False(a == b);
@@ -127,7 +145,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneJumpNotZero() {
-    JumpNotZero a = new("L1", new Constant(Type.I32, 1));
+    JumpNotZero a = new("L1", new Constant(Type.I32, [1]));
     JumpNotZero b = a.Clone();
 
     Assert.False(a == b);
@@ -167,9 +185,20 @@ public class CloneTests {
   }
 
   [Fact]
+  public void CloneStore() {
+    Store a = new(Type.I32,
+                  new LocalID("a"),
+                  new Constant(Type.Pointer, [0]));
+    Store b = a.Clone();
+
+    Assert.False(a == b);
+    Assert.Equal(a, b);
+  }
+
+  [Fact]
   public void CloneGlobalDef() {
     GlobalDef a = new(Type.F32, new GlobalID("global"),
-                      new Constant(Type.F32, 3.14));
+                      new Constant(Type.F32, [0]));
     GlobalDef b = a.Clone();
 
     Assert.False(a == b);

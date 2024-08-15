@@ -6,7 +6,7 @@ public class LEB128Tests {
   [Fact]
   public void EncodeUnsigned624485() {
     byte[] bytes = LEB128.EncodeUnsigned(624_485);
-    Assert.Equal([0xe5, 0x8e, 0x26], bytes); // LSB to MSB
+    Assert.Equal([0xe5, 0x8e, 0x26], bytes); // NOTE: Wasm is little endian
   }
 
   [Fact]
