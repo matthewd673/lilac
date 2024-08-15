@@ -1,0 +1,7 @@
+func main() -> void
+  i32 $a = 12i32 + 6i32
+  i32 $a = $a - 0i32
+  i32 $a = $a * -2i32
+  i32 $a = $a / -2i32
+  i32 $a = $a % 2i32
+end

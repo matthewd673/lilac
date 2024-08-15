@@ -48,6 +48,8 @@ public class ValueEncoderTests {
   [InlineData(Type.F64, -1683113.3452894, new byte[] {
     0xD9, 0xE2, 0x64, 0x58, 0xA9, 0xAE, 0x39, 0xC1,
   })]
+  [InlineData(Type.Void, 0, new byte[0])]
+  [InlineData(Type.Void, 312, new byte[0])]
   public void EncodeValueInRange(Type type, object value, byte[] expected) {
     Assert.True(ValueEncoder.Encode(type, value).SequenceEqual(expected));
   }
