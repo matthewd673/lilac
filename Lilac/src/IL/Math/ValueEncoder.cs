@@ -42,7 +42,7 @@ public static class ValueEncoder {
                                                  Convert.ToSingle(value));
         break;
       case Type.F64:
-        BinaryPrimitives.WriteDoubleBigEndian(arr,
+        BinaryPrimitives.WriteDoubleLittleEndian(arr,
                                               Convert.ToDouble(value));
         break;
       case Type.Void:
