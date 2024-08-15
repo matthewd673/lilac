@@ -32,6 +32,15 @@ jobs:
         wabt-asset: ['wabt-1.0.35-ubuntu-20.04.tar.gz']
 
     steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
     - name: Install wabt 1.0.35
       uses: robinraju/release-downloader@v1.10
       with:
