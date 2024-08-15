@@ -1,7 +1,6 @@
 # lilac
 
-![Build workflow](https://github.com/matthewd673/lilac/actions/workflows/build.yml/badge.svg)
-![Test workflow](https://github.com/matthewd673/lilac/actions/workflows/test.yml/badge.svg)
+![.NET workflow](https://github.com/matthewd673/lilac/actions/workflows/dotnet.yml/badge.svg)
 
 Lilac is a little intermediate language (Lilac IL) and compiler for the IL.
 It currently targets Wasm and features a number of small optimizations and analyses with more on the way.
