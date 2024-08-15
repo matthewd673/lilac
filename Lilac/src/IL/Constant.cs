@@ -1,3 +1,5 @@
+using Lilac.IL.Math;
+
 namespace Lilac.IL;
 
 public class Constant(Type type, byte[] value) : Value {
@@ -11,6 +13,11 @@ public class Constant(Type type, byte[] value) : Value {
   /// little-endian. Void type constants may have a zero-length array.
   /// </summary>
   public byte[] Value { get; } = value;
+
+  public Constant(Type type, object numericValue)
+    : this(type, ValueEncoder.Encode(type, numericValue)) {
+    // Empty
+  }
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Constant)) {
