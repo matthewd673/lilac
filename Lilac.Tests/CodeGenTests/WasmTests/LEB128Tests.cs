@@ -1,6 +1,6 @@
 using Lilac.CodeGen.Targets.Wasm;
 
-namespace Lilac.Tests.GraphTests.CodeGenTests.WasmTests;
+namespace Lilac.Tests.CodeGenTests.WasmTests;
 
 public class LEB128Tests {
   [Fact]

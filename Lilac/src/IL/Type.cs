@@ -72,7 +72,7 @@ public static class TypeMethods {
       Type.F32 => 4,
       Type.F64 => 8,
       Type.Pointer => throw new NotSupportedException(),
-      Type.Void => throw new NotSupportedException(),
+      Type.Void => 0,
       _ => throw new ArgumentOutOfRangeException(),
     };
   }

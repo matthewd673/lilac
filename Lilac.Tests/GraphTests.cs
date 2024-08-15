@@ -1,4 +1,4 @@
-namespace Lilac.Tests.GraphTests;
+namespace Lilac.Tests;
 
 public class GraphTests {
   [Fact]
@@ -12,7 +12,7 @@ public class GraphTests {
 
     Assert.Equal("new_node", graph.GetNodes().First().Id);
 
-    AssertGraphInvariants<Analysis.BB>(graph);
+    AssertGraphInvariants(graph);
   }
 
   [Fact]
@@ -106,13 +106,14 @@ public class GraphTests {
     AssertGraphInvariants(graph);
   }
 
-  private void AssertGraphInvariants<T>(Graph<T> graph) {
+  private void AssertGraphInvariants<T>(Graph<T> graph) where T : notnull {
     AssertIncomingOutgoingEdgeParity(graph);
     AssertIncomingToIsNode(graph);
     AssertOutgoingFromIsNode(graph);
   }
 
-  private void AssertIncomingOutgoingEdgeParity<T>(Graph<T> graph) {
+  private void AssertIncomingOutgoingEdgeParity<T>(Graph<T> graph)
+    where T : notnull {
     List<Graph<T>.Edge> incoming = new();
     List<Graph<T>.Edge> outgoing = new();
 
@@ -125,15 +126,15 @@ public class GraphTests {
     Assert.Equal(graph.EdgesCount * 2, incoming.Count + outgoing.Count);
 
     foreach (Graph<T>.Edge e in incoming) {
-      Assert.True(graph.GetEdges().Contains(e));
+      Assert.Contains(e, graph.GetEdges());
     }
 
     foreach (Graph<T>.Edge e in outgoing) {
-      Assert.True(graph.GetEdges().Contains(e));
+      Assert.Contains(e, graph.GetEdges());
     }
   }
 
-  private void AssertIncomingToIsNode<T>(Graph<T> graph) {
+  private void AssertIncomingToIsNode<T>(Graph<T> graph) where T : notnull {
     foreach (T n in graph.GetNodes()) {
       foreach (Graph<T>.Edge e in graph.GetIncoming(n)) {
         Assert.True(e.To.Equals(n));
@@ -141,7 +142,7 @@ public class GraphTests {
     }
   }
 
-  private void AssertOutgoingFromIsNode<T>(Graph<T> graph) {
+  private void AssertOutgoingFromIsNode<T>(Graph<T> graph) where T : notnull {
     foreach (T n in graph.GetNodes()) {
       foreach (Graph<T>.Edge e in graph.GetOutgoing(n)) {
         Assert.True(e.From.Equals(n));

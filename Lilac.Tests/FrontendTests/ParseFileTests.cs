@@ -35,127 +35,127 @@ public class ParseFileTests {
                          new Definition(Type.I32, new LocalID("a"),
                                         new BinaryOp(
                                            BinaryOp.Operator.Add,
-                                           new Constant(Type.I32, 12L),
-                                           new Constant(Type.I32, 6L)
+                                           new Constant(Type.I32, 12),
+                                           new Constant(Type.I32, 6)
                                           )
                                         ),
                          new Definition(Type.I32, new LocalID("a"),
                                         new BinaryOp(
                                            BinaryOp.Operator.Sub,
                                            new LocalID("a"),
-                                           new Constant(Type.I32, 0L)
+                                           new Constant(Type.I32, 0)
                                           )
                                         ),
                          new Definition(Type.I32, new LocalID("a"),
                                         new BinaryOp(
                                            BinaryOp.Operator.Mul,
                                            new LocalID("a"),
-                                           new Constant(Type.I32, -2L)
+                                           new Constant(Type.I32, -2)
                                           )
                                         ),
                          new Definition(Type.I32, new LocalID("a"),
                                         new BinaryOp(
                                            BinaryOp.Operator.Div,
                                            new LocalID("a"),
-                                           new Constant(Type.I32, -2L)
+                                           new Constant(Type.I32, -2)
                                           )
                                         ),
                          new Definition(Type.I32, new LocalID("a"),
                                         new BinaryOp(
                                            BinaryOp.Operator.Mod,
                                            new LocalID("a"),
-                                           new Constant(Type.I32, 2L)
+                                           new Constant(Type.I32, 2)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("b"),
                                         new BinaryOp(
                                               BinaryOp.Operator.Eq,
-                                              new Constant(Type.U8, 0L),
-                                              new Constant(Type.U8, 0L)
+                                              new Constant(Type.U8, (byte)0),
+                                              new Constant(Type.U8, (byte)0)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("c"),
                                         new BinaryOp(
                                               BinaryOp.Operator.Neq,
-                                              new Constant(Type.U8, 1L),
-                                              new Constant(Type.U8, 0L)
+                                              new Constant(Type.U8, (byte)1),
+                                              new Constant(Type.U8, (byte)0)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("d"),
                                         new BinaryOp(
                                               BinaryOp.Operator.Lt,
-                                              new Constant(Type.U8, 2L),
-                                              new Constant(Type.U8, 4L)
+                                              new Constant(Type.U8, (byte)2),
+                                              new Constant(Type.U8, (byte)4)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("e"),
                                         new BinaryOp(
                                               BinaryOp.Operator.Gt,
-                                              new Constant(Type.U8, 3L),
-                                              new Constant(Type.U8, 1L)
+                                              new Constant(Type.U8, (byte)3),
+                                              new Constant(Type.U8, (byte)1)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("f"),
                                         new BinaryOp(
                                               BinaryOp.Operator.Leq,
-                                              new Constant(Type.U8, 1L),
-                                              new Constant(Type.U8, 1L)
+                                              new Constant(Type.U8, (byte)1),
+                                              new Constant(Type.U8, (byte)1)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("g"),
                                         new BinaryOp(
                                               BinaryOp.Operator.Geq,
-                                              new Constant(Type.U8, 0L),
-                                              new Constant(Type.U8, 1L)
+                                              new Constant(Type.U8, (byte)0),
+                                              new Constant(Type.U8, (byte)1)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("h"),
                                         new BinaryOp(
                                               BinaryOp.Operator.BoolOr,
-                                              new Constant(Type.U8, 1L),
-                                              new Constant(Type.U8, 0L)
+                                              new Constant(Type.U8, (byte)1),
+                                              new Constant(Type.U8, (byte)0)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("i"),
                                         new BinaryOp(
                                               BinaryOp.Operator.BoolAnd,
-                                              new Constant(Type.U8, 0L),
-                                              new Constant(Type.U8, 1L)
+                                              new Constant(Type.U8, (byte)0),
+                                              new Constant(Type.U8, (byte)1)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("j"),
                                         new BinaryOp(
                                               BinaryOp.Operator.BitLs,
-                                              new Constant(Type.U8, 4L),
-                                              new Constant(Type.U8, 1L)
+                                              new Constant(Type.U8, (byte)4),
+                                              new Constant(Type.U8, (byte)1)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("k"),
                                         new BinaryOp(
                                               BinaryOp.Operator.BitRs,
-                                              new Constant(Type.U8, 16L),
-                                              new Constant(Type.U8, 1L)
+                                              new Constant(Type.U8, (byte)16),
+                                              new Constant(Type.U8, (byte)1)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("l"),
                                         new BinaryOp(
                                               BinaryOp.Operator.BitAnd,
-                                              new Constant(Type.U8, 8L),
-                                              new Constant(Type.U8, 8L)
+                                              new Constant(Type.U8, (byte)8),
+                                              new Constant(Type.U8, (byte)8)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("m"),
                                         new BinaryOp(
                                               BinaryOp.Operator.BitOr,
-                                              new Constant(Type.U8, 8L),
-                                              new Constant(Type.U8, 4L)
+                                              new Constant(Type.U8, (byte)8),
+                                              new Constant(Type.U8, (byte)4)
                                           )
                                         ),
                          new Definition(Type.U8, new LocalID("n"),
                                         new BinaryOp(
                                               BinaryOp.Operator.BitXor,
-                                              new Constant(Type.U8, 12L),
-                                              new Constant(Type.U8, 8L)
+                                              new Constant(Type.U8, (byte)12),
+                                              new Constant(Type.U8, (byte)8)
                                           )
                                         ),
                        ]);
@@ -193,7 +193,7 @@ public class ParseFileTests {
                                         new Call("divide",
                                                  [
                                                    new Constant(Type.F64, 6.0),
-                                                   new Constant(Type.F64, 3.3),
+                                                   new Constant(Type.F64, 2.1),
                                                  ])),
                          new Definition(Type.F64, new LocalID("ans"),
                                         new ValueExpr(new LocalID("1"))),
