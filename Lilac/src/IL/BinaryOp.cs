@@ -19,7 +19,7 @@ public class BinaryOp : Expression {
     /// </summary>
     Div,
     /// <summary>
-    /// Modulo
+    /// Modulo. Behavior is undefined if operands are floats.
     /// </summary>
     Mod,
     /// <summary>

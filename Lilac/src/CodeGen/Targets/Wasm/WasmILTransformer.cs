@@ -155,6 +155,13 @@ internal class WasmILTransformer(SymbolTable symbolTable)
              new DivideSigned(GetWasmType(binaryOp.Left)) :
              new DivideUnsigned(GetWasmType(binaryOp.Right)),
         ],
+      BinaryOp { Op: BinaryOp.Operator.Mod } binaryOp =>
+        [..Transform(binaryOp.Left),
+         ..Transform(binaryOp.Right),
+         GetILType(binaryOp.Left).IsSigned() ?
+           new RemainderSigned(GetWasmType(binaryOp.Left)) :
+           new RemainderUnsigned(GetWasmType(binaryOp.Left)),
+        ],
       BinaryOp {
           Op: BinaryOp.Operator.Eq,
           Left: Constant { Type: var leftType,

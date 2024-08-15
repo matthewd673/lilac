@@ -49,9 +49,8 @@ public static class TypeMethods {
       IL.Type.F32 => Type.F32,
       IL.Type.F64 => Type.F64,
       IL.Type.Pointer => Runtime.PointerType,
-      _ => throw new ArgumentOutOfRangeException(nameof(type),
-                                                 type,
-                                                 "IL type not support in Wasm"),
+      _ => throw new ArgumentOutOfRangeException(nameof(type), type,
+                                                 "IL type is not supported in Wasm"),
     };
   }
 
