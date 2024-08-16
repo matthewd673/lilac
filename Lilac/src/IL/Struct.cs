@@ -1,7 +1,8 @@
 namespace Lilac.IL;
 
-public class Struct(List<Type> fields) : Component {
-  public List<Type> Fields { get; } = fields;
+public class Struct(string name, List<Type> fieldTypes) : Component {
+  public string Name { get; } = name;
+  public List<Type> FieldTypes { get; } = fieldTypes;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Struct)) {
@@ -9,10 +10,10 @@ public class Struct(List<Type> fields) : Component {
     }
 
     Struct other = (Struct)obj;
-    return Fields.SequenceEqual(other.Fields);
+    return Name.Equals(other.Name) && FieldTypes.SequenceEqual(other.FieldTypes);
   }
 
-  public override int GetHashCode() => HashCode.Combine(GetType(), Fields);
+  public override int GetHashCode() => HashCode.Combine(GetType(), FieldTypes);
 
-  public override Struct Clone() => new(Fields);
+  public override Struct Clone() => new(Name, FieldTypes);
 }

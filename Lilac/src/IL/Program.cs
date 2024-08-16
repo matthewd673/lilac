@@ -1,19 +1,15 @@
 namespace Lilac.IL;
 
 public class Program {
-  private Dictionary<string, GlobalDef> globalMap;
-  private Dictionary<string, FuncDef> funcMap;
-  private Dictionary<(string, string), ExternFuncDef> externFuncMap;
+  private readonly Dictionary<string, GlobalDef> globalMap = new();
+  private readonly Dictionary<string, FuncDef> funcMap = new();
+  private readonly Dictionary<(string, string), ExternFuncDef> externFuncMap = new();
+  private readonly Dictionary<string, Struct> structMap = new();
 
   public int GlobalCount => globalMap.Count;
   public int FuncCount => funcMap.Count;
   public int ExternFuncCount => externFuncMap.Count;
-
-  public Program() {
-    globalMap = new();
-    funcMap = new();
-    externFuncMap = new();
-  }
+  public int StructCount => structMap.Count;
 
   public void AddGlobal(GlobalDef globalDef) {
     globalMap.Add(globalDef.Id.Name, globalDef);
@@ -73,6 +69,25 @@ public class Program {
     }
   }
 
+  public void AddStruct(Struct @struct) {
+    structMap.Add(@struct.Name, @struct);
+  }
+
+  public IEnumerable<Struct> GetStructs() {
+    foreach (Struct s in structMap.Values) {
+      yield return s;
+    }
+  }
+
+  public Struct? GetStruct(string name) {
+    try {
+      return structMap[name];
+    }
+    catch (KeyNotFoundException) {
+      return null;
+    }
+  }
+
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Program)) {
       return false;
@@ -110,10 +125,24 @@ public class Program {
       }
     }
 
+    if (StructCount != other.StructCount) {
+      return false;
+    }
+
+    foreach (string k in structMap.Keys) {
+      if (!structMap[k].Equals(other.GetStruct(k))) {
+        return false;
+      }
+    }
+
     return true;
   }
 
   public override int GetHashCode() {
-    return HashCode.Combine(GetType(), globalMap, funcMap, externFuncMap);
+    return HashCode.Combine(GetType(),
+                            globalMap,
+                            funcMap,
+                            externFuncMap,
+                            structMap);
   }
 }

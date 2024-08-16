@@ -38,6 +38,10 @@ public class Generator(Program program) {
       str += $"{GenerateExternFuncDef(f)}\n";
     }
 
+    foreach (Struct s in program.GetStructs()) {
+      str += $"{GenerateStruct(s)}\n";
+    }
+
     foreach (FuncDef f in program.GetFuncs()) {
       str += $"{GenerateFuncDef(f)}\n";
     }
@@ -53,6 +57,9 @@ public class Generator(Program program) {
     $"extern func {externFuncDef.Source} {externFuncDef.Name} (" +
       $"{GenerateTypeList(externFuncDef.ParamTypes)}) -> " +
       $"{GenerateType(externFuncDef.RetType)}";
+
+  protected virtual string GenerateStruct(Struct @struct) =>
+    $"struct {@struct.Name} ({GenerateTypeList(@struct.FieldTypes)})";
 
   protected virtual string GenerateFuncDef(FuncDef funcDef) {
     string str =
@@ -184,7 +191,7 @@ public class Generator(Program program) {
     $"phi ({GenerateValueList(new(phi.Ids))})";
 
   protected virtual string GenerateStackAlloc(StackAlloc stackAlloc) =>
-    throw new NotImplementedException(); // TODO
+    $"stack_alloc {GenerateSizeOf(stackAlloc.Size)}";
 
   protected virtual string GenerateLoad(Load load) =>
     $"load {GenerateType(load.Type)} {GenerateValue(load.Address)}";
@@ -216,6 +223,12 @@ public class Generator(Program program) {
       LocalID => $"${id.Name}",
       _ => throw new CannotGenerateException(id),
     };
+
+  protected virtual string GenerateSizeOf(SizeOf sizeOf) => sizeOf switch {
+    SizeOfPrimitive sizeOfPrim => $"sizeof {GenerateType(sizeOfPrim.Type)}",
+    SizeOfStruct sizeOfStr => $"sizeof struct {sizeOfStr.StructName}",
+    _ => throw new CannotGenerateException(sizeOf),
+  };
 
   protected string GenerateTypeList(List<IL.Type> typeList) {
     string str = "";
