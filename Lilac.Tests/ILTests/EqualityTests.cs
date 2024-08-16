@@ -240,15 +240,15 @@ public class EqualityTests {
 
   [Fact]
   public void StackAllocsEqual() {
-    StackAlloc a = new(Type.I32);
-    StackAlloc b = new(Type.I32);
+    StackAlloc a = new(new SizeOfPrimitive(Type.I32));
+    StackAlloc b = new(new SizeOfPrimitive(Type.I32));
     Assert.Equal(a, b);
   }
 
   [Fact]
   public void StackAllocsNotEqual() {
-    StackAlloc a = new(Type.I32);
-    StackAlloc b = new(Type.U32);
+    StackAlloc a = new(new SizeOfPrimitive(Type.I32));
+    StackAlloc b = new(new SizeOfPrimitive(Type.U32));
     Assert.NotEqual(a, b);
   }
 

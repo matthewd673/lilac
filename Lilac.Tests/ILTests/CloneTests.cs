@@ -99,7 +99,7 @@ public class CloneTests {
 
   [Fact]
   public void CloneStackAlloc() {
-    StackAlloc a = new(Type.I32);
+    StackAlloc a = new(new SizeOfPrimitive(Type.I32));
     StackAlloc b = a.Clone();
 
     Assert.False(a == b);

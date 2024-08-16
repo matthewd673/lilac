@@ -24,9 +24,8 @@ internal class WasmILTransformer(SymbolTable symbolTable)
           new LocalSet(def.Id.Name),
          def.Id is GlobalID ?
           new GlobalGet(def.Id.Name) :
-          new LocalGet(def.Id.Name), // has a change to become a tee
-         new Const(Runtime.PointerType,
-                   stackAlloc.Type.ToWasmType().GetSizeBytes().ToString()),
+          new LocalGet(def.Id.Name), // has a chance to become a tee
+         ..Transform(stackAlloc.Size),
          new Add(Runtime.PointerType),
          new GlobalSet(Runtime.StackPointerName),
         ],
@@ -264,14 +263,18 @@ internal class WasmILTransformer(SymbolTable symbolTable)
                      ValueEncoder.StringifyValue(constant.Type,
                                                  constant.Value)),
             ],
+      SizeOfPrimitive sizeOf =>
+        [new Const(Runtime.PointerType,
+                   sizeOf.Type.ToWasmType().GetSizeBytes().ToString())],
       _ => throw new ArgumentOutOfRangeException(),
     };
   }
 
   public IL.Type GetILType(Expression expr) {
     return expr switch {
-      BinaryOp binaryOp => GetILType(binaryOp.Left), // left & right must match
+      BinaryOp binaryOp => GetILType(binaryOp.Left), // assume left & right match
       UnaryOp unaryOp => GetILType(unaryOp.Value),
+      ValueExpr valueExpr => GetILType(valueExpr.Value),
       _ => throw new ArgumentOutOfRangeException(),
     };
   }

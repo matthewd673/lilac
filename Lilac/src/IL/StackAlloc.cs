@@ -1,7 +1,7 @@
 namespace Lilac.IL;
 
-public class StackAlloc(Type type) : Expression {
-  public Type Type { get; } = type;
+public class StackAlloc(SizeOf size) : Expression {
+  public SizeOf Size { get; } = size;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(StackAlloc)) {
@@ -9,12 +9,12 @@ public class StackAlloc(Type type) : Expression {
     }
 
     StackAlloc other = (StackAlloc)obj;
-    return Type.Equals(other.Type);
+    return Size.Equals(other.Size);
   }
 
   public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Type);
+    return HashCode.Combine(GetType(), Size);
   }
 
-  public override StackAlloc Clone() => new(Type);
+  public override StackAlloc Clone() => new(Size);
 }

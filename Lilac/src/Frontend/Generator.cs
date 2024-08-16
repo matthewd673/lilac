@@ -184,7 +184,7 @@ public class Generator(Program program) {
     $"phi ({GenerateValueList(new(phi.Ids))})";
 
   protected virtual string GenerateStackAlloc(StackAlloc stackAlloc) =>
-    $"stack_alloc {GenerateType(stackAlloc.Type)}";
+    throw new NotImplementedException(); // TODO
 
   protected virtual string GenerateLoad(Load load) =>
     $"load {GenerateType(load.Type)} {GenerateValue(load.Address)}";
@@ -220,7 +220,7 @@ public class Generator(Program program) {
   protected string GenerateTypeList(List<IL.Type> typeList) {
     string str = "";
 
-    foreach (IL.Type t in typeList) {
+    foreach (Type t in typeList) {
       str += $"{GenerateType(t)}, ";
     }
 
