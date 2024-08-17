@@ -1,3 +1,4 @@
+using Lilac.Analysis;
 using Lilac.CodeGen.Targets.Wasm.Instructions;
 using Lilac.IL;
 using Lilac.IL.Math;
@@ -6,8 +7,8 @@ using Type = Lilac.CodeGen.Targets.Wasm.Instructions.Type;
 
 namespace Lilac.CodeGen.Targets.Wasm;
 
-internal class WasmILTransformer(SymbolTable symbolTable)
-  : ILTransformer<WasmInstruction> {
+internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
+  : ILTransformer<WasmInstruction>(program) {
   private SymbolTable symbolTable = symbolTable;
 
   public override List<WasmInstruction> Transform(Node node) {
@@ -17,6 +18,8 @@ internal class WasmILTransformer(SymbolTable symbolTable)
         [inlineInstr.Instr as WasmInstruction ??
           throw new InvalidOperationException(),
         ],
+      // the below pattern is more concise than would be possible if
+      // StackAlloc was transformed in an independent recursive call
       Definition { Rhs: StackAlloc stackAlloc } def =>
         [new GlobalGet(Runtime.StackPointerName),
          def.Id is GlobalID ? // NOTE: only locals should be stack alloc'd
@@ -266,6 +269,12 @@ internal class WasmILTransformer(SymbolTable symbolTable)
       SizeOfPrimitive sizeOf =>
         [new Const(Runtime.PointerType,
                    sizeOf.Type.ToWasmType().GetSizeBytes().ToString())],
+      SizeOfStruct sizeOf =>
+        [new Const(Runtime.PointerType,
+                   ComputeStructSize(Program.GetStruct(sizeOf.StructName)
+                                     ?? throw new NullReferenceException())
+                     .ToString()),
+        ],
       _ => throw new ArgumentOutOfRangeException(),
     };
   }
@@ -289,5 +298,16 @@ internal class WasmILTransformer(SymbolTable symbolTable)
 
   private Type GetWasmType(Value value) {
     return GetILType(value).ToWasmType();
+  }
+
+  private int ComputeStructSize(Struct @struct) {
+    int size = 0;
+
+    // TODO: no alignment, just trying to get something working
+    foreach (IL.Type t in @struct.FieldTypes) {
+      size += t.ToWasmType().GetSizeBytes();
+    }
+
+    return size;
   }
 }

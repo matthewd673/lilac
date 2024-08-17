@@ -2,18 +2,8 @@ using Lilac.IL;
 
 namespace Lilac.Analysis;
 
-public class CFGProgram {
-  private Dictionary<string, GlobalDef> globalMap;
-  private Dictionary<string, CFGFuncDef> funcMap;
-  private Dictionary<(string, string), ExternFuncDef> externFuncMap;
-
-  public CFGProgram() {
-    globalMap = new();
-    funcMap = new();
-    externFuncMap = new();
-  }
-
-  public static CFGProgram FromProgram(Program program) {
+public class CFGProgram : Program<CFGFuncDef> {
+  public static CFGProgram FromProgram(Program<FuncDef> program) {
     // create CFGProgram from main
     CFGProgram cfgProgram = new();
 
@@ -42,64 +32,4 @@ public class CFGProgram {
 
     return cfgProgram;
   }
-
-  public void AddGlobal(GlobalDef globalDef) {
-    globalMap.Add(globalDef.Id.Name, globalDef);
-  }
-
-  public IEnumerable<GlobalDef> GetGlobals() {
-    foreach (GlobalDef g in globalMap.Values) {
-      yield return g;
-    }
-  }
-
-  public GlobalDef? GetGlobal(string name) {
-    try {
-      return globalMap[name];
-    }
-    catch (KeyNotFoundException) {
-      return null;
-    }
-  }
-
-  public void AddFunc(CFGFuncDef funcDef) {
-    funcMap.Add(funcDef.Name, funcDef);
-  }
-
-  public IEnumerable<CFGFuncDef> GetFuncs() {
-    foreach (CFGFuncDef f in funcMap.Values) {
-      yield return f;
-    }
-  }
-
-  public CFGFuncDef? GetFunc(string name) {
-    try {
-      return funcMap[name];
-    }
-    catch (KeyNotFoundException) {
-      return null;
-    }
-  }
-
-  public void AddExternFunc(ExternFuncDef externFuncDef) {
-    externFuncMap.Add((externFuncDef.Source, externFuncDef.Name),
-                      externFuncDef);
-  }
-
-  public IEnumerable<ExternFuncDef> GetExternFuncs() {
-    foreach (ExternFuncDef f in externFuncMap.Values) {
-      yield return f;
-    }
-  }
-
-  public ExternFuncDef? GetExternFunc(string source, string name) {
-    try {
-      return externFuncMap[(source, name)];
-    }
-    catch (KeyNotFoundException) {
-      return null;
-    }
-  }
-
-  // TODO: implement ToString, Equals, GetHashCode, and Clone
 }

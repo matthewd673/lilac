@@ -1,9 +1,16 @@
 namespace Lilac.IL;
 
-public class Program {
+public class Program : Program<FuncDef> {
+  // NOTE: default Program class for most use cases
+}
+
+public class Program<TFuncDef> where TFuncDef : FuncDef {
   private readonly Dictionary<string, GlobalDef> globalMap = new();
-  private readonly Dictionary<string, FuncDef> funcMap = new();
-  private readonly Dictionary<(string, string), ExternFuncDef> externFuncMap = new();
+  private readonly Dictionary<string, TFuncDef> funcMap = new();
+
+  private readonly Dictionary<(string, string), ExternFuncDef> externFuncMap =
+    new();
+
   private readonly Dictionary<string, Struct> structMap = new();
 
   public int GlobalCount => globalMap.Count;
@@ -30,17 +37,17 @@ public class Program {
     }
   }
 
-  public void AddFunc(FuncDef funcDef) {
+  public void AddFunc(TFuncDef funcDef) {
     funcMap.Add(funcDef.Name, funcDef);
   }
 
-  public IEnumerable<FuncDef> GetFuncs() {
-    foreach (FuncDef f in funcMap.Values) {
+  public IEnumerable<TFuncDef> GetFuncs() {
+    foreach (TFuncDef f in funcMap.Values) {
       yield return f;
     }
   }
 
-  public FuncDef? GetFunc(string name) {
+  public TFuncDef? GetFunc(string name) {
     try {
       return funcMap[name];
     }

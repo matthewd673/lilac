@@ -31,7 +31,7 @@ public class WasmTranslator : Translator<WasmInstruction> {
 
     StartFunction = null;
 
-    Transformer = new WasmILTransformer(symbols);
+    Transformer = new WasmILTransformer(cfgProgram, symbols);
     CFGProgram = cfgProgram;
   }
 
