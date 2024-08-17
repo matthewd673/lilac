@@ -35,9 +35,9 @@ public static class TypeMethods {
   public static int GetSizeBytes(this Type type) {
     return type switch {
       Type.I32 => 4,
-      Type.I64 => 4,
+      Type.I64 => 8,
       Type.F32 => 4,
-      Type.F64 => 4,
+      Type.F64 => 8,
       _ => throw new ArgumentOutOfRangeException(),
     };
   }

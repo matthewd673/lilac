@@ -253,6 +253,12 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
           ..Transform(store.Value),
           new Instructions.Store(Type.F64),
         ],
+      IL.Store { Type: IL.Type.Pointer } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Runtime.PointerType),
+        ],
       // VALUE RULES
       ID id =>
         [id is GlobalID ?

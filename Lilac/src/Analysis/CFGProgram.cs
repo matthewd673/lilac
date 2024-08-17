@@ -30,6 +30,11 @@ public class CFGProgram : Program<CFGFuncDef> {
       cfgProgram.AddExternFunc(f);
     }
 
+    // add all structs
+    foreach (Struct s in program.GetStructs()) {
+      cfgProgram.AddStruct(s);
+    }
+
     return cfgProgram;
   }
 }
