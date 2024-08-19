@@ -130,6 +130,7 @@ public class Generator(Program program) {
       Phi phi => GeneratePhi(phi),
       StackAlloc stackAlloc => GenerateStackAlloc(stackAlloc),
       Load load => GenerateLoad(load),
+      GetFieldOffset getFieldOffset => GenerateGetFieldOffset(getFieldOffset),
       _ => throw new CannotGenerateException(expr),
     };
 
@@ -191,15 +192,21 @@ public class Generator(Program program) {
     $"phi ({GenerateValueList(new(phi.Ids))})";
 
   protected virtual string GenerateStackAlloc(StackAlloc stackAlloc) =>
-    $"stack_alloc {GenerateSizeOf(stackAlloc.Size)}";
+    $"stack_alloc {GenerateValue(stackAlloc.Size)}";
 
   protected virtual string GenerateLoad(Load load) =>
     $"load {GenerateType(load.Type)} {GenerateValue(load.Address)}";
+
+  protected virtual string GenerateGetFieldOffset
+    (GetFieldOffset getFieldOffset) =>
+    $"get_field_offset {GenerateValue(getFieldOffset.Address)} " +
+      $"{getFieldOffset.StructName} {getFieldOffset.Index}";
 
   protected virtual string GenerateValue(Value value) =>
     value switch {
       Constant constant => GenerateConstant(constant),
       ID id => GenerateID(id),
+      SizeOf sizeOf => GenerateSizeOf(sizeOf),
       _ => throw new CannotGenerateException(value),
     };
 
