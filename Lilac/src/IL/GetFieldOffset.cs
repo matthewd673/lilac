@@ -20,4 +20,7 @@ public class GetFieldOffset(Value address, string structName, int index)
   public override int GetHashCode() => HashCode.Combine(GetType(), Index);
 
   public override GetFieldOffset Clone() => new(Address, StructName, Index);
+
+  public override string ToString() =>
+    $"(GetFieldOffset Address={Address} StructName={StructName} Index={Index})";
 }

@@ -15,4 +15,6 @@ public class SizeOfPrimitive(Type type) : SizeOf {
   public override int GetHashCode() => HashCode.Combine(GetType(), Type);
 
   public override SizeOfPrimitive Clone() => new(Type);
+
+  public override string ToString() => $"(SizeOfPrimitive Type={Type})";
 }

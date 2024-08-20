@@ -21,4 +21,6 @@ public class VoidCall : Statement {
   }
 
   public override VoidCall Clone() => new(Call);
+
+  public override string ToString() => $"(VoidCall Call={Call})";
 }

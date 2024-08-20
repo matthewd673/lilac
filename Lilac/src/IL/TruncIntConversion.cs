@@ -1,10 +1,9 @@
 namespace Lilac.IL;
 
-public class TruncIntConversion : Conversion {
-  public TruncIntConversion(Value value, Type newType)
-    : base(value, newType) {
-    // Empty
-  }
-
+public class TruncIntConversion(Value value, Type newType)
+  : Conversion(value, newType) {
   public override TruncIntConversion Clone() => new(Value, NewType);
+
+  public override string ToString() =>
+    $"(TruncIntConversion Value={Value} NewType={NewType})";
 }

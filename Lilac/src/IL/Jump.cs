@@ -1,11 +1,7 @@
 namespace Lilac.IL;
 
-public class Jump : Statement {
-  public string Target { get; set; }
-
-  public Jump(string target) {
-    Target = target;
-  }
+public class Jump(string target) : Statement {
+  public string Target { get; set; } = target;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Jump)) {
@@ -21,4 +17,6 @@ public class Jump : Statement {
   }
 
   public override Jump Clone() => new(Target);
+
+  public override string ToString() => $"(Jump Target={Target})";
 }

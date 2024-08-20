@@ -101,4 +101,7 @@ public class BinaryOp : Expression {
   }
 
   public override BinaryOp Clone() => new(Op, Left, Right);
+
+  public override string ToString() =>
+    $"(BinaryOp Op={Op} Left={Left} Right={Right})";
 }

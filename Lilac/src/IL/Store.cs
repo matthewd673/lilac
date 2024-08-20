@@ -20,4 +20,7 @@ public class Store(Type type, Value address, Value value) : Statement {
   }
 
   public override Store Clone() => new(Type, Address, Value);
+
+  public override string ToString() =>
+    $"(Store Type={Type} Address={Address} Value={Value})";
 }

@@ -16,4 +16,7 @@ public class Struct(string name, List<Type> fieldTypes) : Component {
   public override int GetHashCode() => HashCode.Combine(GetType(), FieldTypes);
 
   public override Struct Clone() => new(Name, FieldTypes);
+
+  public override string ToString() =>
+    $"(Struct Name={Name} FieldTypes=[{String.Join(", ", FieldTypes)}])";
 }

@@ -15,4 +15,6 @@ public class GlobalID(string name) : ID(name) {
   }
 
   public override GlobalID Clone() => new(Name);
+
+  public override string ToString() => $"(GlobalID Name={Name})";
 }

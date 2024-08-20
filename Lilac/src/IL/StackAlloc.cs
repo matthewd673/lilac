@@ -17,4 +17,6 @@ public class StackAlloc(SizeOf size) : Expression {
   }
 
   public override StackAlloc Clone() => new(Size);
+
+  public override string ToString() => $"(StackAlloc Size={Size})";
 }

@@ -15,4 +15,7 @@ public class SizeOfStruct(string structName) : SizeOf {
   public override int GetHashCode() => HashCode.Combine(GetType(), StructName);
 
   public override SizeOfStruct Clone() => new(StructName);
+
+  public override string ToString() =>
+    $"(SizeOfStruct StructName={StructName})";
 }

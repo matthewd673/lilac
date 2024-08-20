@@ -13,7 +13,6 @@ public enum Type {
   F64,
   Pointer, // pointer, primitive
   Void, // void, primitive
-  Struct, // !primitive
 }
 
 public static class TypeMethods {
@@ -52,10 +51,6 @@ public static class TypeMethods {
 
   public static bool IsVoid(this Type type) {
     return type == Type.Void;
-  }
-
-  public static bool IsPrimitive(this Type type) {
-    return type.IsNumeric() || type.IsVoid();
   }
 
   public static int GetSizeBytes(this Type type) {

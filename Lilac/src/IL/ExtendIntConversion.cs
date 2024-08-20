@@ -1,10 +1,9 @@
 namespace Lilac.IL;
 
-public class ExtendIntConversion : Conversion {
-  public ExtendIntConversion(Value value, Type newType)
-    : base(value, newType) {
-    // Empty
-  }
-
+public class ExtendIntConversion(Value value, Type newType)
+  : Conversion(value, newType) {
   public override ExtendIntConversion Clone() => new(Value, NewType);
+
+  public override string ToString() =>
+    $"(ExtendIntConversion Value={Value} NewType={NewType})";
 }

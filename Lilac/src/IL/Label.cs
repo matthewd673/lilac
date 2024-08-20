@@ -1,11 +1,7 @@
 namespace Lilac.IL;
 
-public class Label : Statement {
-  public string Name { get; }
-
-  public Label(string name) {
-    Name = name;
-  }
+public class Label(string name) : Statement {
+  public string Name { get; } = name;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Label)) {
@@ -21,4 +17,6 @@ public class Label : Statement {
   }
 
   public override Label Clone() => new(Name);
+
+  public override string ToString() => $"(Label Name={Name})";
 }

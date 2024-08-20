@@ -1,14 +1,8 @@
 namespace Lilac.IL;
 
-public class ExternCall : Call {
-  public string FuncSource { get; }
-
-  public ExternCall(string funcSource,
-                    string funcName,
-                    List<Value> args)
-    : base(funcName, args) {
-    FuncSource = funcSource;
-  }
+public class ExternCall(string funcSource, string funcName, List<Value> args)
+  : Call(funcName, args) {
+  public string FuncSource { get; } = funcSource;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(ExternCall)) {
@@ -26,4 +20,8 @@ public class ExternCall : Call {
   }
 
   public override ExternCall Clone() => new(FuncSource, FuncName, Args);
+
+  public override string ToString() =>
+    $"(ExternCall FuncSource={FuncSource} FuncName={FuncName} " +
+    $"Args=[{String.Join(", ", Args)}])";
 }

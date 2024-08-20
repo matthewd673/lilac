@@ -15,4 +15,6 @@ public class LocalID(string name) : ID(name) {
   }
 
   public override LocalID Clone() => new(Name);
+
+  public override string ToString() => $"(LocalID Name={Name})";
 }

@@ -29,4 +29,6 @@ public class UnaryOp : Expression {
   }
 
   public override UnaryOp Clone() => new(Op, Value);
+
+  public override string ToString() => $"(UnaryOp Op={Op} Value={Value})";
 }
