@@ -124,6 +124,14 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
             new GlobalSet(def.Id.Name) :
             new LocalSet(def.Id.Name),
         ],
+      Definition { Rhs: IL.Load { Type: IL.Type.Pointer } load } def =>
+        [
+          ..Transform(load.Address),
+          new Load(Runtime.PointerType),
+          def.Id is GlobalID ?
+            new GlobalSet(def.Id.Name) :
+            new LocalSet(def.Id.Name),
+        ],
       Definition def =>
         [..Transform(def.Rhs),
          def.Id is GlobalID ?
@@ -132,6 +140,51 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
         ],
       VoidCall voidCall =>
         Transform(voidCall.Call),
+      IL.Return @return =>
+        [..Transform(@return.Value),
+         new Instructions.Return()],
+      IL.Store { Type: IL.Type.U8 or IL.Type.I8 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Store8(Type.I32),
+        ],
+      IL.Store { Type: IL.Type.U16 or IL.Type.I16 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Store16(Type.I32),
+        ],
+      IL.Store { Type: IL.Type.U32 or IL.Type.I32 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Type.I32),
+        ],
+      IL.Store { Type: IL.Type.U64 or IL.Type.U64 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Type.I64),
+        ],
+      IL.Store { Type: IL.Type.F32 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Type.F32),
+        ],
+      IL.Store { Type: IL.Type.F64 } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Type.F64),
+        ],
+      IL.Store { Type: IL.Type.Pointer } store =>
+        [
+          ..Transform(store.Address),
+          ..Transform(store.Value),
+          new Instructions.Store(Runtime.PointerType),
+        ],
       // EXPRESSION RULES
       BinaryOp { Op: BinaryOp.Operator.Add } binaryOp =>
         [..Transform(binaryOp.Left),
@@ -212,52 +265,17 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
         [..call.Args.SelectMany(Transform),
          new Instructions.Call(call.FuncName),
         ],
-      IL.Return @return =>
-        [..Transform(@return.Value),
-         new Instructions.Return()],
       ValueExpr valueExpr =>
         Transform(valueExpr.Value), // ValueExpr is just a wrapper
-      IL.Store { Type: IL.Type.U8 or IL.Type.I8 } store =>
+      GetFieldOffset getFieldOffset =>
         [
-          ..Transform(store.Address),
-          ..Transform(store.Value),
-          new Store8(Type.I32),
-        ],
-      IL.Store { Type: IL.Type.U16 or IL.Type.I16 } store =>
-        [
-          ..Transform(store.Address),
-          ..Transform(store.Value),
-          new Store16(Type.I32),
-        ],
-      IL.Store { Type: IL.Type.U32 or IL.Type.I32 } store =>
-        [
-          ..Transform(store.Address),
-          ..Transform(store.Value),
-          new Instructions.Store(Type.I32),
-        ],
-      IL.Store { Type: IL.Type.U64 or IL.Type.U64 } store =>
-        [
-          ..Transform(store.Address),
-          ..Transform(store.Value),
-          new Instructions.Store(Type.I64),
-        ],
-      IL.Store { Type: IL.Type.F32 } store =>
-        [
-          ..Transform(store.Address),
-          ..Transform(store.Value),
-          new Instructions.Store(Type.F32),
-        ],
-      IL.Store { Type: IL.Type.F64 } store =>
-        [
-          ..Transform(store.Address),
-          ..Transform(store.Value),
-          new Instructions.Store(Type.F64),
-        ],
-      IL.Store { Type: IL.Type.Pointer } store =>
-        [
-          ..Transform(store.Address),
-          ..Transform(store.Value),
-          new Instructions.Store(Runtime.PointerType),
+          ..Transform(getFieldOffset.Address),
+          new Const(Runtime.PointerType,
+                    ComputeStructFieldOffset(
+                      Program.GetStruct(getFieldOffset.StructName)
+                        ?? throw new NullReferenceException(),
+                      getFieldOffset.Index).ToString()),
+          new Add(Runtime.PointerType),
         ],
       // VALUE RULES
       ID id =>
@@ -278,7 +296,7 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
       SizeOfStruct sizeOf =>
         [new Const(Runtime.PointerType,
                    ComputeStructSize(Program.GetStruct(sizeOf.StructName)
-                                     ?? throw new NullReferenceException())
+                                       ?? throw new NullReferenceException())
                      .ToString()),
         ],
       _ => throw new ArgumentOutOfRangeException(),
@@ -315,5 +333,15 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
     }
 
     return size;
+  }
+
+  private int ComputeStructFieldOffset(Struct @struct, int fieldIndex) {
+    // TODO: no alignment yet
+    int offset = 0;
+    for (int i = 0; i < fieldIndex; i++) {
+      offset += @struct.FieldTypes[i].ToWasmType().GetSizeBytes();
+    }
+
+    return offset;
   }
 }
