@@ -99,7 +99,7 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
         ],
       Definition {
           Rhs: IL.Load { Type: IL.Type.U64 or IL.Type.I64 } load,
-          Type: IL.Type.U64 or IL.Type.I32,
+          Type: IL.Type.U64 or IL.Type.I64,
         } def =>
         [
           ..Transform(load.Address),
@@ -161,7 +161,7 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
           ..Transform(store.Value),
           new Instructions.Store(Type.I32),
         ],
-      IL.Store { Type: IL.Type.U64 or IL.Type.U64 } store =>
+      IL.Store { Type: IL.Type.U64 or IL.Type.I64 } store =>
         [
           ..Transform(store.Address),
           ..Transform(store.Value),
@@ -278,11 +278,8 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
           new Add(Runtime.PointerType),
         ],
       // VALUE RULES
-      ID id =>
-        [id is GlobalID ?
-          new GlobalGet(id.Name) :
-          new LocalGet(id.Name),
-        ],
+      LocalID localId => [new LocalGet(localId.Name)],
+      GlobalID globalId => [new GlobalGet(globalId.Name)],
       Constant constant =>
         constant.Type.IsVoid() ?
           [] :
