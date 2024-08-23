@@ -21,4 +21,6 @@ public class Phi : Expression {
   }
 
   public override Phi Clone() => new(Ids);
+
+  public override string ToString() => $"(Phi Ids=[{String.Join(", ", Ids)}])";
 }

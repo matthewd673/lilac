@@ -685,3 +685,9 @@ public class EmptyType : WasmInstruction {
   public override byte OpCode => 0x40;
   public override string Wat => "nop";
 }
+
+public class Comment(string text) : WasmInstruction {
+  public string Text { get; } = text;
+  public override byte OpCode => throw new InvalidOperationException();
+  public override string Wat => $";; {text}";
+}

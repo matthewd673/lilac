@@ -1,19 +1,22 @@
 namespace Lilac.IL;
 
-public class Program {
-  private Dictionary<string, GlobalDef> globalMap;
-  private Dictionary<string, FuncDef> funcMap;
-  private Dictionary<(string, string), ExternFuncDef> externFuncMap;
+public class Program : Program<FuncDef> {
+  // NOTE: default Program class for most use cases
+}
+
+public class Program<TFuncDef> where TFuncDef : FuncDef {
+  private readonly Dictionary<string, GlobalDef> globalMap = new();
+  private readonly Dictionary<string, TFuncDef> funcMap = new();
+
+  private readonly Dictionary<(string, string), ExternFuncDef> externFuncMap =
+    new();
+
+  private readonly Dictionary<string, Struct> structMap = new();
 
   public int GlobalCount => globalMap.Count;
   public int FuncCount => funcMap.Count;
   public int ExternFuncCount => externFuncMap.Count;
-
-  public Program() {
-    globalMap = new();
-    funcMap = new();
-    externFuncMap = new();
-  }
+  public int StructCount => structMap.Count;
 
   public void AddGlobal(GlobalDef globalDef) {
     globalMap.Add(globalDef.Id.Name, globalDef);
@@ -34,17 +37,17 @@ public class Program {
     }
   }
 
-  public void AddFunc(FuncDef funcDef) {
+  public void AddFunc(TFuncDef funcDef) {
     funcMap.Add(funcDef.Name, funcDef);
   }
 
-  public IEnumerable<FuncDef> GetFuncs() {
-    foreach (FuncDef f in funcMap.Values) {
+  public IEnumerable<TFuncDef> GetFuncs() {
+    foreach (TFuncDef f in funcMap.Values) {
       yield return f;
     }
   }
 
-  public FuncDef? GetFunc(string name) {
+  public TFuncDef? GetFunc(string name) {
     try {
       return funcMap[name];
     }
@@ -67,6 +70,25 @@ public class Program {
   public ExternFuncDef? GetExternFunc(string source, string name) {
     try {
       return externFuncMap[(source, name)];
+    }
+    catch (KeyNotFoundException) {
+      return null;
+    }
+  }
+
+  public void AddStruct(Struct @struct) {
+    structMap.Add(@struct.Name, @struct);
+  }
+
+  public IEnumerable<Struct> GetStructs() {
+    foreach (Struct s in structMap.Values) {
+      yield return s;
+    }
+  }
+
+  public Struct? GetStruct(string name) {
+    try {
+      return structMap[name];
     }
     catch (KeyNotFoundException) {
       return null;
@@ -110,10 +132,24 @@ public class Program {
       }
     }
 
+    if (StructCount != other.StructCount) {
+      return false;
+    }
+
+    foreach (string k in structMap.Keys) {
+      if (!structMap[k].Equals(other.GetStruct(k))) {
+        return false;
+      }
+    }
+
     return true;
   }
 
   public override int GetHashCode() {
-    return HashCode.Combine(GetType(), globalMap, funcMap, externFuncMap);
+    return HashCode.Combine(GetType(),
+                            globalMap,
+                            funcMap,
+                            externFuncMap,
+                            structMap);
   }
 }

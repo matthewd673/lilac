@@ -1,13 +1,8 @@
 namespace Lilac.IL;
 
-public class FuncParam : Node {
-  public Type Type { get; }
-  public LocalID Id { get; }
-
-  public FuncParam(Type type, LocalID id) {
-    Type = type;
-    Id = id;
-  }
+public class FuncParam(Type type, LocalID id) : Node {
+  public Type Type { get; } = type;
+  public LocalID Id { get; } = id;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(FuncParam)) {
@@ -23,4 +18,7 @@ public class FuncParam : Node {
   }
 
   public override FuncParam Clone() => new(Type, Id);
+
+  public override string ToString() =>
+    $"(FuncParam Type={Type} Id={Id})";
 }

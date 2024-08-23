@@ -1,10 +1,6 @@
 namespace Lilac.IL;
 
-public class JumpNotZero : CondJump {
-  public JumpNotZero(string target, Value cond) : base(target, cond) {
-    // Empty
-  }
-
+public class JumpNotZero(string target, Value cond) : CondJump(target, cond) {
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(JumpNotZero)) {
       return false;
@@ -19,4 +15,7 @@ public class JumpNotZero : CondJump {
   }
 
   public override JumpNotZero Clone() => new(Target, Cond);
+
+  public override string ToString() =>
+    $"(JumpNotZero Target={Target} Cond={Cond})";
 }

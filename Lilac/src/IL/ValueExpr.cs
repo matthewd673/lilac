@@ -21,4 +21,6 @@ public class ValueExpr : Expression {
   }
 
   public override ValueExpr Clone() => new(Value);
+
+  public override string ToString() => $"(ValueExpr Value={Value})";
 }

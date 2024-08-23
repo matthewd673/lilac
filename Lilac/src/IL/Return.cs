@@ -1,11 +1,7 @@
 namespace Lilac.IL;
 
-public class Return : Statement {
-  public Value Value { get; }
-
-  public Return(Value value) {
-    Value = value;
-  }
+public class Return(Value value) : Statement {
+  public Value Value { get; } = value;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Return)) {
@@ -21,4 +17,6 @@ public class Return : Statement {
   }
 
   public override Return Clone() => new(Value);
+
+  public override string ToString() => $"(Return Value={Value})";
 }

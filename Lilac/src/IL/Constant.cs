@@ -36,4 +36,7 @@ public class Constant(Type type, byte[] value) : Value {
   }
 
   public override Constant Clone() => new(Type, Value);
+
+  public override String ToString() =>
+    $"(Constant Type={Type} Value=[{String.Join(", ", Value)}])";
 }

@@ -23,4 +23,7 @@ public class InlineInstr : Statement {
   }
 
   public override InlineInstr Clone() => new(Target, Instr);
+
+  public override string ToString() =>
+    $"(InlineInstr Target={Target} Instr={Instr})";
 }

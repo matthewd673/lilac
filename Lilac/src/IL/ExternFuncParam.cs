@@ -1,20 +1,14 @@
 namespace Lilac.IL;
 
-public class ExternFuncDef : Component {
-  public string Source { get; }
-  public string Name { get; }
-  public List<Type> ParamTypes { get; }
-  public Type RetType { get; }
-
-  public ExternFuncDef(string source,
-                       string name,
-                       List<Type> paramTypes,
-                       Type retType) {
-    Source = source;
-    Name = name;
-    ParamTypes = paramTypes;
-    RetType = retType;
-  }
+public class ExternFuncDef(string source,
+                           string name,
+                           List<Type> paramTypes,
+                           Type retType)
+  : Component {
+  public string Source { get; } = source;
+  public string Name { get; } = name;
+  public List<Type> ParamTypes { get; } = paramTypes;
+  public Type RetType { get; } = retType;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(ExternFuncDef)) {
@@ -33,4 +27,8 @@ public class ExternFuncDef : Component {
 
   public override ExternFuncDef Clone() =>
     new(Source, Name, ParamTypes, RetType);
+
+  public override string ToString() =>
+    $"(ExternFuncParam Source={Source} Name={Name} " +
+    $"ParamTypes={String.Join(", ", ParamTypes)} RetType={RetType})";
 }

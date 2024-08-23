@@ -1,15 +1,9 @@
 namespace Lilac.IL;
 
-public class GlobalDef : Component {
-  public Type Type { get; }
-  public GlobalID Id { get; }
-  public Constant Rhs { get; }
-
-  public GlobalDef(Type type, GlobalID id, Constant rhs) {
-    Type = type;
-    Id = id;
-    Rhs = rhs;
-  }
+public class GlobalDef(Type type, GlobalID id, Constant rhs) : Component {
+  public Type Type { get; } = type;
+  public GlobalID Id { get; } = id;
+  public Constant Rhs { get; } = rhs;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(GlobalDef)) {
@@ -26,4 +20,7 @@ public class GlobalDef : Component {
   }
 
   public override GlobalDef Clone() => new(Type, Id, Rhs);
+
+  public override string ToString() =>
+    $"(GlobalDef Type={Type} Id={Id} Rhs={Rhs})";
 }

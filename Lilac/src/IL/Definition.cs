@@ -26,4 +26,7 @@ public class Definition : Statement {
   }
 
   public override Definition Clone() => new(Type, Id, Rhs);
+
+  public override string ToString() =>
+    $"(Definition Type={Type} Id={Id} Rhs={Rhs})";
 }

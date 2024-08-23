@@ -11,8 +11,8 @@ public enum Type {
   I64,
   F32,
   F64,
-  Pointer,
-  Void,
+  Pointer, // pointer, primitive
+  Void, // void, primitive
 }
 
 public static class TypeMethods {
@@ -46,17 +46,11 @@ public static class TypeMethods {
   }
 
   public static bool IsPointer(this Type type) {
-    return type switch {
-      Type.Pointer => true,
-      _ => false,
-    };
+    return type == Type.Pointer;
   }
 
   public static bool IsVoid(this Type type) {
-    return type switch {
-      Type.Void => true,
-      _ => false,
-    };
+    return type == Type.Void;
   }
 
   public static int GetSizeBytes(this Type type) {

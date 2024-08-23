@@ -38,6 +38,10 @@ public class Generator(Program program) {
       str += $"{GenerateExternFuncDef(f)}\n";
     }
 
+    foreach (Struct s in program.GetStructs()) {
+      str += $"{GenerateStruct(s)}\n";
+    }
+
     foreach (FuncDef f in program.GetFuncs()) {
       str += $"{GenerateFuncDef(f)}\n";
     }
@@ -53,6 +57,9 @@ public class Generator(Program program) {
     $"extern func {externFuncDef.Source} {externFuncDef.Name} (" +
       $"{GenerateTypeList(externFuncDef.ParamTypes)}) -> " +
       $"{GenerateType(externFuncDef.RetType)}";
+
+  protected virtual string GenerateStruct(Struct @struct) =>
+    $"struct {@struct.Name} ({GenerateTypeList(@struct.FieldTypes)})";
 
   protected virtual string GenerateFuncDef(FuncDef funcDef) {
     string str =
@@ -123,6 +130,7 @@ public class Generator(Program program) {
       Phi phi => GeneratePhi(phi),
       StackAlloc stackAlloc => GenerateStackAlloc(stackAlloc),
       Load load => GenerateLoad(load),
+      GetFieldOffset getFieldOffset => GenerateGetFieldOffset(getFieldOffset),
       _ => throw new CannotGenerateException(expr),
     };
 
@@ -184,15 +192,21 @@ public class Generator(Program program) {
     $"phi ({GenerateValueList(new(phi.Ids))})";
 
   protected virtual string GenerateStackAlloc(StackAlloc stackAlloc) =>
-    $"stack_alloc {GenerateType(stackAlloc.Type)}";
+    $"stack_alloc {GenerateValue(stackAlloc.Size)}";
 
   protected virtual string GenerateLoad(Load load) =>
     $"load {GenerateType(load.Type)} {GenerateValue(load.Address)}";
+
+  protected virtual string GenerateGetFieldOffset
+    (GetFieldOffset getFieldOffset) =>
+    $"get_field_offset {GenerateValue(getFieldOffset.Address)} " +
+      $"{getFieldOffset.StructName} {getFieldOffset.Index}";
 
   protected virtual string GenerateValue(Value value) =>
     value switch {
       Constant constant => GenerateConstant(constant),
       ID id => GenerateID(id),
+      SizeOf sizeOf => GenerateSizeOf(sizeOf),
       _ => throw new CannotGenerateException(value),
     };
 
@@ -217,10 +231,16 @@ public class Generator(Program program) {
       _ => throw new CannotGenerateException(id),
     };
 
+  protected virtual string GenerateSizeOf(SizeOf sizeOf) => sizeOf switch {
+    SizeOfPrimitive sizeOfPrim => $"sizeof {GenerateType(sizeOfPrim.Type)}",
+    SizeOfStruct sizeOfStr => $"sizeof struct {sizeOfStr.StructName}",
+    _ => throw new CannotGenerateException(sizeOf),
+  };
+
   protected string GenerateTypeList(List<IL.Type> typeList) {
     string str = "";
 
-    foreach (IL.Type t in typeList) {
+    foreach (Type t in typeList) {
       str += $"{GenerateType(t)}, ";
     }
 

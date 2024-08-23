@@ -23,4 +23,7 @@ public class Call : Expression {
   }
 
   public override Call Clone() => new(FuncName, Args);
+
+  public override string ToString() =>
+    $"(Call FuncName={FuncName} Args=[{String.Join(", ", Args)}])";
 }

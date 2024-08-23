@@ -18,4 +18,6 @@ public class Load(Type type, Value address) : Expression {
   }
 
   public override Load Clone() => new(Type, Address);
+
+  public override string ToString() => $"(Load Type={Type} Address={Address})";
 }

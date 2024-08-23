@@ -1,10 +1,9 @@
 namespace Lilac.IL;
 
-public class FloatToIntConversion : Conversion {
-  public FloatToIntConversion(Value value, Type newType)
-    : base(value, newType) {
-    // Empty
-  }
-
+public class FloatToIntConversion(Value value, Type newType)
+  : Conversion(value, newType) {
   public override FloatToIntConversion Clone() => new(Value, NewType);
+
+  public override string ToString() =>
+    $"(FloatToIntConversion Value={Value} NewType={NewType})";
 }
