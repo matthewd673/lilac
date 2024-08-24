@@ -24,6 +24,10 @@ public class HexWriter : IEnumerable<byte> {
     bytes.AddRange(Encoding.UTF8.GetBytes(str));
   }
 
+  public void WriteFrom(HexWriter other) {
+    bytes.AddRange(other);
+  }
+
   public IEnumerator<byte> GetEnumerator() {
     return bytes.GetEnumerator();
   }
