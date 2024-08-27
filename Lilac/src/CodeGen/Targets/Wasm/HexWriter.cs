@@ -37,6 +37,6 @@ public class HexWriter : IEnumerable<byte> {
   }
 
   public override string ToString() {
-    throw new NotImplementedException(); // TODO
+    return Encoding.Default.GetString(bytes.ToArray());
   }
 }
