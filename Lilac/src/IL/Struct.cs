@@ -1,6 +1,6 @@
 namespace Lilac.IL;
 
-public class Struct(string name, List<Type> fieldTypes) : Component {
+public class Struct(string name, List<Type> fieldTypes) : Component, INamed {
   public string Name { get; } = name;
   public List<Type> FieldTypes { get; } = fieldTypes;
 

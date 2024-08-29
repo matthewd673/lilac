@@ -9,7 +9,8 @@ internal static class Runtime {
   public const Instructions.Type PointerType = Instructions.Type.I32;
 
   public const int StackSizePages = 1;
-  public const string StackPointerName = "__lilac_sp";
+  public const string StackPointerName = "@__lilac_sp";
+  public const string LocalStackMarkerName = "@__lilac_sm";
 
   public static readonly List<WasmComponent> StackEmulatorComponents = [
     new Memory(StackSizePages),
@@ -17,5 +18,19 @@ internal static class Runtime {
                StackPointerName,
                new(PointerType, "0"),
                true),
+  ];
+
+  public static readonly List<WasmComponent> FuncStackEmulatorComponents = [
+    new Local(PointerType, LocalStackMarkerName),
+  ];
+
+  public static readonly List<WasmInstruction> FuncStartStackEmulatorInstrs = [
+    new GlobalGet(StackPointerName),
+    new LocalSet(LocalStackMarkerName),
+  ];
+
+  public static readonly List<WasmInstruction> FuncEndStackEmulatorInstrs = [
+    new LocalGet(LocalStackMarkerName),
+    new GlobalSet(StackPointerName),
   ];
 }

@@ -17,7 +17,7 @@ public class WasmTranslator : Translator<WasmInstruction> {
     set {
       _startFunction = value;
       if (_startFunction != null &&
-          CFGProgram.GetFunc(_startFunction) is null) {
+          !CFGProgram.FuncDefs.ContainsName(_startFunction)) {
         throw new KeyNotFoundException();
       }
     }
@@ -39,29 +39,21 @@ public class WasmTranslator : Translator<WasmInstruction> {
     List<WasmComponent> components = [];
     symbols.PushScope(); // always have scope for globals and top-level
 
-    // import all extern functions
-    foreach (ExternFuncDef f in CFGProgram.GetExternFuncs()) {
-      components.Add(TranslateImport(f));
-    }
+    // Translate all components
+    components.AddRange(CFGProgram.ExternFuncDefs.Select(TranslateImport));
+    components.AddRange(CFGProgram.FuncDefs.Select(TranslateFunc));
 
-    // translate all globals
-    foreach (GlobalDef g in CFGProgram.GetGlobals()) {
-      // add global to top-level scope
+    // Globals must also be remembered in the symbol table
+    foreach (GlobalDef g in CFGProgram.Globals) {
       symbols.Add(new(g.Id, g.Type));
       components.Add(TranslateGlobal(g));
     }
 
-    // translate all functions
-    foreach (CFGFuncDef f in CFGProgram.GetFuncs()) {
-      components.Add(TranslateFunc(f));
-    }
-
-    // add start component if a start function has been set
     if (StartFunction is not null) {
       components.Add(new Start(StartFunction));
     }
 
-    // add runtime memory helpers
+    // Add runtime memory helpers
     components.AddRange(Runtime.StackEmulatorComponents);
 
     return new Module(components);
@@ -79,8 +71,8 @@ public class WasmTranslator : Translator<WasmInstruction> {
       results.Add(externFuncDef.RetType.ToWasmType());
     }
 
-    return new Import(externFuncDef.Source,
-                      externFuncDef.Name,
+    return new Import(externFuncDef.FuncSource,
+                      externFuncDef.FuncName,
                       paramTypes,
                       results);
   }

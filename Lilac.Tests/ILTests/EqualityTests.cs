@@ -559,29 +559,25 @@ public class EqualityTests {
     Assert.Equal(a, b);
 
     Program c = new();
-    c.AddGlobal(new(Type.I32, new("global"),
-                    new Constant(Type.I32, [8])));
-    c.AddFunc(new FuncDef("main", [], Type.I32,
-                          [
-                            new Definition(Type.I32, new LocalID("a"),
-                              new ValueExpr(new Constant(Type.I32, [0]))),
-                            new Return(new LocalID("a")),
-                          ])
-              );
-    c.AddExternFunc(new("source", "name", [],
-                        Type.Void));
+    c.Globals.Add(new(Type.I32, new("global"), new Constant(Type.I32, [8])));
+    c.FuncDefs.Add(new FuncDef("main", [], Type.I32,
+                               [
+                                 new Definition(Type.I32, new LocalID("a"),
+                                   new ValueExpr(new Constant(Type.I32, [0]))),
+                                 new Return(new LocalID("a")),
+                               ])
+                  );
+    c.ExternFuncDefs.Add(new("source", "name", [], Type.Void));
     Program d = new();
-    d.AddGlobal(new(Type.I32, new("global"),
-                    new Constant(Type.I32, [8])));
-    d.AddFunc(new FuncDef("main", [], Type.I32,
-                          [
-                            new Definition(Type.I32, new LocalID("a"),
-                              new ValueExpr(new Constant(Type.I32, [0]))),
-                            new Return(new LocalID("a")),
-                          ])
+    d.Globals.Add(new(Type.I32, new("global"), new Constant(Type.I32, [8])));
+    d.FuncDefs.Add(new("main", [], Type.I32,
+                       [
+                         new Definition(Type.I32, new LocalID("a"),
+                           new ValueExpr(new Constant(Type.I32, [0]))),
+                         new Return(new LocalID("a")),
+                       ])
               );
-    d.AddExternFunc(new("source", "name", [],
-                        Type.Void));
+    d.ExternFuncDefs.Add(new("source", "name", [], Type.Void));
     Assert.Equal(c, d);
   }
 
@@ -589,57 +585,51 @@ public class EqualityTests {
   public void ProgramsNotEqual() {
     Program a = new();
     Program b = new();
-    a.AddGlobal(new(Type.I32, new("global"),
-                    new Constant(Type.I32, [8])));
+    a.Globals.Add(new(Type.I32, new("global"), new Constant(Type.I32, [8])));
     Assert.NotEqual(a, b);
 
     Program c = new();
     Program d = new();
-    c.AddGlobal(new(Type.I32, new("global"),
-                    new Constant(Type.I32, [8])));
-    d.AddGlobal(new(Type.I32, new("global2"),
-                    new Constant(Type.I32, [8])));
+    c.Globals.Add(new(Type.I32, new("global"), new Constant(Type.I32, [8])));
+    d.Globals.Add(new(Type.I32, new("global2"), new Constant(Type.I32, [8])));
     Assert.NotEqual(c, d);
 
     Program e = new();
     Program f = new();
-    e.AddFunc(new FuncDef("main", [], Type.I32,
-                          [
-                            new Definition(Type.I32, new LocalID("a"),
-                              new ValueExpr(new Constant(Type.I32, [0]))),
-                            new Return(new LocalID("a")),
-                          ])
-              );
+    e.FuncDefs.Add(new FuncDef("main", [], Type.I32,
+                               [
+                                 new Definition(Type.I32, new LocalID("a"),
+                                   new ValueExpr(new Constant(Type.I32, [0]))),
+                                 new Return(new LocalID("a")),
+                               ])
+                  );
     Assert.NotEqual(e, f);
 
     Program g = new();
     Program h = new();
-    g.AddFunc(new FuncDef("main", [], Type.I32,
-                          [
-                            new Definition(Type.I32, new LocalID("a"),
-                              new ValueExpr(new Constant(Type.I32, [0]))),
-                            new Return(new LocalID("a")),
-                          ])
-              );
-    h.AddFunc(new FuncDef("main", [], Type.I32,
-                          [
-                            new Return(new Constant(Type.I32, [0])),
-                          ])
-              );
+    g.FuncDefs.Add(new FuncDef("main", [], Type.I32,
+                               [
+                                 new Definition(Type.I32, new LocalID("a"),
+                                   new ValueExpr(new Constant(Type.I32, [0]))),
+                                 new Return(new LocalID("a")),
+                               ])
+                  );
+    h.FuncDefs.Add(new FuncDef("main", [], Type.I32,
+                               [
+                                 new Return(new Constant(Type.I32, [0])),
+                               ])
+                  );
     Assert.NotEqual(g, h);
 
     Program i = new();
-    i.AddExternFunc(new("source", "name", [],
-                        Type.Void));
+    i.ExternFuncDefs.Add(new("source", "name", [], Type.Void));
     Program j = new();
     Assert.NotEqual(i, j);
 
     Program k = new();
-    k.AddExternFunc(new("source", "name", [],
-                        Type.Void));
+    k.ExternFuncDefs.Add(new("source", "name", [], Type.Void));
     Program l = new();
-    l.AddExternFunc(new("source", "name", [],
-                        Type.I32));
+    l.ExternFuncDefs.Add(new("source", "name", [], Type.I32));
     Assert.NotEqual(k, l);
   }
 

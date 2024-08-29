@@ -69,15 +69,15 @@ public class Parser {
       }
       // global def
       else if (See(TokenType.Global)) {
-        program.AddGlobal(ParseGlobalDef());
+        program.Globals.Add(ParseGlobalDef());
       }
       // func def
       else if (See(TokenType.Func)) {
-        program.AddFunc(ParseFuncDef());
+        program.FuncDefs.Add(ParseFuncDef());
       }
       // extern func def
       else if (See(TokenType.Extern)) {
-        program.AddExternFunc(ParseExternFuncDef());
+        program.ExternFuncDefs.Add(ParseExternFuncDef());
       }
       else {
         throw new CannotBeginException(nextToken.Position, "program",

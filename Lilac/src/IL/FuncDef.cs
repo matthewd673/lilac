@@ -5,7 +5,7 @@ public class FuncDef(string name,
                      Type retType,
                      List<Statement> stmtList,
                      bool exported = false)
-  : Component {
+  : Component, INamed {
   public string Name { get; } = name;
   public List<FuncParam> Params { get; } = @params;
   public Type RetType { get; } = retType;

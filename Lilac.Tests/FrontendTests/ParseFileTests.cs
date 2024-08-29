@@ -17,7 +17,7 @@ public class ParseFileTests {
                                         )),
                        ]
                       );
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/definition.lilac");
@@ -159,7 +159,7 @@ public class ParseFileTests {
                                           )
                                         ),
                        ]);
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/binop.lilac");
@@ -170,8 +170,8 @@ public class ParseFileTests {
   [Fact]
   public void ParseExtern() {
     Program expected = new();
-    expected.AddExternFunc(new("console", "log",
-                               [Type.F64], Type.Void));
+    expected.ExternFuncDefs.Add(new("console", "log",
+                                    [Type.F64], Type.Void));
     FuncDef divide = new("divide",
                          [
                            new(Type.F64, new LocalID("a")),
@@ -202,8 +202,8 @@ public class ParseFileTests {
                                           [new LocalID("ans")])),
                          new Return(new Constant(Type.Void, 0)),
                        ]);
-    expected.AddFunc(divide);
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(divide);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/extern.lilac");
@@ -237,8 +237,8 @@ public class ParseFileTests {
                                                    new Constant(Type.I32, 5L),
                                                  ])),
                        ]);
-    expected.AddFunc(multiply);
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(multiply);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/func.lilac");
@@ -248,10 +248,10 @@ public class ParseFileTests {
   [Fact]
   public void ParseGlobals() {
     Program expected = new();
-    expected.AddGlobal(new GlobalDef(Type.I32, new("a"),
-                                     new Constant(Type.I32, 2L)));
-    expected.AddGlobal(new GlobalDef(Type.I32, new("b"),
-                                     new Constant(Type.I32, 0L)));
+    expected.Globals.Add(new GlobalDef(Type.I32, new("a"),
+                                       new Constant(Type.I32, 2L)));
+    expected.Globals.Add(new GlobalDef(Type.I32, new("b"),
+                                       new Constant(Type.I32, 0L)));
     FuncDef main = new("main", [], Type.Void,
                        [
                          new Definition(Type.I32, new LocalID("a"),
@@ -265,7 +265,7 @@ public class ParseFileTests {
                          new Definition(Type.I32, new GlobalID("b"),
                                         new ValueExpr(new LocalID("0"))),
                        ]);
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/globals.lilac");
@@ -284,7 +284,7 @@ public class ParseFileTests {
                          new JumpNotZero("L0", new LocalID("a")),
                          new JumpZero("L0", new Constant(Type.U8, 1L)),
                        ]);
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/jz_jnz.lilac");
@@ -302,7 +302,7 @@ public class ParseFileTests {
                                            new Constant(Type.I32, 3L))),
                          new Jump("L0"),
                        ]);
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/label_and_jmp.lilac");
@@ -352,7 +352,7 @@ public class ParseFileTests {
                                         new ValueExpr(
                                            new LocalID("b"))),
                        ]);
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/phi.lilac");
@@ -395,7 +395,7 @@ public class ParseFileTests {
                                         new ValueExpr(
                                           new Constant(Type.F64, -1.0))),
                        ]);
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/types.lilac");
@@ -420,7 +420,7 @@ public class ParseFileTests {
                                           UnaryOp.Operator.BitNot,
                                           new Constant(Type.U16, 12L))),
                        ]);
-    expected.AddFunc(main);
+    expected.FuncDefs.Add(main);
 
     Program actual =
       Frontend.Parser.ParseFile("./Resources/unop.lilac");

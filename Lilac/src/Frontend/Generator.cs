@@ -27,53 +27,29 @@ public class Generator(Program program) {
       _ => throw new CannotGenerateException(type),
     };
 
-  protected virtual string GenerateProgram(Program program) {
-    string str = "";
-
-    foreach (GlobalDef g in program.GetGlobals()) {
-      str += $"{GenerateGlobalDef(g)}\n";
-    }
-
-    foreach (ExternFuncDef f in program.GetExternFuncs()) {
-      str += $"{GenerateExternFuncDef(f)}\n";
-    }
-
-    foreach (Struct s in program.GetStructs()) {
-      str += $"{GenerateStruct(s)}\n";
-    }
-
-    foreach (FuncDef f in program.GetFuncs()) {
-      str += $"{GenerateFuncDef(f)}\n";
-    }
-
-    return str;
-  }
+  protected virtual string GenerateProgram(Program program) =>
+    $"{string.Join('\n', program.Globals.Select(GenerateGlobalDef))}\n" +
+    $"{string.Join('\n', program.ExternFuncDefs.Select(GenerateExternFuncDef))}\n" +
+    $"{string.Join('\n', program.Structs.Select(GenerateStruct))}\n" +
+    $"{string.Join('\n', program.FuncDefs.Select(GenerateFuncDef))}\n";
 
   protected virtual string GenerateGlobalDef(GlobalDef globalDef) =>
     $"global {GenerateType(globalDef.Type)} {GenerateID(globalDef.Id)} " +
-      $"= {GenerateConstant(globalDef.Rhs)}";
+    $"= {GenerateConstant(globalDef.Rhs)}";
 
   protected virtual string GenerateExternFuncDef(ExternFuncDef externFuncDef) =>
-    $"extern func {externFuncDef.Source} {externFuncDef.Name} (" +
-      $"{GenerateTypeList(externFuncDef.ParamTypes)}) -> " +
-      $"{GenerateType(externFuncDef.RetType)}";
+    $"extern func {externFuncDef.FuncSource} {externFuncDef.FuncName} (" +
+    $"{GenerateTypeList(externFuncDef.ParamTypes)}) -> " +
+    $"{GenerateType(externFuncDef.RetType)}";
 
   protected virtual string GenerateStruct(Struct @struct) =>
     $"struct {@struct.Name} ({GenerateTypeList(@struct.FieldTypes)})";
 
-  protected virtual string GenerateFuncDef(FuncDef funcDef) {
-    string str =
-      $"func {funcDef.Name} ({GenerateFuncParamList(funcDef.Params)}) " +
-      $"-> {GenerateType(funcDef.RetType)}\n";
-
-    foreach (Statement s in funcDef.StmtList) {
-      str += $"  {GenerateStatement(s)}\n";
-    }
-
-    str += "end";
-
-    return str;
-  }
+  protected virtual string GenerateFuncDef(FuncDef funcDef) =>
+    $"func {funcDef.Name} ({GenerateFuncParamList(funcDef.Params)}) " +
+    $"-> {GenerateType(funcDef.RetType)}\n" +
+    string.Join('\n', funcDef.StmtList.Select(s => $"  {GenerateStatement(s)}")) +
+    "\nend";
 
   protected virtual string GenerateFuncParam(FuncParam funcParam) =>
     $"{GenerateType(funcParam.Type)} {GenerateID(funcParam.Id)}";
@@ -92,7 +68,7 @@ public class Generator(Program program) {
 
   protected virtual string GenerateDefinition(Definition definition) =>
     $"{GenerateType(definition.Type)} {GenerateID(definition.Id)} = " +
-      $"{GenerateExpression(definition.Rhs)}";
+    $"{GenerateExpression(definition.Rhs)}";
 
   protected virtual string GenerateLabel(Label label) =>
     $"{label.Name}:";
@@ -139,7 +115,7 @@ public class Generator(Program program) {
 
   protected virtual string GenerateBinaryOp(BinaryOp binaryOp) =>
     $"{GenerateValue(binaryOp.Left)} {GenerateBinaryOpOperator(binaryOp.Op)} " +
-      $"{GenerateValue(binaryOp.Right)}";
+    $"{GenerateValue(binaryOp.Right)}";
 
   protected virtual string GenerateBinaryOpOperator(BinaryOp.Operator op) =>
     op switch {
@@ -176,7 +152,7 @@ public class Generator(Program program) {
     };
 
   protected virtual string GenerateConversion(Conversion conversion) {
-    // TODO: syntax is not implemented
+    // TODO: Syntax is not implemented
     throw new CannotGenerateException(conversion);
   }
 
@@ -200,7 +176,7 @@ public class Generator(Program program) {
   protected virtual string GenerateGetFieldOffset
     (GetFieldOffset getFieldOffset) =>
     $"get_field_offset {GenerateValue(getFieldOffset.Address)} " +
-      $"{getFieldOffset.StructName} {getFieldOffset.Index}";
+    $"{getFieldOffset.StructName} {getFieldOffset.Index}";
 
   protected virtual string GenerateValue(Value value) =>
     value switch {
@@ -216,7 +192,7 @@ public class Generator(Program program) {
     }
 
     string valStr = ValueEncoder.StringifyValue(constant.Type, constant.Value);
-    // easy patch for generating floats with 0s in the decimal
+    // Easy patch for generating floats with 0s in the decimal
     if (constant.Type.IsFloat() && !valStr.Contains('.')) {
       valStr += ".";
     }
@@ -237,45 +213,12 @@ public class Generator(Program program) {
     _ => throw new CannotGenerateException(sizeOf),
   };
 
-  protected string GenerateTypeList(List<IL.Type> typeList) {
-    string str = "";
+  protected string GenerateTypeList(List<IL.Type> typeList) =>
+    string.Join(", ", typeList.Select(GenerateType));
 
-    foreach (Type t in typeList) {
-      str += $"{GenerateType(t)}, ";
-    }
+  protected string GenerateFuncParamList(List<FuncParam> funcParamList) =>
+    string.Join(", ", funcParamList.Select(GenerateFuncParam));
 
-    if (str.Length > 2) {
-      str = str.Remove(str.Length - 2);
-    }
-
-    return str;
-  }
-
-  protected string GenerateFuncParamList(List<FuncParam> funcParamList) {
-    string str = "";
-
-    foreach (FuncParam p in funcParamList) {
-      str += $"{GenerateFuncParam(p)}, ";
-    }
-
-    if (str.Length > 2) {
-      str = str.Remove(str.Length - 2);
-    }
-
-    return str;
-  }
-
-  protected string GenerateValueList(List<Value> valueList) {
-    string str = "";
-
-    foreach (Value v in valueList) {
-      str += $"{GenerateValue(v)}, ";
-    }
-
-    if (str.Length > 2) {
-      str = str.Remove(str.Length - 2);
-    }
-
-    return str;
-  }
+  protected string GenerateValueList(List<Value> valueList) =>
+    string.Join(", ", valueList.Select(GenerateValue));
 }

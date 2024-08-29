@@ -8,16 +8,18 @@ public class CFGFuncDef(string name,
                         CFG cfg,
                         bool exported)
   : FuncDef(name, @params, retType, null!, exported) {
-  public string Name { get; } = name;
-  public List<FuncParam> Params { get; } = @params;
-  public IL.Type RetType { get; } = retType;
   public CFG CFG { get; } = cfg;
-  public bool Exported { get; } = exported;
 
   // TODO: implement ToString, Equals, GetHashCode, and Clone
 
   public override CFGFuncDef Clone() {
-    // TODO
-    throw new NotImplementedException();
+    throw new NotImplementedException(); // TODO
   }
+
+  public static CFGFuncDef FromFuncDef(FuncDef funcDef) => new(
+    funcDef.Name,
+    funcDef.Params,
+    funcDef.RetType,
+    new CFG(BB.FromStmtList(funcDef.StmtList)),
+    funcDef.Exported);
 }

@@ -689,5 +689,5 @@ public class EmptyType : WasmInstruction {
 public class Comment(string text) : WasmInstruction {
   public string Text { get; } = text;
   public override byte OpCode => throw new InvalidOperationException();
-  public override string Wat => $";; {text}";
+  public override string Wat => $";; {Text}";
 }

@@ -1,14 +1,16 @@
 namespace Lilac.IL;
 
-public class ExternFuncDef(string source,
-                           string name,
+public class ExternFuncDef(string funcSource,
+                           string funcName,
                            List<Type> paramTypes,
                            Type retType)
-  : Component {
-  public string Source { get; } = source;
-  public string Name { get; } = name;
+  : Component, INamed<(string, string)> {
+  public string FuncSource { get; } = funcSource;
+  public string FuncName { get; } = funcName;
   public List<Type> ParamTypes { get; } = paramTypes;
   public Type RetType { get; } = retType;
+
+  public (string, string) Name => (FuncSource, FuncName);
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(ExternFuncDef)) {
@@ -16,19 +18,19 @@ public class ExternFuncDef(string source,
     }
 
     ExternFuncDef other = (ExternFuncDef)obj;
-    return Source.Equals(other.Source) && Name.Equals(other.Name) &&
+    return FuncSource.Equals(other.FuncSource) &&
+           FuncName.Equals(other.FuncName) &&
            ParamTypes.SequenceEqual(other.ParamTypes) &&
            RetType.Equals(other.RetType);
   }
 
-  public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Source, Name, ParamTypes, RetType);
-  }
+  public override int GetHashCode() =>
+    HashCode.Combine(GetType(), FuncSource, FuncName, ParamTypes, RetType);
 
   public override ExternFuncDef Clone() =>
-    new(Source, Name, ParamTypes, RetType);
+    new(FuncSource, FuncName, ParamTypes, RetType);
 
   public override string ToString() =>
-    $"(ExternFuncParam Source={Source} Name={Name} " +
+    $"(ExternFuncParam Source={FuncSource} Name={FuncName} " +
     $"ParamTypes={String.Join(", ", ParamTypes)} RetType={RetType})";
 }

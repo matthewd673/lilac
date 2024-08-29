@@ -1,9 +1,12 @@
 namespace Lilac.IL;
 
-public class GlobalDef(Type type, GlobalID id, Constant rhs) : Component {
+public class GlobalDef(Type type, GlobalID id, Constant rhs)
+  : Component, INamed {
   public Type Type { get; } = type;
   public GlobalID Id { get; } = id;
   public Constant Rhs { get; } = rhs;
+
+  public string Name => Id.Name;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(GlobalDef)) {

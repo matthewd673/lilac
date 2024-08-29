@@ -272,7 +272,7 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
           ..Transform(getFieldOffset.Address),
           new Const(Runtime.PointerType,
                     ComputeStructFieldOffset(
-                      Program.GetStruct(getFieldOffset.StructName)
+                      Program.Structs[getFieldOffset.StructName]
                         ?? throw new NullReferenceException(),
                       getFieldOffset.Index).ToString()),
           new Add(Runtime.PointerType),
@@ -292,8 +292,7 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
                    sizeOf.Type.ToWasmType().GetSizeBytes().ToString())],
       SizeOfStruct sizeOf =>
         [new Const(Runtime.PointerType,
-                   ComputeStructSize(Program.GetStruct(sizeOf.StructName)
-                                       ?? throw new NullReferenceException())
+                   ComputeStructSize(Program.Structs[sizeOf.StructName])
                      .ToString()),
         ],
       _ => throw new ArgumentOutOfRangeException(),
