@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Security.Cryptography;
 
 namespace Lilac;
 
@@ -40,6 +41,13 @@ public class NamedCollection<TItem, TName>
     dict.Add(item.Name, item);
   }
 
+  /// <summary>
+  /// Enumerate over a collection of items and add them each to the collection.
+  /// </summary>
+  /// <param name="items">The collection of items to add.</param>
+  /// <exception cref="ArgumentException">
+  ///   If an element with the same name already exists in the collection.
+  /// </exception>
   public void AddRange(IEnumerable<TItem> items) {
     foreach (TItem i in items) {
       Add(i);
@@ -98,7 +106,18 @@ public class NamedCollection<TItem, TName>
     dict.Clear();
   }
 
-  public bool Contains(TItem item) => dict.ContainsValue(item);
+  /// <summary>
+  /// Check if the collection contains a given item.
+  /// This approaches an O(1) operation.
+  /// </summary>
+  /// <param name="item">The item to check for in the collection.</param>
+  /// <returns>
+  ///   <c>true</c> if the item exists in the collection.
+  ///   <c>false</c> otherwise.
+  /// </returns>
+  public bool Contains(TItem item) {
+    return dict.TryGetValue(item.Name, out TItem? found) && found.Equals(item);
+  }
 
   public void CopyTo(TItem[] array, int arrayIndex) {
     int index = arrayIndex;
