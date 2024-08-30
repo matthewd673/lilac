@@ -2,11 +2,25 @@ using System.Collections;
 
 namespace Lilac;
 
+/// <summary>
+/// A NamedCollection of items with <c>string</c> names.
+/// </summary>
+/// <typeparam name="TItem">
+///   The type of item in the collection. Must have a <c>string</c> name.
+/// </typeparam>
 public class NamedCollection<TItem> : NamedCollection<TItem, string>
-  where TItem : INamed<string> {
+  where TItem : INamed {
   // This is the "default" NamedCollection class.
 }
 
+/// <summary>
+/// A NamedCollection is a collection of items with "names" making it easy to
+/// add, remove, lookup, and enumerate them.
+/// </summary>
+/// <typeparam name="TItem">The type of item in the collection.</typeparam>
+/// <typeparam name="TName">
+///   The type of name of the items in the collection.
+/// </typeparam>
 public class NamedCollection<TItem, TName>
   : ICollection<TItem> where TItem : INamed<TName> where TName : notnull {
   private readonly Dictionary<TName, TItem> dict = [];
@@ -15,6 +29,13 @@ public class NamedCollection<TItem, TName>
 
   public bool IsReadOnly => false;
 
+  /// <summary>
+  /// Add a new item the collection.
+  /// </summary>
+  /// <param name="item">The item to add.</param>
+  /// <exception cref="ArgumentException">
+  ///   If an element with the same name already exists in the collection.
+  /// </exception>
   public void Add(TItem item) {
     dict.Add(item.Name, item);
   }
@@ -25,19 +46,46 @@ public class NamedCollection<TItem, TName>
     }
   }
 
+  /// <summary>
+  /// Get the item in the collection with a given name.
+  /// </summary>
+  /// <param name="name">The name of the item in the collection.</param>
+  /// <returns>The item in the collection with the given name.</returns>
+  /// <exception cref="KeyNotFoundException">
+  ///   If no item with that name exists in the collection.
+  /// </exception>
   public TItem this[TName name] {
     get => dict[name];
   }
 
-  public TItem GetOrDefault(TName key, TItem @default) {
+  /// <summary>
+  /// Get the item with a given name in the collection. If it does not exist,
+  /// return a default value instead.
+  /// </summary>
+  /// <param name="name">The name of the item in the collection.</param>
+  /// <param name="default">
+  ///   The default value, returned if the item does not exist. May be null.
+  /// </param>
+  /// <returns>
+  ///   The item with the given name in the collection or the provided default.
+  /// </returns>
+  public TItem? GetOrDefault(TName name, TItem? @default) {
     try {
-      return dict[key];
+      return dict[name];
     }
     catch (KeyNotFoundException) {
       return @default;
     }
   }
 
+  /// <summary>
+  /// Check if the collection contains an item with the given name.
+  /// </summary>
+  /// <param name="name">The name of the item to check for.</param>
+  /// <returns>
+  ///   <c>true</c> if an item with the given name exists.
+  ///   <c>false</c> otherwise.
+  /// </returns>
   public bool ContainsName(TName name) {
     return dict.ContainsKey(name);
   }
