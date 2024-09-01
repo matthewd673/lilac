@@ -1,11 +1,8 @@
 namespace Lilac.Analysis;
 
 class DomTree : Graph<BB> {
-  private BB entry;
-
   public DomTree(CFGFacts<BB> domCfgFacts) : base() {
     ComputeGraph(domCfgFacts);
-    entry = domCfgFacts.CFG.Entry;
   }
 
   public BB? IDom(BB node) {

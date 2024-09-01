@@ -1,12 +1,35 @@
 namespace Lilac.Analysis;
 
+/// <summary>
+/// A CFG is a control flow graph with BBs as nodes and directed Edges between
+/// them representing the control flow of a procedure.
+/// </summary>
 public class CFG : Graph<BB> {
+  /// <summary>
+  /// The ID used for the entry BB in a CFG. This ID is reserved and must not
+  /// be used by any other BBs in a CFG.
+  /// </summary>
   public const string EntryId = "ENTRY";
+  /// <summary>
+  /// The ID used for the exit BB in a CFG. This ID is reserved and must not be
+  /// be used by any other BBs in a CFG.
+  /// </summary>
   public const string ExitId = "EXIT";
 
+  /// <summary>
+  /// The entry BB in this CFG.
+  /// </summary>
   public BB Entry;
+  /// <summary>
+  /// The exit BB in this CFG.
+  /// </summary>
   public BB Exit;
 
+
+  /// <summary>
+  /// Construct a new CFG. It will contain a new entry and exit BB but will
+  /// not contain any Edges.
+  /// </summary>
   public CFG() : base() {
     // create an ENTRY and an EXIT node
     // NOTE: ENTRY and EXIT are not connected by default
@@ -17,6 +40,12 @@ public class CFG : Graph<BB> {
     AddNode(Exit);
   }
 
+  /// <summary>
+  /// Construct a new CFG from a list of BBs. These BBs will be added to the CFG
+  /// and all Edges, including from and to the entry and exit BBs, will be
+  /// computed.
+  /// </summary>
+  /// <param name="blocks">The list of BBs to construct the CFG from.</param>
   public CFG(List<BB> blocks) : base() {
     // create an ENTRY and an EXIT node
     Entry = new(EntryId, stmtList: new());
