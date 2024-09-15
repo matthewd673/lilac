@@ -1,18 +1,11 @@
 namespace Lilac.Frontend;
 
-public class Token {
-  public TokenType Type { get; }
-  public string Image { get; }
-  public Position Position { get; }
+public class Token(TokenType type, string image, Position position) {
+  public TokenType Type { get; } = type;
+  public string Image { get; } = image;
+  public Position Position { get; } = position;
 
-  public Token(TokenType type, string image, Position position) {
-    Type = type;
-    Image = image;
-    Position = position;
-  }
-
-  public override string ToString() {
-    return $"{{ type: {Type}, image: \"{Image}\", position: {Position} }}";
-  }
+  public override string ToString() =>
+    $"{{ type: {Type}, image: \"{Image}\", position: {Position} }}";
 }
 

@@ -5,9 +5,10 @@ using Lilac.IL.Math;
 
 namespace Lilac.Frontend;
 
-public class Parser {
-  private Scanner scanner;
-  private Token nextToken;
+public class Parser(string str)
+{
+  private readonly Scanner scanner = new(str);
+  private Token nextToken = new(TokenType.None, "", new(0, 0));
 
   public static Program ParseFile(string filename) {
     string content = File.ReadAllText(filename);
@@ -15,47 +16,21 @@ public class Parser {
     return parser.Parse();
   }
 
-  public Parser(string str) {
-    scanner = new(str);
-    nextToken = new(TokenType.None, "", new(0, 0));
-  }
-
   public Program Parse() {
     nextToken = scanner.ScanNext();
     return ParseProgram();
   }
 
-  public List<Statement> ParseStatement() {
-    nextToken = scanner.ScanNext();
-    if (See(TokenType.EOF)) {
-      return new();
-    }
-
-    return ParseStmt();
-  }
-
-  private bool See(params TokenType[] types) {
-    foreach (TokenType t in types) {
-      if (nextToken.Type == t) {
-        return true;
-      }
-    }
-
-    return false;
-  }
+  private bool See(params TokenType[] types) => types.Contains(nextToken.Type);
 
   private Token Eat(params TokenType[] types) {
-    foreach (TokenType t in types) {
-      if (nextToken.Type != t) {
-        continue;
-      }
-
-      Token eaten = nextToken;
-      nextToken = scanner.ScanNext();
-      return eaten;
+    if (!types.Contains(nextToken.Type)) {
+      throw new UnexpectedTokenException(nextToken.Position, types, nextToken);
     }
 
-    throw new UnexpectedTokenException(nextToken.Position, types, nextToken);
+    Token eaten = nextToken;
+    nextToken = scanner.ScanNext();
+    return eaten;
   }
 
   private Program ParseProgram() {
@@ -91,7 +66,7 @@ public class Parser {
   }
 
   private List<Statement> ParseStmtList() {
-    List<Statement> stmtList = new();
+    List<Statement> stmtList = [];
 
     // parse stmts until we reach the end
     while (!See(TokenType.EOF, TokenType.End, TokenType.Func)) {
@@ -105,7 +80,7 @@ public class Parser {
     // empty stmt
     if (See(TokenType.NewLine)) {
       Eat(TokenType.NewLine);
-      return new();
+      return [];
     }
     // definition
     else if (See(TokenType.Type)) {
@@ -123,21 +98,21 @@ public class Parser {
 
       Expression rhs = ParseExpr();
 
-      return new() { new Definition(type, id, rhs) };
+      return [new Definition(type, id, rhs)];
     }
     // label
     else if (See(TokenType.Label)) {
       string labelStr = Eat(TokenType.Label).Image;
       labelStr = labelStr.Remove(labelStr.Length - 1); // remove ':'
 
-      return new() { new Label(labelStr) };
+      return [new Label(labelStr)];
     }
     // jump
     else if (See(TokenType.Jump)) {
       Eat(TokenType.Jump);
       string targetStr = Eat(TokenType.Name).Image;
 
-      return new() { new Jump(targetStr) };
+      return [new Jump(targetStr)];
     }
     // jump zero
     else if (See(TokenType.JumpZero)) {
@@ -145,7 +120,7 @@ public class Parser {
       Value @value = ParseValue();
       string targetStr = Eat(TokenType.Name).Image;
 
-      return new() { new JumpZero(targetStr, @value) };
+      return [new JumpZero(targetStr, @value)];
     }
     // jump not zero
     else if (See(TokenType.JumpNotZero)) {
@@ -153,21 +128,21 @@ public class Parser {
       Value @value = ParseValue();
       string targetStr = Eat(TokenType.Name).Image;
 
-      return new() { new JumpNotZero(targetStr, @value) };
+      return [new JumpNotZero(targetStr, @value)];
     }
     // return
     else if (See(TokenType.Return)) {
       Eat(TokenType.Return);
       Value @value = ParseValue();
 
-      return new() { new Return(@value) };
+      return [new Return(@value)];
     }
     // void call
     else if (See(TokenType.VoidConst)) {
       Eat(TokenType.VoidConst);
       Call call = ParseCall();
 
-      return new() { new VoidCall(call) };
+      return [new VoidCall(call)];
     }
 
     throw new CannotBeginException(nextToken.Position, "stmt",
@@ -420,56 +395,37 @@ public class Parser {
     }
   }
 
-  private IL.Type TypeFromString(string str) {
-    switch (str) {
-      case "void": return IL.Type.Void;
-      case "u8": return IL.Type.U8;
-      case "u16": return IL.Type.U16;
-      case "u32": return IL.Type.U32;
-      case "u64": return IL.Type.U64;
-      case "i8": return IL.Type.I8;
-      case "i16": return IL.Type.I16;
-      case "i32": return IL.Type.I32;
-      case "i64": return IL.Type.I64;
-      case "f32": return IL.Type.F32;
-      case "f64": return IL.Type.F64;
-    }
+  private IL.Type TypeFromString(string str) => str switch {
+    "void" => IL.Type.Void,
+    "u8" => IL.Type.U8,
+    "u16" => IL.Type.U16,
+    "u32" => IL.Type.U32,
+    "u64" => IL.Type.U64,
+    "i8" => IL.Type.I8,
+    "i16" => IL.Type.I16,
+    "i32" => IL.Type.I32,
+    "i64" => IL.Type.I64,
+    "f32" => IL.Type.F32,
+    "f64" => IL.Type.F64,
+    // NOTE: If this happens then something is wrong in the Scanner
+    _ => throw new InvalidTypeException(nextToken.Position, str),
+  };
 
-    // NOTE: if this happens then something is wrong in the Scanner
-    throw new InvalidTypeException(nextToken.Position, str);
-  }
+  private ID IdFromString(string str) => str[0] switch {
+    '@' => new GlobalID(str.Remove(0, 1)),
+    '$' => new LocalID(str.Remove(0, 1)),
+    _ => throw new InvalidStringFormatException(nextToken.Position, str, "ID");
+  };
 
-  private ID IdFromString(string str) {
-    if (str.StartsWith("@")) { // global
-      return new GlobalID(str.Remove(0, 1));
-    }
-    else if (str.StartsWith("$")) { // local
-      return new LocalID(str.Remove(0, 1));
-    }
+  private LocalID LocalIdFromString(string str) =>
+    IdFromString(str) is LocalID lId
+      ? lId
+      : throw new InvalidStringFormatException(nextToken.Position, str, "LocalID");
 
-    throw new InvalidStringFormatException(nextToken.Position, str,
-                                           "ID");
-  }
-
-  private LocalID LocalIdFromString(string str) {
-    ID id = IdFromString(str);
-    if (id is LocalID lId) {
-      return lId;
-    }
-
-    throw new InvalidStringFormatException(nextToken.Position, str,
-                                           "LocalID");
-  }
-
-  private GlobalID GlobalIdFromString(string str) {
-    ID id = IdFromString(str);
-    if (id is GlobalID gId) {
-      return gId;
-    }
-
-    throw new InvalidStringFormatException(nextToken.Position, str,
-                                           "GlobalID");
-  }
+  private GlobalID GlobalIdFromString(string str) =>
+    IdFromString(str) is GlobalID gId
+      ? gId
+      : throw new InvalidStringFormatException(nextToken.Position, str, "GlobalID");
 
   private Constant ConstantFromString(string str) {
     // find numeric and type in constant string
@@ -504,10 +460,8 @@ public class Parser {
                                            "Constant");
   }
 
-  private BinaryOp BinOpFromToken(Token token,
-                                     Value left,
-                                     Value right) {
-    BinaryOp.Operator? op = token.Image switch {
+  private BinaryOp BinOpFromToken(Token token, Value left, Value right) {
+    BinaryOp.Operator op = token.Image switch {
       "+" => BinaryOp.Operator.Add,
       "-" => BinaryOp.Operator.Sub,
       "*" => BinaryOp.Operator.Mul,
@@ -526,32 +480,24 @@ public class Parser {
       "&" => BinaryOp.Operator.BitAnd,
       "|" => BinaryOp.Operator.BitOr,
       "^" => BinaryOp.Operator.BitXor,
-      _ => null,
+      _ => throw new InvalidStringFormatException(nextToken.Position, token.Image,
+                                                  "binary operator"),
+
     };
 
-    if (op is null) {
-      // NOTE: if we hit this then the TokenDef or the switch statement is wrong
-      throw new InvalidStringFormatException(nextToken.Position, token.Image,
-                                             "binary operator");
-    }
-
-    return new BinaryOp((BinaryOp.Operator)op, left, right);
+    return new BinaryOp(op, left, right);
   }
 
   private UnaryOp UnOpFromToken(Token token, Value @value) {
-    UnaryOp.Operator? op = token.Image switch {
+    UnaryOp.Operator op = token.Image switch {
       "-@" => UnaryOp.Operator.Neg,
       "!@" => UnaryOp.Operator.BoolNot,
       "~@" => UnaryOp.Operator.BitNot,
-      _ => null,
+      _ => throw new InvalidStringFormatException(nextToken.Position, token.Image,
+                                                  "unary operator"),
+
     };
 
-    if (op is null) {
-      // NOTE: if we hit this then the TokenDef or the switch statement is wrong
-      throw new InvalidStringFormatException(nextToken.Position, token.Image,
-                                             "unary operator");
-    }
-
-    return new UnaryOp((UnaryOp.Operator)op, @value);
+    return new UnaryOp(op, @value);
   }
 }
