@@ -86,7 +86,7 @@ public class CFG : Graph<BB> {
   private void ComputeGraph(List<BB> blocks) {
     // this can only ever be called at construction so it will never be run
     // more than once.
-    Dictionary<string, BB> labelMap = new();
+    Dictionary<string, BB> labelMap = [];
 
     // add all blocks to the graph nodes
     foreach (BB b in blocks) {
@@ -105,13 +105,8 @@ public class CFG : Graph<BB> {
       // create edge for block exit
       if (b.Exit is not null) {
         IL.Jump jump = b.Exit;
-        BB successor = labelMap[jump.Target];
-
-        // unlikely but maybe possible
-        if (successor is null) {
-          // TODO: use a special exception type
-          throw new Exception($"CFG attempted to build edge to label that doesn't exist: \"{jump.Target}\"");
-        }
+        BB successor = labelMap[jump.Target]
+          ?? throw new Exception($"CFG attempted to build edge to label that doesn't exist: \"{jump.Target}\"");
 
         // create an edge to the target block
         // if jump is conditional then mark the successor as the "true branch"

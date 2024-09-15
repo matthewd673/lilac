@@ -1,17 +1,17 @@
 namespace Lilac.Analysis;
 
 class DomFrontiers {
-  private CFG cfg;
-  private DomTree domTree;
-  private Dictionary<BB, HashSet<BB>> df;
+  private readonly CFG cfg;
+  private readonly DomTree domTree;
+  private readonly Dictionary<BB, HashSet<BB>> df;
 
   public DomFrontiers(CFG cfg, DomTree domTree) {
     this.cfg = cfg;
     this.domTree = domTree;
 
-    df = new();
+    df = [];
     foreach (BB n in cfg.GetNodes()) {
-      df.Add(n, new());
+      df.Add(n, []);
     }
   }
 

@@ -1,11 +1,8 @@
 namespace Lilac.Analysis;
 
-public class Reducible {
-  private CFG cfg;
-
-  public Reducible(CFG cfg) {
-    this.cfg = cfg.Clone();
-  }
+public class Reducible(CFG cfg)
+{
+  private readonly CFG cfg = cfg.Clone();
 
   public bool Run() {
     // run until no more transformations can be applied
@@ -56,7 +53,7 @@ public class Reducible {
     }
 
     // if there are now multiple edges from m to some node, remove them
-    HashSet<BB> seenTo = new();
+    HashSet<BB> seenTo = [];
     foreach (CFG.Edge o in cfg.GetOutgoing(m)) {
       // duplicate
       if (seenTo.Contains(o.To)) {

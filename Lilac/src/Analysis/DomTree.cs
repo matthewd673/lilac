@@ -5,17 +5,12 @@ class DomTree : Graph<BB> {
     ComputeGraph(domCfgFacts);
   }
 
-  public BB? IDom(BB node) {
-    if (GetIncomingCount(node) == 0) {
-      return null;
-    }
-
-    // there will only be one IDOM in a valid CFG
-    // TODO: verify this somehow
-    BB idom = GetPredecessors(node).First();
-
-    return idom;
-  }
+  public BB? IDom(BB node) =>
+    GetIncomingCount(node) == 0
+      ? null
+      // NOTE: There will only be one IDOM in a valid CFG
+      // TODO: Verify this invariant
+      : GetPredecessors(node).First();
 
   public IEnumerable<BB> GetSDom(BB node) {
     // yield each predecessor and recurse on them
@@ -56,7 +51,7 @@ class DomTree : Graph<BB> {
     }
   }
 
-  private BB? ComputeIDom(CFGFacts<BB> domCfgFacts, BB node) {
+  private static BB? ComputeIDom(CFGFacts<BB> domCfgFacts, BB node) {
     BB? idom = null;
     int idomDist = -1;
 
@@ -70,20 +65,20 @@ class DomTree : Graph<BB> {
     return idom;
   }
 
-  private int FindDomDist(CFG cfg, BB node, BB dom, int dist) {
-    // check if self is dom, and if so, stop
+  private static int FindDomDist(CFG cfg, BB node, BB dom, int dist) {
+    // Check if self is Dom, and if so, stop
     if (node == dom) {
       return dist;
     }
 
-    // recursively check all predecessors
-    foreach (BB p in cfg.GetPredecessors(node)) {
-      int newDist = FindDomDist(cfg, p, dom, dist + 1);
-      if (newDist >= 0) {
-        return newDist;
-      }
+    // Recursively check for the first predecessor that is Dom
+    try {
+      return cfg.GetPredecessors(node)
+              .Select(p => FindDomDist(cfg, p, dom, dist + 1))
+              .First(newDist => newDist >= 0);
     }
-
-    return -1; // dom was never found
+    catch (InvalidOperationException) { // Dom was not found
+      return -1;
+    }
   }
 }

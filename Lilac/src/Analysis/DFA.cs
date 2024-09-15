@@ -1,35 +1,23 @@
 namespace Lilac.Analysis;
 
-abstract class DFA<T> {
+abstract class DFA<T>(DFA<T>.Direction direction,
+                      HashSet<T> boundary,
+                      HashSet<T> @init,
+                      CFG cfg) {
   public enum Direction {
     Forwards,
     Backwards,
   }
 
-  private Direction direction;
-  private HashSet<T> boundary;
-  private HashSet<T> @init;
-  protected CFG CFG { get; }
+  private readonly Direction direction = direction;
+  private readonly HashSet<T> boundary = boundary;
+  private readonly HashSet<T> @init = @init;
+  protected CFG CFG { get; } = cfg;
 
-  protected Dictionary<BB, HashSet<T>> Out;
-  protected Dictionary<BB, HashSet<T>> In;
-  protected Dictionary<BB, HashSet<T>> Gen;
-  protected Dictionary<BB, HashSet<T>> Kill;
-
-  public DFA(Direction direction,
-             HashSet<T> boundary,
-             HashSet<T> @init,
-             CFG cfg) {
-    this.direction = direction;
-    this.boundary = boundary;
-    this.@init = @init;
-    CFG = cfg;
-
-    Out = new();
-    In = new();
-    Gen = new();
-    Kill = new();
-  }
+  protected Dictionary<BB, HashSet<T>> Out = [];
+  protected Dictionary<BB, HashSet<T>> In = [];
+  protected Dictionary<BB, HashSet<T>> Gen = [];
+  protected Dictionary<BB, HashSet<T>> Kill = [];
 
   public CFGFacts<T> Run() {
     // run custom fact set initialization for each block
@@ -63,23 +51,15 @@ abstract class DFA<T> {
 
   protected abstract void InitSets(BB block);
 
-  protected HashSet<T> GetSet(Dictionary<BB, HashSet<T>> dict, BB block) {
-    HashSet<T>? blockSet;
-    if (!dict.TryGetValue(block, out blockSet)) {
-      return new();
-    }
-
-    return blockSet;
-  }
+  protected static HashSet<T> GetSet(Dictionary<BB, HashSet<T>> dict, BB block) =>
+    dict.TryGetValue(block, out HashSet<T>? blockSet)
+      ? blockSet
+      : [];
 
   private void RunForwards() {
     // initialize all nodes
     Out.Add(CFG.Entry, boundary);
-    foreach (BB n in CFG.GetNodes()) {
-      if (n == CFG.Entry) {
-        continue;
-      }
-
+    foreach (BB n in CFG.GetNodes().Where(n => n != CFG.Entry)) {
       Out.Add(n, @init);
     }
 
@@ -93,15 +73,13 @@ abstract class DFA<T> {
           continue;
         }
 
-        HashSet<T>? oldOut;
-        if (!Out.TryGetValue(n, out oldOut)) {
+        if (!Out.TryGetValue(n, out HashSet<T>? oldOut)) {
           throw new Exception(); // TODO: nicer exception type
         }
 
         StepForwards(n);
 
-        HashSet<T>? newOut;
-        if (!Out.TryGetValue(n, out newOut)) {
+        if (!Out.TryGetValue(n, out HashSet<T>? newOut)) {
           throw new Exception(); // TODO: nicer exception type
         }
 
@@ -120,11 +98,7 @@ abstract class DFA<T> {
   private void RunBackwards() {
     // initialize all nodes
     In.Add(CFG.Exit, boundary);
-    foreach (BB n in CFG.GetNodes()) {
-      if (n == CFG.Exit) {
-        continue;
-      }
-
+    foreach (BB n in CFG.GetNodes().Where(n => n != CFG.Exit)) {
       In.Add(n, @init);
     }
 
@@ -138,15 +112,13 @@ abstract class DFA<T> {
           continue;
         }
 
-        HashSet<T>? oldIn;
-        if (!In.TryGetValue(n, out oldIn)) {
+        if (!In.TryGetValue(n, out HashSet<T>? oldIn)) {
           throw new Exception(); // TODO: nicer exception type
         }
 
         StepBackwards(n);
 
-        HashSet<T>? newIn;
-        if (!In.TryGetValue(n, out newIn)) {
+        if (!In.TryGetValue(n, out HashSet<T>? newIn)) {
           throw new Exception(); // TODO: nicer exception type
         }
 

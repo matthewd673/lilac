@@ -1,19 +1,15 @@
 namespace Lilac.Analysis;
 
-class Dominators : DFA<BB> {
-  private HashSet<BB> allNodes;
-
-  public Dominators(CFG cfg)
-    : base(Direction.Forwards,
-           new() { cfg.Entry }, // boundary
-           cfg.GetNodes().ToHashSet(), // init
-           cfg) {
-    allNodes = cfg.GetNodes().ToHashSet();
-  }
+class Dominators(CFG cfg)
+  : DFA<BB>(Direction.Forwards,
+            [cfg.Entry], // boundary
+            cfg.GetNodes().ToHashSet(), // init
+            cfg) {
+  private readonly HashSet<BB> allNodes = cfg.GetNodes().ToHashSet();
 
   protected override void InitSets(BB block) {
-    Gen.Add(block, new() { block });
-    Kill.Add(block, new());
+    Gen.Add(block, [block]);
+    Kill.Add(block, []);
   }
 
   protected override HashSet<BB> Transfer(BB block) {
@@ -33,7 +29,7 @@ class Dominators : DFA<BB> {
 
     // no predecessors = return empty set
     if (preds == 0) {
-      return new();
+      return [];
     }
 
     return i;
