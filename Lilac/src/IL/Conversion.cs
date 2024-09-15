@@ -1,13 +1,8 @@
 namespace Lilac.IL;
 
-public abstract class Conversion : Expression {
-  public Value Value { get; }
-  public Type NewType { get; }
-
-  public Conversion(Value value, Type newType) {
-    Value = value;
-    NewType = newType;
-  }
+public abstract class Conversion(Value value, Type newType) : Expression {
+  public Value Value { get; } = value;
+  public Type NewType { get; } = newType;
 
   public override bool Equals(object? obj) {
     // NOTE: this type equality check is a little less strict than usual

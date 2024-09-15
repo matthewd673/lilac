@@ -1,15 +1,9 @@
 namespace Lilac.IL;
 
-public class Definition : Statement {
-  public Type Type { get; }
-  public ID Id { get; }
-  public Expression Rhs { get; set; }
-
-  public Definition(Type type, ID id, Expression rhs) {
-    Type = type;
-    Id = id;
-    Rhs = rhs;
-  }
+public class Definition(Type type, ID id, Expression rhs) : Statement {
+  public Type Type { get; } = type;
+  public ID Id { get; } = id;
+  public Expression Rhs { get; set; } = rhs;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Definition)) {

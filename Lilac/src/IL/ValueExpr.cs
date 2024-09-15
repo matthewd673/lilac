@@ -1,11 +1,7 @@
 namespace Lilac.IL;
 
-public class ValueExpr : Expression {
-  public Value Value { get; }
-
-  public ValueExpr(Value @value) {
-    Value = @value;
-  }
+public class ValueExpr(Value @value) : Expression {
+  public Value Value { get; } = @value;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(ValueExpr)) {

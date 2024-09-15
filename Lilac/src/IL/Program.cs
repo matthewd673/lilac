@@ -8,7 +8,7 @@ public class Program<TFuncDef> where TFuncDef : FuncDef {
   public NamedCollection<GlobalDef> Globals { get; } = new();
   public NamedCollection<TFuncDef> FuncDefs { get; } = new();
   public NamedCollection<ExternFuncDef, (string, string)> ExternFuncDefs = new();
-  public NamedCollection<Struct> Structs = new();
+  public NamedCollection<Struct> Structs = [];
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Program)) {

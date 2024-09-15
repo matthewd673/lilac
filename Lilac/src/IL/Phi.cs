@@ -1,11 +1,7 @@
 namespace Lilac.IL;
 
-public class Phi : Expression {
-  public List<ID> Ids { get; }
-
-  public Phi(List<ID> ids) {
-    Ids = ids;
-  }
+public class Phi(List<ID> ids) : Expression {
+  public List<ID> Ids { get; } = ids;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Phi)) {

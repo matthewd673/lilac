@@ -1,11 +1,7 @@
 namespace Lilac.IL;
 
-public class VoidCall : Statement {
-  public Call Call { get; }
-
-  public VoidCall(Call call) {
-    Call = call;
-  }
+public class VoidCall(Call call) : Statement {
+  public Call Call { get; } = call;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(VoidCall)) {

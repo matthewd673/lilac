@@ -1,19 +1,14 @@
 namespace Lilac.IL;
 
-public class UnaryOp : Expression {
+public class UnaryOp(UnaryOp.Operator op, Value @value) : Expression {
   public enum Operator {
     Neg,
     BoolNot,
     BitNot,
   }
 
-  public Operator Op { get; }
-  public Value Value { get; }
-
-  public UnaryOp(Operator op, Value @value) {
-    Op = op;
-    Value = @value;
-  }
+  public Operator Op { get; } = op;
+  public Value Value { get; } = @value;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(UnaryOp)) {

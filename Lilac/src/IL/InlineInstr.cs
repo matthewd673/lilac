@@ -1,13 +1,8 @@
 namespace Lilac.IL;
 
-public class InlineInstr : Statement {
-  public string Target { get; }
-  public CodeGen.Instruction Instr { get; }
-
-  public InlineInstr(string target, CodeGen.Instruction instr) {
-    Target = target;
-    Instr = instr;
-  }
+public class InlineInstr(string target, CodeGen.Instruction instr) : Statement {
+  public string Target { get; } = target;
+  public CodeGen.Instruction Instr { get; } = instr;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(InlineInstr)) {

@@ -1,13 +1,8 @@
 namespace Lilac.IL;
 
-public class Call : Expression {
-  public string FuncName { get; }
-  public List<Value> Args { get; }
-
-  public Call(string funcName, List<Value> args) {
-    FuncName = funcName;
-    Args = args;
-  }
+public class Call(string funcName, List<Value> args) : Expression {
+  public string FuncName { get; } = funcName;
+  public List<Value> Args { get; } = args;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(Call)) {
