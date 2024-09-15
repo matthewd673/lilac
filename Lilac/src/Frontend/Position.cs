@@ -1,16 +1,9 @@
 namespace Lilac.Frontend;
 
-public class Position {
-  public int Row { get; }
-  public int Col { get; }
+public class Position(int row, int col) {
+  public int Row { get; } = row;
+  public int Col { get; } = col;
 
-  public Position(int row, int col) {
-    Row = row;
-    Col = col;
-  }
-
-  public override string ToString() {
-    return $"{Row + 1}:{Col + 1}";
-  }
+  public override string ToString() => $"{Row + 1}:{Col + 1}";
 }
 

@@ -3,16 +3,11 @@ using Lilac.Frontend.SyntaxExceptions;
 
 namespace Lilac.Frontend;
 
-internal class Scanner {
-  private string str;
-  private int scanRow;
-  private int scanCol;
-
-  public Scanner(string str) {
-    this.str = str;
-    scanRow = 0;
-    scanCol = 0;
-  }
+internal class Scanner(string str) {
+  private string str = str;
+  private int index = 0;
+  private int scanRow = 0;
+  private int scanCol = 0;
 
   public Token ScanNext() {
     // strip whitespace
@@ -34,22 +29,22 @@ internal class Scanner {
     Token? best = null;
     foreach (TokenDef t in TokenDefConstants.DefList) {
       // find first match
-      Match m = t.Pattern.Match(str);
+      Match match = t.Pattern.Match(str, index);
 
       // skip if no match or match is not at beginning of string
-      if (!m.Success || m.Index > 0) {
+      if (!match.Success || match.Index > index) {
         continue;
       }
 
       // something is always better than nothing
       if (best is null) {
-        best = new(t.Type, m.Value, pos);
+        best = new(t.Type, match.Value, pos);
         continue;
       }
 
       // check if this is better than the current best (longer is better)
-      if (m.Length > best.Image.Length) {
-        best = new(t.Type, m.Value, pos);
+      if (match.Length > best.Image.Length) {
+        best = new(t.Type, match.Value, pos);
       }
     }
 
@@ -58,7 +53,7 @@ internal class Scanner {
     }
 
     // trim best match from string and return
-    str = str.Remove(0, best.Image.Length);
+    index += best.Image.Length;
     scanCol += best.Image.Length;
 
     return best;
@@ -67,32 +62,34 @@ internal class Scanner {
   private bool StripWhitespace() {
     bool sawNl = false;
 
-    while (true) {
-      if (str.StartsWith(" ")) {
-        str = str.Remove(0, 1);
-        scanCol += 1;
-      }
-      else if (str.StartsWith("\n")) {
-        str = str.Remove(0, 1);
-        scanRow += 1;
-        scanCol = 0;
-        sawNl = true;
-      }
-      else if (str.StartsWith("\r")) {
-        str = str.Remove(0, 1);
-      }
-      else if (str.StartsWith("\t")) {
-        str = str.Remove(0, 1);
-        scanCol += 1;
-      }
-      // ignore annotations
-      else if (str.StartsWith("\"")) {
-        while (str.Length > 0 && str[0] != '\n') {
-          str = str.Remove(0, 1);
-        }
-      }
-      else {
-        break;
+    bool stripping = true;
+    while (stripping) {
+      switch (str[index]) {
+        case ' ':
+          index += 1;
+          scanCol += 1;
+          break;
+        case '\n':
+          index += 1;
+          scanRow += 1;
+          scanCol = 0;
+          sawNl = true;
+          break;
+        case '\r':
+          index += 1;
+          break;
+        case '\t':
+          index += 1;
+          scanCol += 1;
+          break;
+        case '"':
+          while (str.Length > 0 && str[0] != '\n') {
+            index += 1;
+          }
+          break;
+        default:
+          stripping = false;
+          break;
       }
     }
 

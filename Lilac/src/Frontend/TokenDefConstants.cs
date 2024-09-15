@@ -1,7 +1,7 @@
 namespace Lilac.Frontend;
 
 internal static class TokenDefConstants {
-  public static TokenDef[] DefList = new TokenDef[] {
+  public static TokenDef[] DefList = [
     // keywords
     new(TokenType.Type, new("u8|u16|u32|u64|i8|i16|i32|i64|f32|f64")),
     new(TokenType.Arrow, new("->")),
@@ -35,5 +35,5 @@ internal static class TokenDefConstants {
     new(TokenType.ID, new(@"\$[a-zA-Z0-9_.]+")),
     new(TokenType.GlobalID, new("@[a-zA-Z0-9_.]+")),
     new(TokenType.Name, new("[a-zA-Z_.][a-zA-Z_.0-9]*")),
-  };
+  ];
 }
