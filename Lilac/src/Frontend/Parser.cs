@@ -33,14 +33,17 @@ public class Parser(string str)
     return eaten;
   }
 
+  private bool TryEat(params TokenType[] types) =>
+    See(types) && Eat(types) is not null;
+
   private Program ParseProgram() {
     Program program = new();
 
     // parse top level components
     while (!See(TokenType.EOF)) {
       // ignore newlines here
-      if (See(TokenType.NewLine)) {
-        Eat(TokenType.NewLine);
+      if (TryEat(TokenType.NewLine)) {
+        // Empty
       }
       // global def
       else if (See(TokenType.Global)) {
@@ -78,8 +81,7 @@ public class Parser(string str)
 
   private List<Statement> ParseStmt() {
     // empty stmt
-    if (See(TokenType.NewLine)) {
-      Eat(TokenType.NewLine);
+    if (TryEat(TokenType.NewLine)) {
       return [];
     }
     // definition
@@ -108,41 +110,30 @@ public class Parser(string str)
       return [new Label(labelStr)];
     }
     // jump
-    else if (See(TokenType.Jump)) {
-      Eat(TokenType.Jump);
-      string targetStr = Eat(TokenType.Name).Image;
-
-      return [new Jump(targetStr)];
+    else if (TryEat(TokenType.Jump)) {
+      return [new Jump(Eat(TokenType.Name).Image)];
     }
     // jump zero
-    else if (See(TokenType.JumpZero)) {
-      Eat(TokenType.JumpZero);
+    else if (TryEat(TokenType.JumpZero)) {
       Value @value = ParseValue();
       string targetStr = Eat(TokenType.Name).Image;
 
       return [new JumpZero(targetStr, @value)];
     }
     // jump not zero
-    else if (See(TokenType.JumpNotZero)) {
-      Eat(TokenType.JumpNotZero);
+    else if (TryEat(TokenType.JumpNotZero)) {
       Value @value = ParseValue();
       string targetStr = Eat(TokenType.Name).Image;
 
       return [new JumpNotZero(targetStr, @value)];
     }
     // return
-    else if (See(TokenType.Return)) {
-      Eat(TokenType.Return);
-      Value @value = ParseValue();
-
-      return [new Return(@value)];
+    else if (TryEat(TokenType.Return)) {
+      return [new Return(ParseValue())];
     }
     // void call
-    else if (See(TokenType.VoidConst)) {
-      Eat(TokenType.VoidConst);
-      Call call = ParseCall();
-
-      return [new VoidCall(call)];
+    else if (TryEat(TokenType.VoidConst)) {
+      return [new VoidCall(ParseCall())];
     }
 
     throw new CannotBeginException(nextToken.Position, "stmt",
@@ -178,9 +169,7 @@ public class Parser(string str)
       return ParseCall();
     }
     // phi function
-    else if (See(TokenType.Phi)) {
-      Eat(TokenType.Phi);
-
+    else if (TryEat(TokenType.Phi)) {
       // eat id list
       Eat(TokenType.LeftParen);
       List<ID> ids = ParseIdList().ToList();
@@ -195,9 +184,8 @@ public class Parser(string str)
 
   private Call ParseCall() {
     // func call
-    if (See(TokenType.Call)) {
+    if (TryEat(TokenType.Call)) {
       // eat func name
-      Eat(TokenType.Call);
       string funcName = Eat(TokenType.Name).Image;
 
       // eat args
@@ -208,9 +196,8 @@ public class Parser(string str)
       return new Call(funcName, args);
     }
     // extern func call
-    else if (See(TokenType.Extern)) {
+    else if (TryEat(TokenType.Extern)) {
       // eat func source and name
-      Eat(TokenType.Extern);
       Eat(TokenType.Call);
       string funcSource = Eat(TokenType.Name).Image;
       string funcName = Eat(TokenType.Name).Image;
@@ -233,8 +220,7 @@ public class Parser(string str)
       return ParseConstant();
     }
     // void constant
-    else if (See(TokenType.VoidConst)) {
-      Eat(TokenType.VoidConst);
+    else if (TryEat(TokenType.VoidConst)) {
       return new Constant(IL.Type.Void, []);
     }
     // id
@@ -327,11 +313,10 @@ public class Parser(string str)
     yield return new FuncParam(type, id);
 
     // if we see a comma then we have to recurse
-    if (!See(TokenType.Comma)) {
+    if (!TryEat(TokenType.Comma)) {
       yield break;
     }
 
-    Eat(TokenType.Comma);
     foreach (FuncParam p in ParseFuncParams()) {
       yield return p;
     }
@@ -349,11 +334,10 @@ public class Parser(string str)
     yield return type;
 
     // if we see a comma then we have to recurse
-    if (!See(TokenType.Comma)) {
+    if (!TryEat(TokenType.Comma)) {
       yield break;
     }
 
-    Eat(TokenType.Comma);
     foreach (IL.Type t in ParseExternFuncParamTypes()) {
       yield return t;
     }
@@ -369,27 +353,28 @@ public class Parser(string str)
     yield return @value;
 
     // if we see a comma then we have to recurse
-    if (!See(TokenType.Comma)) {
+    if (!TryEat(TokenType.Comma)) {
       yield break;
     }
 
-    Eat(TokenType.Comma);
     foreach (Value v in ParseCallArgs()) {
       yield return v;
     }
   }
 
   private IEnumerable<ID> ParseIdList() {
-    ID id = IdFromString(Eat(TokenType.ID, TokenType.GlobalID).Image);
-
-    yield return id;
-
-    // if we see a comma then we have to recurse
-    if (!See(TokenType.Comma)) {
+    if (See(TokenType.RightParen)) {
       yield break;
     }
 
-    Eat(TokenType.Comma);
+    ID id = IdFromString(Eat(TokenType.ID, TokenType.GlobalID).Image);
+    yield return id;
+
+    // if we see a comma then we have to recurse
+    if (!TryEat(TokenType.Comma)) {
+      yield break;
+    }
+
     foreach (ID i in ParseIdList()) {
       yield return i;
     }

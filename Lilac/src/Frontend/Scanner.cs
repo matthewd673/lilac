@@ -4,7 +4,7 @@ using Lilac.Frontend.SyntaxExceptions;
 namespace Lilac.Frontend;
 
 internal class Scanner(string str) {
-  private string str = str;
+  private readonly string str = str;
   private int index = 0;
   private int scanRow = 0;
   private int scanCol = 0;
@@ -21,7 +21,7 @@ internal class Scanner(string str) {
     }
 
     // return end of file once we reach it
-    if (str.Length == 0) {
+    if (index >= str.Length) {
       return new(TokenType.EOF, "$$", pos);
     }
 
@@ -49,7 +49,7 @@ internal class Scanner(string str) {
     }
 
     if (best is null) {
-      throw new InvalidCharacterException(pos, str[0]);
+      throw new InvalidCharacterException(pos, str[index]);
     }
 
     // trim best match from string and return
@@ -63,7 +63,7 @@ internal class Scanner(string str) {
     bool sawNl = false;
 
     bool stripping = true;
-    while (stripping) {
+    while (stripping && index < str.Length) {
       switch (str[index]) {
         case ' ':
           index += 1;
@@ -83,7 +83,7 @@ internal class Scanner(string str) {
           scanCol += 1;
           break;
         case '"':
-          while (str.Length > 0 && str[0] != '\n') {
+          while (str.Length > 0 && str[index] != '\n') {
             index += 1;
           }
           break;
