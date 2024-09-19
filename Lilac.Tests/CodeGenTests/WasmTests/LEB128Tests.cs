@@ -3,24 +3,29 @@ using Lilac.CodeGen.Targets.Wasm;
 namespace Lilac.Tests.CodeGenTests.WasmTests;
 
 public class LEB128Tests {
-  [Fact]
-  public void EncodeUnsigned624485() {
-    byte[] bytes = LEB128.EncodeUnsigned(624_485);
-    Assert.Equal([0xe5, 0x8e, 0x26], bytes); // NOTE: Wasm is little endian
+  [Theory]
+  [InlineData(624_485, new byte[] { 0xe5, 0x8e, 0x26 })]
+  public void EncodeUnsigned(int value, byte[] expected) {
+    byte[] bytes = LEB128.EncodeUnsigned(value);
+    Assert.Equal(expected, bytes);
   }
 
-  [Fact]
-  public void EncodeSignedNegative123456() {
-    byte[] bytes = LEB128.EncodeSigned(-123_456);
-    Assert.Equal([0xc0, 0xbb, 0x78], bytes);
+  [Theory]
+  [InlineData(-123_456, new byte[] { 0xc0, 0xbb, 0x78 })]
+  public void EncodeSigned(int value, byte[] expected) {
+    byte[] bytes = LEB128.EncodeSigned(value);
+    Assert.Equal(expected, bytes);
   }
 
-  [Fact]
-  public void EncodeSignedEqualsEncodeUnsigned() {
-    byte[] uBytes = LEB128.EncodeUnsigned(128);
-    byte[] sBytes = LEB128.EncodeSigned(128);
+  [Theory]
+  [InlineData(128)]
+  [InlineData(123_456)]
+  [InlineData(0)]
+  [InlineData(810)]
+  public void EncodeSignedEqualsEncodeUnsignedForPositiveValues(int value) {
+    byte[] uBytes = LEB128.EncodeUnsigned(value);
+    byte[] sBytes = LEB128.EncodeSigned(value);
 
-    Assert.Equal([0x80, 0x01], uBytes);
     Assert.Equal(uBytes, sBytes);
   }
 }
