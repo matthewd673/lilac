@@ -394,7 +394,7 @@ public static class InternalMath {
     AssertValueInvariants(type, a, b);
 
     byte[] ans = new byte[a.Length];
-    ans[0] = (byte)(IsNonZero(a) && IsNonZero(b) ? 0x1 : 0x0);
+    ans[0] = (byte)(!IsZero(a) && !IsZero(b) ? 0x1 : 0x0);
     return ans;
   }
 
@@ -402,7 +402,7 @@ public static class InternalMath {
     AssertValueInvariants(type, a, b);
 
     byte[] ans = new byte[a.Length];
-    ans[0] = (byte)(IsNonZero(a) || IsNonZero(b) ? 0x1 : 0x0);
+    ans[0] = (byte)(!IsZero(a) || !IsZero(b) ? 0x1 : 0x0);
     return ans;
   }
 
@@ -414,38 +414,59 @@ public static class InternalMath {
     return new(value.Type, []); // TODO: TEMP!
   }
 
-  public static bool IsZero(byte[] bytes) {
-    foreach (byte b in bytes) {
-      if (b != 0) {
-        return false;
-      }
-    }
+  /// <summary>
+  /// Check if all bits in a byte array are zero. This can be used to check if
+  /// an integer value is equal to zero. NOTE: This function will return
+  /// <c>false</c> for floating-point values of <c>-0.0</c>.
+  /// </summary>
+  /// <param name="bytes">The array of bytes to check.</param>
+  /// <returns>
+  ///   <c>true</c> if all bits in the array of bytes are 0.
+  ///   <c>false</c> otherwise.
+  /// </returns>
+  public static bool IsZero(byte[] bytes) => !bytes.Where(b => b != 0).Any();
 
-    return true;
-  }
+  /// <summary>
+  /// Get the number of bytes required to represent a value of the given numeric
+  /// type.
+  /// </summary>
+  /// <param name="type">The numeric type to get the byte length for.</param>
+  /// <returns>The required length of the type's byte array.</returns>
+  /// <exception cref="NotSupportedException">
+  /// If the type is not a constant size numeric type (e.g. Void or Pointer).
+  /// </exception>
+  public static int ByteLength(Type type) => type switch {
+    Type.U8 or Type.I8 => 1,
+    Type.U16 or Type.I16 => 2,
+    Type.U32 or Type.I32 => 4,
+    Type.U64 or Type.I64 => 8,
+    Type.F32 => 4,
+    Type.F64 => 8,
+    _ => throw new NotSupportedException(),
+  };
 
-  public static bool IsNonZero(byte[] bytes) {
-    foreach (byte b in bytes) {
-      if (b != 0) {
-        return true;
-      }
-    }
-
-    return true;
-  }
+  /// <summary>
+  /// Get the binary representation of zero for a given numeric type. This will
+  /// return <c>+0.0</c> for floating-point types.
+  /// </summary>
+  /// <param name="type">The type to get zero for.</param>
+  /// <returns>
+  ///   A byte array containing the binary representation of zero for the given
+  ///   numeric type.
+  /// </returns>
+  /// <exception cref="NotSupportedException">
+  ///   If the given type is not a numeric type.
+  /// </exception>
+  public static byte[] GetZero(Type type) => type switch {
+    Type.U8 or Type.I8 => [0],
+    Type.U16 or Type.I16 => [0, 0],
+    Type.U32 or Type.I32 or Type.F32 => [0, 0, 0, 0],
+    Type.U64 or Type.I64 or Type.F64 => [0, 0, 0, 0, 0, 0, 0, 0],
+    _ => throw new NotSupportedException(),
+  };
 
   private static void AssertValueInvariants(Type type, byte[] bytes) {
-    int expectedLen = type switch {
-      Type.U8 or Type.I8 => 1,
-      Type.U16 or Type.I16 => 2,
-      Type.U32 or Type.I32 => 4,
-      Type.U64 or Type.I64 => 8,
-      Type.F32 => 4,
-      Type.F64 => 8,
-      _ => throw new NotSupportedException(),
-    };
-
-    if (bytes.Length != expectedLen) {
+    if (bytes.Length != ByteLength(type)) {
       throw new IllegalValueException();
     }
   }

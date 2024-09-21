@@ -1,6 +1,6 @@
 namespace Lilac.IL;
 
-public class BinaryOp : Expression {
+public class BinaryOp(BinaryOp.Operator op, Value left, Value right) : Expression {
   public enum Operator {
     /// <summary>
     /// Addition
@@ -76,15 +76,9 @@ public class BinaryOp : Expression {
     BitXor,
   }
 
-  public Operator Op { get; }
-  public Value Left { get; }
-  public Value Right { get; }
-
-  public BinaryOp(Operator op, Value left, Value right) {
-    Op = op;
-    Left = left;
-    Right = right;
-  }
+  public Operator Op { get; } = op;
+  public Value Left { get; } = left;
+  public Value Right { get; } = right;
 
   public override bool Equals(object? obj) {
     if (obj is null || obj.GetType() != typeof(BinaryOp)) {
