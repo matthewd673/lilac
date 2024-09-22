@@ -1,7 +1,14 @@
-namespace Lilac.Validation;
-
 using Lilac.IL;
 
+namespace Lilac.Validation;
+
+/// <summary>
+/// Validate that all InlineInstr Statements in a Program have the expected
+/// target and CodeGen Instruction type.
+/// </summary>
+/// <param name="program">The Program to validate.</param>
+/// <param name="target">The expected target name.</param>
+/// <param name="instrType">The expected CodeGen Instruction type.</param>
 public class InlineInstructions(Program program,
                                 string target,
                                 System.Type instrType)
