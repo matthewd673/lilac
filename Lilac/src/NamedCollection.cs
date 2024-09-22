@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Security.Cryptography;
 
 namespace Lilac;
 
@@ -86,6 +85,9 @@ public class NamedCollection<TItem, TName>
     }
   }
 
+  public bool TryGetValue(TName name, out TItem value) =>
+    dict.TryGetValue(name, out value);
+
   /// <summary>
   /// Check if the collection contains an item with the given name.
   /// </summary>
@@ -94,9 +96,7 @@ public class NamedCollection<TItem, TName>
   ///   <c>true</c> if an item with the given name exists.
   ///   <c>false</c> otherwise.
   /// </returns>
-  public bool ContainsName(TName name) {
-    return dict.ContainsKey(name);
-  }
+  public bool ContainsName(TName name) => dict.ContainsKey(name);
 
   public IEnumerator<TItem> GetEnumerator() => dict.Values.GetEnumerator();
 
@@ -115,9 +115,8 @@ public class NamedCollection<TItem, TName>
   ///   <c>true</c> if the item exists in the collection.
   ///   <c>false</c> otherwise.
   /// </returns>
-  public bool Contains(TItem item) {
-    return dict.TryGetValue(item.Name, out TItem? found) && found.Equals(item);
-  }
+  public bool Contains(TItem item) =>
+    dict.TryGetValue(item.Name, out TItem? found) && found.Equals(item);
 
   public void CopyTo(TItem[] array, int arrayIndex) {
     int index = arrayIndex;
