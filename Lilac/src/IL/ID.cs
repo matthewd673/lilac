@@ -1,5 +1,5 @@
 namespace Lilac.IL;
 
-public abstract class ID(string name) : Value, INamed {
-  public string Name { get; } = name;
+public abstract record ID(string Name) : Value, INamed {
+  public string Name { get; } = Name;
 }

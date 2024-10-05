@@ -1,5 +1,5 @@
 namespace Lilac.IL;
 
-public abstract class SizeOf : Value {
+public record class SizeOf : Value {
   // Empty
 }

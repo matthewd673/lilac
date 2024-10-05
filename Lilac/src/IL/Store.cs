@@ -1,25 +1,12 @@
 namespace Lilac.IL;
 
-public class Store(Type type, Value address, Value value) : Statement {
-  public Type Type { get; } = type;
-  public Value Address { get; } = address;
-  public Value Value { get; } = value;
+public record Store(Type Type, Value Address, Value Value) : Statement {
+  public Type Type { get; } = Type;
+  public Value Address { get; } = Address;
+  public Value Value { get; } = Value;
 
-  public override bool Equals(object? obj) {
-    if (obj is null || obj.GetType() != typeof(Store)) {
-      return false;
-    }
-
-    Store other = (Store)obj;
-    return Type.Equals(other.Type) && Address.Equals(other.Address) &&
-           Value.Equals(other.Value);
-  }
-
-  public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Type, Address, Value);
-  }
-
-  public override Store Clone() => new(Type, Address, Value);
+  public override int GetHashCode() =>
+    HashCode.Combine(GetType(), Type, Address, Value);
 
   public override string ToString() =>
     $"(Store Type={Type} Address={Address} Value={Value})";

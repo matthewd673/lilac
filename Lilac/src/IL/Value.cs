@@ -1,5 +1,5 @@
 namespace Lilac.IL;
 
-public abstract class Value : Node {
+public abstract record Value : Node {
   // Empty
 }

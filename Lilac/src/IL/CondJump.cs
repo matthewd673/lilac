@@ -1,5 +1,5 @@
 namespace Lilac.IL;
 
-public abstract class CondJump(string target, Value cond) : Jump(target) {
-  public Value Cond = cond;
+public abstract record CondJump(string Target, Value Cond) : Jump(Target) {
+  public Value Cond { get; init; } = Cond;
 }

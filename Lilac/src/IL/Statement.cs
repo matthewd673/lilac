@@ -1,5 +1,5 @@
 namespace Lilac.IL;
 
-public abstract class Statement : Node {
+public abstract record Statement : Node {
   // Empty
 }

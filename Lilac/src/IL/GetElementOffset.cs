@@ -1,13 +1,13 @@
 namespace Lilac.IL;
 
-public record GetFieldOffset(Value Address, string StructName, int Index)
+public record GetElementOffset(Value Address, Type ElementType, int Index)
   : Expression {
   public Value Address { get; } = Address;
-  public string StructName { get; } = StructName;
+  public Type ElementType { get; } = ElementType;
   public int Index { get; } = Index;
 
   public override int GetHashCode() => HashCode.Combine(GetType(), Index);
 
   public override string ToString() =>
-    $"(GetFieldOffset Address={Address} StructName={StructName} Index={Index})";
+    $"(GetFieldOffset Address={Address} ElementType={ElementType} Index={Index})";
 }

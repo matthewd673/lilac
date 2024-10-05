@@ -2,41 +2,34 @@ using Lilac.IL.Math;
 
 namespace Lilac.IL;
 
-public class Constant(Type type, byte[] value) : Value {
+public record Constant(Type Type, byte[] Value) : Value {
   /// <summary>
   /// The type of the Constant.
   /// </summary>
-  public Type Type { get; } = type;
+  public Type Type { get; } = Type;
 
   /// <summary>
   /// The value of the Constant represented as an array of bytes. Values are
   /// little-endian. Void type constants may have a zero-length array.
   /// </summary>
-  public byte[] Value { get; } = value;
+  public byte[] Value { get; } = Value;
 
+  /// <summary>
+  /// Construct a new Constant from a C# numeric value (e.g.: <c>int</c>).
+  /// </summary>
+  /// <param name="type">The type of the Constant.</param>
+  /// <param name="numericValue">
+  ///   The numeric value, which will be encoded into a byte array.
+  /// </param>
   public Constant(Type type, object numericValue)
     : this(type, ValueEncoder.Encode(type, numericValue)) {
     // Empty
-  }
-
-  public override bool Equals(object? obj) {
-    if (obj is null || obj.GetType() != typeof(Constant)) {
-      return false;
-    }
-
-    Constant other = (Constant)obj;
-    // Don't check for value equality on void constants, conceptually they don't
-    // have a value. This has also been the source of an extremely annoying bug.
-    return Type.Equals(other.Type) &&
-           (Type.Equals(Type.Void) || Value.SequenceEqual(other.Value));
   }
 
   public override int GetHashCode() {
     return HashCode.Combine(GetType(), Type, Value);
   }
 
-  public override Constant Clone() => new(Type, Value);
-
   public override string ToString() =>
-    $"(Constant Type={Type} Value=[{String.Join(", ", Value)}])";
+    $"(Constant Type={Type} Value=[{string.Join(", ", Value)}])";
 }

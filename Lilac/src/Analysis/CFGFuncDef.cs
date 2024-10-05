@@ -2,19 +2,15 @@ using Lilac.IL;
 
 namespace Lilac.Analysis;
 
-public class CFGFuncDef(string name,
-                        List<FuncParam> @params,
-                        IL.Type retType,
-                        CFG cfg,
-                        bool exported)
-  : FuncDef(name, @params, retType, null!, exported) {
-  public CFG CFG { get; } = cfg;
+public record CFGFuncDef(string Name,
+                        List<FuncParam> Params,
+                        IL.Type RetType,
+                        CFG Cfg,
+                        bool Exported)
+  : FuncDef(Name, Params, RetType, null!, Exported) {
+  public CFG CFG { get; } = Cfg;
 
-  // TODO: implement ToString, Equals, GetHashCode, and Clone
-
-  public override CFGFuncDef Clone() {
-    throw new NotImplementedException(); // TODO
-  }
+  // TODO: implement ToString and GetHashCode
 
   public static CFGFuncDef FromFuncDef(FuncDef funcDef) => new(
     funcDef.Name,

@@ -1,40 +1,22 @@
 namespace Lilac.IL;
 
-public class FuncDef(string name,
-                     List<FuncParam> @params,
-                     Type retType,
-                     List<Statement> stmtList,
-                     bool exported = false)
+public record FuncDef(string Name,
+                      List<FuncParam> Params,
+                      Type RetType,
+                      List<Statement> StmtList,
+                      bool Exported = false)
   : Component, INamed {
-  public string Name { get; } = name;
-  public List<FuncParam> Params { get; } = @params;
-  public Type RetType { get; } = retType;
-  public List<Statement> StmtList { get; } = stmtList;
-  public bool Exported { get; } = exported;
+  public string Name { get; } = Name;
+  public List<FuncParam> Params { get; } = Params;
+  public Type RetType { get; } = RetType;
+  public List<Statement> StmtList { get; } = StmtList;
+  public bool Exported { get; } = Exported;
 
-  public override bool Equals(object? obj) {
-    if (obj is null || obj.GetType() != typeof(FuncDef)) {
-      return false;
-    }
-
-    FuncDef other = (FuncDef)obj;
-
-    return Name.Equals(other.Name) && Params.SequenceEqual(other.Params) &&
-           RetType.Equals(other.RetType) &&
-           StmtList.SequenceEqual(other.StmtList) &&
-           Exported.Equals(other.Exported);
-  }
-
-  public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Name, Params, RetType, StmtList,
-                            Exported);
-  }
-
-  public override FuncDef Clone() =>
-    new(Name, Params, RetType, StmtList, Exported);
+  public override int GetHashCode() =>
+    HashCode.Combine(GetType(), Name, Params, RetType, StmtList, Exported);
 
   public override string ToString() =>
-    $"(FuncDef Name={Name} Params=[{String.Join(", ", Params)}] " +
-    $"RetType={RetType} StmtList=[{String.Join(", ", StmtList)}] " +
+    $"(FuncDef Name={Name} Params=[{string.Join(", ", Params)}] " +
+    $"RetType={RetType} StmtList=[{string.Join(", ", StmtList)}] " +
     $"Exported={Exported})";
 }
