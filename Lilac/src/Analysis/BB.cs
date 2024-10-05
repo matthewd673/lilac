@@ -8,68 +8,49 @@ namespace Lilac.Analysis;
 /// <remarks>
 /// Construct a new BB.
 /// </remarks>
-/// <param name="id">The ID of the BB.</param>
-/// <param name="entry">The Label entry of the BB.</param>
-/// <param name="exit">The Jump exit of the BB.</param>
-/// <param name="stmtList">The list of IL Statements within the BB.</param>
-/// <param name="trueBranch">
+/// <param name="Id">The ID of the BB.</param>
+/// <param name="Entry">The Label entry of the BB.</param>
+/// <param name="Exit">The Jump exit of the BB.</param>
+/// <param name="StmtList">The list of IL Statements within the BB.</param>
+/// <param name="TrueBranch">
 ///   Indicates if the BB is the "true" branch of a conditional jump.
 /// </param>
-public class BB(string id,
-                Label? entry = null,
-                Jump? exit = null,
-                List<Statement>? stmtList = null,
-                bool trueBranch = false) {
+public record BB(string Id,
+                 Label? Entry = null,
+                 Jump? Exit = null,
+                 List<Statement>? StmtList = null,
+                 bool TrueBranch = false) {
   /// <summary>
   /// The ID of the BB. Must be unique within any collection of BBs.
   /// </summary>
-  public string Id { get; } = id;
+  public string Id { get; } = Id;
   /// <summary>
   /// The Label that marks the entry of the BB. A BB may have no explicit
   /// entry e.g. if it immediately follows a BB with a Jump exit.
   /// </summary>
-  public Label? Entry { get; } = entry;
+  public Label? Entry { get; } = Entry;
   /// <summary>
   /// The Jump that marks the exit of the BB. A BB may have no explicit exit
   /// e.g. if it immediately preceeds a BB with a Label entry.
   /// </summary>
-  public Jump? Exit { get; } = exit;
+  public Jump? Exit { get; } = Exit;
   /// <summary>
   /// The list of IL Statements in the BB. Must not contain Labels or Jumps.
   /// </summary>
-  public List<Statement> StmtList { get; } = stmtList ?? [];
+  public List<Statement> StmtList { get; } = StmtList ?? [];
   /// <summary>
   /// Indicates if this BB is the "true" branch of a conditional jump. That is,
   /// if conditional jump in another BB has the entry Label of this BB as its
   /// target.
   /// </summary>
-  public bool TrueBranch { get; internal set; } = trueBranch;
+  public bool TrueBranch { get; internal set; } = TrueBranch;
 
   /// <summary>
   /// The number of IL Statements in the statement list.
   /// </summary>
   public int Count => StmtList.Count;
 
-  public override bool Equals(object? obj) {
-    if (obj is null || obj.GetType() != typeof(BB)) {
-      return false;
-    }
-
-    BB other = (BB)obj;
-
-    return Id.Equals(other.Id);
-  }
-
-  public override int GetHashCode() {
-    return Id.GetHashCode();
-  }
-
-  public BB Clone() =>
-    new((string)Id.Clone(),
-        Entry?.Clone(),
-        Exit?.Clone(),
-        StmtList.Select(s => (Statement)s.Clone()).ToList(),
-        TrueBranch);
+  public override int GetHashCode() => Id.GetHashCode();
 
   public override string ToString() {
     string s = $"BB#{Id}";
@@ -111,8 +92,8 @@ public class BB(string id,
         // push previous block onto list (its exit will be null)
         if (!(blockStmts.Count == 0 && currentEntry is null)) {
           blocks.Add(new(Guid.NewGuid().ToString(),
-                         entry: currentEntry,
-                         stmtList: blockStmts));
+                         Entry: currentEntry,
+                         StmtList: blockStmts));
           blockStmts = [];
         }
 
@@ -130,9 +111,9 @@ public class BB(string id,
       }
 
       blocks.Add(new(Guid.NewGuid().ToString(),
-                     entry: currentEntry,
-                     exit: (Jump)s,
-                     stmtList: blockStmts));
+                     Entry: currentEntry,
+                     Exit: (Jump)s,
+                     StmtList: blockStmts));
       blockStmts = [];
       currentEntry = null;
     }
@@ -140,8 +121,8 @@ public class BB(string id,
     // scoop up stragglers
     if (blockStmts.Count > 0 || currentEntry is not null) {
       blocks.Add(new(Guid.NewGuid().ToString(),
-                     entry: currentEntry,
-                     stmtList: blockStmts));
+                     Entry: currentEntry,
+                     StmtList: blockStmts));
     }
 
     return blocks;

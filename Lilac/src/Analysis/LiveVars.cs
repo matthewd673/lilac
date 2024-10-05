@@ -1,5 +1,4 @@
 using Lilac.IL;
-using Microsoft.VisualBasic;
 
 namespace Lilac.Analysis;
 
