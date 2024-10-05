@@ -2,10 +2,10 @@ using Lilac.CodeGen.Targets.Wasm.Instructions;
 
 namespace Lilac.CodeGen.Targets.Wasm.Optimization;
 
-public class Tee(Module module) : WasmOptimization {
-	private Module module = module;
+public class Tee(Module module) : WasmOptimization<Module> {
+	private readonly Module module = module;
 
-	public override string Id => "tee";
+	public override string Id => "Tee";
 
   public override void Run() {
 		foreach (Component c in module.Components) {

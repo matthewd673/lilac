@@ -6,10 +6,11 @@ namespace Lilac.Validation;
 /// Validate that all Labels within a Statement list have unique names.
 /// </summary>
 /// <param name="stmtList">The Statement list to validate.</param>
-public class UniqueLabels(List<Statement> stmtList) : ValidationPass {
-  private readonly List<Statement> stmtList = stmtList;
-
+public class UniqueLabels(List<Statement> stmtList)
+  : ValidationPass<List<Statement>> {
   public override string Id => "UniqueLabels";
+
+  private readonly List<Statement> stmtList = stmtList;
 
   public override void Run() {
     HashSet<string> names = [];

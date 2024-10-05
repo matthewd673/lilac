@@ -1,6 +1,6 @@
 namespace Lilac;
 
-public abstract class Pass {
+public abstract class Pass<TUnit> {
   public abstract string Id { get; }
 
   public abstract void Run();

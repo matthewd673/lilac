@@ -4,12 +4,12 @@ using Lilac.IL.Math;
 
 namespace Lilac.Optimization;
 
-public class LVN(BB block) : OptimizationPass {
-  public override string Id => "lvn";
+public class LVN(BB block) : OptimizationPass<BB> {
+  public override string Id => "LVN";
 
-  private BB block = block;
-  private ValueNumberMap valueNumberMap = new();
-  private IDNumberMap idNumberMap = new();
+  private readonly BB block = block;
+  private readonly ValueNumberMap valueNumberMap = new();
+  private readonly IDNumberMap idNumberMap = new();
 
   public override void Run() {
     foreach (Statement s in block.StmtList) {
@@ -135,8 +135,6 @@ public class LVN(BB block) : OptimizationPass {
       case Call call: {
         throw new NotImplementedException(); // TODO
       }
-      default:
-        throw new ArgumentOutOfRangeException();
     }
 
     throw new ArgumentOutOfRangeException();

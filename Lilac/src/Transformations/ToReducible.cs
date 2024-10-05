@@ -3,16 +3,12 @@ using System;
 
 namespace Lilac.Transformations;
 
-class ToReducible : Pass {
-  public override string Id => "to_reducible";
+// TODO: This implementation is not complete.
+class ToReducible(CFG cfg) : Pass<CFG> {
+  public override string Id => "ToReducible";
 
-  private CFG cfg;
-  private int labelCt;
-
-  public ToReducible(CFG cfg) {
-    this.cfg = cfg;
-    labelCt = 0;
-  }
+  private readonly CFG cfg = cfg;
+  private int labelCt = 0;
 
   public override void Run() {
     labelCt = 0;

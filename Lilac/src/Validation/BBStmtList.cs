@@ -8,10 +8,10 @@ namespace Lilac.Validation;
 /// (e.g.: Label, Jump).
 /// </summary>
 /// <param name="bb">The BB to validate.</param>
-public class BBStmtList(BB bb) : ValidationPass {
-  private readonly BB bb = bb;
-
+public class BBStmtList(BB bb) : ValidationPass<BB> {
   public override string Id => "BBStmtList";
+
+  private readonly BB bb = bb;
 
   public override void Run() {
     if (bb.StmtList.Where(s => s is Label or Jump).Any()) {

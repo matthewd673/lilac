@@ -3,37 +3,37 @@ using Lilac.IL;
 namespace Lilac.Validation;
 
 /// <summary>
-/// Validate that all InlineInstr Statements in a Program have the expected
-/// target and CodeGen Instruction type.
+/// Validate that an InlineInstr Statement has the  expected target and
+/// CodeGen Instruction type.
 /// </summary>
-/// <param name="program">The Program to validate.</param>
+/// <param name="stmt">The Statement to validate.</param>
 /// <param name="target">The expected target name.</param>
 /// <param name="instrType">The expected CodeGen Instruction type.</param>
-public class InlineInstructions(Program program,
+public class InlineInstructions(Statement stmt,
                                 string target,
                                 System.Type instrType)
-  : ValidationPass {
-  private readonly Program program = program;
+  : ValidationPass<Statement> {
+  public override string Id => "InlineAssemblyTarget";
+
+  private readonly Statement stmt = stmt;
   private readonly string target = target;
   private readonly System.Type instrType = instrType;
 
-  public override string Id => "InlineAssemblyTarget";
-
   public override void Run() {
-    foreach (FuncDef f in program.FuncDefs) {
-      ValidateFuncDef(f);
+    if (stmt is not InlineInstr inlineInstr) {
+      return;
     }
-  }
 
-  private void ValidateFuncDef(FuncDef funcDef) {
-    foreach (InlineInstr i in funcDef.StmtList.Where(s => s is InlineInstr)) {
-      if (!target.Equals(i.Target)) {
-        throw new ValidationException(Id, $"Target \"{i.Target}\" is not expected target \"{target}\"");
-      }
+    if (!target.Equals(inlineInstr.Target)) {
+      throw new ValidationException(Id, $"Target \"{inlineInstr.Target}\" is not expected target \"{target}\"");
+    }
 
-      if (!i.Instr.GetType().IsSubclassOf(instrType)) {
-        throw new ValidationException(Id, $"Instruction of type \"{i.Instr.GetType()}\" is not a subclass of expected type \"{instrType}\"");
-      }
+    if (inlineInstr.Instr is null) {
+      throw new ValidationException(Id, $"Instruction is null");
+    }
+
+    if (!inlineInstr.Instr.GetType().IsSubclassOf(instrType)) {
+      throw new ValidationException(Id, $"Instruction of type \"{inlineInstr.Instr.GetType()}\" is not a subclass of expected type \"{instrType}\"");
     }
   }
 }
