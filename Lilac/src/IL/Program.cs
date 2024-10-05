@@ -5,9 +5,9 @@ public class Program : Program<FuncDef> {
 }
 
 public class Program<TFuncDef> where TFuncDef : FuncDef {
-  public NamedCollection<GlobalDef> Globals { get; } = new();
-  public NamedCollection<TFuncDef> FuncDefs { get; } = new();
-  public NamedCollection<ExternFuncDef, (string, string)> ExternFuncDefs = new();
+  public NamedCollection<GlobalDef> Globals { get; } = [];
+  public NamedCollection<TFuncDef> FuncDefs { get; } = [];
+  public NamedCollection<ExternFuncDef, (string, string)> ExternFuncDefs = [];
   public NamedCollection<Struct> Structs = [];
 
   public override bool Equals(object? obj) {

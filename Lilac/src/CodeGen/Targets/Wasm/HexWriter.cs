@@ -4,7 +4,7 @@ using System.Text;
 namespace Lilac.CodeGen.Targets.Wasm;
 
 public class HexWriter : IEnumerable<byte> {
-  private List<byte> bytes = [];
+  private readonly List<byte> bytes = [];
 
   public int Count => bytes.Count;
 

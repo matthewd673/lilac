@@ -48,8 +48,8 @@ public class CFG : Graph<BB> {
   /// <param name="blocks">The list of BBs to construct the CFG from.</param>
   public CFG(List<BB> blocks) : base() {
     // create an ENTRY and an EXIT node
-    Entry = new(EntryId, stmtList: new());
-    Exit = new(ExitId, stmtList: new());
+    Entry = new(EntryId, stmtList: []);
+    Exit = new(ExitId, stmtList: []);
 
     AddNode(Entry);
     AddNode(Exit);

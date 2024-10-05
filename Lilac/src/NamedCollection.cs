@@ -85,7 +85,7 @@ public class NamedCollection<TItem, TName>
     }
   }
 
-  public bool TryGetValue(TName name, out TItem value) =>
+  public bool TryGetValue(TName name, out TItem? value) =>
     dict.TryGetValue(name, out value);
 
   /// <summary>
