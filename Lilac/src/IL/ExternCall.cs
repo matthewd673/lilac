@@ -1,7 +1,8 @@
 namespace Lilac.IL;
 
-public record ExternCall(string FuncSource, string FuncName, List<Value> Args)
-  : Call(FuncName, Args) {
+public record ExternCall(string FuncSource,
+                         string FuncName,
+                         DeepEqualList<Value> Args) : Call(FuncName, Args) {
   public string FuncSource { get; } = FuncSource;
 
   public override int GetHashCode() =>

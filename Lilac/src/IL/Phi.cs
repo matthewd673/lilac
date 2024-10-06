@@ -1,7 +1,7 @@
 namespace Lilac.IL;
 
-public record Phi(List<ID> Ids) : Expression {
-  public List<ID> Ids { get; } = Ids;
+public record Phi(DeepEqualList<ID> Ids) : Expression {
+  public DeepEqualList<ID> Ids { get; } = Ids;
 
   public override int GetHashCode() => HashCode.Combine(GetType(), Ids);
 

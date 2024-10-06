@@ -3,10 +3,10 @@ using Lilac.IL;
 namespace Lilac.Analysis;
 
 public record CFGFuncDef(string Name,
-                        List<FuncParam> Params,
-                        IL.Type RetType,
-                        CFG Cfg,
-                        bool Exported)
+                         DeepEqualList<FuncParam> Params,
+                         IL.Type RetType,
+                         CFG Cfg,
+                         bool Exported)
   : FuncDef(Name, Params, RetType, null!, Exported) {
   public CFG CFG { get; } = Cfg;
 

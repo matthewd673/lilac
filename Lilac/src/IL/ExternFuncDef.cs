@@ -2,12 +2,12 @@ namespace Lilac.IL;
 
 public record ExternFuncDef(string FuncSource,
                             string FuncName,
-                            List<Type> ParamTypes,
+                            DeepEqualList<Type> ParamTypes,
                             Type RetType)
   : Component, INamed<(string, string)> {
   public string FuncSource { get; } = FuncSource;
   public string FuncName { get; } = FuncName;
-  public List<Type> ParamTypes { get; } = ParamTypes;
+  public DeepEqualList<Type> ParamTypes { get; } = ParamTypes;
   public Type RetType { get; } = RetType;
 
   public (string, string) Name => (FuncSource, FuncName);

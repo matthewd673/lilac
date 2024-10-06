@@ -5,8 +5,7 @@ using Lilac.IL.Math;
 
 namespace Lilac.Frontend;
 
-public class Parser(string str)
-{
+public class Parser(string str) {
   private readonly Scanner scanner = new(str);
   private Token nextToken = new(TokenType.None, "", new(0, 0));
 
@@ -172,7 +171,7 @@ public class Parser(string str)
     else if (TryEat(TokenType.Phi)) {
       // eat id list
       Eat(TokenType.LeftParen);
-      List<ID> ids = ParseIdList().ToList();
+      DeepEqualList<ID> ids = new(ParseIdList());
       Eat(TokenType.RightParen);
 
       return new Phi(ids);
@@ -190,7 +189,7 @@ public class Parser(string str)
 
       // eat args
       Eat(TokenType.LeftParen);
-      List<Value> args = ParseCallArgs().ToList();
+      DeepEqualList<Value> args = new(ParseCallArgs());
       Eat(TokenType.RightParen);
 
       return new Call(funcName, args);
@@ -204,7 +203,7 @@ public class Parser(string str)
 
       // eat args
       Eat(TokenType.LeftParen);
-      List<Value> args = ParseCallArgs().ToList();
+      DeepEqualList<Value> args = new(ParseCallArgs());
       Eat(TokenType.RightParen);
 
       return new ExternCall(funcSource, funcName, args);
@@ -265,7 +264,7 @@ public class Parser(string str)
     string name = Eat(TokenType.Name).Image;
 
     Eat(TokenType.LeftParen);
-    List<FuncParam> funcParams = ParseFuncParams().ToList();
+    DeepEqualList<FuncParam> funcParams = new(ParseFuncParams());
     Eat(TokenType.RightParen);
 
     Eat(TokenType.Arrow);
@@ -273,7 +272,7 @@ public class Parser(string str)
     IL.Type retType = TypeFromString(retTypeStr);
     Eat(TokenType.NewLine);
 
-    List<Statement> stmtList = ParseStmtList();
+    DeepEqualList<Statement> stmtList = new(ParseStmtList());
 
     Eat(TokenType.End);
 
@@ -287,7 +286,7 @@ public class Parser(string str)
     string name = Eat(TokenType.Name).Image;
 
     Eat(TokenType.LeftParen);
-    List<IL.Type> funcParamTypes = ParseExternFuncParamTypes().ToList();
+    DeepEqualList<IL.Type> funcParamTypes = new(ParseExternFuncParamTypes());
     Eat(TokenType.RightParen);
 
     Eat(TokenType.Arrow);

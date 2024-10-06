@@ -1,13 +1,12 @@
 namespace Lilac.IL;
 
-public record Call(string FuncName, List<Value> Args) : Expression {
+public record Call(string FuncName, DeepEqualList<Value> Args) : Expression {
   public string FuncName { get; } = FuncName;
-  public List<Value> Args { get; } = Args;
+  public DeepEqualList<Value> Args { get; } = Args;
 
-  public override int GetHashCode() {
-    return HashCode.Combine(GetType(), FuncName, Args);
-  }
+  public override int GetHashCode() =>
+    HashCode.Combine(GetType(), FuncName, Args);
 
   public override string ToString() =>
-    $"(Call FuncName={FuncName} Args=[{String.Join(", ", Args)}])";
+    $"(Call FuncName={FuncName} Args=[{string.Join(", ", Args)}])";
 }
