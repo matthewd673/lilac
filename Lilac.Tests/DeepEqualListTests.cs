@@ -39,7 +39,7 @@ public class DeepEqualListTests {
   [Fact]
   public void FromListIsSequenceEqual() {
     List<LocalID> a = [new("a"), new("b"), new("c")];
-    DeepEqualList<LocalID> b = new(a.AsEnumerable());
+    DeepEqualList<LocalID> b = new(a);
 
     Assert.True(Enumerable.SequenceEqual(a, b));
   }
