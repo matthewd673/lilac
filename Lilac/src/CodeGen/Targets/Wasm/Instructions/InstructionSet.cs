@@ -1,6 +1,6 @@
 namespace Lilac.CodeGen.Targets.Wasm.Instructions;
 
-public class Const(Type type, string value) : TypedWasmInstruction(type) {
+public record Const(Type Type, string Value) : TypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x41,
@@ -12,23 +12,10 @@ public class Const(Type type, string value) : TypedWasmInstruction(type) {
 
   public override string Wat => $"{Type.GetWat()}.const {Value}";
 
-  public string Value { get; } = value;
-
-  public override bool Equals(object? obj) {
-    if (obj is not Const other) {
-      return false;
-    }
-
-    return OpCode.Equals(other.OpCode) && Type.Equals(other.Type) &&
-           Value.Equals(other.Value);
-  }
-
-  public override int GetHashCode() {
-    return HashCode.Combine(OpCode, Type, Value);
-  }
+  public string Value { get; } = Value;
 }
 
-public class Equal(Type type) : TypedWasmInstruction(type) {
+public record Equal(Type Type) : TypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x46,
@@ -41,7 +28,7 @@ public class Equal(Type type) : TypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.eq";
 }
 
-public class EqualZero(Type type) : IntegerTypedWasmInstruction(type) {
+public record EqualZero(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x45,
@@ -52,7 +39,7 @@ public class EqualZero(Type type) : IntegerTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.eqz";
 }
 
-public class NotEqual(Type type) : TypedWasmInstruction(type) {
+public record NotEqual(Type Type) : TypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x47,
@@ -65,8 +52,7 @@ public class NotEqual(Type type) : TypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.ne";
 }
 
-public class GreaterThanSigned(Type type)
-  : IntegerTypedWasmInstruction(type) {
+public record GreaterThanSigned(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x4a,
@@ -77,8 +63,7 @@ public class GreaterThanSigned(Type type)
   public override string Wat => $"{Type.GetWat()}.gt_s";
 }
 
-public class GreaterThanUnsigned(Type type)
-  : IntegerTypedWasmInstruction(type) {
+public record GreaterThanUnsigned(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x4b,
@@ -89,7 +74,7 @@ public class GreaterThanUnsigned(Type type)
   public override string Wat => $"{Type.GetWat()}.gt_u";
 }
 
-public class GreaterThan(Type type) : FloatTypedWasmInstruction(type) {
+public record GreaterThan(Type Type) : FloatTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.F32 => 0x5e,
@@ -100,8 +85,7 @@ public class GreaterThan(Type type) : FloatTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.gt";
 }
 
-public class LessThanSigned(Type type)
-  : IntegerTypedWasmInstruction(type) {
+public record LessThanSigned(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x48,
@@ -112,8 +96,7 @@ public class LessThanSigned(Type type)
   public override string Wat => $"{Type.GetWat()}.lt_s";
 }
 
-public class LessThanUnsigned(Type type)
-  : IntegerTypedWasmInstruction(type) {
+public record LessThanUnsigned(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x49,
@@ -124,7 +107,7 @@ public class LessThanUnsigned(Type type)
   public override string Wat => $"{Type.GetWat()}.lt_u";
 }
 
-public class LessThan(Type type) : FloatTypedWasmInstruction(type) {
+public record LessThan(Type Type) : FloatTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.F32 => 0x5d,
@@ -135,8 +118,8 @@ public class LessThan(Type type) : FloatTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.lt";
 }
 
-public class GreaterOrEqualSigned(Type type)
-  : IntegerTypedWasmInstruction(type) {
+public record GreaterOrEqualSigned(Type Type)
+  : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x4e,
@@ -147,8 +130,8 @@ public class GreaterOrEqualSigned(Type type)
   public override string Wat => $"{Type.GetWat()}.ge_s";
 }
 
-public class GreaterOrEqualUnsigned(Type type)
-  : IntegerTypedWasmInstruction(type) {
+public record GreaterOrEqualUnsigned(Type Type)
+  : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x4f,
@@ -159,7 +142,7 @@ public class GreaterOrEqualUnsigned(Type type)
   public override string Wat => $"{Type.GetWat()}.ge_u";
 }
 
-public class GreaterOrEqual(Type type) : FloatTypedWasmInstruction(type) {
+public record GreaterOrEqual(Type Type) : FloatTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.F32 => 0x60,
@@ -170,8 +153,7 @@ public class GreaterOrEqual(Type type) : FloatTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.ge";
 }
 
-public class LessOrEqualSigned(Type type)
-  : IntegerTypedWasmInstruction(type) {
+public record LessOrEqualSigned(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x4c,
@@ -182,8 +164,8 @@ public class LessOrEqualSigned(Type type)
   public override string Wat => $"{Type.GetWat()}.le_s";
 }
 
-public class LessOrEqualUnsigned(Type type)
-  : IntegerTypedWasmInstruction(type) {
+public record LessOrEqualUnsigned(Type Type)
+  : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x4d,
@@ -194,7 +176,7 @@ public class LessOrEqualUnsigned(Type type)
   public override string Wat => $"{Type.GetWat()}.le_u";
 }
 
-public class LessOrEqual(Type type) : FloatTypedWasmInstruction(type) {
+public record LessOrEqual(Type Type) : FloatTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.F32 => 0x5f,
@@ -205,8 +187,7 @@ public class LessOrEqual(Type type) : FloatTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.le";
 }
 
-
-public class Add(Type type) : TypedWasmInstruction(type) {
+public record Add(Type Type) : TypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x6a,
@@ -219,7 +200,7 @@ public class Add(Type type) : TypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.add";
 }
 
-public class Subtract(Type type) : TypedWasmInstruction(type) {
+public record Subtract(Type Type) : TypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x6b,
@@ -232,7 +213,7 @@ public class Subtract(Type type) : TypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.sub";
 }
 
-public class Multiply(Type type) : TypedWasmInstruction(type) {
+public record Multiply(Type Type) : TypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x6c,
@@ -245,7 +226,7 @@ public class Multiply(Type type) : TypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.mul";
 }
 
-public class DivideSigned(Type type) : IntegerTypedWasmInstruction(type) {
+public record DivideSigned(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x6d,
@@ -256,7 +237,7 @@ public class DivideSigned(Type type) : IntegerTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.div_s";
 }
 
-public class DivideUnsigned(Type type) : IntegerTypedWasmInstruction(type) {
+public record DivideUnsigned(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x6e,
@@ -267,7 +248,7 @@ public class DivideUnsigned(Type type) : IntegerTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.div_u";
 }
 
-public class Divide(Type type) : FloatTypedWasmInstruction(type) {
+public record Divide(Type Type) : FloatTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.F32 => 0x95,
@@ -278,7 +259,7 @@ public class Divide(Type type) : FloatTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.div";
 }
 
-public class RemainderSigned(Type type) : IntegerTypedWasmInstruction(type) {
+public record RemainderSigned(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x6f,
@@ -289,7 +270,7 @@ public class RemainderSigned(Type type) : IntegerTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.rem_s";
 }
 
-public class RemainderUnsigned(Type type) : IntegerTypedWasmInstruction(type) {
+public record RemainderUnsigned(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x70,
@@ -300,67 +281,67 @@ public class RemainderUnsigned(Type type) : IntegerTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.rem_u";
 }
 
-public class LocalGet(string variable) : VariableWasmInstruction(variable) {
+public record LocalGet(string Variable) : VariableWasmInstruction(Variable) {
   public override byte OpCode => 0x20;
 
   public override string Wat => $"local.get ${Variable}";
 }
 
-public class LocalSet(string variable) : VariableWasmInstruction(variable) {
+public record LocalSet(string Variable) : VariableWasmInstruction(Variable) {
   public override byte OpCode => 0x21;
 
   public override string Wat => $"local.set ${Variable}";
 }
 
-public class LocalTee(string variable) : VariableWasmInstruction(variable) {
+public record LocalTee(string Variable) : VariableWasmInstruction(Variable) {
   public override byte OpCode => 0x22;
 
   public override string Wat => $"local.tee ${Variable}";
 }
 
-public class GlobalGet(string variable) : VariableWasmInstruction(variable) {
+public record GlobalGet(string Variable) : VariableWasmInstruction(Variable) {
   public override byte OpCode => 0x23;
 
   public override string Wat => $"global.get ${Variable}";
 }
 
-public class GlobalSet(string variable) : VariableWasmInstruction(variable) {
+public record GlobalSet(string Variable) : VariableWasmInstruction(Variable) {
   public override byte OpCode => 0x24;
 
   public override string Wat => $"global.set ${Variable}";
 }
 
-public class ExtendI32S : WasmInstruction {
+public record ExtendI32S : WasmInstruction {
   public override byte OpCode => 0xac;
 
   public override string Wat => "i64.extend_i32_s";
 }
 
-public class ExtendI32U : WasmInstruction {
+public record ExtendI32U : WasmInstruction {
   public override byte OpCode => 0xad;
 
   public override string Wat => "i64.extend_i32_u";
 }
 
-public class WrapI64 : WasmInstruction {
+public record WrapI64 : WasmInstruction {
   public override byte OpCode => 0xa7;
 
   public override string Wat => "i64.wrap_i64";
 }
 
-public class PromoteF32 : WasmInstruction {
+public record PromoteF32 : WasmInstruction {
   public override byte OpCode => 0xbb;
 
   public override string Wat => "f64.promote_f32";
 }
 
-public class DemoteF64 : WasmInstruction {
+public record DemoteF64 : WasmInstruction {
   public override byte OpCode => 0xb6;
 
   public override string Wat => "f64.demote_f64";
 }
 
-public class ConvertI32S(Type type) : FloatTypedWasmInstruction(type) {
+public record ConvertI32S(Type Type) : FloatTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.F32 => 0xb2,
@@ -371,7 +352,7 @@ public class ConvertI32S(Type type) : FloatTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.convert_i32_s";
 }
 
-public class ConvertI32U(Type type) : FloatTypedWasmInstruction(type) {
+public record ConvertI32U(Type Type) : FloatTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.F32 => 0xb3,
@@ -382,7 +363,7 @@ public class ConvertI32U(Type type) : FloatTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.convert_i32_u";
 }
 
-public class ConvertI64S(Type type) : FloatTypedWasmInstruction(type) {
+public record ConvertI64S(Type Type) : FloatTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.F32 => 0xb4,
@@ -393,7 +374,7 @@ public class ConvertI64S(Type type) : FloatTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.convert_i64_s";
 }
 
-public class ConvertI64U(Type type) : FloatTypedWasmInstruction(type) {
+public record ConvertI64U(Type Type) : FloatTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.F32 => 0xb5,
@@ -404,7 +385,7 @@ public class ConvertI64U(Type type) : FloatTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.convert_i64_u";
 }
 
-public class TruncF32S(Type type) : IntegerTypedWasmInstruction(type) {
+public record TruncF32S(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0xa8,
@@ -415,7 +396,7 @@ public class TruncF32S(Type type) : IntegerTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.trunc_f32_s";
 }
 
-public class TruncF32U(Type type) : IntegerTypedWasmInstruction(type) {
+public record TruncF32U(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0xa9,
@@ -426,7 +407,7 @@ public class TruncF32U(Type type) : IntegerTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.trunc_f32_u";
 }
 
-public class TruncF64S(Type type) : IntegerTypedWasmInstruction(type) {
+public record TruncF64S(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0xaa,
@@ -437,7 +418,7 @@ public class TruncF64S(Type type) : IntegerTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.trunc_f64_s";
 }
 
-public class TruncF64U(Type type) : IntegerTypedWasmInstruction(type) {
+public record TruncF64U(Type Type) : IntegerTypedWasmInstruction(Type) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0xab,
@@ -448,22 +429,22 @@ public class TruncF64U(Type type) : IntegerTypedWasmInstruction(type) {
   public override string Wat => $"{Type.GetWat()}.trunc_f64_u";
 }
 
-public class Grow(string memory) : MemoryWasmInstruction(memory) {
+public record Grow(string Memory) : MemoryWasmInstruction(Memory) {
   public override byte OpCode => 0x40;
 
   public override string Wat =>
     $"memory.grow{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Size(string memory) : MemoryWasmInstruction(memory) {
+public record Size(string Memory) : MemoryWasmInstruction(Memory) {
   public override byte OpCode => 0x3f;
 
   public override string Wat =>
     $"memory.size{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load(Type type, string? memory = null)
-  : TypedMemoryWasmInstruction(type, memory) {
+public record Load(Type Type, string? Memory = null)
+  : TypedMemoryWasmInstruction(Type, Memory) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x28,
@@ -477,8 +458,8 @@ public class Load(Type type, string? memory = null)
     $"{Type.GetWat()}.load{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load8S(Type type, string? memory = null)
-  : IntegerTypedMemoryWasmInstruction(type, memory) {
+public record Load8S(Type Type, string? Memory = null)
+  : IntegerTypedMemoryWasmInstruction(Type, Memory) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x2c,
@@ -490,8 +471,8 @@ public class Load8S(Type type, string? memory = null)
     $"{Type.GetWat()}.load8_s{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load8U(Type type, string? memory = null)
-  : IntegerTypedMemoryWasmInstruction(type, memory) {
+public record Load8U(Type Type, string? Memory = null)
+  : IntegerTypedMemoryWasmInstruction(Type, Memory) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x2d,
@@ -503,8 +484,8 @@ public class Load8U(Type type, string? memory = null)
     $"{Type.GetWat()}.load8_u{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load16S(Type type, string? memory = null)
-  : IntegerTypedMemoryWasmInstruction(type, memory) {
+public record Load16S(Type Type, string? Memory = null)
+  : IntegerTypedMemoryWasmInstruction(Type, Memory) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x2c,
@@ -516,8 +497,8 @@ public class Load16S(Type type, string? memory = null)
     $"{Type.GetWat()}.load16_s{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load16U(Type type, string? memory = null)
-  : IntegerTypedMemoryWasmInstruction(type, memory) {
+public record Load16U(Type Type, string? Memory = null)
+  : IntegerTypedMemoryWasmInstruction(Type, Memory) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x2f,
@@ -529,23 +510,23 @@ public class Load16U(Type type, string? memory = null)
     $"{Type.GetWat()}.load16_u{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load32S(string? memory = null) : MemoryWasmInstruction(memory) {
+public record Load32S(string? Memory = null) : MemoryWasmInstruction(Memory) {
   public override byte OpCode => 0x34;
 
   public override string Wat =>
     $"i64.load32_s{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Load32U(string? memory = null)
-  : MemoryWasmInstruction(memory) {
+public record Load32U(string? Memory = null)
+  : MemoryWasmInstruction(Memory) {
   public override byte OpCode => 0x35;
 
   public override string Wat =>
     $"i64.load32_u{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Store(Type type, string? memory = null)
-  : TypedMemoryWasmInstruction(type, memory) {
+public record Store(Type Type, string? Memory = null)
+  : TypedMemoryWasmInstruction(Type, Memory) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x36,
@@ -559,8 +540,8 @@ public class Store(Type type, string? memory = null)
     $"{Type.GetWat()}.store{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Store8(Type type, string? memory = null)
-  : TypedMemoryWasmInstruction(type, memory) {
+public record Store8(Type Type, string? Memory = null)
+  : TypedMemoryWasmInstruction(Type, Memory) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x3a,
@@ -572,8 +553,8 @@ public class Store8(Type type, string? memory = null)
     $"{Type.GetWat()}.store8{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Store16(Type type, string? memory = null)
-  : TypedMemoryWasmInstruction(type, memory) {
+public record Store16(Type Type, string? Memory = null)
+  : TypedMemoryWasmInstruction(Type, Memory) {
   public override byte OpCode =>
     Type switch {
       Type.I32 => 0x3b,
@@ -585,7 +566,7 @@ public class Store16(Type type, string? memory = null)
     $"{Type.GetWat()}.store16{(Memory is null ? "" : $" (memory ${Memory})")}";
 }
 
-public class Store32(string? memory = null) : MemoryWasmInstruction(memory) {
+public record Store32(string? Memory = null) : MemoryWasmInstruction(Memory) {
   public override byte OpCode => 0x3e;
 
   public override string Wat =>
@@ -596,98 +577,65 @@ public class Store32(string? memory = null) : MemoryWasmInstruction(memory) {
 
 // TODO: fill
 
-public class Block(string label) : LabelWasmInstruction(label) {
+public record Block(string Label) : LabelWasmInstruction(Label) {
   public override byte OpCode => 0x02;
 
   public override string Wat => $"block ${Label}";
 }
 
-public class Branch(string label) : LabelWasmInstruction(label) {
+public record Branch(string Label) : LabelWasmInstruction(Label) {
   public override byte OpCode => 0x0c;
 
   public override string Wat => $"br ${Label}";
 }
 
-public class BranchIf(string label) : LabelWasmInstruction(label) {
+public record BranchIf(string Label) : LabelWasmInstruction(Label) {
   public override byte OpCode => 0x0d;
 
   public override string Wat => $"br_if ${Label}";
 }
 
-public class Call : WasmInstruction {
+public record Call(string FuncName) : WasmInstruction {
   public override byte OpCode => 0x10;
   public override string Wat => $"call ${FuncName}";
 
-  public string FuncName { get; }
-
-  public Call(string funcName) {
-    FuncName = funcName;
-  }
-
-  public override bool Equals(object? obj) {
-    if (obj is not Call other) {
-      return false;
-    }
-
-    return FuncName.Equals(other.FuncName);
-  }
-
-  public override int GetHashCode() {
-    return HashCode.Combine(OpCode, FuncName);
-  }
+  public string FuncName { get; } = FuncName;
 }
 
-public class End : WasmInstruction {
+public record End : WasmInstruction {
   public override byte OpCode => 0x0b;
   public override string Wat => "end";
 }
 
-public class If : WasmInstruction {
+public record If(Else? ElseBranch = null) : WasmInstruction {
   public override byte OpCode => 0x04;
   public override string Wat => "if";
 
-  public Else? ElseBranch { get; }
-
-  public If(Else? elseBranch = null) {
-    ElseBranch = elseBranch;
-  }
-
-  public override bool Equals(object? obj) {
-    if (obj is not If other) {
-      return false;
-    }
-
-    return ElseBranch is null && other.ElseBranch is null ||
-           ElseBranch != null && ElseBranch.Equals(other.ElseBranch);
-  }
-
-  public override int GetHashCode() {
-    return HashCode.Combine(OpCode, ElseBranch);
-  }
+  public Else? ElseBranch { get; } = ElseBranch;
 }
 
-public class Else : WasmInstruction {
+public record Else : WasmInstruction {
   public override byte OpCode => 0x05;
   public override string Wat => "else";
 }
 
-public class Loop(string label) : LabelWasmInstruction(label) {
+public record Loop(string Label) : LabelWasmInstruction(Label) {
   public override byte OpCode => 0x03;
   public override string Wat => $"loop ${Label}";
 }
 
-public class Return : WasmInstruction {
+public record Return : WasmInstruction {
   public override byte OpCode => 0x0f;
   public override string Wat => "return";
 }
 
-public class EmptyType : WasmInstruction {
+public record EmptyType : WasmInstruction {
   public override byte OpCode => 0x40;
   public override string Wat => "nop";
 }
 
-public class Comment(string text) : WasmInstruction {
-  public string Text { get; } = text;
+public record Comment(string Text) : WasmInstruction {
+  public string Text { get; } = Text;
   public override byte OpCode => throw new InvalidOperationException();
   public override string Wat => $";; {Text}";
 }

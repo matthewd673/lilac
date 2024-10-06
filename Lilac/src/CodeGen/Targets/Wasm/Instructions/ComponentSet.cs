@@ -1,57 +1,57 @@
 namespace Lilac.CodeGen.Targets.Wasm.Instructions;
 
-public class WasmComponent : Component {
-  // NOTE: stub
+public record WasmComponent : Component {
+  // Empty
 }
 
-public class Module(List<WasmComponent> components) : WasmComponent {
-  public List<WasmComponent> Components { get; } = components;
+public record Module(DeepEqualList<WasmComponent> Components) : WasmComponent {
+  public DeepEqualList<WasmComponent> Components { get; } = Components;
 }
 
-public class Start(string name) : WasmComponent {
-  public string Name { get; } = name;
+public record Start(string Name) : WasmComponent {
+  public string Name { get; } = Name;
 }
 
-public class Func(string name,
-                  List<Local> @params,
-                  List<Type> results,
-                  Dictionary<Type, List<Local>> localsDict,
-                  List<WasmInstruction> instructions,
-                  string? export = null) : WasmComponent {
-  public string Name { get; } = name;
-  public List<Local> Params { get; } = @params;
-  public List<Type> Results { get; } = results;
-  public Dictionary<Type, List<Local>> LocalsDict { get; } = localsDict;
-  public List<WasmInstruction> Instructions { get; } = instructions;
-  public string? Export { get; } = export;
+public record Func(string Name,
+                   DeepEqualList<Local> Params,
+                   DeepEqualList<Type> Results,
+                   Dictionary<Type, DeepEqualList<Local>> LocalsDict,
+                   DeepEqualList<WasmInstruction> Instructions,
+                   string? Export = null) : WasmComponent {
+  public string Name { get; } = Name;
+  public DeepEqualList<Local> Params { get; } = Params;
+  public DeepEqualList<Type> Results { get; } = Results;
+  public Dictionary<Type, DeepEqualList<Local>> LocalsDict { get; } = LocalsDict;
+  public DeepEqualList<WasmInstruction> Instructions { get; } = Instructions;
+  public string? Export { get; } = Export;
 }
 
-public class Local(Type type, string name) : WasmComponent {
-  public Type Type { get; } = type;
-  public string Name { get; } = name;
+public record Local(Type Type, string Name) : WasmComponent {
+  public Type Type { get; } = Type;
+  public string Name { get; } = Name;
 }
 
-public class Global(Type type,
-                    string name,
-                    Const defaultValue,
-                    bool mutable) : WasmComponent {
-  public Type Type { get; } = type;
-  public string Name { get; } = name;
-  public Const DefaultValue { get; } = defaultValue;
-  public bool Mutable { get; } = mutable;
+public record Global(Type Type,
+                     string Name,
+                     Const DefaultValue,
+                     bool Mutable) : WasmComponent {
+  public Type Type { get; } = Type;
+  public string Name { get; } = Name;
+  public Const DefaultValue { get; } = DefaultValue;
+  public bool Mutable { get; } = Mutable;
 }
 
-public class Import(string moduleName,
-                    string funcName,
-                    List<Type> paramTypes,
-                    List<Type> results) : WasmComponent {
-  public string ModuleName { get; } = moduleName;
-  public string FuncName { get; } = funcName;
-  public List<Type> ParamTypes { get; } = paramTypes;
-  public List<Type> Results { get; } = results;
+public record Import(string ModuleName,
+                     string FuncName,
+                     DeepEqualList<Type> ParamTypes,
+                     DeepEqualList<Type> Results) : WasmComponent {
+  public string ModuleName { get; } = ModuleName;
+  public string FuncName { get; } = FuncName;
+  public DeepEqualList<Type> ParamTypes { get; } = ParamTypes;
+  public DeepEqualList<Type> Results { get; } = Results;
 }
 
-public class Memory(int size, string? name = null) : WasmComponent {
-  public int Size { get; } = size;
-  public string? Name { get; } = name;
+public record Memory(int Size, string? Name = null) : WasmComponent {
+  public int Size { get; } = Size;
+  public string? Name { get; } = Name;
 }

@@ -1,32 +1,11 @@
-using Type = Lilac.CodeGen.Targets.Wasm.Instructions.Type;
+namespace Lilac.CodeGen.Targets.Wasm;
 
-internal class Signature(List<Type> @params, List<Type> results) {
-  private const int hashSeed = 487;
-  private const int hashModifier = 31;
+using Type = Instructions.Type;
 
-  public List<Type> Params { get; } = @params;
-  public List<Type> Results { get; } = results;
+internal record Signature(DeepEqualList<Type> Params,
+                          DeepEqualList<Type> Results) {
+  public DeepEqualList<Type> Params { get; } = Params;
+  public DeepEqualList<Type> Results { get; } = Results;
 
-  public override bool Equals(object? obj) {
-    if (obj is null || obj is not Signature other) {
-      return false;
-    }
-
-    return Params.SequenceEqual(other.Params) &&
-      Results.SequenceEqual(other.Results);
-  }
-
-  public override int GetHashCode() {
-    return HashCode.Combine(GetListHashCode(Params), GetListHashCode(Results));
-  }
-
-  // NOTE: Adapted from https://stackoverflow.com/a/30758270 (including hash
-  // seed and modifier)
-  private int GetListHashCode<T>(List<T> list) where T : notnull {
-    unchecked {
-      return list.Aggregate(hashSeed,
-        (current, item) => (current * hashModifier) + item.GetHashCode()
-      );
-    }
-  }
+  public override int GetHashCode() => HashCode.Combine(Params, Results);
 }
