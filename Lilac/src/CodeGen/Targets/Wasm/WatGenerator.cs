@@ -95,10 +95,10 @@ public class WatGenerator(WasmComponent rootComponent)
     return str.TrimEnd();
   }
 
-  private string StringifyLocals(Dictionary<Type, List<Local>> localsDict,
+  private string StringifyLocals(Dictionary<Type, DeepEqualList<Local>> localsDict,
                                  string indent = "") {
     string str = "";
-    foreach (List<Local> l in localsDict.Values) {
+    foreach (DeepEqualList<Local> l in localsDict.Values) {
       str += $"{GenerateRange([..l], indent + "  ")}\n";
     }
 

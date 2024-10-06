@@ -36,7 +36,7 @@ public class WasmTranslator : Translator<WasmInstruction> {
   }
 
   public override Module Translate() {
-    List<WasmComponent> components = [];
+    DeepEqualList<WasmComponent> components = [];
     symbols.PushScope(); // always have scope for globals and top-level
 
     // Translate all components
@@ -61,12 +61,12 @@ public class WasmTranslator : Translator<WasmInstruction> {
 
   private Import TranslateImport(ExternFuncDef externFuncDef) {
     // translate param types for function signature
-    List<Type> paramTypes = [];
+    DeepEqualList<Type> paramTypes = [];
     foreach (IL.Type t in externFuncDef.ParamTypes) {
       paramTypes.Add(t.ToWasmType());
     }
 
-    List<Type> results = [];
+    DeepEqualList<Type> results = [];
     if (!externFuncDef.RetType.IsVoid()) {
       results.Add(externFuncDef.RetType.ToWasmType());
     }
@@ -91,7 +91,7 @@ public class WasmTranslator : Translator<WasmInstruction> {
   }
 
   private Func TranslateFunc(CFGFuncDef cfgFuncDef) {
-    List<Local> @params = []; // list of params for functions signature
+    DeepEqualList<Local> @params = []; // list of params for functions signature
 
     // create a new scope with func params
     symbols.PushScope();
@@ -105,16 +105,17 @@ public class WasmTranslator : Translator<WasmInstruction> {
     }
 
     // find all locals in the function
-    Dictionary<Type, List<Local>> locals = FindLocals(cfgFuncDef.CFG);
+    Dictionary<Type, DeepEqualList<Local>> locals = FindLocals(cfgFuncDef.CFG);
 
     // translate instructions and pop the scope we used
-    List<WasmInstruction> instructions = TranslateInstructions(cfgFuncDef.CFG);
+    DeepEqualList<WasmInstruction> instructions =
+      new(TranslateInstructions(cfgFuncDef.CFG));
     symbols.PopScope();
     instructions.Add(new End()); // every func ends with End
 
     // construct func with appropriate params and return type
     // if return type is void then result is simply null
-    List<Type> results = [];
+    DeepEqualList<Type> results = [];
     if (!cfgFuncDef.RetType.IsVoid()) {
       results.Add(cfgFuncDef.RetType.ToWasmType());
     }
@@ -128,8 +129,8 @@ public class WasmTranslator : Translator<WasmInstruction> {
                     exportName);
   }
 
-  private Dictionary<Type, List<Local>> FindLocals(CFG cfg) {
-    Dictionary<Type, List<Local>> locals = new();
+  private Dictionary<Type, DeepEqualList<Local>> FindLocals(CFG cfg) {
+    Dictionary<Type, DeepEqualList<Local>> locals = [];
 
     // scan forwards to build a symbol table of all locals and their types
     // NOTE: assume that our caller has pushed a new scope for us
@@ -153,7 +154,7 @@ public class WasmTranslator : Translator<WasmInstruction> {
         Type type = d.Type.ToWasmType();
         Local newLocal = new(type, d.Id.Name);
 
-        if (!locals.TryGetValue(type, out List<Local>? typeList)) {
+        if (!locals.TryGetValue(type, out DeepEqualList<Local>? typeList)) {
           locals.Add(type, [newLocal]);
         }
         else {

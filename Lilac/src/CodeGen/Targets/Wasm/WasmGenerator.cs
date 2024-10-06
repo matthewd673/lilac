@@ -98,7 +98,7 @@ public class WasmGenerator(Module module)
     }
 
     foreach (Func f in functions) {
-      Signature signature = new(f.Params.Select(p => p.Type).ToList(),
+      Signature signature = new(new(f.Params.Select(p => p.Type)),
                                 f.Results);
       if (sigDict.ContainsKey(signature)) {
         continue;
@@ -222,8 +222,7 @@ public class WasmGenerator(Module module)
     // write all function signatures
     // LAYOUT: signature index
     foreach (Func f in functions) {
-      int index = sigDict[new(f.Params.Select(p => p.Type).ToList(),
-                              f.Results)];
+      int index = sigDict[new(new(f.Params.Select(p => p.Type)), f.Results)];
       sw.Write(LEB128.EncodeUnsigned(index));
       MarkFunctionIndex(f.Name);
     }
@@ -283,8 +282,7 @@ public class WasmGenerator(Module module)
       sw.WriteUtf8(f.Name);
       sw.Write(KindFunc); // NOTE: only func exports are supported so far
 
-      int index = sigDict[new(f.Params.Select(p => p.Type).ToList(),
-                              f.Results)];
+      int index = sigDict[new(new(f.Params.Select(p => p.Type)), f.Results)];
       sw.Write(LEB128.EncodeUnsigned(index));
     }
 
