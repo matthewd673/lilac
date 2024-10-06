@@ -5,9 +5,6 @@ public record Store(Type Type, Value Address, Value Value) : Statement {
   public Value Address { get; } = Address;
   public Value Value { get; } = Value;
 
-  public override int GetHashCode() =>
-    HashCode.Combine(GetType(), Type, Address, Value);
-
   public override string ToString() =>
     $"(Store Type={Type} Address={Address} Value={Value})";
 }

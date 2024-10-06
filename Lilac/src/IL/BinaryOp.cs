@@ -81,10 +81,6 @@ public record BinaryOp(BinaryOp.Operator Op, Value Left, Value Right)
   public Value Left { get; } = Left;
   public Value Right { get; } = Right;
 
-  public override int GetHashCode() {
-    return HashCode.Combine(GetType(), Op, Left, Right);
-  }
-
   public override string ToString() =>
     $"(BinaryOp Op={Op} Left={Left} Right={Right})";
 }

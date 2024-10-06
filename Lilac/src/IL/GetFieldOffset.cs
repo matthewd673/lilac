@@ -6,8 +6,6 @@ public record GetFieldOffset(Value Address, string StructName, int Index)
   public string StructName { get; } = StructName;
   public int Index { get; } = Index;
 
-  public override int GetHashCode() => HashCode.Combine(GetType(), Index);
-
   public override string ToString() =>
     $"(GetFieldOffset Address={Address} StructName={StructName} Index={Index})";
 }

@@ -12,9 +12,6 @@ public record ExternFuncDef(string FuncSource,
 
   public (string, string) Name => (FuncSource, FuncName);
 
-  public override int GetHashCode() =>
-    HashCode.Combine(GetType(), FuncSource, FuncName, ParamTypes, RetType);
-
   public override string ToString() =>
     $"(ExternFuncParam Source={FuncSource} Name={FuncName} " +
     $"ParamTypes={String.Join(", ", ParamTypes)} RetType={RetType})";

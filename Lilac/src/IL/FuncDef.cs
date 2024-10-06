@@ -12,9 +12,6 @@ public record FuncDef(string Name,
   public DeepEqualList<Statement> StmtList { get; } = StmtList;
   public bool Exported { get; } = Exported;
 
-  public override int GetHashCode() =>
-    HashCode.Combine(GetType(), Name, Params, RetType, StmtList, Exported);
-
   public override string ToString() =>
     $"(FuncDef Name={Name} Params=[{string.Join(", ", Params)}] " +
     $"RetType={RetType} StmtList=[{string.Join(", ", StmtList)}] " +

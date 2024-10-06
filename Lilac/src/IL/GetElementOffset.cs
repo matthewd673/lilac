@@ -6,8 +6,6 @@ public record GetElementOffset(Value Address, Type ElementType, int Index)
   public Type ElementType { get; } = ElementType;
   public int Index { get; } = Index;
 
-  public override int GetHashCode() => HashCode.Combine(GetType(), Index);
-
   public override string ToString() =>
     $"(GetFieldOffset Address={Address} ElementType={ElementType} Index={Index})";
 }
