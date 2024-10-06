@@ -220,7 +220,7 @@ public class Parser(string str) {
     }
     // void constant
     else if (TryEat(TokenType.VoidConst)) {
-      return new Constant(IL.Type.Void, []);
+      return new Constant(IL.Type.Void, new DeepEqualArray<byte>([]));
     }
     // id
     else if (See(TokenType.ID, TokenType.GlobalID)) {

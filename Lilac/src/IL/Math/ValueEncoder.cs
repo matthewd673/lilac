@@ -72,4 +72,7 @@ public static class ValueEncoder {
       _ => throw new ArgumentOutOfRangeException(),
     };
   }
+
+  public static string StringifyValue(Type type, DeepEqualArray<byte> value) =>
+    StringifyValue(type, value.Array);
 }

@@ -221,7 +221,7 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
           Op: BinaryOp.Operator.Eq,
           Left: Constant { Type: var leftType,
                            Value: var value }
-        } binaryOp when leftType.IsInteger() && InternalMath.IsZero(value) =>
+        } binaryOp when leftType.IsInteger() && InternalMath.IsZero(value.Array) =>
         [..Transform(binaryOp.Right),
          new EqualZero(GetWasmType(binaryOp.Right)),
         ],
@@ -229,7 +229,7 @@ internal class WasmILTransformer(CFGProgram program, SymbolTable symbolTable)
           Op: BinaryOp.Operator.Eq,
           Right: Constant { Type: var rightType,
                             Value: var value },
-        } binaryOp when rightType.IsInteger() && InternalMath.IsZero(value) =>
+        } binaryOp when rightType.IsInteger() && InternalMath.IsZero(value.Array) =>
         [..Transform(binaryOp.Left),
          new EqualZero(GetWasmType(binaryOp.Left)),
         ],

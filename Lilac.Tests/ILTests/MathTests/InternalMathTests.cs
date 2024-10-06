@@ -26,20 +26,20 @@ public class InternalMathTests {
     Assert.Throws<IllegalOperandTypeException>(() =>
                                                  InternalMath
                                                    .Calculate(BinaryOp.Operator.Add,
-                                                     new Constant(Type.Void, []),
+                                                     new Constant(Type.Void, new DeepEqualArray<byte>()),
                                                      new Constant(Type.I32, 0)
                                               ));
     Assert.Throws<IllegalOperandTypeException>(() =>
                                                  InternalMath
                                                    .Calculate(BinaryOp.Operator.Add,
                                                      new Constant(Type.I32, 0),
-                                                     new Constant(Type.Void, [])
+                                                     new Constant(Type.Void, new DeepEqualArray<byte>())
                                               ));
     Assert.Throws<IllegalOperandTypeException>(() =>
                                                  InternalMath
                                                    .Calculate(BinaryOp.Operator.Add,
-                                                     new Constant(Type.Void, []),
-                                                     new Constant(Type.Void, [])
+                                                     new Constant(Type.Void, new DeepEqualArray<byte>()),
+                                                     new Constant(Type.Void, new DeepEqualArray<byte>())
                                               ));
   }
 

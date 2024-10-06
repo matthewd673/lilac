@@ -1,11 +1,7 @@
 namespace Lilac.CodeGen;
 
-public abstract class Generator {
-  protected Component RootComp { get; }
+public abstract class Generator(Component rootComp) {
+  protected Component RootComp { get; } = rootComp;
 
-  public Generator(Component rootComp) {
-    RootComp = rootComp;
-  }
-
-  public abstract String Generate();
+  public abstract string Generate();
 }

@@ -2,7 +2,7 @@ using Lilac.IL.Math;
 
 namespace Lilac.IL;
 
-public record Constant(Type Type, byte[] Value) : Value {
+public record Constant(Type Type, DeepEqualArray<byte> Value) : Value {
   /// <summary>
   /// The type of the Constant.
   /// </summary>
@@ -12,7 +12,7 @@ public record Constant(Type Type, byte[] Value) : Value {
   /// The value of the Constant represented as an array of bytes. Values are
   /// little-endian. Void type constants may have a zero-length array.
   /// </summary>
-  public byte[] Value { get; } = Value;
+  public DeepEqualArray<byte> Value { get; } = Value;
 
   /// <summary>
   /// Construct a new Constant from a C# numeric value (e.g.: <c>int</c>).
@@ -21,8 +21,13 @@ public record Constant(Type Type, byte[] Value) : Value {
   /// <param name="numericValue">
   ///   The numeric value, which will be encoded into a byte array.
   /// </param>
-  public Constant(Type type, object numericValue)
-    : this(type, ValueEncoder.Encode(type, numericValue)) {
+  public Constant(Type Type, object NumericValue)
+    : this(Type, new DeepEqualArray<byte>(ValueEncoder.Encode(Type, NumericValue))) {
+    // Empty
+  }
+
+  public Constant(Type Type, byte[] Value)
+    : this(Type, new DeepEqualArray<byte>(Value)) {
     // Empty
   }
 

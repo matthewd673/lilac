@@ -12,22 +12,25 @@ public static class InternalMath {
 
     Type type = left.Type; // because both must match
 
+    byte[] lArr = left.Value.Array;
+    byte[] rArr = right.Value.Array;
+
     byte[] value = op switch {
-      BinaryOp.Operator.Add => BinaryOpAdd(type, left.Value, right.Value),
-      BinaryOp.Operator.Sub => BinaryOpSub(type, left.Value, right.Value),
-      BinaryOp.Operator.Mul => BinaryOpMul(type, left.Value, right.Value),
-      BinaryOp.Operator.Div => BinaryOpDiv(type, left.Value, right.Value),
-      BinaryOp.Operator.Mod => BinaryOpMod(type, left.Value, right.Value),
-      BinaryOp.Operator.Eq => BinaryOpEq(type, left.Value, right.Value),
-      BinaryOp.Operator.Neq => BinaryOpNeq(type, left.Value, right.Value),
+      BinaryOp.Operator.Add => BinaryOpAdd(type, lArr, rArr),
+      BinaryOp.Operator.Sub => BinaryOpSub(type, lArr, rArr),
+      BinaryOp.Operator.Mul => BinaryOpMul(type, lArr, rArr),
+      BinaryOp.Operator.Div => BinaryOpDiv(type, lArr, rArr),
+      BinaryOp.Operator.Mod => BinaryOpMod(type, lArr, rArr),
+      BinaryOp.Operator.Eq => BinaryOpEq(type, lArr, rArr),
+      BinaryOp.Operator.Neq => BinaryOpNeq(type, lArr, rArr),
       BinaryOp.Operator.Lt => throw new NotImplementedException(),
       BinaryOp.Operator.Gt => throw new NotImplementedException(),
       BinaryOp.Operator.Leq => throw new NotImplementedException(),
       BinaryOp.Operator.Geq => throw new NotImplementedException(),
       BinaryOp.Operator.BoolAnd =>
-        BinaryOpBoolAnd(type, left.Value, right.Value),
+        BinaryOpBoolAnd(type, lArr, rArr),
       BinaryOp.Operator.BoolOr =>
-        BinaryOpBoolOr(type, left.Value, right.Value),
+        BinaryOpBoolOr(type, lArr, rArr),
       BinaryOp.Operator.BitLs => throw new NotImplementedException(),
       BinaryOp.Operator.BitRs => throw new NotImplementedException(),
       BinaryOp.Operator.BitAnd => throw new NotImplementedException(),
@@ -411,7 +414,7 @@ public static class InternalMath {
       throw new IllegalOperandTypeException();
     }
 
-    return new(value.Type, []); // TODO: TEMP!
+    return new(value.Type, new DeepEqualArray<byte>([])); // TODO: TEMP!
   }
 
   /// <summary>
